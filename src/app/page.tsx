@@ -1,4 +1,4 @@
-import ProjectItem from '@/components/projectItem';
+import ProjectsItem from '@/components/projectsItem';
 import Image from 'next/image';
 
 export default function HomePage() {
@@ -17,9 +17,9 @@ export default function HomePage() {
           <Image 
             src='/images/programmer-looking.png'
             alt='picture of me'
-            width={120}
-            height={120}
-            className='w-40 mr-20'/>
+            width={160}
+            height={160}
+            className='mr-20'/>
           <div className='flex flex-1 flex-col justify-center'>
             <div className='text-4xl ml-2 mb-4'>임해찬</div>
             <div className='flex w-full relative mb-2'>
@@ -81,7 +81,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        <ProjectItem />
+        <ProjectsItem />
       </div>
     </div>
   );
