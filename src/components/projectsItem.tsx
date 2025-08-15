@@ -1,59 +1,39 @@
 "use client";
 
+import { Project } from '@/features/project/domain/project';
+import { ProjectDto } from '@/features/project/dto/projectsDto';
+import { toDomain } from '@/features/project/mapper/projectMapper';
+import { ProjectItemProps } from '@/features/project/ui/projectItemProps';
 import clsx from 'clsx';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+
+const PLATFORMS = ['Android', 'React', 'Flutter'];
 
 export default function ProjectsItem() {
-  type YearMonth = {
-    year: number;
-    month: number;
-  };
-  type ProjectPeriod = {
-    start: YearMonth;
-    end: YearMonth;
-  };
-  type Platform = 'Android' | 'React' | 'Flutter';
-  type Language = 'Kotlin' | 'TypeScript';
-  type ProjectItemProps = {
-    title: string;
-    period: ProjectPeriod;
-    platform: Platform;
-    language: Language;
-    description: string;
-    screenshots: string[];
-    thumbnail: string;
-  }
-
-  const [platforms, setPlatforms] = useState(['Android', 'React', 'Flutter']);
   const [selectedPlatform, setSelectedPlatform] = useState('Android');
-  const [projects, setProjects] = useState<ProjectItemProps[]>([
-    {
-      title: '숏과외',
-      period: {
-        start: {
-          year: 2023,
-          month: 6
-        },
-        end: {
-          year: 2023,
-          month: 11
-        }
-      },
-      platform: 'Android',
-      language: 'Kotlin',
-      description: '숏과외에요',
-      screenshots: [
-        '/images/programmer-looking.png',
-        '/images/programmer-looking.png'
-      ],
-      thumbnail: '/images/short_tutoring_home.png'
+  const [projects, setProjects] = useState<Project[] | null>(null);
+  const projectItemProps = useMemo<ProjectItemProps[] | null>(() => {
+    return projects === null ? null : projects.map(project => project.toProps());
+  }, [projects]);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await fetch('/data/projects.json');
+        if (!response.ok) throw Error(`HTTP ${response.status}`);
+        const dtos = await response.json() as ProjectDto[];
+        setProjects(dtos.map(dto => toDomain(dto)))
+      } catch (error) {
+        console.log(error);
+      }
     }
-  ]);
+    fetchProjects();
+  }, []);
 
   return (
     <div className='flex flex-col'>
       <div className='flex mb-10'>
-        {platforms.map(((platform, i) => {
+        {PLATFORMS.map(((platform, i) => {
           return (
             <div key={platform} className='flex text-xl font-bold'>
               <button 
@@ -66,7 +46,7 @@ export default function ProjectsItem() {
               >
                 {platform}
               </button>
-              {i !== platforms.length - 1 && (
+              {i !== PLATFORMS.length - 1 && (
                 <div className='text-gray-300'>/</div>
               )}
             </div>
@@ -75,7 +55,7 @@ export default function ProjectsItem() {
       </div>
 
       <div className='grid sm:grid-cols-2 md:grid-cols-3 gap-2'>
-        {projects.map(project => {
+        {projectItemProps !== null && projectItemProps.map(project => {
           return (
             <button
               key={project.title}

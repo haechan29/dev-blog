@@ -1,0 +1,18 @@
+[
+  {
+    "title": "숏과외",
+    "startYear": 2023,
+    "startMonth": 6,
+    "endYear": 2023,
+    "endMonth": 11,
+    "platform": "Android",
+    "language": "Kotlin",
+    "description": "숏과외에요",
+    "screenshots": [
+      "/images/short_tutoring_home.png",
+      "/images/short_tutoring_mypage.png",
+      "/images/short_tutoring_mypage.png"
+    ],
+    "thumbnail": "/images/short_tutoring_home.png"
+  }
+]
