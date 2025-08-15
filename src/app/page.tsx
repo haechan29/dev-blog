@@ -1,3 +1,4 @@
+import ProjectItem from '@/components/projectItem';
 import Image from 'next/image';
 
 export default function HomePage() {
@@ -47,7 +48,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className='flex border-1 border-gray-200 rounded-sm'>
+        <div className='flex border-1 border-gray-200 rounded-sm mb-20'>
           <div className='flex flex-1 flex-col border-r border-gray-200 px-10 py-6'>
             <div className='text-xl font-semibold mb-4'>
               <div>실무 경력을 가진</div>
@@ -79,6 +80,8 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+
+        <ProjectItem />
       </div>
     </div>
   );
