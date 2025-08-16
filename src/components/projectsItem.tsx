@@ -47,7 +47,7 @@ export default function ProjectsItem() {
   }, []);
 
   return (
-    <div className='flex flex-col mb-20'>
+    <div className='flex flex-col'>
       <div className='flex mb-10'>
         {PLATFORM_FILTERS.map(((platform, i) => {
           return (

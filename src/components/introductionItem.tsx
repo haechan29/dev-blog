@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 export default function IntroductionIem() {
   return (
-    <div className='flex mb-20'>
+    <div className='flex mb-30'>
       <Image 
         src='/images/programmer-looking.png'
         alt='picture of me'

@@ -13,7 +13,7 @@ export default function HomePage() {
         </div>
       </header>
 
-      <div className='mx-auto max-w-4xl px-4 py-10 flex flex-col'>
+      <div className='mx-auto max-w-4xl px-4 py-20 flex flex-col'>
         <IntroductionIem />
         <CapabilityItem />
         <ProjectsItem />

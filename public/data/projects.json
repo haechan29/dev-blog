@@ -1,5 +1,19 @@
 [
   {
+    "title": "캐시닥",
+    "startYear": 2024,
+    "startMonth": 6,
+    "endYear": 2025,
+    "endMonth": 7,
+    "platform": "Android",
+    "tools": ["Kotlin"],
+    "description": "캐시닥이에요",
+    "screenshots": [
+      "/images/cashdoc_home.png"
+    ],
+    "thumbnail": "/images/cashdoc_home.png"
+  },
+  {
     "title": "숏과외",
     "startYear": 2023,
     "startMonth": 6,
@@ -30,22 +44,6 @@
     "thumbnail": "/images/problem_timer_records.png"
   },
   {
-    "title": "지하철 위치 알림이",
-    "startYear": 2025,
-    "startMonth": 6,
-    "endYear": 2025,
-    "endMonth": 6,
-    "platform": "Flutter",
-    "tools": ["Dart"],
-    "description": "지하철 위치 알림이에요",
-    "screenshots": [
-      "/images/this_station_start.png",
-      "/images/this_station_list.png",
-      "/images/this_station_notification.png"
-    ],
-    "thumbnail": "/images/this_station_list.png"
-  },
-  {
     "title": "오목",
     "startYear": 2025,
     "startMonth": 4,
@@ -60,6 +58,22 @@
       "/images/gomok_record.png"
     ],
     "thumbnail": "/images/gomok_game.png"
+  },
+  {
+    "title": "지하철 위치 알림이",
+    "startYear": 2025,
+    "startMonth": 6,
+    "endYear": 2025,
+    "endMonth": 6,
+    "platform": "Flutter",
+    "tools": ["Dart"],
+    "description": "지하철 위치 알림이에요",
+    "screenshots": [
+      "/images/this_station_start.png",
+      "/images/this_station_list.png",
+      "/images/this_station_notification.png"
+    ],
+    "thumbnail": "/images/this_station_list.png"
   },
   {
     "title": "트래블러",
