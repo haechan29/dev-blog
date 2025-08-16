@@ -5,6 +5,8 @@ import { ProjectDto } from '@/features/project/dto/projectsDto';
 import { toDomain } from '@/features/project/mapper/projectMapper';
 import { ProjectItemProps } from '@/features/project/ui/projectItemProps';
 import clsx from 'clsx';
+import { motion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 const PLATFORM_FILTERS: string[] = ['전체', 'Android', 'Web', 'Flutter'];
@@ -58,7 +60,7 @@ export default function ProjectsItem() {
                 )}
               >
                 <div className={clsx('pr-1', i !== 0 ? 'pl-2' : '')}>{platform}</div>
-                <div className='text-sm pr-2'>{platformCounts?.get(platform) ?? 0}</div>
+                <div className='text-base pr-2'>{platformCounts?.get(platform) ?? 0}</div>
               </button>
               {i !== PLATFORM_FILTERS.length - 1 && (
                 <div className='text-gray-300'>/</div>
@@ -73,7 +75,7 @@ export default function ProjectsItem() {
           return (
             <button
               key={project.title}
-              className='relative aspect-square min-w-[200px] rounded-xl bg-gray-50 overflow-hidden'
+              className='relative aspect-square min-w-[200px] bg-gray-50 overflow-hidden group'
             >
               <div className='absolute inset-0 p-4'>
                 <img
@@ -82,14 +84,19 @@ export default function ProjectsItem() {
                   className='w-full h-full object-contain object-center'
                 />
               </div>
-              <div className={clsx(
-                'absolute h-1/2 inset-x-0 bottom-0 flex flex-col justify-end items-start', 
-                'bg-gradient-to-t from-black/50 to-transparent pointer-events-none px-4 py-3'
-              )}>
-                <div className='text-white font-bold'>{project.title}</div>
-                <div className='flex'>
-                  <div className='text-sm text-white mr-1'>{project.platform}</div>
-                  <div className='text-sm text-white'>{`(${project.tools.join(', ')})`}</div>
+              <div className='absolute inset-0 pointer-events-none flex flex-col items-start
+                bg-black/60 text-white p-4 group-hover:opacity-100 opacity-0 transition-opacity duration-300 ease-in-out
+              '>
+                <div className='text-lg font-bold'>{project.title}</div>
+                <div className='flex text-sm'>
+                  <div className='mr-1'>{project.platform}</div>
+                  <div>{`(${project.tools.join(', ')})`}</div>
+                </div>
+                <div className='flex flex-1 w-full justify-end items-end'>
+                  <div className='flex items-center'>
+                    <div className='text-sm mr-1'>자세히 보기</div>
+                    <ArrowRight className='w-4 h-4' />
+                  </div>
                 </div>
               </div>
             </button>
