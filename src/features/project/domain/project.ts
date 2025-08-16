@@ -22,7 +22,7 @@ type ProjectPeriod = {
   end: YearMonth;
 };
 
-export type Platform = 'Android' | 'React' | 'Flutter';
+export type Platform = 'Android' | 'Web' | 'Flutter';
 
 export class Project {
   constructor(

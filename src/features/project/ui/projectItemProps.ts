@@ -1,7 +1,9 @@
+import { Platform } from '../domain/project';
+
 export type ProjectItemProps = {
   title: string;
   period: string;
-  platform: string;
+  platform: Platform;
   tools: string[];
   description: string;
   screenshots: string[];

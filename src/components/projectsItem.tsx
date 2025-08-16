@@ -7,14 +7,28 @@ import { ProjectItemProps } from '@/features/project/ui/projectItemProps';
 import clsx from 'clsx';
 import { useEffect, useMemo, useState } from 'react';
 
-const PLATFORMS = ['Android', 'React', 'Flutter'];
+const PLATFORM_FILTERS: string[] = ['전체', 'Android', 'Web', 'Flutter'];
 
 export default function ProjectsItem() {
-  const [selectedPlatform, setSelectedPlatform] = useState('Android');
   const [projects, setProjects] = useState<Project[] | null>(null);
-  const projectItemProps = useMemo<ProjectItemProps[] | null>(() => {
-    return projects === null ? null : projects.map(project => project.toProps());
+  const [selectedFilter, setSelectedFilter] = useState('전체');
+  
+  const platformCounts = useMemo<Map<string, number> | null>(() => {
+    if (projects === null) return null;
+    const count = new Map<string, number>();
+    count.set('전체', projects.length);
+    projects.map(p => p.platform).forEach(platform => count.set(platform, (count.get(platform) ?? 0) + 1));
+    return count;
   }, [projects]);
+
+  const filteredProjects = useMemo<Project[] | null>(() => {
+    if (selectedFilter === '전체') return projects;
+    return projects?.filter(p => p.platform === selectedFilter) ?? null;
+  }, [projects, selectedFilter]);
+  
+  const projectItemProps = useMemo<ProjectItemProps[] | null>(() => {
+    return filteredProjects?.map(project => project.toProps()) ?? null;
+  }, [filteredProjects]);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -33,20 +47,20 @@ export default function ProjectsItem() {
   return (
     <div className='flex flex-col'>
       <div className='flex mb-10'>
-        {PLATFORMS.map(((platform, i) => {
+        {PLATFORM_FILTERS.map(((platform, i) => {
           return (
             <div key={platform} className='flex text-xl font-bold'>
               <button 
-                onClick={() => setSelectedPlatform(platform)}
+                onClick={() => setSelectedFilter(platform)}
                 className={clsx(
-                  'hover:text-blue-500',
-                  i === 0 ? 'pr-2' : 'px-2',
-                  platform === selectedPlatform ? 'text-blue-500' : 'text-gray-300'
+                  'flex items-end hover:text-blue-500',
+                  platform === selectedFilter ? 'text-blue-500' : 'text-gray-300'
                 )}
               >
-                {platform}
+                <div className={clsx('pr-1', i !== 0 ? 'pl-2' : '')}>{platform}</div>
+                <div className='text-sm pr-2'>{platformCounts?.get(platform) ?? 0}</div>
               </button>
-              {i !== PLATFORMS.length - 1 && (
+              {i !== PLATFORM_FILTERS.length - 1 && (
                 <div className='text-gray-300'>/</div>
               )}
             </div>
@@ -59,7 +73,7 @@ export default function ProjectsItem() {
           return (
             <button
               key={project.title}
-              className='relative aspect-square min-w-[200px] rounded-xl bg-gray-50 overflow-hidden hover:shadow-md'
+              className='relative aspect-square min-w-[200px] rounded-xl bg-gray-50 overflow-hidden'
             >
               <div className='absolute inset-0 p-4'>
                 <img
@@ -69,8 +83,8 @@ export default function ProjectsItem() {
                 />
               </div>
               <div className={clsx(
-                'absolute h-20 inset-x-0 bottom-0 flex flex-col justify-end items-start', 
-                'bg-gradient-to-t from-black/70 to-transparent pointer-events-none px-4 py-3'
+                'absolute h-1/2 inset-x-0 bottom-0 flex flex-col justify-end items-start', 
+                'bg-gradient-to-t from-black/50 to-transparent pointer-events-none px-4 py-3'
               )}>
                 <div className='text-white font-bold'>{project.title}</div>
                 <div className='flex'>
