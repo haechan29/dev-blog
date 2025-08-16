@@ -13,7 +13,7 @@ export class YearMonth {
   }
 
   toString(): string {
-    return `${this.year}.${this.month}`;
+    return `${this.year}.${this.month.toString().padStart(2, '0')}`;
   }
 };
 
@@ -24,14 +24,12 @@ type ProjectPeriod = {
 
 export type Platform = 'Android' | 'React' | 'Flutter';
 
-export type Language = 'Kotlin' | 'TypeScript';
-
 export class Project {
   constructor(
     public readonly title: string,
     public readonly period: ProjectPeriod,
     public readonly platform: Platform,
-    public readonly language: Language,
+    public readonly tools: string[],
     public readonly description: string,
     public readonly screenshots: string[],
     public readonly thumbnail: string
@@ -42,7 +40,7 @@ export class Project {
       title: this.title,
       period: this.formattedPeriod(),
       platform: this.platform,
-      language: this.language,
+      tools: this.tools,
       description: this.description,
       screenshots: this.screenshots,
       thumbnail: this.thumbnail

@@ -5,7 +5,7 @@ export type ProjectDto = {
   endYear: number;
   endMonth: number;
   platform: string;
-  language: string;
+  tools: string[];
   description: string;
   screenshots: string[];
   thumbnail: string;

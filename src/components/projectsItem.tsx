@@ -26,7 +26,7 @@ export default function ProjectsItem() {
       } catch (error) {
         console.log(error);
       }
-    }
+    };
     fetchProjects();
   }, []);
 
@@ -54,24 +54,29 @@ export default function ProjectsItem() {
         }))}
       </div>
 
-      <div className='grid sm:grid-cols-2 md:grid-cols-3 gap-2'>
+      <div className='grid sm:grid-cols-2 md:grid-cols-3 gap-4'>
         {projectItemProps !== null && projectItemProps.map(project => {
           return (
             <button
               key={project.title}
-              className='relative aspect-square min-w-[200px] rounded-xl overflow-hidden hover:shadow-md focus:outline-none'
+              className='relative aspect-square min-w-[200px] rounded-xl bg-gray-50 overflow-hidden hover:shadow-md'
             >
-              <img
-                src={project.thumbnail}
-                alt={`${project.title} project thumbnail`}
-                className='absolute inset-0 w-full h-full object-scale-down'
-              />
+              <div className='absolute inset-0 p-4'>
+                <img
+                  src={project.thumbnail}
+                  alt={`${project.title} project thumbnail`}
+                  className='w-full h-full object-contain object-center'
+                />
+              </div>
               <div className={clsx(
                 'absolute h-20 inset-x-0 bottom-0 flex flex-col justify-end items-start', 
-                'bg-gradient-to-t from-black/70 to-transparent bg-blackpointer-events-none px-4 py-3'
+                'bg-gradient-to-t from-black/70 to-transparent pointer-events-none px-4 py-3'
               )}>
                 <div className='text-white font-bold'>{project.title}</div>
-                <div className='text-sm text-white'>{`${project.platform} / ${project.language}`}</div>
+                <div className='flex'>
+                  <div className='text-sm text-white mr-1'>{project.platform}</div>
+                  <div className='text-sm text-white'>{`(${project.tools.join(', ')})`}</div>
+                </div>
               </div>
             </button>
           );

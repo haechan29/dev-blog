@@ -1,4 +1,4 @@
-import { Language, Platform, Project, YearMonth } from '../domain/project';
+import { Platform, Project, YearMonth } from '../domain/project';
 import { ProjectDto } from '../dto/projectsDto';
 
 export function toDomain(dto: ProjectDto): Project {
@@ -9,7 +9,7 @@ export function toDomain(dto: ProjectDto): Project {
       end: new YearMonth(dto.endYear, dto.endMonth)
     },
     dto.platform as Platform,
-    dto.language as Language,
+    dto.tools,
     dto.description,
     dto.screenshots,
     dto.thumbnail
