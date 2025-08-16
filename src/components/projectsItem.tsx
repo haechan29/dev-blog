@@ -5,7 +5,6 @@ import { ProjectDto } from '@/features/project/dto/projectsDto';
 import { toDomain } from '@/features/project/mapper/projectMapper';
 import { ProjectItemProps } from '@/features/project/ui/projectItemProps';
 import clsx from 'clsx';
-import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
