@@ -11,7 +11,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 const PLATFORM_FILTERS: string[] = ['전체', 'Android', 'Web', 'Flutter'];
 
-export default function ProjectsItem() {
+export default function ProjectsItem({ className }: { className?: string }) {
   const [projects, setProjects] = useState<Project[] | null>(null);
   const [selectedFilter, setSelectedFilter] = useState('전체');
   
@@ -47,7 +47,7 @@ export default function ProjectsItem() {
   }, []);
 
   return (
-    <div className='flex flex-col'>
+    <div className={clsx('flex flex-col', className)}>
       <div className='flex mb-10'>
         {PLATFORM_FILTERS.map(((platform, i) => {
           return (

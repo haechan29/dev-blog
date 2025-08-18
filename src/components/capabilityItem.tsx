@@ -1,3 +1,5 @@
+import clsx from 'clsx';
+
 type CapabilityItemProps = {
   titles: string[];
   description: string;
@@ -31,9 +33,9 @@ const capabilityItemProps: CapabilityItemProps[] = [
   }
 ]
 
-export default function CapabilityItem() {
+export default function CapabilityItem({ className }: { className?: string }) {
   return (
-    <div className='flex min-h-72 mb-50 gap-4'>
+    <div className={clsx('flex min-h-72 gap-4', className)}>
       {capabilityItemProps.map(item => (
           <div
             key={item.description}

@@ -25,7 +25,7 @@ const introductionItemProps: IntroductionItemProps[] = [
   }
 ]      
 
-export default function IntroductionItem() {
+export default function IntroductionItem({ className }: { className?: string }) {
   const [isOneSecondElapsed, setIsOneSecondElapsed] = useState(false);
   const [isAtTop, setIsAtTop] = useState(true);
 
@@ -45,7 +45,7 @@ export default function IntroductionItem() {
   }, []);
 
   return (
-    <div className='flex flex-col min-h-screen mb-20'>
+    <div className={clsx('flex flex-col min-h-screen', className)}>
       <div className='flex flex-col my-auto'>
         <div className='flex justify-center items-center mb-20'>
           <Image 
