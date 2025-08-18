@@ -35,7 +35,7 @@ export default function IntroductionItem({ className }: { className?: string }) 
       setIsAtTop(window.scrollY == 0);
       window.removeEventListener('scroll', scrollHander);
     };
-    const timer = setTimeout(() => setIsOneSecondElapsed(true), 1000);
+    const timer = setTimeout(() => setIsOneSecondElapsed(true), 700);
     
     window.addEventListener('scroll', scrollHander);
 
@@ -66,9 +66,9 @@ export default function IntroductionItem({ className }: { className?: string }) 
             <div className='flex-2'/>
             {introductionItemProps.map((item, idx) => (
               <motion.div
-                initial={{ opacity: 0, x: -10 }}
+                initial={{ opacity: 0, x: -5 * (idx + 1) }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: 0.3 * idx, ease: 'easeOut' }}
+                transition={{ duration: 0.1 * (idx + 2), delay: 0.1 * idx, ease: 'easeOut' }}
                 key={item.description}
                 className='relative basis-[380px] z-10'>
                   <div className='w-8 h-8 border-4 border-gray-300 bg-white rounded-full ml-4 mb-4' />
@@ -82,7 +82,7 @@ export default function IntroductionItem({ className }: { className?: string }) 
       </div>
       <ChevronsDown className={clsx(
         'fixed bottom-10 w-10 h-10 text-black place-self-center',
-        'animate-bounce transition-opacity duration-500',
+        'animate-bounce transition-opacity duration-700',
         isAtTop && isOneSecondElapsed ? 'opacity-100' : 'opacity-0'
       )}/>
     </div>
