@@ -1,6 +1,7 @@
 "use client";
 
 import clsx from 'clsx';
+import { motion } from 'framer-motion';
 import { ChevronsDown } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
@@ -59,21 +60,23 @@ export default function IntroductionItem({ className }: { className?: string }) 
             <div className='text-5xl text-gray-500 font-light'>Im Haechan</div>
           </div>
         </div>
-        <div className='w-screen relative left-1/2 mx-[-50vw]'>
+        <div className='w-[99vw] left-1/2 -translate-x-1/2 relative'>
+          <div className='absolute top-0 inset-x-0 h-2 bg-gray-300 mt-3'/>
           <div className='flex'>
-            <div className='flex flex-2 h-2 bg-gray-300 mt-3' />
-            {introductionItemProps.map((item) => (
-              <div key={item.description} className='basis-[380px] flex-col'>
-                <div className='flex items-center mb-4'>
-                  <div className='w-4 h-2 bg-gray-300' />
-                  <div className='w-8 h-8 border-4 border-gray-300 rounded-full' />
-                  <div className='flex flex-1 h-2 bg-gray-300' />
-                </div>
-                <div className='text-lg text-gray-500 ml-4 mb-1'>{item.period}</div>
-                <div className='text-2xl font-semibold ml-4'>{item.description}</div>
-              </div>
+            <div className='flex-2'/>
+            {introductionItemProps.map((item, idx) => (
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: 0.3 * idx, ease: 'easeOut' }}
+                key={item.description}
+                className='relative basis-[380px] z-10'>
+                  <div className='w-8 h-8 border-4 border-gray-300 bg-white rounded-full ml-4 mb-4' />
+                  <div className='text-lg text-gray-500 ml-4 mb-1'>{item.period}</div>
+                  <div className='text-2xl font-semibold ml-4'>{item.description}</div>
+              </motion.div>
             ))}
-            <div className='flex flex-1 h-2 bg-gray-300 mt-3' />
+            <div className='flex-1' />
           </div>
         </div>
       </div>
