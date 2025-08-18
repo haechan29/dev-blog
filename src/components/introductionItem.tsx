@@ -1,4 +1,9 @@
+"use client";
+
+import clsx from 'clsx';
+import { ChevronsDown } from 'lucide-react';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 type IntroductionItemProps = {
   period: string;
@@ -21,37 +26,62 @@ const introductionItemProps: IntroductionItemProps[] = [
 ]      
 
 export default function IntroductionItem() {
+  const [isOneSecondElapsed, setIsOneSecondElapsed] = useState(false);
+  const [isAtTop, setIsAtTop] = useState(true);
+
+  useEffect(() => {
+    const scrollHander = () => {
+      setIsAtTop(window.scrollY == 0);
+      window.removeEventListener('scroll', scrollHander);
+    };
+    const timer = setTimeout(() => setIsOneSecondElapsed(true), 1000);
+    
+    window.addEventListener('scroll', scrollHander);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('scroll', scrollHander);
+    }
+  }, []);
+
   return (
-    <div className='flex flex-col mb-60'>
-      <div className='flex justify-center items-center mb-20'>
-        <Image 
-          src='/images/programmer-looking.png'
-          alt='picture of me'
-          width={160}
-          height={160}
-          className='mr-20'/>
-        <div className='flex items-end'>
-          <div className='text-7xl mr-6'>임해찬</div>
-          <div className='text-5xl text-gray-500 font-light'>Im Haechan</div>
+    <div className='flex flex-col min-h-screen mb-20'>
+      <div className='flex flex-col my-auto'>
+        <div className='flex justify-center items-center mb-20'>
+          <Image 
+            src='/images/programmer-looking.png'
+            alt='picture of me'
+            width={160}
+            height={160}
+            className='mr-20'/>
+          <div className='flex items-end'>
+            <div className='text-7xl mr-6'>임해찬</div>
+            <div className='text-5xl text-gray-500 font-light'>Im Haechan</div>
+          </div>
         </div>
-      </div>
-      <div className='w-screen relative left-1/2 mx-[-50vw]'>
-        <div className='flex'>
-          <div className='flex flex-2 h-2 bg-gray-300 mt-3' />
-          {introductionItemProps.map((item) => (
-            <div key={item.description} className='basis-[380px] max-w-[380px] flex-col'>
-              <div className='flex items-center mb-4'>
-                <div className='w-4 h-2 bg-gray-300' />
-                <div className='w-8 h-8 border-4 border-gray-300 rounded-full' />
-                <div className='flex flex-1 h-2 bg-gray-300' />
+        <div className='w-screen relative left-1/2 mx-[-50vw]'>
+          <div className='flex'>
+            <div className='flex flex-2 h-2 bg-gray-300 mt-3' />
+            {introductionItemProps.map((item) => (
+              <div key={item.description} className='basis-[380px] flex-col'>
+                <div className='flex items-center mb-4'>
+                  <div className='w-4 h-2 bg-gray-300' />
+                  <div className='w-8 h-8 border-4 border-gray-300 rounded-full' />
+                  <div className='flex flex-1 h-2 bg-gray-300' />
+                </div>
+                <div className='text-lg text-gray-500 ml-4 mb-1'>{item.period}</div>
+                <div className='text-2xl font-semibold ml-4'>{item.description}</div>
               </div>
-              <div className='text-lg text-gray-500 ml-4 mb-1'>{item.period}</div>
-              <div className='text-2xl font-semibold ml-4'>{item.description}</div>
-            </div>
-          ))}
-          <div className='flex flex-1 h-2 bg-gray-300 mt-3' />
+            ))}
+            <div className='flex flex-1 h-2 bg-gray-300 mt-3' />
+          </div>
         </div>
       </div>
+      <ChevronsDown className={clsx(
+        'fixed bottom-10 w-10 h-10 text-black place-self-center',
+        'animate-bounce transition-opacity duration-500',
+        isAtTop && isOneSecondElapsed ? 'opacity-100' : 'opacity-0'
+      )}/>
     </div>
-  )
+  );
 }
