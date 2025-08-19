@@ -8,12 +8,14 @@ import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import ProjectDialog from './projectDialog';
 
 const PLATFORM_FILTERS: string[] = ['전체', 'Android', 'Web', 'Flutter'];
 
 export default function ProjectsItem({ className }: { className?: string }) {
   const [projects, setProjects] = useState<Project[] | null>(null);
   const [selectedFilter, setSelectedFilter] = useState('전체');
+  const [selectedProject, setSelectedProject] = useState<ProjectItemProps | null>(null);
   
   const platformCounts = useMemo<Map<string, number> | null>(() => {
     if (projects === null) return null;
@@ -55,7 +57,7 @@ export default function ProjectsItem({ className }: { className?: string }) {
               <button 
                 onClick={() => setSelectedFilter(platform)}
                 className={clsx(
-                  'flex items-end hover:text-blue-500',
+                  'flex items-end cursor-pointer hover:text-blue-500',
                   platform === selectedFilter ? 'text-blue-500' : 'text-gray-300'
                 )}
               >
@@ -81,7 +83,8 @@ export default function ProjectsItem({ className }: { className?: string }) {
                 animate={{ opacity: 1, scale: 1.0 }}
                 exit={{ opacity: 0, scale: 0.3 }}
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
-                className='relative aspect-square min-w-[200px] bg-gray-50 overflow-hidden group'
+                onClick={() => setSelectedProject(project)}
+                className='relative aspect-square min-w-[200px] bg-gray-50 overflow-hidden cursor-pointer group'
               >
                 <div className='absolute inset-0 p-4'>
                   <img
@@ -110,6 +113,8 @@ export default function ProjectsItem({ className }: { className?: string }) {
           })}
         </AnimatePresence>
       </div>
+
+      <ProjectDialog item={selectedProject} setItem={setSelectedProject} />
     </div>
   );
 }

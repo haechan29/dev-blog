@@ -85,6 +85,23 @@
     "githubUrl": "https://github.com/haechan29/this_station"
   },
   {
+    "title": "잡스",
+    "startYear": 2025,
+    "startMonth": 8,
+    "endYear": 2025,
+    "endMonth": 8,
+    "platform": "Web",
+    "tools": ["React", "TypeScript"],
+    "summary": "취업 공고 모음 사이트",
+    "description": "잡스는 여러 취업 공고를 간단히 모아볼 수 있는 사이트입니다. 필터링, 정렬 등 편의 기능을 제공합니다.",
+    "screenshots": [
+      "/images/jobs_postings.png"
+    ],
+    "thumbnail": "/images/jobs_postings.png",
+    "githubUrl": "https://github.com/haechan29/jobs",
+    "siteUrl": "https://jobs-all.vercel.app/"
+  },
+  {
     "title": "트래블러",
     "startYear": 2025,
     "startMonth": 7,
@@ -100,22 +117,5 @@
     ],
     "thumbnail": "/images/traveler_home.png",
     "githubUrl": "https://github.com/haechan29/travel-client"
-  },
-  {
-    "title": "잡스",
-    "startYear": 2025,
-    "startMonth": 8,
-    "endYear": 2025,
-    "endMonth": 8,
-    "platform": "Web",
-    "tools": ["React", "TypeScript"],
-    "summary": "취업 공고 모음 사이트",
-    "description": "잡스는 여러 취업 공고를 간단히 모아볼 수 있는 사이트입니다. 필터링, 정렬 등 유저 편의 기능을 제공합니다.",
-    "screenshots": [
-      "/images/jobs_postings.png"
-    ],
-    "thumbnail": "/images/jobs_postings.png",
-    "githubUrl": "https://github.com/haechan29/jobs",
-    "siteUrl": "https://jobs-all.vercel.app/"
   }
 ]
