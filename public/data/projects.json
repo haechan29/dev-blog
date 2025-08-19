@@ -12,7 +12,8 @@
     "screenshots": [
       "/images/cashdoc_home.png"
     ],
-    "thumbnail": "/images/cashdoc_home.png"
+    "thumbnail": "/images/cashdoc_home.png",
+    "siteUrl": "https://cashdoc.me/"
   },
   {
     "title": "숏과외",
