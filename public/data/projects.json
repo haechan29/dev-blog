@@ -7,11 +7,13 @@
     "endMonth": 7,
     "platform": "Android",
     "tools": ["Kotlin"],
-    "description": "캐시닥이에요",
+    "summary": "병원 관련 정보 제공 플랫폼",
+    "description": "캐시닥은 병원 관련 정보와 리워드를 제공하여 의료 서비스 접근성을 높이는 플랫폼입니다. Android 앱의 신규 기능을 개발했으며, 만보기 로직 등 기존 로직을 개선했습니다.",
     "screenshots": [
       "/images/cashdoc_home.png"
     ],
-    "thumbnail": "/images/cashdoc_home.png"
+    "thumbnail": "/images/cashdoc_home.png",
+    "siteUrl": "https://cashdoc.me/"
   },
   {
     "title": "숏과외",
@@ -21,13 +23,15 @@
     "endMonth": 11,
     "platform": "Android",
     "tools": ["Kotlin"],
-    "description": "숏과외에요",
+    "summary": "실시간 화상 과외 플랫폼",
+    "description": "숏과외는 학습 과정 중에 생긴 어려움을 즉각적으로 해결할 수 있도록 돕는 초단기 과외 플랫폼입니다. 소프트웨어 마에스트로의 지원을 받아 진행되었습니다.",
     "screenshots": [
       "/images/short_tutoring_home.png",
       "/images/short_tutoring_mypage.png",
       "/images/short_tutoring_mypage.png"
     ],
-    "thumbnail": "/images/short_tutoring_home.png"
+    "thumbnail": "/images/short_tutoring_home.png",
+    "githubUrl": "https://github.com/haechan29/ShortTutoring"
   },
   {
     "title": "수학문제 타이머",
@@ -37,11 +41,13 @@
     "endMonth": 12,
     "platform": "Android",
     "tools": ["Kotlin"],
-    "description": "수학문제 타이머에요",
+    "summary": "수학 학습 보조 앱",
+    "description": "수학문제 타이머는 학생의 수학 학습 역량을 수치화하여 메타인지 향상을 돕는 학습 어플리케이션입니다. 수학 문제를 푸는데 걸린 시간을 기반으로 간단한 통계 처리가 이루어집니다.",
     "screenshots": [
       "/images/problem_timer_records.png"
     ],
-    "thumbnail": "/images/problem_timer_records.png"
+    "thumbnail": "/images/problem_timer_records.png",
+    "githubUrl": "https://github.com/haechan29/Problem-Timer-2"
   },
   {
     "title": "오목",
@@ -51,13 +57,15 @@
     "endMonth": 4,
     "platform": "Android",
     "tools": ["Kotlin"],
-    "description": "오목이에요",
+    "summary": "게임 앱",
+    "description": "오목 게임을 진행할 수 있는 서비스입니다. Android 앱 아키텍처를 적용했습니다.",
     "screenshots": [
       "/images/gomok_game.png",
       "/images/gomok_pause.png",
       "/images/gomok_record.png"
     ],
-    "thumbnail": "/images/gomok_game.png"
+    "thumbnail": "/images/gomok_game.png",
+    "githubUrl": "https://github.com/haechan29/gomok"
   },
   {
     "title": "지하철 위치 알림이",
@@ -67,28 +75,15 @@
     "endMonth": 6,
     "platform": "Flutter",
     "tools": ["Dart"],
-    "description": "지하철 위치 알림이에요",
+    "summary": "지하철 위치 알림 서비스",
+    "description": "지하철 위치 알림이는 지하철 내부에서 현재 위치를 알기 어려울 때 사용할 수 있는 위치 조회 어플리케이션입니다. 주기적으로 위치 정보를 조회하여 가까운 지하철 역을 푸시 알림으로 안내합니다.",
     "screenshots": [
       "/images/this_station_start.png",
       "/images/this_station_list.png",
       "/images/this_station_notification.png"
     ],
-    "thumbnail": "/images/this_station_list.png"
-  },
-  {
-    "title": "트래블러",
-    "startYear": 2025,
-    "startMonth": 7,
-    "endYear": 2025,
-    "endMonth": 7,
-    "platform": "Web",
-    "tools": ["React", "TypeScript"],
-    "description": "트래블러에요",
-    "screenshots": [
-      "/images/traveler_home.png",
-      "/images/traveler_goods.png"
-    ],
-    "thumbnail": "/images/traveler_home.png"
+    "thumbnail": "/images/this_station_list.png",
+    "githubUrl": "https://github.com/haechan29/this_station"
   },
   {
     "title": "잡스",
@@ -98,10 +93,30 @@
     "endMonth": 8,
     "platform": "Web",
     "tools": ["React", "TypeScript"],
-    "description": "취업 공고를 쉽게 찾는 사이트",
+    "summary": "취업 공고 모음 사이트",
+    "description": "잡스는 여러 취업 공고를 간단히 모아볼 수 있는 사이트입니다. 필터링, 정렬 등 편의 기능을 제공합니다.",
     "screenshots": [
       "/images/jobs_postings.png"
     ],
-    "thumbnail": "/images/jobs_postings.png"
+    "thumbnail": "/images/jobs_postings.png",
+    "githubUrl": "https://github.com/haechan29/jobs",
+    "siteUrl": "https://jobs-all.vercel.app/"
+  },
+  {
+    "title": "트래블러",
+    "startYear": 2025,
+    "startMonth": 7,
+    "endYear": 2025,
+    "endMonth": 7,
+    "platform": "Web",
+    "tools": ["React", "TypeScript"],
+    "summary": "AI 기반 여행 상품 조회 솔루션",
+    "description": "트래블러는 다양한 조건의 여행 상품 정보를 요약 제공하는 서비스입니다. ChatGPT API를 통해 사용자 맞춤 여행 상품을 조회하고 필터를 동적으로 생성합니다.",
+    "screenshots": [
+      "/images/traveler_home.png",
+      "/images/traveler_goods.png"
+    ],
+    "thumbnail": "/images/traveler_home.png",
+    "githubUrl": "https://github.com/haechan29/travel-client"
   }
 ]

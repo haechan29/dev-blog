@@ -5,7 +5,10 @@ export type ProjectItemProps = {
   period: string;
   platform: Platform;
   tools: string[];
+  summary: string;
   description: string;
   screenshots: string[];
   thumbnail: string;
+  githubUrl?: string;
+  siteUrl?: string;
 }

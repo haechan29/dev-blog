@@ -6,7 +6,10 @@ export type ProjectDto = {
   endMonth: number;
   platform: string;
   tools: string[];
+  summary: string;
   description: string;
   screenshots: string[];
   thumbnail: string;
+  githubUrl?: string;
+  siteUrl?: string;
 }

@@ -30,9 +30,12 @@ export class Project {
     public readonly period: ProjectPeriod,
     public readonly platform: Platform,
     public readonly tools: string[],
+    public readonly summary: string,
     public readonly description: string,
     public readonly screenshots: string[],
-    public readonly thumbnail: string
+    public readonly thumbnail: string,
+    public readonly githubUrl?: string,
+    public readonly siteUrl?: string
   ) {}
 
   toProps(): ProjectItemProps {
@@ -41,9 +44,12 @@ export class Project {
       period: this.formattedPeriod(),
       platform: this.platform,
       tools: this.tools,
+      summary: this.summary,
       description: this.description,
       screenshots: this.screenshots,
-      thumbnail: this.thumbnail
+      thumbnail: this.thumbnail,
+      githubUrl: this.githubUrl,
+      siteUrl: this.siteUrl
     }
   }
 

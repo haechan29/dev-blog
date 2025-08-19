@@ -10,8 +10,11 @@ export function toDomain(dto: ProjectDto): Project {
     },
     dto.platform as Platform,
     dto.tools,
+    dto.summary,
     dto.description,
     dto.screenshots,
-    dto.thumbnail
+    dto.thumbnail,
+    dto.githubUrl,
+    dto.siteUrl
   )
 }
