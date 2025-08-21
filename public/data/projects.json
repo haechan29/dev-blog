@@ -8,7 +8,7 @@
     "platform": "Android",
     "tools": ["Kotlin"],
     "summary": "병원 관련 정보 제공 플랫폼",
-    "description": "캐시닥은 병원 관련 정보와 리워드를 제공하여 의료 서비스 접근성을 높이는 플랫폼입니다. Android 앱의 신규 기능을 개발했으며, 만보기 로직 등 기존 로직을 개선했습니다.",
+    "description": "캐시닥은 병원 관련 정보와 리워드를 제공하여 의료 서비스 접근성을 높이는 플랫폼입니다. Android 앱의 신규 기능을 개발했으며, 만보기, 광고 리워드 등 기존 로직을 개선했습니다.",
     "screenshots": [
       "/images/cashdoc_home.png"
     ],
