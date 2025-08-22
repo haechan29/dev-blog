@@ -21,7 +21,7 @@ export class Post {
       .replace(/\[(.*?)\]\(.*?\)/g, '$1') // 링크 제거
       .replace(/\n+/g, ' ') // 개행 제거
       .trim()
-      .substring(0, 150); // 150자로 제한
+      .substring(0, 150) + '...'; // 150자로 제한
   }
 
   toProps(): PostItemProps {

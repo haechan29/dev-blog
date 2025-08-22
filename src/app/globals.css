@@ -157,7 +157,7 @@ body {
   
   /* 텍스트 */
   .prose p {
-    @apply mb-4 text-base leading-7;
+    @apply mb-4 text-base text-gray-900 leading-7;
   }
   
   .prose strong {
