@@ -3,6 +3,7 @@
 import { Heading } from '@/features/post/domain/post';
 import clsx from 'clsx';
 import { useEffect, useState } from 'react';
+import { throttle } from 'lodash';
 
 export default function TableOfContents({ headings }: { headings: Heading[]; }) {
   const [activeId, setActiveId] = useState<string>('');
@@ -45,11 +46,12 @@ export default function TableOfContents({ headings }: { headings: Heading[]; }) 
     };
 
     checkActiveHeading();
-    
-    window.addEventListener('scroll', checkActiveHeading);
+
+    const throttledCheck = throttle(checkActiveHeading, 100);
+    window.addEventListener('scroll', throttledCheck);
     
     return () => {
-      window.removeEventListener('scroll', checkActiveHeading);
+      window.removeEventListener('scroll', throttledCheck);
     };
   }, [headings]);
 
