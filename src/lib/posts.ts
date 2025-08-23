@@ -47,7 +47,7 @@ export function extractHeadings(content: string): Heading[] {
       .join('');
     
     const id = text.toLowerCase()
-      .replace(/[^\w\s]/g, '')
+      .replace(/[^\w\s가-힣]/g, '')
       .replace(/\s+/g, '-');
 
     headings.push({
