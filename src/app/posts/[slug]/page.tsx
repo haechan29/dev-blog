@@ -1,5 +1,11 @@
 import { getPostBySlug } from '@/lib/posts';
 import { MDXRemote } from 'next-mdx-remote/rsc';
+import rehypeSlug from 'rehype-slug';
+import rehypePrettyCode from 'rehype-pretty-code';
+
+const ExternalLink = ({children, ...props}: any) => {
+  return <a rel='noopener noreferrer' target='_blank' { ...props }>{children}</a>
+};
 
 export default async function PostPage({ params }: { params: Promise<{ slug: string; }> }) {
   const { slug } = await params;
@@ -16,7 +22,20 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       </div>
       <div className='w-full h-[1px] bg-gray-200 mb-10'/>
       <div className='prose'>
-        <MDXRemote source={post.content} />
+        <MDXRemote
+          source={post.content}
+          components={{
+            a: ExternalLink
+          }}
+          options={{
+            mdxOptions: {
+              rehypePlugins: [
+                [rehypePrettyCode],
+                rehypeSlug
+              ]
+            }
+          }}
+        />
       </div>
     </div>
   );
