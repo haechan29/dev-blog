@@ -10,37 +10,47 @@ export default function TableOfContents({ headings }: { headings: Heading[]; }) 
   useEffect(() => {
     if (headings.length > 0) setActiveId(headings[0].id);
     
-    const observer = new IntersectionObserver(
-      entries => {        
-        const visibleHeadings = entries
-          .filter(entry => entry.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-
-        if (visibleHeadings.length > 0) {
-          return setActiveId(visibleHeadings[0].target.id);
-        }
-
-        const allHeadingsAbove = headings.filter(heading => {
-          const element = document.getElementById(heading.id);
-          return element && element.getBoundingClientRect().top < 40;
-        });
-
-        if (allHeadingsAbove.length > 0) {
-          setActiveId(allHeadingsAbove[allHeadingsAbove.length - 1].id);
-        }
-      },
-      {
-        rootMargin: '-20px 0px -80% 0px',
-        threshold: 0
+    const checkActiveHeading = () => {
+      const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 10;      
+      if (isAtBottom) {
+        setActiveId(headings[headings.length - 1].id);
+        return;
       }
-    );
 
-    headings.forEach(heading => {
-      const element = document.getElementById(heading.id);
-      if (element) observer.observe(element);
-    });
+      const headingsInVisibleArea = headings.filter(heading => {
+        const element = document.getElementById(heading.id);
+        if (!element) return false;
+        
+        const rect = element.getBoundingClientRect();
+        return rect.top >= 20 && rect.top <= window.innerHeight * 0.2;
+      }).sort((a, b) => {
+        const aElement = document.getElementById(a.id);
+        const bElement = document.getElementById(b.id);
+        return aElement!.getBoundingClientRect().top - bElement!.getBoundingClientRect().top;
+      });
 
-    return () => observer.disconnect();
+      if (headingsInVisibleArea.length > 0) {
+        setActiveId(headingsInVisibleArea[0].id);
+        return;
+      }
+
+      const allHeadingsAbove = headings.filter(heading => {
+        const element = document.getElementById(heading.id);
+        return element && element.getBoundingClientRect().top < 20;
+      });
+
+      if (allHeadingsAbove.length > 0) {
+        setActiveId(allHeadingsAbove[allHeadingsAbove.length - 1].id);
+      }
+    };
+
+    checkActiveHeading();
+    
+    window.addEventListener('scroll', checkActiveHeading);
+    
+    return () => {
+      window.removeEventListener('scroll', checkActiveHeading);
+    };
   }, [headings]);
 
   const handleClick = (id: string) => {
