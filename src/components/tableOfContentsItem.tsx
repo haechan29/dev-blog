@@ -73,9 +73,9 @@ export default function TableOfContents({ headings }: { headings: Heading[]; }) 
             <button
               onClick={() => handleClick(heading.id)}
               className={clsx(
-                'text-sm hover:text-blue-500 truncate',
+                'w-full text-left text-sm hover:text-blue-500 truncate',
                 activeId === heading.id ? 'text-blue-500' : 'text-gray-500',
-                heading.level >= 4 ? `ml-${(heading.level - 3) * 2}`: ''
+                heading.level >= 6 ? 'ml-6' : heading.level >= 5 ? 'ml-4' : heading.level >= 4 ? 'ml-2' : ''
               )}
             >
               {heading.text}
