@@ -10,25 +10,25 @@ export default function FooterItem() {
         rel='noopener noreferrer'
         className='flex items-center'>
         <Image
-          width={28}
-          height={28}
+          width={20}
+          height={20}
           src='/images/github.png'
           alt='github icon'
           className='mr-2'
         />
-        <div className='font-bold'>github.com/haechan29</div>
+        <div>github.com/haechan29</div>
       </a>
       <div className='flex items-center'>
         <div className='rounded-full bg-black p-1 mr-2'>
-          <Phone className='w-5 h-5 fill-white'/>
+          <Phone className='w-3 h-3 fill-white'/>
         </div>
-        <div className='font-bold'>+82 10-5634-7522</div>
+        <div>+82 10-5634-7522</div>
       </div>
       <div className='flex items-center'>
         <div className='rounded-full bg-black p-1 mr-2'>
-          <Mail className='w-5 h-5 text-white'/>
+          <Mail className='w-3 h-3 text-white'/>
         </div>
-        <div className='font-bold'>haechan.im@gmail.com</div>
+        <div>haechan.im@gmail.com</div>
       </div>
     </footer>
   )
