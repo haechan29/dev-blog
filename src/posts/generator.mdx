@@ -3,6 +3,24 @@ title: '제너레이터란'
 date: '2025-08-24'
 ---
 
+### 요약
+<div className='grid grid-cols-[160px_1fr] border border-gray-200 rounded-sm gap-y-1 p-6'>
+  <div>제너레이터란?</div>
+  <ToggleButtonItem>
+    <div className='flex'>필요할 때마다 값을 하나씩 생성하는 이터레이터</div>
+  </ToggleButtonItem>
+  <div>언제 사용될까?</div>
+  <ToggleButtonItem className='flex flex-col'>
+    <div className='flex'>리스트를 한 방향으로 순회할 때 (ex. API 페이지네이션)</div>
+    <div className='flex'>메모리 효율이 중요할 때 (ex. 파일 읽기, 무한 시퀀스)</div>
+  </ToggleButtonItem>
+  <div>내부 원리는?</div>
+  <ToggleButtonItem>
+    <div className='flex'>함수의 실행 상태를 저장한다.</div>
+  </ToggleButtonItem>
+</div>
+<br/>
+
 ### 제너레이터, 그게 뭔데?
 요즘은 알고리즘 문제를 푼 후에 ChatGPT에게서 피드백을 받는데, 종종 리스트 대신 제너레이터를 쓰라는 이야기를 듣는다.
 이름은 많이 들어봤지만 무엇인지는 잘 몰라서 이 기회에 알아보려고 한다.

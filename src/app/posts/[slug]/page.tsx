@@ -3,6 +3,7 @@ import { MDXRemote } from 'next-mdx-remote/rsc';
 import rehypeSlug from 'rehype-slug';
 import rehypePrettyCode from 'rehype-pretty-code';
 import TableOfContents from '@/components/tableOfContentsItem';
+import ToggleButtonItem from '@/components/toggleButtonItem';
 
 const ExternalLink = ({children, ...props}: any) => {
   return <a rel='noopener noreferrer' target='_blank' { ...props }>{children}</a>
@@ -27,6 +28,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         <MDXRemote
           source={post.content}
           components={{
+            ToggleButtonItem,
             a: ExternalLink
           }}
           options={{
