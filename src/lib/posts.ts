@@ -42,8 +42,8 @@ export function extractHeadings(content: string): Heading[] {
 
   visit(tree, 'heading', (node) => {
     const text = node.children
-      .filter((child: any) => child.type === 'text')
-      .map((child: any) => child.value)
+      .filter(child => child.type === 'text')
+      .map(child => child.value)
       .join('');
     
     const id = text.toLowerCase()

@@ -4,8 +4,9 @@ import rehypeSlug from 'rehype-slug';
 import rehypePrettyCode from 'rehype-pretty-code';
 import TableOfContents from '@/components/tableOfContentsItem';
 import ToggleButtonItem from '@/components/toggleButtonItem';
+import { ReactNode } from 'react';
 
-const ExternalLink = ({children, ...props}: any) => {
+const ExternalLink = ({children, ...props}: { children: ReactNode; }) => {
   return <a rel='noopener noreferrer' target='_blank' { ...props }>{children}</a>
 };
 
