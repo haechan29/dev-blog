@@ -1,5 +1,5 @@
-import { Platform, Project, YearMonth } from '../domain/project';
-import { ProjectDto } from '../dto/projectsDto';
+import { Platform, Project, YearMonth } from '@/features/project/domain/model/project';
+import { ProjectDto } from '@/features/project/data/dto/projectDto';
 
 export function toDomain(dto: ProjectDto): Project {
   return new Project(

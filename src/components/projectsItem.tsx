@@ -1,14 +1,13 @@
 "use client";
 
-import { Project } from '@/features/project/domain/project';
-import { ProjectDto } from '@/features/project/dto/projectsDto';
-import { toDomain } from '@/features/project/mapper/projectMapper';
+import { Project } from '@/features/project/domain/model/project';
 import { ProjectItemProps } from '@/features/project/ui/projectItemProps';
 import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import ProjectDialog from './projectDialog';
+import { fetchProjects } from '@/features/project/domain/service/projectService';
 
 const PLATFORM_FILTERS: string[] = ['전체', 'Android', 'Web', 'Flutter'];
 
@@ -35,17 +34,9 @@ export default function ProjectsItem({ className }: { className?: string }) {
   }, [filteredProjects]);
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const response = await fetch('/data/projects.json');
-        if (!response.ok) throw Error(`HTTP ${response.status}`);
-        const dtos = await response.json() as ProjectDto[];
-        setProjects(dtos.map(dto => toDomain(dto)))
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchProjects();
+    fetchProjects()
+      .then(setProjects)
+      .catch(e => console.error(`Project item fetch 실패: `, e))
   }, []);
 
   return (

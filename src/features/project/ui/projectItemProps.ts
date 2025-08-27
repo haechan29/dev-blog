@@ -1,4 +1,4 @@
-import { Platform } from '../domain/project';
+import { Platform } from '@/features/project/domain/model/project';
 
 export type ProjectItemProps = {
   title: string;

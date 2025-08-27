@@ -1,4 +1,4 @@
-import { ProjectItemProps } from '../ui/projectItemProps';
+import { ProjectItemProps } from '@/features/project/ui/projectItemProps';
 
 export class YearMonth {
   constructor(
