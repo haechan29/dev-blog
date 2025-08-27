@@ -22,6 +22,10 @@ export default function BlogSidebar({
     return [...tagMap.entries()];
   }, [posts]);
 
+  const projectsOfTag = useMemo(() => {
+    return selectedTag ? posts.filter(post => post.tags.includes(selectedTag)) : null;
+  }, [posts, selectedTag]);
+
   return (
     <div className={clsx(
       className,
@@ -42,16 +46,26 @@ export default function BlogSidebar({
       <div className='flex flex-col flex-1 overflow-y-auto'>
         {tagCount.map(([tag, count]) => {
           return (
-            <button
-              key={tag}
-              onClick={() => setSelectedTag(prev => prev ? null : tag)}
-              className={clsx(
-                'flex w-full py-3 px-9 cursor-pointer hover:text-blue-500',
-                tag === selectedTag ? 'bg-blue-50 font-semibold text-blue-500' : 'text-gray-900 '
-              )}
-            >
-              <div className='text-sm'>{tag} {count}</div>
-            </button>
+            <div key={tag}>
+              <button
+                onClick={() => setSelectedTag(prev => prev ? null : tag)}
+                className={clsx(
+                  'flex items-start w-full py-3 px-9 cursor-pointer hover:text-blue-500',
+                  tag === selectedTag ? 'bg-blue-50 font-semibold text-blue-500' : 'text-gray-900'
+                )}
+              >
+                <div className='text-sm mr-1'>{tag}</div>
+                <div className='text-xs'>{count}</div>
+              </button>
+              {tag === selectedTag && projectsOfTag !== null && (projectsOfTag.map(project => (
+                <button
+                  key={`${tag}-${project.title} `}
+                  className='flex w-full py-3 pl-12 pr-9'
+                >
+                  <div className='text-sm'>{project.title}</div>
+                </button>
+              )))}
+            </div>
           )
         })}
       </div>
