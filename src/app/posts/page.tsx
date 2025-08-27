@@ -1,14 +1,14 @@
-import { getAllPosts } from '@/lib/posts';
+import { fetchAllPosts } from '@/features/post/domain/service/postService';
 import Link from 'next/link';
-import { JSX } from 'react';
 
-export default function BlogPage(): JSX.Element {
-  const posts = getAllPosts().map((post) => post.toProps());
+export default async function BlogPage() {
+  const posts = await fetchAllPosts();
+  const postProps = posts.map(post => post.toProps());
 
   return (
     <>
       <div className='flex flex-col'>
-        {posts.map((post) => (
+        {postProps.map((post) => (
           <Link 
             key={post.slug} 
             href={`/posts/${post.slug}`}

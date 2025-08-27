@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { FileUser, Mail, Phone } from 'lucide-react';
+import { FileUser, Mail } from 'lucide-react';
 import Image from 'next/image';
 
 export default function BlogSidebar({ className }: { className: string; }) {

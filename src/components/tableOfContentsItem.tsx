@@ -1,6 +1,6 @@
 "use client";
 
-import { Heading } from '@/features/post/domain/post';
+import { Heading } from '@/features/post/domain/model/post';
 import clsx from 'clsx';
 import { useEffect, useState } from 'react';
 import { throttle } from 'lodash';
