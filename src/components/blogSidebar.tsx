@@ -1,9 +1,26 @@
+'use client';
+
+import { PostItemProps } from '@/features/post/ui/postItemProps';
 import clsx from 'clsx';
 import { FileUser, Mail } from 'lucide-react';
 import Image from 'next/image';
+import { useMemo, useState } from 'react';
 
-export default function BlogSidebar({ className }: { className: string; }) {
-  const tags = ['전체', 'Java', 'Android', 'React'];
+export default function BlogSidebar({ 
+  className,
+  posts
+}: { 
+  className: string;
+  posts: PostItemProps[];
+}) {
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+
+  const tagCount = useMemo(() => {
+    const tagMap = posts
+      .flatMap(post => post.tags)
+      .reduce((acc, tag) => acc.set(tag, (acc.get(tag) ?? 0) + 1), new Map<string, number>());
+    return [...tagMap.entries()];
+  }, [posts]);
 
   return (
     <div className={clsx(
@@ -23,16 +40,17 @@ export default function BlogSidebar({ className }: { className: string; }) {
       </div>
 
       <div className='flex flex-col flex-1 overflow-y-auto'>
-        {tags.map(tag => {
+        {tagCount.map(([tag, count]) => {
           return (
             <button
               key={tag}
+              onClick={() => setSelectedTag(prev => prev ? null : tag)}
               className={clsx(
                 'flex w-full py-3 px-9 cursor-pointer hover:text-blue-500',
-                tag === '전체' ? 'bg-blue-50 font-semibold text-blue-500' : 'text-gray-900'
+                tag === selectedTag ? 'bg-blue-50 font-semibold text-blue-500' : 'text-gray-900 '
               )}
             >
-              <div className='text-sm'>{tag} (20)</div>
+              <div className='text-sm'>{tag} {count}</div>
             </button>
           )
         })}
