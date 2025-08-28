@@ -7,6 +7,45 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
+import TooltipItem from './tooltipItem';
+
+function Footer({ className }: { className: string }) {
+  return (
+    <div className={clsx(
+      'flex justify-center items-center gap-x-2',
+      className
+    )}>
+      <TooltipItem text='Github'>
+        <a
+          href='https://github.com/haechan29'
+          target='_blank'
+          rel='noopener noreferrer'
+          className='w-10 h-10 flex justify-center items-center rounded-full hover:bg-blue-300 transition-colors duration-300 ease-in-out'>
+          <Image
+            width={20}
+            height={20}
+            src='/images/github.png'
+            alt='github icon'
+            className='rounded-full'
+          />
+        </a>
+      </TooltipItem>
+      <TooltipItem text='haechan.im@gmail.com'>
+        <button className='w-10 h-10 flex justify-center items-center cursor-pointer rounded-full hover:bg-blue-300 transition-colors duration-300 ease-in-out'>
+          <Mail className='w-5 h-5'/>
+        </button>
+      </TooltipItem>
+
+      <TooltipItem text='포트폴리오'>
+        <Link
+          href='/portfolio'
+          className='w-10 h-10 flex justify-center items-center cursor-pointer rounded-full hover:bg-blue-300 transition-colors duration-300 ease-in-out'>
+          <FileUser className='w-5 h-5'/>
+        </Link>
+      </TooltipItem>
+    </div>
+  )
+}
 
 export default function BlogSidebar({ 
   className,
@@ -78,28 +117,7 @@ export default function BlogSidebar({
           )
         })}
       </div>
-
-      <div className="py-12 flex justify-center items-center gap-x-2">
-        <a
-          href='https://github.com/haechan29'
-          target='_blank'
-          rel='noopener noreferrer'
-          className='w-10 h-10 flex justify-center items-center rounded-full hover:bg-blue-300 transition-colors duration-300 ease-in-out'>
-          <Image
-            width={20}
-            height={20}
-            src='/images/github.png'
-            alt='github icon'
-            className='rounded-full'
-          />
-        </a>
-        <button className='w-10 h-10 flex justify-center items-center cursor-pointer rounded-full hover:bg-blue-300 transition-colors duration-300 ease-in-out'>
-          <Mail className='w-5 h-5'/>
-        </button>
-        <button className='w-10 h-10 flex justify-center items-center cursor-pointer rounded-full hover:bg-blue-300 transition-colors duration-300 ease-in-out'>
-          <FileUser className='w-5 h-5'/>
-        </button>
-      </div>
+      <Footer className='py-12'/>
     </div>
   );
 }
