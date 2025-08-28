@@ -4,6 +4,8 @@ import { PostItemProps } from '@/features/post/ui/postItemProps';
 import clsx from 'clsx';
 import { FileUser, Mail } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
 
 export default function BlogSidebar({ 
@@ -13,7 +15,10 @@ export default function BlogSidebar({
   className: string;
   posts: PostItemProps[];
 }) {
-  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const params = useParams();
+  const searchParams = useSearchParams();
+  const selectedSlug = params.slug as string | undefined;
+  const selectedTag = searchParams.get('tag') ?? null;
 
   const tagCount = useMemo(() => {
     const tagMap = posts
@@ -22,7 +27,7 @@ export default function BlogSidebar({
     return [...tagMap.entries()];
   }, [posts]);
 
-  const projectsOfTag = useMemo(() => {
+  const postsOfTag = useMemo(() => {
     return selectedTag ? posts.filter(post => post.tags.includes(selectedTag)) : null;
   }, [posts, selectedTag]);
 
@@ -32,7 +37,7 @@ export default function BlogSidebar({
       'flex flex-col bg-blue-50/30'
     )}>
       <div className="px-6 py-9">
-        <a
+        <Link
           className='px-3 py-3 flex flex-col w-fit'
           href='/posts'
         >
@@ -40,30 +45,34 @@ export default function BlogSidebar({
             Haechan
           </div>
           <div className="text-xs text-gray-400 mt-1 font-light tracking-wide">DEV BLOG</div>
-        </a>
+        </Link>
       </div>
 
       <div className='flex flex-col flex-1 overflow-y-auto'>
         {tagCount.map(([tag, count]) => {
           return (
             <div key={tag}>
-              <button
-                onClick={() => setSelectedTag(prev => prev ? null : tag)}
+              <Link
+                href={!selectedSlug && selectedTag === tag ? '/posts' : `/posts?tag=${tag}`}
                 className={clsx(
-                  'flex items-start w-full py-3 px-9 cursor-pointer hover:text-blue-500',
-                  tag === selectedTag ? 'bg-blue-50 font-semibold text-blue-500' : 'text-gray-900'
+                  'flex items-start w-full py-3 px-9 hover:text-blue-500',
+                  !selectedSlug && tag === selectedTag ? 'bg-blue-50 font-semibold text-blue-500' : 'text-gray-900'
                 )}
               >
                 <div className='text-sm mr-1'>{tag}</div>
                 <div className='text-xs'>{count}</div>
-              </button>
-              {tag === selectedTag && projectsOfTag !== null && (projectsOfTag.map(project => (
-                <button
-                  key={`${tag}-${project.title} `}
-                  className='flex w-full py-3 pl-12 pr-9'
+              </Link>
+              {tag === selectedTag && postsOfTag && (postsOfTag.map(post => (
+                <Link
+                  key={`${tag}-${post.slug} `}
+                  href={`/posts/${post.slug}${selectedTag ? `?tag=${selectedTag}` : ''}`}
+                  className={clsx(
+                    'flex w-full py-3 pl-12 pr-9 hover:text-blue-500',
+                    post.slug === selectedSlug ? 'bg-blue-50 font-semibold text-blue-500' : 'text-gray-900'
+                  )}
                 >
-                  <div className='text-sm'>{project.title}</div>
-                </button>
+                  <div className='text-sm'>{post.title}</div>
+                </Link>
               )))}
             </div>
           )
