@@ -1,5 +1,5 @@
 import BlogSidebar from '@/components/blogSidebar';
-import { ReactNode } from 'react';
+import { ReactNode, Suspense } from 'react';
 import { fetchAllPosts } from '@/features/post/domain/service/postService';
 
 export default async function PostsLayout({ children }: { children: ReactNode; }) {
@@ -8,7 +8,9 @@ export default async function PostsLayout({ children }: { children: ReactNode; }
 
   return (<>
     <div className='min-h-screen bg-white'>
-      <BlogSidebar className='fixed left-0 top-0 h-screen hidden xl:flex w-1/5 max-w-72' posts={postProps}/>
+      <Suspense>
+        <BlogSidebar className='fixed left-0 top-0 h-screen hidden xl:flex w-1/5 max-w-72' posts={postProps}/>
+      </Suspense>
       <div className='mx-auto xl:mx-72 px-20'>
         {children}
       </div>
