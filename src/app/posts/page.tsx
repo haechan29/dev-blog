@@ -1,9 +1,11 @@
 import { fetchAllPosts } from '@/features/post/domain/service/postService';
 import Link from 'next/link';
 
-export default async function BlogPage() {
+export default async function BlogPage({ searchParams }: { searchParams: Promise<{ tag?: string }> }) {
+  const tag = await searchParams.then(param => param.tag ?? null);
   const posts = await fetchAllPosts();
-  const postProps = posts.map(post => post.toProps());
+  const filteredPosts = tag ? posts.filter(post => post.tags?.includes(tag)) : posts;
+  const postProps = filteredPosts.map(post => post.toProps());
 
   return (
     <>
