@@ -1,17 +1,17 @@
-import { getAllPosts } from '@/lib/posts';
+import { fetchAllPosts } from '@/features/post/domain/service/postService';
 import Link from 'next/link';
-import { JSX } from 'react';
 
-export default function BlogPage(): JSX.Element {
-  const posts = getAllPosts().map((post) => post.toProps());
+export default async function BlogPage({ searchParams }: { searchParams: Promise<{ tag?: string }> }) {
+  const tag = await searchParams.then(param => param.tag ?? null);
+  const posts = await fetchAllPosts();
+  const filteredPosts = tag ? posts.filter(post => post.tags?.includes(tag)) : posts;
+  const postProps = filteredPosts.map(post => post.toProps());
 
   return (
-    <div className='max-w-2xl mx-auto px-4 py-8'>
-      <div className='text-2xl font-bold mb-8'>블로그</div>
-      
-      <div className='flex flex-col'>
-        {posts.map((post) => (
-          <Link 
+    <>
+      <div className='py-8 flex flex-col'>
+        {postProps.map((post) => (
+          <Link
             key={post.slug} 
             href={`/posts/${post.slug}`}
             className='w-full py-6 border-b border-b-gray-200'
@@ -27,6 +27,6 @@ export default function BlogPage(): JSX.Element {
           </Link>
         ))}
       </div>
-    </div>
+    </>
   );
 }

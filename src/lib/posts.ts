@@ -1,37 +1,7 @@
-import path from 'path';
-import fs from 'fs';
-import matter from 'gray-matter';
-import { Heading, Post } from '@/features/post/domain/post';
+import { Heading } from '@/features/post/domain/model/post';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import { visit } from 'unist-util-visit';
-
-const postsDirectory = path.join(process.cwd(), 'src/posts');
-
-export function getPostBySlug(slug: string): Post {
-  const fullPath = path.join(postsDirectory, `${slug}.mdx`);
-  const fileContents = fs.readFileSync(fullPath, 'utf8');
-  const { data, content } = matter(fileContents);
-
-  return new Post(
-    slug,
-    data.title,
-    data.date,
-    content,
-    data.tags
-  )
-}
-
-export function getAllPosts() {
-  const files = fs.readdirSync(postsDirectory);
-  const posts = files
-    .filter((file) => file.endsWith('.mdx'))
-    .map((file) => {
-      const slug = file.replace(/\.mdx$/, '');
-      return getPostBySlug(slug);
-    })
-  return posts.sort((a, b) => a.date > b.date ? -1 : 1);
-}
 
 export function extractHeadings(content: string): Heading[] {
   const headings: Heading[] = [];

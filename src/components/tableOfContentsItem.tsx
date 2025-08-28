@@ -1,11 +1,13 @@
 "use client";
 
-import { Heading } from '@/features/post/domain/post';
+import { Heading } from '@/features/post/domain/model/post';
 import clsx from 'clsx';
 import { useEffect, useState } from 'react';
 import { throttle } from 'lodash';
 
-export default function TableOfContents({ headings }: { headings: Heading[]; }) {
+export default function TableOfContentsItem({ headings }: { 
+  headings: Heading[];
+}) {
   const [activeId, setActiveId] = useState<string>('');
 
   useEffect(() => {
@@ -66,15 +68,18 @@ export default function TableOfContents({ headings }: { headings: Heading[]; }) 
   };
 
   return (
-    <div className='hidden xl:block fixed right-8 top-1/2 transform -translate-y-1/2 w-64 p-4 border border-gray-200'>
+    <div className={clsx(
+      'p-4 border border-gray-200',
+      'w-full xl:fixed xl:right-8 xl:top-1/2 xl:transform xl:-translate-y-1/2 xl:w-64'
+    )}>
       <ul className="space-y-2">
         {headings.map((heading) => (
           <li key={heading.id}>
             <button
               onClick={() => handleClick(heading.id)}
               className={clsx(
-                'w-full text-left text-sm hover:text-blue-500 truncate',
-                activeId === heading.id ? 'text-blue-500' : 'text-gray-500',
+                'w-full text-left text-sm hover:text-blue-500 truncate text-gray-900',
+                activeId === heading.id ? 'xl:text-blue-500' : 'xl:text-gray-500',
                 heading.level >= 6 ? 'ml-6' : heading.level >= 5 ? 'ml-4' : heading.level >= 4 ? 'ml-2' : ''
               )}
             >
