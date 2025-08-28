@@ -9,9 +9,9 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
 
   return (
     <>
-      <div className='flex flex-col'>
+      <div className='py-8 flex flex-col'>
         {postProps.map((post) => (
-          <Link 
+          <Link
             key={post.slug} 
             href={`/posts/${post.slug}`}
             className='w-full py-6 border-b border-b-gray-200'

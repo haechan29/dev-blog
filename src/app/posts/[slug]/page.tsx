@@ -17,7 +17,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const postProps = (post as Post).toProps();
 
   return (
-    <div className='max-w-2xl mx-auto px-4 py-20'>
+    <div className='py-14'>
       <div className='text-4xl font-bold mb-4'>{postProps.title}</div>
       <div className='flex mb-10'>
         <div className='text-gray-500 mr-4'>{postProps.date}</div>
