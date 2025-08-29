@@ -14,14 +14,14 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
           <Link
             key={post.slug} 
             href={`/posts/${post.slug}`}
-            className='w-full py-6 border-b border-b-gray-200'
+            className='w-full py-8 border-b border-b-gray-200'
           >
-            <div className='text-xl font-semibold text-black mb-1 truncate'>{post.title}</div>
-            <div className='text-gray-500 text-sm mb-4'>{post.date}</div>
+            <div className='text-xl font-semibold text-black mb-4 truncate'>{post.title}</div>
+            <div className='text-sm text-gray-500 mb-4'>{post.date}</div>
             <div className='text-black line-clamp-3 mb-4'>{post.plainText}</div>
-            <div className='flex'>
+            <div className='flex flex-wrap gap-x-2'>
               {post.tags.map(tag => (
-                <div key={tag} className='text-xs px-2 py-1 border border-gray-300 rounded-full mr-2'>{tag}</div>
+                <div key={tag} className='text-xs px-2 py-1 border border-gray-300 rounded-full'>{tag}</div>
               ))}
             </div>
           </Link>

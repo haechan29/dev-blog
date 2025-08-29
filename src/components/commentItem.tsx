@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
 import { Heart, Edit2, Trash2 } from 'lucide-react';
+import DeleteCommentDialog from '@/components/deleteCommentDialog';
+import { useEffect, useState } from 'react';
+import clsx from 'clsx';
 
 interface Comment {
   id: number;
@@ -12,10 +14,108 @@ interface Comment {
   updatedAt: string;
 }
 
-export default function CommentItem({ comment }: { comment: Comment }) {
+function ContentItem({ 
+  comment,
+  isEditing, 
+  setIsEditing 
+}: { 
+  comment: Comment,
+  isEditing: boolean,
+  setIsEditing: (isEditing: boolean) => void
+}) {
+  const [password, setPassword] = useState('');
+  const [content, setContent] = useState(comment.content);
+  const [isPasswordValid, setIsPasswordValid] = useState(true);
+  const [isContentValid, setIsContentValid] = useState(true);
+
+  useEffect(() => {
+    if (!isEditing) {
+      setPassword('');
+      setContent(comment.content);
+      setIsPasswordValid(true);
+      setIsContentValid(true);
+    }
+  }, [isEditing]);
+
+  const handleEdit = () => {
+    if (!password.trim()) {
+      setIsPasswordValid(false);
+      setIsContentValid(true);
+      return;
+    }
+
+    if (!content.trim()) {
+      setIsPasswordValid(true);
+      setIsContentValid(false);
+      return;
+    }
+  };
+
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6">
-      <div className="flex justify-between items-start mb-4">
+    <div className='mb-2'>
+      {isEditing ? (
+        <div className="space-y-3">
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => {
+              setIsPasswordValid(true);
+              setPassword(e.target.value);
+            }}
+            placeholder="비밀번호"
+            className={clsx(
+              "w-full p-3 outline-none border rounded-lg",
+              isPasswordValid ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500': 'border-red-400 animate-shake',
+              password ? 'bg-white' : 'bg-gray-50'
+            )}
+          />
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder='댓글을 작성해주세요'
+            className={clsx(
+              "w-full p-4 resize-none outline-none border rounded-lg overflow-y-hidden",
+              isContentValid ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500': 'border-red-400 animate-shake',
+              content ? 'bg-white' : 'bg-gray-50'
+            )}
+            rows={3}
+          />
+          <div className="flex space-x-2 text-sm">
+            <button
+              onClick={handleEdit}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500"
+            >
+              저장
+            </button>
+            <button
+              onClick={() => setIsEditing(false)}
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+            >
+              취소
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div>
+          <div className="text-gray-800 leading-relaxed mb-4">{comment.content}</div>
+          <div className="flex items-center space-x-4">
+            <button className="flex items-center space-x-1 text-gray-500 hover:text-red-500 transition-colors">
+              <Heart size={16} />
+              <span className="text-sm">0</span>
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function CommentItem({ comment }: { comment: Comment}) {
+  const [isEditing, setIsEditing] = useState(false);
+  
+  return (
+    <div className="rounded-lg py-4 border-b-1 border-b-gray-200">
+      <section className="flex justify-between items-start mb-6">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
             {comment.authorName.charAt(0)}
@@ -33,66 +133,26 @@ export default function CommentItem({ comment }: { comment: Comment }) {
         
         <div className="flex space-x-2">
           <button
-            onClick={() => 'startEdit(comment)'}
+            onClick={() => setIsEditing((prev) => !prev)}
             className="text-gray-400 hover:text-blue-600 transition-colors p-1"
           >
             <Edit2 size={16} />
           </button>
-          <button
-            onClick={() => 'setDeleteModal({ show: true, commentId: comment.id })'}
-            className="text-gray-400 hover:text-red-600 transition-colors p-1"
-          >
-            <Trash2 size={16} />
-          </button>
-        </div>
-      </div>
-
-      {/* 댓글 내용 / 수정 폼 */}
-      {'editingId'.length === comment.id ? (
-        <div className="space-y-3">
-          <textarea
-            value={'editContent'}
-            onChange={(e) => 'setEditContent(e.target.value)'}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-            rows={3}
+          <DeleteCommentDialog
+            commentId={comment.id}
+            children={
+              <button className="text-gray-400 hover:text-red-600 transition-colors p-1">
+                <Trash2 size={16}/>
+              </button>
+            }
           />
-          <input
-            type="password"
-            value={'editPassword'}
-            onChange={(e) => 'setEditPassword(e.target.value)'}
-            placeholder="비밀번호"
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-          <div className="flex space-x-2">
-            <button
-              onClick={() => 'completeEdit(comment.id)'}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
-            >
-              저장
-            </button>
-            <button
-              onClick={() => {
-                // setEditingId(null);
-                // setEditContent('');
-                // setEditPassword('');
-              }}
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 text-sm"
-            >
-              취소
-            </button>
-          </div>
         </div>
-      ) : (
-        <p className="text-gray-800 leading-relaxed mb-4">{comment.content}</p>
-      )}
+      </section>
 
-      {/* 좋아요 버튼 */}
-      <div className="flex items-center space-x-4 pt-2">
-        <button className="flex items-center space-x-1 text-gray-500 hover:text-red-500 transition-colors">
-          <Heart size={16} />
-          <span className="text-sm">0</span>
-        </button>
-      </div>
+      <ContentItem 
+        comment={comment} 
+        isEditing={isEditing} 
+        setIsEditing={setIsEditing} />
     </div>
   );
 }
