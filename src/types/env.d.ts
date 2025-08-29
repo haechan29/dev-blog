@@ -4,3 +4,12 @@ declare namespace NodeJS {
     NEXT_PUBLIC_SUPABASE_ANON_KEY: string
   }
 }
+
+export type Comment = {
+  id: string,
+  post_id: string,
+  author_name: string,
+  content: string,
+  created_at: string,
+  updated_at: string,
+}

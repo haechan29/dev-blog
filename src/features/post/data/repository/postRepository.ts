@@ -41,11 +41,7 @@ async function fetchAllPostsInner(): Promise<PostDto[]> {
     .filter(post => post !== null)
 }
 
-export const fetchAllPosts = unstable_cache(
-  fetchAllPostsInner,
-  ['getAllPosts'],
-  { revalidate: 3600 }
-)
+export const fetchAllPosts = fetchAllPostsInner;
 
 export async function fetchPostBySlug(slug: string): Promise<PostDto> {
   const posts = await fetchAllPosts();
