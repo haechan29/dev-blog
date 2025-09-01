@@ -1,3 +1,5 @@
+import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+
 export class Comment {
   constructor(
     public readonly id: number,
@@ -7,4 +9,15 @@ export class Comment {
     public readonly createdAt: string,
     public readonly updatedAt: string
   ) {}
+
+  toProps(): CommentItemProps {
+    return {
+      id: this.id,
+      postId: this.postId,
+      authorName: this.authorName,
+      content: this.content,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+    };
+  }
 }

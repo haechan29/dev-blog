@@ -1,0 +1,38 @@
+'use client';
+
+import CommentFormItem from '@/components/commentFormItem';
+import { MessageCircle } from 'lucide-react';
+import CommentItem from '@/components/commentItem';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { getComments } from '@/features/comment/domain/service/commentService';
+
+export default function CommentSectionClient({ slug }: { slug: string }) {
+  const { data: comments, error } = useSuspenseQuery({
+    queryKey: ['comments', slug],
+    queryFn: () => getComments(slug),
+  });
+
+  const commentProps = error ? [] : comments.map(comment => comment.toProps());
+
+  return (
+    <section>
+      <div className='text-xl font-bold text-gray-900 mb-8'>
+        댓글 {commentProps.length}개
+      </div>
+      <CommentFormItem postId={slug} />
+      <div className='space-y-6'>
+        {commentProps.length === 0 ? (
+          <div className='text-center py-12'>
+            <MessageCircle className='mx-auto text-gray-300 mb-4' size={48} />
+            <p className='text-gray-500 text-lg'>아직 댓글이 없습니다.</p>
+            <p className='text-gray-400'>첫 번째 댓글을 작성해보세요!</p>
+          </div>
+        ) : (
+          commentProps.map(comment => (
+            <CommentItem key={comment.id} comment={comment} />
+          ))
+        )}
+      </div>
+    </section>
+  );
+}
