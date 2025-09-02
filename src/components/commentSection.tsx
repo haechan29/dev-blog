@@ -11,7 +11,10 @@ export default async function CommentSection({ slug }: { slug: string }) {
 
   await queryClient.prefetchQuery({
     queryKey: ['comments', slug],
-    queryFn: () => getComments(slug),
+    queryFn: async () => {
+      const comments = await getComments(slug);
+      return comments.map(comment => comment.toProps());
+    },
   });
 
   return (

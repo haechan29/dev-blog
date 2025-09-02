@@ -1,5 +1,5 @@
 import { Comment } from '@/features/comment/domain/model/comment';
-import { CommentResponseDto } from '../dto/commentResponseDto';
+import { CommentResponseDto } from '@/features/comment/data/dto/commentResponseDto';
 
 export function toDomain(dto: CommentResponseDto): Comment {
   return new Comment(
@@ -9,5 +9,5 @@ export function toDomain(dto: CommentResponseDto): Comment {
     dto.content,
     dto.createdAt,
     dto.updatedAt
-  )
+  );
 }

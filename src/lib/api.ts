@@ -1,30 +1,30 @@
 import { isServer } from '@tanstack/react-query';
 
 export const api = {
-  get: <T>(url: string, options?: RequestInit) =>
-    fetchWithErrorHandling<T>(url, options),
+  get: (url: string, options?: RequestInit) =>
+    fetchWithErrorHandling(url, options),
 
-  post: <T>(url: string, body: any, options?: RequestInit) =>
-    fetchWithErrorHandling<T>(url, {
+  post: (url: string, body: any, options?: RequestInit) =>
+    fetchWithErrorHandling(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
       ...options,
     }),
 
-  put: <T>(url: string, body: any, options?: RequestInit) =>
-    fetchWithErrorHandling<T>(url, {
+  put: (url: string, body: any, options?: RequestInit) =>
+    fetchWithErrorHandling(url, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
       ...options,
     }),
 
-  delete: <T>(url: string, options?: RequestInit) =>
-    fetchWithErrorHandling<T>(url, { method: 'DELETE', ...options }),
+  delete: (url: string, options?: RequestInit) =>
+    fetchWithErrorHandling(url, { method: 'DELETE', ...options }),
 };
 
-async function fetchWithErrorHandling<T>(url: string, options?: RequestInit) {
+async function fetchWithErrorHandling(url: string, options?: RequestInit) {
   const baseUrl = isServer ? process.env.NEXT_PUBLIC_URL : '';
 
   if (baseUrl === undefined) {

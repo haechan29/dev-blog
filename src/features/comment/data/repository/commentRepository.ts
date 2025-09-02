@@ -5,10 +5,9 @@ import { Comment } from '@/types/env';
 export async function getComments(
   postId: string
 ): Promise<CommentResponseDto[]> {
-  const response = await api.get<CommentResponseDto[]>(
-    `/api/comments?post_id=${postId}`
-  );
+  const response = await api.get(`/api/comments?post_id=${postId}`);
   const data = response.data;
+
   return data.map((comment: Comment) => ({
     id: comment.id,
     postId: comment.post_id,
@@ -25,10 +24,7 @@ export async function createComment(requestBody: {
   content: string;
   password: string;
 }): Promise<CommentResponseDto> {
-  const response = await api.post<CommentResponseDto>(
-    '/api/comments',
-    requestBody
-  );
+  const response = await api.post('/api/comments', requestBody);
   const comment = response.data;
   return {
     id: comment.id,
@@ -45,10 +41,7 @@ export async function updateComment(requestBody: {
   content: string;
   password: string;
 }): Promise<CommentResponseDto> {
-  const response = await api.put<CommentResponseDto>(
-    '/api/comments',
-    requestBody
-  );
+  const response = await api.put('/api/comments', requestBody);
   const comment = response.data;
   return {
     id: comment.id,

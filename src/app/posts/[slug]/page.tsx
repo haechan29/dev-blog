@@ -17,46 +17,6 @@ const ExternalLink = ({ children, ...props }: { children: ReactNode }) => {
   );
 };
 
-interface Comment {
-  id: number;
-  postId: string;
-  authorName: string;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-// 가짜 데이터
-const mockComments: Comment[] = [
-  {
-    id: 1,
-    postId: 'sample-post',
-    authorName: '김개발',
-    content:
-      '정말 유용한 글이네요! 특히 타입스크립트 부분이 도움이 많이 되었습니다. 실무에서 바로 적용해보겠어요. 정말 유용한 글이네요! 특히 타입스크립트 부분이 도움이 많이 되었습니다. 실무에서 바로 적용해보겠어요. 정말 유용한 글이네요! 특히 타입스크립트 부분이 도움이 많이 되었습니다. 실무에서 바로 적용해보겠어요.',
-    createdAt: '2024-01-15T10:30:00Z',
-    updatedAt: '2024-01-15T10:30:00Z',
-  },
-  {
-    id: 2,
-    postId: 'sample-post',
-    authorName: '프론트엔더',
-    content:
-      'Next.js 15 정보 감사합니다! 마침 프로젝트에서 업그레이드를 고민하고 있었는데 많은 도움이 되었어요.',
-    createdAt: '2024-01-15T14:20:00Z',
-    updatedAt: '2024-01-15T14:20:00Z',
-  },
-  {
-    id: 3,
-    postId: 'sample-post',
-    authorName: '신입개발자',
-    content:
-      '초보자도 이해하기 쉽게 설명해주셔서 감사합니다. 계속 좋은 글 부탁드려요!',
-    createdAt: '2024-01-15T16:45:00Z',
-    updatedAt: '2024-01-15T16:45:00Z',
-  },
-];
-
 export default async function PostPage({
   params,
 }: {
@@ -108,8 +68,8 @@ export default async function PostPage({
         />
       </section>
 
-      <ErrorBoundary fallback={<></>}>
-        <Suspense fallback={<></>}>
+      <ErrorBoundary fallback={<div></div>}>
+        <Suspense fallback={<div></div>}>
           <div className='w-full h-[1px] bg-gray-200 mb-8' />
           <CommentSection slug={slug} />
         </Suspense>
