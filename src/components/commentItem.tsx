@@ -103,17 +103,17 @@ function ContentItem({
           <div className='flex space-x-2 text-sm'>
             <button
               onClick={handleEdit}
-              className='px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500'
+              className='w-14 h-10 flex justify-center items-center bg-blue-600 text-white rounded-lg hover:bg-blue-500'
             >
               {editComment.isPending ? (
-                <Loader2 size={18} strokeWidth={3} className='animate-spin' />
+                <Loader2 size={18} strokeWidth={2} className='animate-spin' />
               ) : (
                 '저장'
               )}
             </button>
             <button
               onClick={() => setIsEditing(false)}
-              className='px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300'
+              className='w-14 h-10 flex justify-center items-center bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300'
             >
               취소
             </button>
@@ -171,6 +171,7 @@ export default function CommentItem({
             <Edit2 size={16} />
           </button>
           <DeleteCommentDialog
+            postId={comment.postId}
             commentId={comment.id}
             children={
               <button className='text-gray-400 hover:text-red-600 transition-colors p-1'>

@@ -117,7 +117,7 @@ export default function CommentFormItem({ postId }: { postId: string }) {
         <button
           onClick={handleSubmit}
           className={clsx(
-            'flex items-center px-5 py-2 text-white rounded-lg bg-blue-600 hover:bg-blue-500 cursor-pointer'
+            'w-30 h-10 flex justify-center items-center text-white rounded-lg bg-blue-600 hover:bg-blue-500 cursor-pointer'
           )}
         >
           {createComment.isPending ? (
