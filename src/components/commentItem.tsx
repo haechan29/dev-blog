@@ -34,7 +34,7 @@ function ContentItem({
   }, [isEditing]);
 
   const editComment = useMutation({
-    mutationKey: ['comments', comment.postId],
+    mutationKey: ['posts', comment.postId, 'comments', comment.id],
     mutationFn: (params: {
       postId: string;
       commentId: number;
@@ -42,9 +42,10 @@ function ContentItem({
       password: string;
     }) => updateComment(params),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['comments', comment.postId] });
+      queryClient.invalidateQueries({
+        queryKey: ['posts', comment.postId, 'comments'],
+      });
       setIsEditing(false);
-      console.log(isEditing);
     },
   });
 

@@ -8,7 +8,7 @@ import { getComments } from '@/features/comment/domain/service/commentService';
 
 export default function CommentSectionClient({ slug }: { slug: string }) {
   const { data: comments } = useSuspenseQuery({
-    queryKey: ['comments', slug],
+    queryKey: ['posts', slug, 'comments'],
     queryFn: async () => {
       const comments = await getComments(slug);
       return comments.map(comment => comment.toProps());

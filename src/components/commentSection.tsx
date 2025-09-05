@@ -10,7 +10,7 @@ export default async function CommentSection({ slug }: { slug: string }) {
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({
-    queryKey: ['comments', slug],
+    queryKey: ['posts', slug, 'comments'],
     queryFn: async () => {
       const comments = await getComments(slug);
       return comments.map(comment => comment.toProps());

@@ -24,7 +24,9 @@ export default function CommentFormItem({ postId }: { postId: string }) {
       password: string;
     }) => CommentService.createComment(params),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['comments', postId] });
+      queryClient.invalidateQueries({
+        queryKey: ['posts', postId, 'comments'],
+      });
       setAuthorName('익명');
       setContent('');
       setPassword('');
