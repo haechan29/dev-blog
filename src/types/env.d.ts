@@ -13,3 +13,12 @@ export type Comment = {
   created_at: string;
   updated_at: string;
 };
+
+export type PostStats = {
+  id: string;
+  post_id: string;
+  like_count: number;
+  comment_count: number;
+  created_at: string;
+  updated_at: string;
+};

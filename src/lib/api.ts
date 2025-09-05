@@ -4,7 +4,7 @@ export const api = {
   get: (url: string, options?: RequestInit) =>
     fetchWithErrorHandling(url, options),
 
-  post: (url: string, body: any, options?: RequestInit) =>
+  post: (url: string, body?: any, options?: RequestInit) =>
     fetchWithErrorHandling(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

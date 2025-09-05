@@ -170,7 +170,7 @@ async function checkPassword(commentId: string, password: string) {
     .from('comments')
     .select('id, password_hash')
     .eq('id', commentId)
-    .single();
+    .maybeSingle();
 
   if (error || !data) {
     return { isCommentExist: false, isValidPassword: false };
