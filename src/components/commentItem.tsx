@@ -36,6 +36,7 @@ function ContentItem({
   const editComment = useMutation({
     mutationKey: ['comments', comment.postId],
     mutationFn: (params: {
+      postId: string;
       commentId: number;
       content: string;
       password: string;
@@ -61,6 +62,7 @@ function ContentItem({
     }
 
     editComment.mutate({
+      postId: comment.postId,
       commentId: comment.id,
       content: content.trim(),
       password: password.trim(),

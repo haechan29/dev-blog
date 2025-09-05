@@ -1,11 +1,12 @@
 import { supabase } from '@/lib/supabase';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { Comment } from '@/types/env';
 
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const postId = searchParams.get('post_id');
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ postId: string }> }
+) {
+  const { postId } = await params;
 
   if (!postId) {
     return NextResponse.json(
@@ -27,9 +28,13 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ data });
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ postId: string }> }
+) {
   try {
-    const { postId, authorName, content, password } = await request.json();
+    const { postId } = await params;
+    const { authorName, content, password } = await request.json();
 
     if (!postId || !content || !password) {
       return NextResponse.json(
@@ -63,9 +68,13 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function PUT(request: NextRequest) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ commentId: number }> }
+) {
   try {
-    const { commentId, content, password } = await request.json();
+    const { commentId } = await params;
+    const { content, password } = await request.json();
 
     if (!commentId || !content || !password) {
       return NextResponse.json(
@@ -115,10 +124,12 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-export async function DELETE(request: NextRequest) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ commentId: number }> }
+) {
   try {
-    const { searchParams } = new URL(request.url);
-    const commentId = searchParams.get('comment_id');
+    const { commentId } = await params;
     const password = request.headers.get('X-Comment-Password');
 
     if (!commentId || !password) {
@@ -165,7 +176,7 @@ export async function DELETE(request: NextRequest) {
   }
 }
 
-async function checkPassword(commentId: string, password: string) {
+async function checkPassword(commentId: number, password: string) {
   const { data, error } = await supabase
     .from('comments')
     .select('id, password_hash')

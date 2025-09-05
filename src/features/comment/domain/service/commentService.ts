@@ -18,6 +18,7 @@ export async function createComment(params: {
 }
 
 export async function updateComment(params: {
+  postId: string;
   commentId: number;
   content: string;
   password: string;
@@ -27,8 +28,9 @@ export async function updateComment(params: {
 }
 
 export async function deleteComment(
+  postId: string,
   commentId: number,
   password: string
 ): Promise<void> {
-  await CommentRepository.deleteComment(commentId, password);
+  await CommentRepository.deleteComment(postId, commentId, password);
 }

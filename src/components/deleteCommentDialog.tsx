@@ -39,12 +39,14 @@ export default function DeleteCommentDialog({
   const deleteComment = useMutation({
     mutationKey: ['comments', postId],
     mutationFn: ({
+      postId,
       commentId,
       password,
     }: {
+      postId: string;
       commentId: number;
       password: string;
-    }) => CommentService.deleteComment(commentId, password),
+    }) => CommentService.deleteComment(postId, commentId, password),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['comments', postId],
@@ -59,7 +61,7 @@ export default function DeleteCommentDialog({
       return;
     }
 
-    deleteComment.mutate({ commentId, password: password.trim() });
+    deleteComment.mutate({ postId, commentId, password: password.trim() });
   };
 
   return (

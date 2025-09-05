@@ -5,7 +5,7 @@ import { Comment } from '@/types/env';
 export async function getComments(
   postId: string
 ): Promise<CommentResponseDto[]> {
-  const response = await api.get(`/api/comments?post_id=${postId}`);
+  const response = await api.get(`/api/posts/${postId}/comments`);
   const data = response.data;
 
   return data.map((comment: Comment) => ({
@@ -18,13 +18,16 @@ export async function getComments(
   }));
 }
 
-export async function createComment(requestBody: {
+export async function createComment({
+  postId,
+  ...requestBody
+}: {
   postId: string;
   authorName: string;
   content: string;
   password: string;
 }): Promise<CommentResponseDto> {
-  const response = await api.post('/api/comments', requestBody);
+  const response = await api.post(`/api/posts/${postId}/comments`, requestBody);
   const comment = response.data;
   return {
     id: comment.id,
@@ -36,12 +39,20 @@ export async function createComment(requestBody: {
   };
 }
 
-export async function updateComment(requestBody: {
+export async function updateComment({
+  postId,
+  commentId,
+  ...requestBody
+}: {
+  postId: string;
   commentId: number;
   content: string;
   password: string;
 }): Promise<CommentResponseDto> {
-  const response = await api.put('/api/comments', requestBody);
+  const response = await api.put(
+    `/api/posts/${postId}/comments/${commentId}`,
+    requestBody
+  );
   const comment = response.data;
   return {
     id: comment.id,
@@ -54,10 +65,11 @@ export async function updateComment(requestBody: {
 }
 
 export async function deleteComment(
+  postId: string,
   commentId: number,
   password: string
 ): Promise<void> {
-  await api.delete(`/api/comments?comment_id=${commentId}`, {
+  await api.delete(`/api/posts/${postId}/comments/${commentId}`, {
     headers: {
       'X-Comment-Password': password,
     },
