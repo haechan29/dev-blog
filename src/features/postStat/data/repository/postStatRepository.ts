@@ -4,7 +4,7 @@ import { api } from '@/lib/api';
 export async function fetchPostStat(
   postId: string
 ): Promise<PostStatResponseDto> {
-  const response = await api.get(`/api/posts/stats/${postId}`);
+  const response = await api.get(`/api/posts/${postId}/stats`);
   const postStat = response.data;
 
   return {
@@ -18,9 +18,9 @@ export async function fetchPostStat(
 }
 
 export async function createPostStat(postId: string): Promise<void> {
-  await api.post(`/api/posts/stats/${postId}`);
+  await api.post(`/api/posts/${postId}/stats`);
 }
 
 export async function deletePostStat(postId: string): Promise<void> {
-  await api.delete(`/api/posts/stats/${postId}`);
+  await api.delete(`/api/posts/${postId}/stats`);
 }
