@@ -6,7 +6,6 @@ export default function toDomain(postStatDto: PostStatResponseDto): PostStat {
     postStatDto.id,
     postStatDto.postId,
     postStatDto.likeCount,
-    postStatDto.commentCount,
     postStatDto.createdAt,
     postStatDto.updatedAt
   );

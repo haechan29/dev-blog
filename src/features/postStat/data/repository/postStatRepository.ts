@@ -11,7 +11,6 @@ export async function fetchPostStat(
     id: postStat.id,
     postId: postStat.post_id,
     likeCount: postStat.like_count,
-    commentCount: postStat.comment_count,
     createdAt: postStat.created_at,
     updatedAt: postStat.updated_at,
   };
@@ -23,4 +22,19 @@ export async function createPostStat(postId: string): Promise<void> {
 
 export async function deletePostStat(postId: string): Promise<void> {
   await api.delete(`/api/posts/${postId}/stats`);
+}
+
+export async function incrementLikeCount(
+  postId: string
+): Promise<PostStatResponseDto> {
+  const response = await api.post(`/api/posts/${postId}/stats/likes/increment`);
+  const postStat = response.data;
+
+  return {
+    id: postStat.id,
+    postId: postStat.post_id,
+    likeCount: postStat.like_count,
+    createdAt: postStat.created_at,
+    updatedAt: postStat.updated_at,
+  };
 }
