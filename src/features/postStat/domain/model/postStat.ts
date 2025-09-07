@@ -1,3 +1,5 @@
+import { PostStatItemProps } from '@/features/postStat/ui/postStatItemProps';
+
 export default class PostStat {
   constructor(
     public readonly id: string,
@@ -6,4 +8,14 @@ export default class PostStat {
     public readonly createdAt: string,
     public readonly updatedAt: string
   ) {}
+
+  toProps(): PostStatItemProps {
+    return {
+      id: this.id,
+      postId: this.postId,
+      likeCount: this.likeCount,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+    };
+  }
 }

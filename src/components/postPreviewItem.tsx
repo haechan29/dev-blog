@@ -1,6 +1,8 @@
 'use client';
 
 import { PostItemProps } from '@/features/post/ui/postItemProps';
+import { fetchPostStat } from '@/features/postStat/domain/service/postStatService';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Calendar, Heart, MessageCircle, Tag } from 'lucide-react';
 import Link from 'next/link';
@@ -9,6 +11,11 @@ import { useEffect, useRef, useState } from 'react';
 export default function PostPreviewItem({ post }: { post: PostItemProps }) {
   const [isTextAreaExpanded, setIsTextAreaExpanded] = useState(false);
   const timerRef = useRef<number | undefined>(undefined);
+
+  const { data: stat } = useSuspenseQuery({
+    queryKey: ['posts', post.slug, 'stats'],
+    queryFn: () => fetchPostStat(post.slug).then(stat => stat.toProps()),
+  });
 
   useEffect(() => {
     return () => {
@@ -62,7 +69,7 @@ export default function PostPreviewItem({ post }: { post: PostItemProps }) {
         <div className='flex items-center gap-4'>
           <div className='flex items-center gap-1 text-gray-500'>
             <Heart className='w-4 h-4' />
-            <span className='text-sm'>{3}</span>
+            <span className='text-sm'>{stat.likeCount}</span>
           </div>
           <div className='flex items-center gap-1 text-gray-500'>
             <MessageCircle className='w-4 h-4' />
