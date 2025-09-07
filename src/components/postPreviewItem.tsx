@@ -2,20 +2,36 @@
 
 import { PostItemProps } from '@/features/post/ui/postItemProps';
 import { fetchPostStat } from '@/features/postStat/domain/service/postStatService';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { Calendar, Heart, MessageCircle, Tag } from 'lucide-react';
+import { BarChart3, Calendar, Heart, Tag } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+
+function PostStatSection({ post }: { post: PostItemProps }) {
+  const { data: stat } = useQuery({
+    queryKey: ['posts', post.slug, 'stats'],
+    queryFn: () => fetchPostStat(post.slug).then(stat => stat.toProps()),
+  });
+
+  return (
+    <div className='flex items-center gap-4'>
+      <div className='flex items-center gap-1 text-gray-500'>
+        <Heart className='w-4 h-4' />
+        <span className='text-sm'>{stat?.likeCount ?? 0}</span>
+      </div>
+
+      <div className='flex items-center gap-1 text-gray-500'>
+        <BarChart3 className='w-4 h-4' />
+        <span className='text-sm'>{stat?.viewCount ?? 0}</span>
+      </div>
+    </div>
+  );
+}
 
 export default function PostPreviewItem({ post }: { post: PostItemProps }) {
   const [isTextAreaExpanded, setIsTextAreaExpanded] = useState(false);
   const timerRef = useRef<number | undefined>(undefined);
-
-  const { data: stat } = useSuspenseQuery({
-    queryKey: ['posts', post.slug, 'stats'],
-    queryFn: () => fetchPostStat(post.slug).then(stat => stat.toProps()),
-  });
 
   useEffect(() => {
     return () => {
@@ -66,16 +82,7 @@ export default function PostPreviewItem({ post }: { post: PostItemProps }) {
       </Link>
 
       <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
-        <div className='flex items-center gap-4'>
-          <div className='flex items-center gap-1 text-gray-500'>
-            <Heart className='w-4 h-4' />
-            <span className='text-sm'>{stat.likeCount}</span>
-          </div>
-          <div className='flex items-center gap-1 text-gray-500'>
-            <MessageCircle className='w-4 h-4' />
-            <span className='text-sm'>{4}</span>
-          </div>
-        </div>
+        <PostStatSection post={post} />
 
         <div className='flex items-center gap-2'>
           <Tag className='w-4 h-4 text-gray-400' />

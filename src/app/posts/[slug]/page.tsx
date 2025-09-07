@@ -8,6 +8,7 @@ import { Post } from '@/features/post/domain/model/post';
 import { fetchPostBySlug } from '@/features/post/domain/service/postService';
 import CommentSection from '@/components/commentSection';
 import { ErrorBoundary } from 'react-error-boundary';
+import PostViewTracker from '@/components/postViewTracker';
 
 const ExternalLink = ({ children, ...props }: { children: ReactNode }) => {
   return (
@@ -28,6 +29,8 @@ export default async function PostPage({
 
   return (
     <div className='py-14'>
+      <PostViewTracker post={postProps} />
+
       <section className='mb-10'>
         <div className='text-4xl font-bold mb-6'>{postProps.title}</div>
         <div className='text-sm text-gray-500 mb-6'>{postProps.date}</div>

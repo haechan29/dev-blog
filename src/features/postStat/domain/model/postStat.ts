@@ -5,6 +5,7 @@ export default class PostStat {
     public readonly id: string,
     public readonly postId: string,
     public readonly likeCount: number,
+    public readonly viewCount: number,
     public readonly createdAt: string,
     public readonly updatedAt: string
   ) {}
@@ -14,6 +15,7 @@ export default class PostStat {
       id: this.id,
       postId: this.postId,
       likeCount: this.likeCount,
+      viewCount: this.viewCount,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };
