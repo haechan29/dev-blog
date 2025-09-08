@@ -9,6 +9,7 @@ import { fetchPostBySlug } from '@/features/post/domain/service/postService';
 import CommentSection from '@/components/commentSection';
 import { ErrorBoundary } from 'react-error-boundary';
 import PostViewTracker from '@/components/postViewTracker';
+import LikeButtonItem from '@/components/likeButtonItem';
 
 const ExternalLink = ({ children, ...props }: { children: ReactNode }) => {
   return (
@@ -56,7 +57,7 @@ export default async function PostPage({
         </section>
       )}
 
-      <section className='prose mb-10'>
+      <section className='prose mb-20'>
         <MDXRemote
           source={postProps.content}
           components={{
@@ -71,9 +72,12 @@ export default async function PostPage({
         />
       </section>
 
+      <section className='flex justify-center mb-20'>
+        <LikeButtonItem postId={post.slug} />
+      </section>
+
       <ErrorBoundary fallback={<div></div>}>
         <Suspense fallback={<div></div>}>
-          <div className='w-full h-[1px] bg-gray-200 mb-8' />
           <CommentSection slug={slug} />
         </Suspense>
       </ErrorBoundary>
