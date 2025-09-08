@@ -2,6 +2,7 @@
 
 import { fetchPostStat } from '@/features/postStat/domain/service/postStatService';
 import * as PostStatService from '@/features/postStat/domain/service/postStatService';
+import { PostStatItemProps } from '@/features/postStat/ui/postStatItemProps';
 import useThrottle from '@/hooks/useThrottle';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
@@ -25,17 +26,20 @@ export default function LikeButtonItem({ postId }: { postId: string }) {
       await queryClient.cancelQueries({ queryKey: ['posts', postId, 'stats'] });
       const previousStat = queryClient.getQueryData(['posts', postId, 'stats']);
 
-      queryClient.setQueryData(['posts', postId, 'stats'], (prev: any) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          likeCount: prev.likeCount + 1,
-        };
-      });
+      queryClient.setQueryData(
+        ['posts', postId, 'stats'],
+        (prev: PostStatItemProps | undefined) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            likeCount: prev.likeCount + 1,
+          };
+        }
+      );
 
       return { previousStat };
     },
-    onError: (error, variables, context) => {
+    onError: (_error, _variables, context) => {
       if (context?.previousStat) {
         queryClient.setQueryData(
           ['posts', postId, 'stats'],
@@ -57,7 +61,7 @@ export default function LikeButtonItem({ postId }: { postId: string }) {
     });
   };
 
-  const handleFillingHeart = (e: React.TransitionEvent<HTMLButtonElement>) => {
+  const handleFillingHeart = () => {
     if (heartFilled) {
       setTimeout(() => setHeartFilled(false), 300);
     }

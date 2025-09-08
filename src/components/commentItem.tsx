@@ -31,7 +31,7 @@ function ContentItem({
       setIsPasswordValid(true);
       setIsContentValid(true);
     }
-  }, [isEditing]);
+  }, [isEditing, comment.content]);
 
   const editComment = useMutation({
     mutationKey: ['posts', comment.postId, 'comments', comment.id],
@@ -173,15 +173,11 @@ export default function CommentItem({
           >
             <Edit2 size={16} />
           </button>
-          <DeleteCommentDialog
-            postId={comment.postId}
-            commentId={comment.id}
-            children={
-              <button className='text-gray-400 hover:text-red-600 transition-colors p-1'>
-                <Trash2 size={16} />
-              </button>
-            }
-          />
+          <DeleteCommentDialog postId={comment.postId} commentId={comment.id}>
+            <button className='text-gray-400 hover:text-red-600 transition-colors p-1'>
+              <Trash2 size={16} />
+            </button>
+          </DeleteCommentDialog>
         </div>
       </section>
 

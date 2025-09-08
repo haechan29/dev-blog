@@ -6,7 +6,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useEffect } from 'react';
 
 export default function PostViewTracker({ post }: { post: PostItemProps }) {
-  const [lastViewTime, setLastViewTime] = useLocalStorage<number>(
+  const [lastViewTime, setLastViewTime] = useLocalStorage(
     `post-view-${post.slug}`,
     0
   );
@@ -17,7 +17,7 @@ export default function PostViewTracker({ post }: { post: PostItemProps }) {
       incrementViewCount(post.slug);
       setLastViewTime(now);
     }
-  }, [post.slug]);
+  }, [post.slug, lastViewTime, setLastViewTime]);
 
   return <></>;
 }

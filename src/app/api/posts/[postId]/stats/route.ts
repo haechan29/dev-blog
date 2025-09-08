@@ -26,7 +26,7 @@ export async function GET(
     }
 
     return NextResponse.json({ data });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: '댓글 게시글 통계 조회 요청이 실패했습니다.' },
       { status: 500 }
@@ -72,7 +72,7 @@ export async function POST(
     }
 
     return NextResponse.json({ data: null }, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: '통계 생성 요청이 실패했습니다.' },
       { status: 500 }
@@ -106,7 +106,7 @@ export async function DELETE(
     }
 
     return NextResponse.json({ data: null });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: '게시글 통계 삭제 요청이 실패했습니다.' },
       { status: 500 }

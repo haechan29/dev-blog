@@ -4,7 +4,7 @@ export const api = {
   get: (url: string, options?: RequestInit) =>
     fetchWithErrorHandling(url, options),
 
-  post: (url: string, body?: any, options?: RequestInit) =>
+  post: (url: string, body?: unknown, options?: RequestInit) =>
     fetchWithErrorHandling(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -12,7 +12,7 @@ export const api = {
       ...options,
     }),
 
-  put: (url: string, body: any, options?: RequestInit) =>
+  put: (url: string, body: unknown, options?: RequestInit) =>
     fetchWithErrorHandling(url, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

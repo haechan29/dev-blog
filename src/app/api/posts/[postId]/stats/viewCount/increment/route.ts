@@ -39,7 +39,7 @@ export async function POST(
     }
 
     return NextResponse.json({ data });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: '조회수 증가 요청이 실패했습니다.' },
       { status: 500 }

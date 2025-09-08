@@ -18,7 +18,7 @@ export function useLocalStorage<T>(
     try {
       const item = localStorage.getItem(key);
       return item ? serializer.parse(item) : initialValue;
-    } catch (error) {
+    } catch {
       return initialValue;
     }
   });
@@ -27,7 +27,7 @@ export function useLocalStorage<T>(
     try {
       setStoredValue(value);
       localStorage.setItem(key, serializer.stringify(value));
-    } catch (error) {}
+    } catch {}
   };
 
   useEffect(() => {
@@ -38,13 +38,13 @@ export function useLocalStorage<T>(
         try {
           const newValue = serializer.parse(e.newValue);
           setStoredValue(newValue);
-        } catch (error) {}
+        } catch {}
       }
     };
 
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, [key, syncAcrossTabs]);
+  }, [syncAcrossTabs, serializer, key, setStoredValue]);
 
   return [storedValue, setValue];
 }

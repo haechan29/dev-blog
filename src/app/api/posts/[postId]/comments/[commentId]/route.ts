@@ -50,7 +50,7 @@ export async function PUT(
     }
 
     return NextResponse.json({ data: data[0] });
-  } catch (e) {
+  } catch {
     return NextResponse.json(
       { error: '댓글 수정 요청이 실패했습니다.' },
       { status: 500 }
@@ -102,7 +102,7 @@ export async function DELETE(
     }
 
     return NextResponse.json({ data: null });
-  } catch (e) {
+  } catch {
     return NextResponse.json(
       { error: '댓글 삭제 요청이 실패했습니다.' },
       { status: 500 }

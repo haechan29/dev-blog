@@ -60,7 +60,7 @@ export async function POST(
     }
 
     return NextResponse.json({ data: data[0] });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: '댓글 생성 요청이 실패했습니다.' },
       { status: 400 }
