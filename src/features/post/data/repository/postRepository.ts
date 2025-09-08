@@ -1,5 +1,5 @@
 import path from 'path';
-import { readdir, readFile } from 'fs/promises'
+import { readdir, readFile } from 'fs/promises';
 import matter from 'gray-matter';
 import { unstable_cache } from 'next/cache';
 import { PostDto } from '@/features/post/data/dto/postDto';
@@ -16,7 +16,7 @@ async function fetchPostBySlugInner(slug: string): Promise<PostDto> {
     title: data.title,
     date: data.date,
     content: content,
-    tags: data.tags
+    tags: data.tags,
   };
 }
 
@@ -25,8 +25,8 @@ async function fetchAllPostsInner(): Promise<PostDto[]> {
 
   const posts = await Promise.all(
     files
-      .filter((file) => file.endsWith('.mdx'))
-      .map(async (file) => {
+      .filter(file => file.endsWith('.mdx'))
+      .map(async file => {
         try {
           const slug = file.replace(/\.mdx$/, '');
           return await fetchPostBySlugInner(slug);
@@ -34,23 +34,22 @@ async function fetchAllPostsInner(): Promise<PostDto[]> {
           console.error(`${file} 파싱 실패: `, e);
           return null;
         }
-     })
-    );
+      })
+  );
 
-  return posts
-    .filter(post => post !== null)
+  return posts.filter(post => post !== null);
 }
 
 export const fetchAllPosts = unstable_cache(
   fetchAllPostsInner,
   ['getAllPosts'],
   { revalidate: 3600 }
-)
+);
 
 export async function fetchPostBySlug(slug: string): Promise<PostDto> {
   const posts = await fetchAllPosts();
   const post = posts.find(post => post.slug === slug);
-  
+
   if (!post) throw new Error(`Post를 찾을 수 없습니다: ${slug}`);
 
   return post;

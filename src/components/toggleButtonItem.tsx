@@ -13,15 +13,17 @@ export default function ToggleButtonItem({
 }) {
   const [isClicked, setIsClicked] = useState(false);
 
-  return <button
-    onClick={() => setIsClicked(prev => !prev)}
-    className={clsx(
-      className,
-      'px-1 rounded-sm transition-colors duration-300 ease-in-out',
-      !isClicked && 'bg-gray-200 text-transparent hover:bg-gray-300'
-    )}
-    { ...props }
-  >
-    {children}
-  </button>
+  return (
+    <button
+      onClick={() => setIsClicked(prev => !prev)}
+      className={clsx(
+        className,
+        'px-1 rounded-sm transition-colors duration-300 ease-in-out',
+        !isClicked && 'bg-gray-200 text-transparent hover:bg-gray-300'
+      )}
+      {...props}
+    >
+      {children}
+    </button>
+  );
 }

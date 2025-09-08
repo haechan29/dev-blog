@@ -5,25 +5,24 @@ import { visit } from 'unist-util-visit';
 
 export function extractHeadings(content: string): Heading[] {
   const headings: Heading[] = [];
-  
-  const tree = unified()
-    .use(remarkParse)
-    .parse(content);
 
-  visit(tree, 'heading', (node) => {
+  const tree = unified().use(remarkParse).parse(content);
+
+  visit(tree, 'heading', node => {
     const text = node.children
       .filter(child => child.type === 'text')
       .map(child => child.value)
       .join('');
-    
-    const id = text.toLowerCase()
+
+    const id = text
+      .toLowerCase()
       .replace(/[^\w\s가-힣]/g, '')
       .replace(/\s+/g, '-');
 
     headings.push({
       id,
       text,
-      level: node.depth
+      level: node.depth,
     });
   });
 
@@ -42,6 +41,5 @@ export function extractPlainText(content: string): string {
     .replace(/\*(.*?)\*/g, '$1') // *기울임* 제거
     .replace(/\[(.*?)\]\(.*?\)/g, '$1') // 링크 제거
     .replace(/\n+/g, ' ') // 개행 제거
-    .trim()
-    .substring(0, 150) + '...'; // 150자로 제한
+    .trim();
 }
