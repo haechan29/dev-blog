@@ -4,7 +4,7 @@ import { PostItemProps } from '@/features/post/ui/postItemProps';
 import { fetchPostStat } from '@/features/postStat/domain/service/postStatService';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { BarChart3, Calendar, Heart, Tag } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
@@ -39,27 +39,31 @@ export default function PostPreviewItem({ post }: { post: PostItemProps }) {
     };
   }, []);
 
+  const onMouseEnter = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    timerRef.current = window.setTimeout(() => {
+      setIsTextAreaExpanded(true);
+    }, 500);
+  };
+
+  const onMouseLeave = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = undefined;
+    }
+    setIsTextAreaExpanded(false);
+  };
+
   return (
     <div className={clsx('w-full py-8 border-b border-b-gray-200')}>
       <Link
         href={`/posts/${post.slug}`}
-        onMouseEnter={() => {
-          if (timerRef.current) {
-            clearTimeout(timerRef.current);
-          }
-          timerRef.current = window.setTimeout(() => {
-            setIsTextAreaExpanded(true);
-          }, 500);
-        }}
-        onMouseLeave={() => {
-          if (timerRef.current) {
-            clearTimeout(timerRef.current);
-            timerRef.current = undefined;
-          }
-          setIsTextAreaExpanded(false);
-        }}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
       >
-        <div className='text-xl font-semibold text-gray-900 mb-4 truncate'>
+        <div className='text-xl font-semibold text-gray-900 mb-4 line-clamp-2'>
           {post.title}
         </div>
 
@@ -78,12 +82,13 @@ export default function PostPreviewItem({ post }: { post: PostItemProps }) {
 
       <div className='flex flex-wrap gap-2 mb-4'>
         {post.tags.map(tag => (
-          <div
+          <Link
+            href={`/posts?tag=${tag}`}
             key={tag}
             className='text-xs px-2 py-1 flex-shrink-0 border border-gray-300 rounded-full'
           >
             {tag}
-          </div>
+          </Link>
         ))}
       </div>
 

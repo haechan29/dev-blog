@@ -10,6 +10,7 @@ import CommentSection from '@/components/commentSection';
 import { ErrorBoundary } from 'react-error-boundary';
 import PostViewTracker from '@/components/postViewTracker';
 import LikeButtonItem from '@/components/likeButtonItem';
+import Link from 'next/link';
 
 const ExternalLink = ({ children, ...props }: { children: ReactNode }) => {
   return (
@@ -37,12 +38,13 @@ export default async function PostPage({
         <div className='text-sm text-gray-500 mb-6'>{postProps.date}</div>
         <div className='flex flex-wrap gap-x-2'>
           {postProps.tags?.map(tag => (
-            <div
+            <Link
               key={tag}
+              href={`/posts?tag=${tag}`}
               className='text-xs px-2 py-1 border border-gray-300 rounded-full'
             >
               {tag}
-            </div>
+            </Link>
           ))}
         </div>
       </section>
