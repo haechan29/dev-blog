@@ -41,7 +41,7 @@ export default async function PostPage({
             <Link
               key={tag}
               href={`/posts?tag=${tag}`}
-              className='text-xs px-2 py-1 border border-gray-300 rounded-full'
+              className='text-xs px-2 py-1 border border-gray-300 rounded-full hover:text-blue-500 hover:border-blue-200'
             >
               {tag}
             </Link>

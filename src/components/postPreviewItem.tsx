@@ -64,7 +64,7 @@ export default function PostPreviewItem({ post }: { post: PostItemProps }) {
           <Link
             href={`/posts?tag=${tag}`}
             key={tag}
-            className='text-xs px-2 py-1 flex-shrink-0 border border-gray-300 rounded-full'
+            className='text-xs px-2 py-1 flex-shrink-0 border border-gray-300 rounded-full hover:text-blue-500 hover:border-blue-200'
           >
             {tag}
           </Link>
