@@ -147,7 +147,7 @@ export default function CommentItem({
   const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <div className='rounded-lg py-4 border-b-1 border-b-gray-200'>
+    <div className='py-4 border-b-1 border-b-gray-200'>
       <section className='flex justify-between items-start mb-6'>
         <div className='flex items-center space-x-3'>
           <div className='w-10 h-10 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold'>

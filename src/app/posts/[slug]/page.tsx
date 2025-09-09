@@ -11,6 +11,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import PostViewTracker from '@/components/postViewTracker';
 import LikeButtonItem from '@/components/likeButtonItem';
 import Link from 'next/link';
+import PostInfoItem from '@/components/postInfoItem';
 
 const ExternalLink = ({ children, ...props }: { children: ReactNode }) => {
   return (
@@ -34,9 +35,8 @@ export default async function PostPage({
       <PostViewTracker post={postProps} />
 
       <section className='mb-10'>
-        <div className='text-4xl font-bold mb-6'>{postProps.title}</div>
-        <div className='text-sm text-gray-500 mb-6'>{postProps.date}</div>
-        <div className='flex flex-wrap gap-x-2'>
+        <div className='text-3xl font-bold mb-6'>{postProps.title}</div>
+        <div className='flex flex-wrap gap-3 mb-6'>
           {postProps.tags?.map(tag => (
             <Link
               key={tag}
@@ -47,6 +47,7 @@ export default async function PostPage({
             </Link>
           ))}
         </div>
+        <PostInfoItem post={postProps} />
       </section>
       <div className='w-full h-[1px] bg-gray-200 mb-10' />
 
