@@ -4,5 +4,5 @@ export type CommentItemProps = {
   authorName: string;
   content: string;
   createdAt: string;
-  updatedAt: string;
+  isUpdated: boolean;
 };

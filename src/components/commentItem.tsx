@@ -158,8 +158,8 @@ export default function CommentItem({
               {comment.authorName}
             </h4>
             <p className='text-sm text-gray-500'>
-              {formatTime(comment.createdAt)}
-              {comment.updatedAt !== comment.createdAt && (
+              {comment.createdAt}
+              {comment.isUpdated && (
                 <span className='ml-1 text-gray-400'>(수정됨)</span>
               )}
             </p>
@@ -188,18 +188,4 @@ export default function CommentItem({
       />
     </div>
   );
-}
-
-function formatTime(dateString: string) {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffInMinutes = Math.floor(
-    (now.getTime() - date.getTime()) / (1000 * 60)
-  );
-
-  if (diffInMinutes < 1) return '방금 전';
-  if (diffInMinutes < 60) return `${diffInMinutes}분 전`;
-  if (diffInMinutes < 60 * 24)
-    return `${Math.floor(diffInMinutes / 60)}시간 전`;
-  return date.toLocaleDateString('ko-KR');
 }
