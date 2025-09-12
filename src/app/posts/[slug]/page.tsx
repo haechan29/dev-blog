@@ -31,7 +31,7 @@ export default async function PostPage({
   const postProps = (post as Post).toProps();
 
   return (
-    <div className='py-14'>
+    <div className='px-10 xl:px-20 py-14'>
       <PostViewTracker post={postProps} />
 
       <section className='mb-10'>

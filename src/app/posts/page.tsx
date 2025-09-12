@@ -32,7 +32,7 @@ export default async function BlogPage({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className='py-8 flex flex-col'>
+      <div className='px-10 xl:px-20 py-8 flex flex-col'>
         {postProps.map(post => (
           <PostPreviewItem key={post.slug} post={post} />
         ))}

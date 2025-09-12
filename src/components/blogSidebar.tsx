@@ -77,7 +77,12 @@ export default function BlogSidebar({
   }, [posts, selectedTag]);
 
   return (
-    <div className={clsx(className, 'flex flex-col bg-gray-50/30')}>
+    <div
+      className={clsx(
+        className,
+        'flex flex-col bg-gray-50/50 border-r border-r-gray-50'
+      )}
+    >
       <div className='px-6 py-9'>
         <Link className='px-3 py-3 flex flex-col w-fit' href='/posts'>
           <div className='text-2xl font-bold tracking-tight text-blue-500'>
