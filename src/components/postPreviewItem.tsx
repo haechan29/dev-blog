@@ -5,10 +5,14 @@ import clsx from 'clsx';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import PostInfoItem from './postInfoItem';
+import { useSearchParams } from 'next/navigation';
 
 export default function PostPreviewItem({ post }: { post: PostItemProps }) {
   const [isTextAreaExpanded, setIsTextAreaExpanded] = useState(false);
   const timerRef = useRef<number | undefined>(undefined);
+
+  const searchParams = useSearchParams();
+  const selectedTag = searchParams.get('tag') ?? null;
 
   useEffect(() => {
     return () => {
@@ -38,7 +42,7 @@ export default function PostPreviewItem({ post }: { post: PostItemProps }) {
   return (
     <div className={clsx('w-full py-8 border-b border-b-gray-200')}>
       <Link
-        href={`/posts/${post.slug}`}
+        href={`/posts/${post.slug}${selectedTag ? `?tag=${selectedTag}` : ''}`}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
