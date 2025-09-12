@@ -77,10 +77,10 @@ export default function BlogSidebar({
   }, [posts, selectedTag]);
 
   return (
-    <div className={clsx(className, 'flex flex-col bg-blue-50/30')}>
+    <div className={clsx(className, 'flex flex-col bg-gray-50/30')}>
       <div className='px-6 py-9'>
         <Link className='px-3 py-3 flex flex-col w-fit' href='/posts'>
-          <div className='text-2xl font-bold tracking-tight bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent'>
+          <div className='text-2xl font-bold tracking-tight text-blue-500'>
             Haechan
           </div>
           <div className='text-xs text-gray-400 mt-1 font-light tracking-wide'>
@@ -100,14 +100,18 @@ export default function BlogSidebar({
                     : `/posts?tag=${tag}`
                 }
                 className={clsx(
-                  'flex items-start w-full py-3 px-9 hover:text-blue-500',
+                  'flex items-center w-full py-3 px-9 gap-2 hover:text-blue-500',
                   !selectedSlug && tag === selectedTag
                     ? 'bg-blue-50 font-semibold text-blue-500'
                     : 'text-gray-900'
                 )}
               >
-                <div className='text-sm mr-1'>{tag}</div>
-                <div className='text-xs'>{count}</div>
+                <div className='flex-1 text-sm'>{tag}</div>
+                {tag !== selectedTag && (
+                  <div className='flex-shrink-0 text-xs text-gray-400'>
+                    {count}
+                  </div>
+                )}
               </Link>
               {tag === selectedTag &&
                 postsOfTag &&
