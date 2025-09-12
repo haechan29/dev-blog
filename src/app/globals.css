@@ -133,27 +133,15 @@ body {
 
   /* 제목들 */
   .prose h1 {
-    @apply text-4xl font-bold text-gray-900 mt-8 mb-4 leading-tight;
+    @apply text-2xl font-bold text-gray-900 py-3 leading-tight;
   }
 
   .prose h2 {
-    @apply text-3xl font-bold text-gray-900 mt-6 mb-3 leading-tight;
+    @apply text-xl font-bold text-gray-900 py-2 leading-tight;
   }
 
   .prose h3 {
-    @apply text-2xl font-bold text-gray-900 mt-4 mb-2 leading-tight;
-  }
-
-  .prose h4 {
-    @apply text-xl font-bold text-gray-900 mt-4 mb-2;
-  }
-
-  .prose h5 {
-    @apply text-lg font-bold text-gray-900 mt-3 mb-1;
-  }
-
-  .prose h6 {
-    @apply text-base font-bold text-gray-900 mt-3 mb-1;
+    @apply text-lg font-bold text-gray-900 py-1 leading-tight;
   }
 
   /* 텍스트 */
