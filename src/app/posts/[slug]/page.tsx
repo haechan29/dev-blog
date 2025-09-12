@@ -10,6 +10,8 @@ import CommentSection from '@/components/commentSection';
 import { ErrorBoundary } from 'react-error-boundary';
 import PostViewTracker from '@/components/postViewTracker';
 import LikeButtonItem from '@/components/likeButtonItem';
+import Link from 'next/link';
+import PostInfoItem from '@/components/postInfoItem';
 
 const ExternalLink = ({ children, ...props }: { children: ReactNode }) => {
   return (
@@ -33,18 +35,19 @@ export default async function PostPage({
       <PostViewTracker post={postProps} />
 
       <section className='mb-10'>
-        <div className='text-4xl font-bold mb-6'>{postProps.title}</div>
-        <div className='text-sm text-gray-500 mb-6'>{postProps.date}</div>
-        <div className='flex flex-wrap gap-x-2'>
+        <div className='text-3xl font-bold mb-6'>{postProps.title}</div>
+        <div className='flex flex-wrap gap-3 mb-6'>
           {postProps.tags?.map(tag => (
-            <div
+            <Link
               key={tag}
-              className='text-xs px-2 py-1 border border-gray-300 rounded-full'
+              href={`/posts?tag=${tag}`}
+              className='text-xs px-2 py-1 border border-gray-300 rounded-full hover:text-blue-500 hover:border-blue-200'
             >
               {tag}
-            </div>
+            </Link>
           ))}
         </div>
+        <PostInfoItem post={postProps} />
       </section>
       <div className='w-full h-[1px] bg-gray-200 mb-10' />
 
