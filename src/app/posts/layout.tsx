@@ -11,15 +11,16 @@ export default async function PostsLayout({
   const postProps = posts.map(post => post.toProps());
 
   return (
-    <div className='min-h-screen flex bg-white'>
+    <div className='min-h-screen bg-white'>
       <BlogSidebar
-        className='hidden xl:flex flex-1 max-w-72 h-screen overflow-y-hidden'
+        className='fixed left-0 top-0 h-screen hidden xl:flex w-1/5 max-w-72'
         posts={postProps}
       />
-      <div className='flex-3 h-screen overflow-y-auto scrollbar-hide'>
-        {children}
+      <div className='flex'>
+        <div className='hidden xl:flex flex-1 max-w-72' />
+        <div className='flex-3'>{children}</div>
+        <div className='hidden xl:flex flex-1 max-w-72' />
       </div>
-      <div className='hidden xl:flex flex-1 max-w-72' />
     </div>
   );
 }
