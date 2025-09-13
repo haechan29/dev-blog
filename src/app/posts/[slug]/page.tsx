@@ -59,7 +59,7 @@ export default async function PostPage({
 
         {postProps.headings.length > 0 && (
           <section className='mb-10 xl:mb-0'>
-            <div className='block xl:hidden text-2xl font-bold text-gray-900 mt-4 mb-2 leading-tight'>
+            <div className='block xl:hidden text-xl xl:text-2xl font-bold text-gray-900 mt-4 mb-2 leading-tight'>
               목차
             </div>
             <TableOfContentsItem headings={postProps.headings} />

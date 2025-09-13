@@ -133,15 +133,15 @@ body {
 
   /* 제목들 */
   .prose h1 {
-    @apply text-2xl font-bold text-gray-900 py-3 leading-tight;
+    @apply text-xl xl:text-2xl font-bold text-gray-900 py-3 leading-tight;
   }
 
   .prose h2 {
-    @apply text-xl font-bold text-gray-900 py-2 leading-tight;
+    @apply text-lg xl:text-xl font-bold text-gray-900 py-2 leading-tight;
   }
 
   .prose h3 {
-    @apply text-lg font-bold text-gray-900 py-1 leading-tight;
+    @apply xl:text-lg font-bold text-gray-900 py-1 leading-tight;
   }
 
   /* 텍스트 */
