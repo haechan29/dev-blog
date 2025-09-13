@@ -10,9 +10,7 @@ import CommentSection from '@/components/commentSection';
 import { ErrorBoundary } from 'react-error-boundary';
 import PostViewTracker from '@/components/postViewTracker';
 import LikeButtonItem from '@/components/likeButtonItem';
-import Link from 'next/link';
-import PostInfoItem from '@/components/postInfoItem';
-import PostToolbar from '@/components/postToolbar';
+import PostHeaderSection from '@/components/postHeaderSection';
 
 const ExternalLink = ({ children, ...props }: { children: ReactNode }) => {
   return (
@@ -33,28 +31,10 @@ export default async function PostPage({
 
   return (
     <div>
-      <div className='block xl:hidden'>
-        <PostToolbar title={postProps.title} headings={postProps.headings} />
-      </div>
-
       <div className='px-10 xl:px-20 py-14'>
         <PostViewTracker post={postProps} />
 
-        <section className='mb-10'>
-          <div className='text-3xl font-bold mb-6'>{postProps.title}</div>
-          <div className='flex flex-wrap gap-3 mb-6'>
-            {postProps.tags?.map(tag => (
-              <Link
-                key={tag}
-                href={`/posts?tag=${tag}`}
-                className='text-xs px-2 py-1 border border-gray-300 rounded-full hover:text-blue-500 hover:border-blue-200'
-              >
-                {tag}
-              </Link>
-            ))}
-          </div>
-          <PostInfoItem post={postProps} />
-        </section>
+        <PostHeaderSection post={postProps} className='mb-10' />
         <div className='w-full h-[1px] bg-gray-200 mb-10' />
 
         {postProps.headings.length > 0 && (

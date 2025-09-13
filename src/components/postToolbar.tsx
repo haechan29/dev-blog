@@ -3,20 +3,28 @@
 import { Heading } from '@/features/post/domain/model/post';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import useThrottle from '@/hooks/useThrottle';
-import { Menu } from 'lucide-react';
+import clsx from 'clsx';
+import { ChevronRight, Menu } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 export default function PostToolbar({
   title,
   headings,
+  isHeaderVisible,
 }: {
   title: string;
   headings: Heading[];
+  isHeaderVisible: boolean;
 }) {
   const [activeHeading, setActiveHeading] = useState<Heading | null>(null);
   const [isInProseSection, setIsInProseSection] = useState(false);
+
   const [throttle100Ms] = useThrottle(100);
   const isLargerThanXl = useMediaQuery('(min-width: 1280px)');
+
+  const searchParams = useSearchParams();
+  const selectedTag = searchParams.get('tag');
 
   const getActiveHeading = useCallback(() => {
     const headingsInVisibleArea = headings.filter(heading => {
@@ -73,14 +81,40 @@ export default function PostToolbar({
   return (
     <div
       className={
-        'fixed top-0 left-0 right-0 backdrop-blur-md bg-white/80 flex items-center border-b border-b-gray-200'
+        'fixed top-0 left-0 right-0 pt-1 pb-4 backdrop-blur-md bg-white/80 flex items-center'
       }
     >
-      <Menu className='w-10 h-10 p-2' />
-      <div className='font-semibold'>
-        {activeHeading !== null && isInProseSection
-          ? activeHeading.text
-          : title}
+      <button className='flex px-2 place-self-end items-center justify-center'>
+        <Menu className='w-6 h-6' />
+      </button>
+      <div
+        className={clsx(
+          'flex flex-col transition-opacity duration-300 ease-in-out',
+          isHeaderVisible ? 'opacity-0' : 'opacity-100'
+        )}
+      >
+        <div className='flex items-center text-xs text-gray-400'>
+          {selectedTag !== null && (
+            <>
+              <div>{selectedTag}</div>
+              <ChevronRight className='w-3 h-3' />
+            </>
+          )}
+          <div
+            className={clsx(
+              'flex items-center transition-opacity duration-300 ease-in-out',
+              isInProseSection ? 'opacity-100' : 'opacity-0'
+            )}
+          >
+            <div>{title}</div>
+            <ChevronRight className='w-3 h-3' />
+          </div>
+        </div>
+        <div className=' font-semibold'>
+          {activeHeading !== null && isInProseSection
+            ? activeHeading.text
+            : title}
+        </div>
       </div>
     </div>
   );
