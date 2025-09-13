@@ -14,6 +14,7 @@ export default function PostToolbar({
   headings: Heading[];
 }) {
   const [activeHeading, setActiveHeading] = useState<Heading | null>(null);
+  const [isInProseSection, setIsInProseSection] = useState(false);
   const [throttle100Ms] = useThrottle(100);
   const isLargerThanXl = useMediaQuery('(min-width: 1280px)');
 
@@ -43,6 +44,20 @@ export default function PostToolbar({
   }, [headings]);
 
   useEffect(() => {
+    const proseElement = document.querySelector('.prose');
+    if (!proseElement) return;
+
+    const proseObserver = new IntersectionObserver(
+      entries => setIsInProseSection(entries[0].isIntersecting),
+      {
+        rootMargin: '-20px 0px -100% 0px',
+      }
+    );
+    proseObserver.observe(proseElement);
+    return () => proseObserver.disconnect();
+  }, []);
+
+  useEffect(() => {
     if (isLargerThanXl) return;
 
     const checkActiveHeading = () => setActiveHeading(getActiveHeading());
@@ -62,6 +77,11 @@ export default function PostToolbar({
       }
     >
       <Menu className='w-10 h-10 p-2' />
+      <div className='font-semibold'>
+        {activeHeading !== null && isInProseSection
+          ? activeHeading.text
+          : title}
+      </div>
     </div>
   );
 }
