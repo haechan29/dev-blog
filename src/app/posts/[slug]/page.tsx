@@ -33,7 +33,10 @@ export default async function PostPage({
 
   return (
     <div>
-      <PostToolbar title={postProps.title} headings={postProps.headings} />
+      <div className='block xl:hidden'>
+        <PostToolbar title={postProps.title} headings={postProps.headings} />
+      </div>
+
       <div className='px-10 xl:px-20 py-14'>
         <PostViewTracker post={postProps} />
 

@@ -2,7 +2,7 @@
 
 import { Heading } from '@/features/post/domain/model/post';
 import clsx from 'clsx';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import useThrottle from '@/hooks/useThrottle';
 import useMediaQuery from '@/hooks/useMediaQuery';
 
@@ -15,49 +15,45 @@ export default function TableOfContentsItem({
   const [throttle100Ms] = useThrottle(100);
   const isLargerThanXl = useMediaQuery('(min-width: 1280px)');
 
+  const getActiveHeading = useCallback(() => {
+    const isAtBottom =
+      window.innerHeight + window.scrollY >=
+      document.documentElement.scrollHeight - 10;
+    if (isAtBottom) {
+      return headings[headings.length - 1];
+    }
+
+    const headingsInVisibleArea = headings.filter(heading => {
+      const element = document.getElementById(heading.id);
+      if (!element) return false;
+
+      const rect = element.getBoundingClientRect();
+      return rect.top >= 20 && rect.top <= window.innerHeight * 0.2;
+    });
+
+    if (headingsInVisibleArea.length > 0) {
+      return headingsInVisibleArea[0];
+    }
+
+    const allHeadingsAbove = headings.filter(heading => {
+      const element = document.getElementById(heading.id);
+      return element && element.getBoundingClientRect().top < 20;
+    });
+
+    if (allHeadingsAbove.length > 0) {
+      return allHeadingsAbove[allHeadingsAbove.length - 1];
+    }
+  }, [headings]);
+
   useEffect(() => {
     if (!isLargerThanXl) return;
 
     if (headings.length > 0) setActiveId(headings[0].id);
 
     const checkActiveHeading = () => {
-      const isAtBottom =
-        window.innerHeight + window.scrollY >=
-        document.documentElement.scrollHeight - 10;
-      if (isAtBottom) {
-        setActiveId(headings[headings.length - 1].id);
-        return;
-      }
-
-      const headingsInVisibleArea = headings
-        .filter(heading => {
-          const element = document.getElementById(heading.id);
-          if (!element) return false;
-
-          const rect = element.getBoundingClientRect();
-          return rect.top >= 20 && rect.top <= window.innerHeight * 0.2;
-        })
-        .sort((a, b) => {
-          const aElement = document.getElementById(a.id);
-          const bElement = document.getElementById(b.id);
-          return (
-            aElement!.getBoundingClientRect().top -
-            bElement!.getBoundingClientRect().top
-          );
-        });
-
-      if (headingsInVisibleArea.length > 0) {
-        setActiveId(headingsInVisibleArea[0].id);
-        return;
-      }
-
-      const allHeadingsAbove = headings.filter(heading => {
-        const element = document.getElementById(heading.id);
-        return element && element.getBoundingClientRect().top < 20;
-      });
-
-      if (allHeadingsAbove.length > 0) {
-        setActiveId(allHeadingsAbove[allHeadingsAbove.length - 1].id);
+      const activeHeading = getActiveHeading();
+      if (activeHeading !== undefined) {
+        setActiveId(activeHeading.id);
       }
     };
 
