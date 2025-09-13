@@ -81,7 +81,7 @@ export default function PostToolbar({
   return (
     <div
       className={
-        'fixed top-0 left-0 right-0 pt-1 pb-4 backdrop-blur-md bg-white/80 flex items-center'
+        'fixed top-0 left-0 right-0 pt-1 pb-4 pr-10 backdrop-blur-md bg-white/80 flex items-center'
       }
     >
       <button className='flex px-2 place-self-end items-center justify-center'>
@@ -89,7 +89,7 @@ export default function PostToolbar({
       </button>
       <div
         className={clsx(
-          'flex flex-col transition-opacity duration-300 ease-in-out',
+          'flex flex-1 overflow-hidden flex-col transition-opacity duration-300 ease-in-out',
           isHeaderVisible ? 'opacity-0' : 'opacity-100'
         )}
       >
@@ -110,7 +110,7 @@ export default function PostToolbar({
             <ChevronRight className='w-3 h-3' />
           </div>
         </div>
-        <div className=' font-semibold'>
+        <div className='font-semibold truncate'>
           {activeHeading !== null && isInProseSection
             ? activeHeading.text
             : title}

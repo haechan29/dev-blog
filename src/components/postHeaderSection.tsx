@@ -5,7 +5,6 @@ import { PostItemProps } from '@/features/post/ui/postItemProps';
 import Link from 'next/link';
 import PostInfoItem from '@/components/postInfoItem';
 import { useEffect, useRef, useState } from 'react';
-import clsx from 'clsx';
 
 export default function PostHeaderSection({
   post,
