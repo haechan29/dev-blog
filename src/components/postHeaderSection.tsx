@@ -1,10 +1,17 @@
 'use client';
 
-import PostToolbar from '@/components/postToolbar';
 import { PostItemProps } from '@/features/post/ui/postItemProps';
 import Link from 'next/link';
 import PostInfoItem from '@/components/postInfoItem';
 import { useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/lib/redux/store';
+import {
+  setBreadcrumb,
+  setIsContentVisible,
+  setTitles,
+} from '@/lib/redux/postToolbarSlice';
+import { useSearchParams } from 'next/navigation';
 
 export default function PostHeaderSection({
   post,
@@ -13,12 +20,15 @@ export default function PostHeaderSection({
   post: PostItemProps;
   className?: string;
 }) {
-  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const headerRef = useRef(null);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const searchParams = useSearchParams();
+  const tag = searchParams.get('tag');
 
   useEffect(() => {
     const headerObserver = new IntersectionObserver(
-      entries => setIsHeaderVisible(entries[0].isIntersecting),
+      entries => dispatch(setIsContentVisible(entries[0].isIntersecting)),
       {
         rootMargin: '-80px 0px -100% 0px',
       }
@@ -29,16 +39,15 @@ export default function PostHeaderSection({
     return () => headerObserver.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (tag !== null) {
+      dispatch(setBreadcrumb([tag]));
+    }
+    dispatch(setTitles(post.headings.map(heading => heading.text)));
+  }, []);
+
   return (
     <div className={className}>
-      <div className='block xl:hidden mb-4'>
-        <PostToolbar
-          title={post.title}
-          headings={post.headings}
-          isHeaderVisible={isHeaderVisible}
-        />
-      </div>
-
       <section ref={headerRef}>
         <div className='text-3xl font-bold mb-6'>{post.title}</div>
         <div className='flex flex-wrap gap-3 mb-6'>

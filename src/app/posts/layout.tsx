@@ -1,6 +1,7 @@
 import BlogSidebar from '@/components/blogSidebar';
-import { ReactNode, Suspense } from 'react';
+import { ReactNode } from 'react';
 import { fetchAllPosts } from '@/features/post/domain/service/postService';
+import PostToolbar from '@/components/postToolbar';
 
 export default async function PostsLayout({
   children,
@@ -18,7 +19,12 @@ export default async function PostsLayout({
       />
       <div className='flex'>
         <div className='hidden xl:flex flex-1 max-w-72' />
-        <div className='flex-3'>{children}</div>
+        <div className='flex-3'>
+          <div className='flex flex-col'>
+            <PostToolbar className='block xl:hidden mb-4' />
+            {children}
+          </div>
+        </div>
         <div className='hidden xl:flex flex-1 max-w-72' />
       </div>
     </div>
