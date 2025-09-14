@@ -9,9 +9,10 @@ import { AppDispatch } from '@/lib/redux/store';
 import {
   setBreadcrumb,
   setIsContentVisible,
-  setTitles,
+  setHeadings,
 } from '@/lib/redux/postToolbarSlice';
 import { useSearchParams } from 'next/navigation';
+import { HeadingItemProps } from '@/features/post/ui/postToolbarProps';
 
 export default function PostHeaderSection({
   post,
@@ -43,7 +44,11 @@ export default function PostHeaderSection({
     if (tag !== null) {
       dispatch(setBreadcrumb([tag]));
     }
-    dispatch(setTitles(post.headings.map(heading => heading.text)));
+    const headingItemProps: HeadingItemProps[] = post.headings.map(heading => ({
+      ...heading,
+      isSelected: false,
+    }));
+    dispatch(setHeadings(headingItemProps));
   }, []);
 
   return (

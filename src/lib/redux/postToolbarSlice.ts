@@ -1,10 +1,9 @@
-import PostToolbarProps from '@/features/post/ui/postToolbarProps';
+import { PostToolbarProps } from '@/features/post/ui/postToolbarProps';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: PostToolbarProps = {
   breadcrumb: [],
-  selectedTitle: null,
-  titles: [],
+  headings: [],
   isContentVisible: false,
   isExpanded: false,
 };
@@ -16,11 +15,8 @@ const postToolbarSlice = createSlice({
     setBreadcrumb: (state, action) => {
       state.breadcrumb = action.payload;
     },
-    setSelectedTitle: (state, action) => {
-      state.selectedTitle = action.payload;
-    },
-    setTitles: (state, action) => {
-      state.titles = action.payload;
+    setHeadings: (state, action) => {
+      state.headings = action.payload;
     },
     setIsContentVisible: (state, action) => {
       state.isContentVisible = action.payload;
@@ -34,8 +30,7 @@ const postToolbarSlice = createSlice({
 export default postToolbarSlice.reducer;
 export const {
   setBreadcrumb,
-  setSelectedTitle,
-  setTitles,
+  setHeadings,
   setIsContentVisible,
   setIsExpanded,
 } = postToolbarSlice.actions;

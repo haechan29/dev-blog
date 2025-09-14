@@ -1,7 +1,13 @@
-export default interface PostToolbarProps {
+export interface HeadingItemProps {
+  id: string;
+  text: string;
+  level: number;
+  isSelected: boolean;
+}
+
+export interface PostToolbarProps {
   breadcrumb: string[];
-  selectedTitle: string | null;
-  titles: string[];
+  headings: HeadingItemProps[];
   isContentVisible: boolean;
   isExpanded: boolean;
 }

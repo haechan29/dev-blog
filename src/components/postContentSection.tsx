@@ -4,6 +4,7 @@ import rehypePrettyCode from 'rehype-pretty-code';
 import ToggleButtonItem from '@/components/toggleButtonItem';
 import { ReactNode } from 'react';
 import { PostItemProps } from '@/features/post/ui/postItemProps';
+import PostContentSectionClient from '@/components/postContentSectionClient';
 
 const ExternalLink = ({ children, ...props }: { children: ReactNode }) => {
   return (
@@ -22,6 +23,7 @@ export default function PostContentSection({
 }) {
   return (
     <section className={className}>
+      <PostContentSectionClient />
       <MDXRemote
         source={post.content}
         components={{
