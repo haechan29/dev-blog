@@ -61,9 +61,10 @@ export default async function PostPage({
           />
         </section>
 
-        <section className='flex justify-center mb-20'>
-          <LikeButtonItem postId={post.slug} />
-        </section>
+        <LikeButtonItem
+          postId={post.slug}
+          className='flex justify-center mb-20'
+        />
 
         <ErrorBoundary fallback={<div></div>}>
           <Suspense fallback={<div></div>}>

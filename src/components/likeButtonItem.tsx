@@ -9,7 +9,13 @@ import clsx from 'clsx';
 import { Heart } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
-export default function LikeButtonItem({ postId }: { postId: string }) {
+export default function LikeButtonItem({
+  postId,
+  className,
+}: {
+  postId: string;
+  className?: string;
+}) {
   const [heartFilled, setHeartFilled] = useState(false);
   const [throttledCall] = useThrottle(1000);
 
@@ -68,26 +74,31 @@ export default function LikeButtonItem({ postId }: { postId: string }) {
   };
 
   return (
-    <button
-      onClick={handleClick}
-      className={clsx(
-        'flex items-center gap-2 px-6 py-3 rounded-lg border transition-all duration-300 hover:scale-105',
-        heartFilled
-          ? 'border-red-300 bg-red-50 shadow-lg shadow-red-200/50'
-          : 'border-gray-200 hover:bg-gray-50 hover:border-gray-300'
-      )}
-      onTransitionEnd={handleFillingHeart}
-    >
-      <Heart
-        size={20}
+    <div className={className}>
+      <button
+        onClick={handleClick}
         className={clsx(
-          'transition-color duration-300 ease-out',
-          heartFilled ? 'text-red-500 fill-red-500' : 'text-gray-400'
+          'flex items-center gap-2 px-6 py-3 rounded-lg border transition-all duration-300 hover:scale-105',
+          heartFilled
+            ? 'border-red-300 bg-red-50 shadow-lg shadow-red-200/50'
+            : 'border-gray-200 hover:bg-gray-50 hover:border-gray-300'
         )}
-      />
+        onTransitionEnd={handleFillingHeart}
+      >
+        <Heart
+          size={20}
+          className={clsx(
+            'transition-color duration-300 ease-out',
+            heartFilled ? 'text-red-500 fill-red-500' : 'text-gray-400'
+          )}
+        />
 
-      <RollingCounter heartFilled={heartFilled} count={stat?.likeCount ?? 0} />
-    </button>
+        <RollingCounter
+          heartFilled={heartFilled}
+          count={stat?.likeCount ?? 0}
+        />
+      </button>
+    </div>
   );
 }
 
