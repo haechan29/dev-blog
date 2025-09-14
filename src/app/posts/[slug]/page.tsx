@@ -1,8 +1,4 @@
-import { MDXRemote } from 'next-mdx-remote/rsc';
-import rehypeSlug from 'rehype-slug';
-import rehypePrettyCode from 'rehype-pretty-code';
 import TableOfContentsItem from '@/components/tableOfContentsItem';
-import ToggleButtonItem from '@/components/toggleButtonItem';
 import { ReactNode, Suspense } from 'react';
 import { Post } from '@/features/post/domain/model/post';
 import { fetchPostBySlug } from '@/features/post/domain/service/postService';
@@ -11,14 +7,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import PostViewTracker from '@/components/postViewTracker';
 import LikeButtonItem from '@/components/likeButtonItem';
 import PostHeaderSection from '@/components/postHeaderSection';
-
-const ExternalLink = ({ children, ...props }: { children: ReactNode }) => {
-  return (
-    <a rel='noopener noreferrer' target='_blank' {...props}>
-      {children}
-    </a>
-  );
-};
+import PostContentSection from '@/components/postContentSection';
 
 export default async function PostPage({
   params,
@@ -46,20 +35,7 @@ export default async function PostPage({
           </section>
         )}
 
-        <section className='prose mb-20'>
-          <MDXRemote
-            source={postProps.content}
-            components={{
-              ToggleButtonItem,
-              a: ExternalLink,
-            }}
-            options={{
-              mdxOptions: {
-                rehypePlugins: [[rehypePrettyCode], rehypeSlug],
-              },
-            }}
-          />
-        </section>
+        <PostContentSection post={postProps} className='prose mb-20' />
 
         <LikeButtonItem
           postId={post.slug}
