@@ -13,20 +13,9 @@ export default async function PostsLayout({
 
   return (
     <div className='min-h-screen bg-white'>
-      <BlogSidebar
-        className='fixed left-0 top-0 h-screen hidden xl:flex w-1/5 max-w-72'
-        posts={postProps}
-      />
-      <div className='flex'>
-        <div className='hidden xl:flex flex-1 max-w-72' />
-        <div className='flex-3'>
-          <div className='flex flex-col'>
-            <PostToolbar className='block xl:hidden mb-4' />
-            {children}
-          </div>
-        </div>
-        <div className='hidden xl:flex flex-1 max-w-72' />
-      </div>
+      <PostToolbar />
+      <BlogSidebar posts={postProps} />
+      <div className='xl:mx-72'>{children}</div>
     </div>
   );
 }

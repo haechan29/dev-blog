@@ -48,13 +48,7 @@ function Footer({ className }: { className: string }) {
   );
 }
 
-export default function BlogSidebar({
-  className,
-  posts,
-}: {
-  className: string;
-  posts: PostItemProps[];
-}) {
+export default function BlogSidebar({ posts }: { posts: PostItemProps[] }) {
   const params = useParams();
   const searchParams = useSearchParams();
   const selectedSlug = params.slug as string | undefined;
@@ -77,70 +71,67 @@ export default function BlogSidebar({
   }, [posts, selectedTag]);
 
   return (
-    <div
-      className={clsx(
-        className,
-        'flex flex-col bg-gray-50/50 border-r border-r-gray-50'
-      )}
-    >
-      <div className='px-6 py-9'>
-        <Link className='px-3 py-3 flex flex-col w-fit' href='/posts'>
-          <div className='text-2xl font-bold tracking-tight text-blue-500'>
-            Haechan
-          </div>
-          <div className='text-xs text-gray-400 mt-1 font-light tracking-wide'>
-            DEV BLOG
-          </div>
-        </Link>
-      </div>
-
-      <div className='flex flex-col flex-1 overflow-y-auto'>
-        {tagCount.map(([tag, count]) => {
-          return (
-            <div key={tag}>
-              <Link
-                href={
-                  !selectedSlug && selectedTag === tag
-                    ? '/posts'
-                    : `/posts?tag=${tag}`
-                }
-                className={clsx(
-                  'flex items-center w-full py-3 px-9 gap-2 hover:text-blue-500',
-                  !selectedSlug && tag === selectedTag
-                    ? 'bg-blue-50 font-semibold text-blue-500'
-                    : 'text-gray-900'
-                )}
-              >
-                <div className='flex-1 text-sm'>{tag}</div>
-                {tag !== selectedTag && (
-                  <div className='flex-shrink-0 text-xs text-gray-400'>
-                    {count}
-                  </div>
-                )}
-              </Link>
-              {tag === selectedTag &&
-                postsOfTag &&
-                postsOfTag.map(post => (
-                  <Link
-                    key={`${tag}-${post.slug} `}
-                    href={`/posts/${post.slug}${
-                      selectedTag ? `?tag=${selectedTag}` : ''
-                    }`}
-                    className={clsx(
-                      'flex w-full py-3 pl-12 pr-9 hover:text-blue-500',
-                      post.slug === selectedSlug
-                        ? 'bg-blue-50 font-semibold text-blue-500'
-                        : 'text-gray-900'
-                    )}
-                  >
-                    <div className='text-sm'>{post.title}</div>
-                  </Link>
-                ))}
+    <div className='fixed left-0 top-0 bottom-0 w-72 hidden xl:block'>
+      <div className='flex h-full flex-col bg-gray-50/50 border-r border-r-gray-50'>
+        <div className='px-6 py-9'>
+          <Link className='px-3 py-3 flex flex-col w-fit' href='/posts'>
+            <div className='text-2xl font-bold tracking-tight text-blue-500'>
+              Haechan
             </div>
-          );
-        })}
+            <div className='text-xs text-gray-400 mt-1 font-light tracking-wide'>
+              DEV BLOG
+            </div>
+          </Link>
+        </div>
+
+        <div className='flex flex-col flex-1 overflow-y-auto'>
+          {tagCount.map(([tag, count]) => {
+            return (
+              <div key={tag}>
+                <Link
+                  href={
+                    !selectedSlug && selectedTag === tag
+                      ? '/posts'
+                      : `/posts?tag=${tag}`
+                  }
+                  className={clsx(
+                    'flex items-center w-full py-3 px-9 gap-2 hover:text-blue-500',
+                    !selectedSlug && tag === selectedTag
+                      ? 'bg-blue-50 font-semibold text-blue-500'
+                      : 'text-gray-900'
+                  )}
+                >
+                  <div className='flex-1 text-sm'>{tag}</div>
+                  {tag !== selectedTag && (
+                    <div className='flex-shrink-0 text-xs text-gray-400'>
+                      {count}
+                    </div>
+                  )}
+                </Link>
+                {tag === selectedTag &&
+                  postsOfTag &&
+                  postsOfTag.map(post => (
+                    <Link
+                      key={`${tag}-${post.slug} `}
+                      href={`/posts/${post.slug}${
+                        selectedTag ? `?tag=${selectedTag}` : ''
+                      }`}
+                      className={clsx(
+                        'flex w-full py-3 pl-12 pr-9 hover:text-blue-500',
+                        post.slug === selectedSlug
+                          ? 'bg-blue-50 font-semibold text-blue-500'
+                          : 'text-gray-900'
+                      )}
+                    >
+                      <div className='text-sm'>{post.title}</div>
+                    </Link>
+                  ))}
+              </div>
+            );
+          })}
+        </div>
+        <Footer className='py-12' />
       </div>
-      <Footer className='py-12' />
     </div>
   );
 }
