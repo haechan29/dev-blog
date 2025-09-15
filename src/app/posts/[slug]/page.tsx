@@ -8,6 +8,7 @@ import PostViewTracker from '@/components/postViewTracker';
 import LikeButtonItem from '@/components/likeButtonItem';
 import PostHeaderSection from '@/components/postHeaderSection';
 import PostContentSection from '@/components/postContentSection';
+import PostDispatcher from '@/components/postDispatcher';
 
 export default async function PostPage({
   params,
@@ -21,7 +22,8 @@ export default async function PostPage({
   return (
     <div>
       <div className='px-10 xl:px-20 py-14'>
-        <PostViewTracker post={postProps} />
+        <PostDispatcher post={postProps} />
+        <PostViewTracker postId={postProps.slug} />
 
         <PostHeaderSection post={postProps} className='mb-10' />
         <div className='w-full h-[1px] bg-gray-200 mb-10' />

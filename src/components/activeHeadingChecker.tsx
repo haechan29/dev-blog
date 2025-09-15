@@ -1,17 +1,18 @@
 'use client';
 
-import { HeadingItemProps } from '@/features/post/ui/postToolbarProps';
+import { Heading } from '@/features/post/domain/model/post';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import useThrottle from '@/hooks/useThrottle';
-import { setHeadings, setIsContentVisible } from '@/lib/redux/postToolbarSlice';
-import { AppDispatch, RootState } from '@/lib/redux/store';
+import { setSelectedHeading, setTitle } from '@/lib/redux/postToolbarSlice';
+import { AppDispatch } from '@/lib/redux/store';
 import { useCallback, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
-export default function PostContentSectionClient() {
-  const headings = useSelector(
-    (state: RootState) => state.postToolbar.headings
-  );
+export default function ActiveHeadingDetector({
+  headings,
+}: {
+  headings: Heading[];
+}) {
   const dispatch = useDispatch<AppDispatch>();
 
   const [throttle100Ms] = useThrottle(100);
@@ -44,14 +45,9 @@ export default function PostContentSectionClient() {
 
   const updateHeadings = useCallback(() => {
     const targetHeading = getTargetHeading();
-    const currentSelected =
-      headings.find(heading => heading.isSelected) ?? null;
-    if (targetHeading === currentSelected) return;
-    const newHeadings: HeadingItemProps[] = headings.map(heading => ({
-      ...heading,
-      isSelected: heading === targetHeading,
-    }));
-    dispatch(setHeadings(newHeadings));
+    if (targetHeading !== null) {
+      dispatch(setSelectedHeading(targetHeading));
+    }
   }, [headings, dispatch, getTargetHeading]);
 
   useEffect(() => {
@@ -65,20 +61,6 @@ export default function PostContentSectionClient() {
       window.removeEventListener('scroll', throttledUpdate);
     };
   }, [isLargerThanXl, updateHeadings]);
-
-  useEffect(() => {
-    const proseElement = document.querySelector('.prose');
-    if (!proseElement) return;
-
-    const proseObserver = new IntersectionObserver(
-      entries => dispatch(setIsContentVisible(entries[0].isIntersecting)),
-      {
-        rootMargin: '-20px 0px -100% 0px',
-      }
-    );
-    proseObserver.observe(proseElement);
-    return () => proseObserver.disconnect();
-  }, []);
 
   return <></>;
 }
