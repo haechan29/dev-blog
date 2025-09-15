@@ -1,5 +1,6 @@
 'use client';
 
+import { toProps } from '@/features/post/domain/model/postToolbar';
 import { RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { ChevronRight, Menu } from 'lucide-react';
@@ -7,23 +8,6 @@ import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export default function PostToolbar({ className }: { className?: string }) {
-  const breadcrumb = useSelector(
-    (state: RootState) => state.postToolbar.breadcrumb
-  );
-  const headings = useSelector(
-    (state: RootState) => state.postToolbar.headings
-  );
-  const isContentVisible = useSelector(
-    (state: RootState) => state.postToolbar.isContentVisible
-  );
-
-  const title = useMemo(() => {
-    const titles = headings
-      .filter(heading => heading.isSelected)
-      .map(heading => heading.text);
-    return titles.length > 0 ? titles[0] : null;
-  }, [headings]);
-
   return (
     <div className={className}>
       <div
@@ -34,9 +18,27 @@ export default function PostToolbar({ className }: { className?: string }) {
         <button className='flex px-2 place-self-end items-center justify-center'>
           <Menu className='w-6 h-6' />
         </button>
-        <div className='flex flex-1 overflow-hidden flex-col'>
-          <div className='flex text-xs text-gray-400'>
-            {breadcrumb.map(item => {
+        <ContentItem />
+      </div>
+    </div>
+  );
+}
+
+function ContentItem() {
+  const postToolbar = useSelector((state: RootState) => state.postToolbar);
+  const postToolbarProps = useMemo(() => toProps(postToolbar), [postToolbar]);
+
+  return (
+    <div
+      className={clsx(
+        'flex flex-1 overflow-hidden transition-opacity duration-300 ease-in-out',
+        postToolbarProps.type === 'empty' ? 'opacity-0' : 'opacity-100'
+      )}
+    >
+      <div className='flex flex-col'>
+        <div className='flex text-xs h-4 text-gray-400'>
+          {postToolbarProps.type !== 'empty' &&
+            postToolbarProps.breadcrumb.map(item => {
               return (
                 <div key={item} className='flex items-center'>
                   <div>{item}</div>
@@ -44,15 +46,9 @@ export default function PostToolbar({ className }: { className?: string }) {
                 </div>
               );
             })}
-          </div>
-          <div
-            className={clsx(
-              'font-semibold truncate',
-              title !== null && isContentVisible ? 'opacity-100' : 'opacity-0'
-            )}
-          >
-            {title ?? ''}
-          </div>
+        </div>
+        <div className='font-semibold h-6 truncate'>
+          {postToolbarProps.type !== 'empty' && postToolbarProps.title}
         </div>
       </div>
     </div>
