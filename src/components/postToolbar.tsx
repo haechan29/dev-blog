@@ -13,28 +13,28 @@ export default function PostToolbar() {
     <div className='block xl:hidden mb-4'>
       <div className='fixed top-0 left-0 right-0 backdrop-blur-md bg-white/80'>
         <div className='flex items-start pt-1 pb-4'>
-          <button className='flex px-2 pt-4 items-center justify-center'>
+          <button className='flex shrink-0 px-2 pt-4 items-center justify-center'>
             <Menu className='w-6 h-6' />
           </button>
-          <ContentItem className='flex flex-1 items-start' />
+          <ContentItem />
         </div>
       </div>
     </div>
   );
 }
 
-function ContentItem({ className }: { className?: string }) {
+function ContentItem() {
   const postToolbar = useSelector((state: RootState) => state.postToolbar);
   const postToolbarProps = useMemo(() => toProps(postToolbar), [postToolbar]);
 
   const dispatch = useDispatch<AppDispatch>();
 
   return (
-    <div className={className}>
-      <div className='flex flex-1'>
+    <div className='flex flex-1 min-w-0 items-start'>
+      <div className='flex flex-1 min-w-0'>
         <div
           className={clsx(
-            'flex flex-col transition-opacity duration-300 ease-in-out',
+            'flex flex-col w-full transition-opacity duration-300 ease-in-out',
             postToolbarProps.type === 'empty' ? 'opacity-0' : 'opacity-100'
           )}
         >
@@ -51,20 +51,25 @@ function ContentItem({ className }: { className?: string }) {
                 );
               })}
           </div>
-          <div className='font-semibold h-6 truncate'>
-            {postToolbarProps.type !== 'empty' && postToolbarProps.title}
-          </div>
           {(postToolbarProps.type === 'collapsed' ||
             postToolbarProps.type === 'expanded') && (
-            <div
-              className={clsx(
-                'flex flex-col transition-discrete duration-300 ease-in',
-                postToolbarProps.type === 'expanded' ? 'max-h-96' : 'max-h-0'
-              )}
-            >
-              {postToolbar.headings.map(heading => (
-                <div key={heading.id} className='truncate'>
-                  {heading.text.repeat(100)}
+            <div className='flex flex-col'>
+              {postToolbarProps.headings.map(heading => (
+                <div
+                  key={heading.id}
+                  className={clsx(
+                    'truncate transition-discrete|opacity duration-300 ease-in',
+                    postToolbarProps.type === 'expanded' ||
+                      postToolbarProps.title === heading.text
+                      ? 'h-7 opacity-100'
+                      : 'h-0 opacity-0',
+                    postToolbarProps.title === heading.text
+                      ? 'text-gray-900 font-semibold '
+                      : 'text-gray-400',
+                    postToolbarProps.type === 'expanded' && 'py-0.5'
+                  )}
+                >
+                  {heading.text}
                 </div>
               ))}
             </div>
@@ -79,7 +84,7 @@ function ContentItem({ className }: { className?: string }) {
             )
           )
         }
-        className='flex px-2 pt-4 items-center justify-center'
+        className='flex shrink-0 px-2 pt-4 items-center justify-center'
       >
         <ChevronDown
           className={clsx(

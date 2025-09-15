@@ -14,12 +14,12 @@ export type CollapsedToolbarProps = {
   type: 'collapsed';
   breadcrumb: string[];
   title: string;
+  headings: Heading[];
 };
 export type ExpandedToolbarProps = {
   type: 'expanded';
   breadcrumb: string[];
   title: string;
-  selectedHeading: Heading | null;
   headings: Heading[];
 };
 

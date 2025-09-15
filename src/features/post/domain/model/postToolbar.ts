@@ -37,6 +37,7 @@ export function toProps(postToolbar: PostToolbar): PostToolbarProps {
         type: postToolbar.type,
         breadcrumb: items,
         title: lastItem,
+        headings: postToolbar.headings,
       };
     }
     case 'expanded':
@@ -46,7 +47,6 @@ export function toProps(postToolbar: PostToolbar): PostToolbarProps {
           ? [postToolbar.tag, postToolbar.title!]
           : [postToolbar.title!],
         title: postToolbar.selectedHeading!.text,
-        selectedHeading: postToolbar.selectedHeading,
         headings: postToolbar.headings,
       };
   }
