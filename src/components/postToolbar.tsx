@@ -1,11 +1,12 @@
 'use client';
 
+import { Heading } from '@/features/post/domain/model/post';
 import { toProps } from '@/features/post/domain/model/postToolbar';
 import { setType } from '@/lib/redux/postToolbarSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { ChevronDown, ChevronRight, Menu } from 'lucide-react';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostToolbar() {
@@ -29,6 +30,37 @@ function ContentItem() {
 
   const dispatch = useDispatch<AppDispatch>();
 
+  const clickedHeading = useRef<Heading | null>(null);
+
+  const handleClick = (heading: Heading) => {
+    if (postToolbarProps.type === 'collapsed') {
+      dispatch(setType('expanded'));
+    }
+    if (postToolbarProps.type === 'expanded') {
+      const element = document.getElementById(heading.id);
+      if (element) {
+        clickedHeading.current = heading;
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (
+      postToolbarProps.type === 'expanded' &&
+      clickedHeading.current?.text === postToolbarProps.title
+    ) {
+      const timer = setTimeout(() => {
+        dispatch(setType('collapsed'));
+        clickedHeading.current = null;
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [postToolbarProps, clickedHeading]);
+
   return (
     <div className='flex flex-1 min-w-0 items-start'>
       <div className='flex flex-1 min-w-0'>
@@ -51,26 +83,38 @@ function ContentItem() {
                 );
               })}
           </div>
+          {postToolbarProps.type === 'basic' && (
+            <div className='font-semibold h-6 truncate'>
+              {postToolbarProps.title}
+            </div>
+          )}
           {(postToolbarProps.type === 'collapsed' ||
             postToolbarProps.type === 'expanded') && (
             <div className='flex flex-col'>
               {postToolbarProps.headings.map(heading => (
-                <div
+                <button
                   key={heading.id}
+                  onClick={() => handleClick(heading)}
                   className={clsx(
-                    'truncate transition-discrete|opacity duration-300 ease-in',
+                    'flex truncate transition-discrete|opacity duration-300 ease-in',
                     postToolbarProps.type === 'expanded' ||
                       postToolbarProps.title === heading.text
                       ? 'h-7 opacity-100'
                       : 'h-0 opacity-0',
                     postToolbarProps.title === heading.text
-                      ? 'text-gray-900 font-semibold '
+                      ? 'text-gray-900 font-semibold'
                       : 'text-gray-400',
-                    postToolbarProps.type === 'expanded' && 'py-0.5'
+                    postToolbarProps.type === 'expanded' && 'py-0.5',
+                    postToolbarProps.type === 'expanded' &&
+                      heading.level == 2 &&
+                      'pl-4',
+                    postToolbarProps.type === 'expanded' &&
+                      heading.level == 3 &&
+                      'pl-8'
                   )}
                 >
                   {heading.text}
-                </div>
+                </button>
               ))}
             </div>
           )}
