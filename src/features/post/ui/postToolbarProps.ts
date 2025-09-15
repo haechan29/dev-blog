@@ -1,6 +1,10 @@
 import { Heading } from '@/features/post/domain/model/post';
 
 export type EmptyToolbarProps = { type: 'empty' };
+export type MinimalToolbarProps = {
+  type: 'minimal';
+  title: string | null;
+};
 export type BasicToolbarProps = {
   type: 'basic';
   breadcrumb: string[];
@@ -21,6 +25,7 @@ export type ExpandedToolbarProps = {
 
 export type PostToolbarProps =
   | EmptyToolbarProps
+  | MinimalToolbarProps
   | BasicToolbarProps
   | CollapsedToolbarProps
   | ExpandedToolbarProps;

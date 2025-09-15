@@ -1,4 +1,5 @@
 import PostPreviewItem from '@/components/postPreviewItem';
+import PostsDispatcher from '@/components/postsDispatcher';
 import { fetchAllPosts } from '@/features/post/domain/service/postService';
 import { PostItemProps } from '@/features/post/ui/postItemProps';
 import { fetchPostStat } from '@/features/postStat/domain/service/postStatService';
@@ -32,6 +33,7 @@ export default async function BlogPage({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
+      <PostsDispatcher />
       <div className='px-10 xl:px-20 py-8 flex flex-col'>
         {postProps.map(post => (
           <PostPreviewItem key={post.slug} post={post} />

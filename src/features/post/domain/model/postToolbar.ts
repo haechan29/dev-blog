@@ -2,7 +2,7 @@ import { Heading } from '@/features/post/domain/model/post';
 import { PostToolbarProps } from '@/features/post/ui/postToolbarProps';
 
 export default interface PostToolbar {
-  type: 'empty' | 'basic' | 'collapsed' | 'expanded';
+  type: 'empty' | 'minimal' | 'basic' | 'collapsed' | 'expanded';
   tag: string | null;
   selectedHeading: Heading | null;
   headings: Heading[];
@@ -14,6 +14,11 @@ export function toProps(postToolbar: PostToolbar): PostToolbarProps {
     case 'empty':
       return {
         type: postToolbar.type,
+      };
+    case 'minimal':
+      return {
+        type: postToolbar.type,
+        title: postToolbar.tag,
       };
     case 'basic':
       return {

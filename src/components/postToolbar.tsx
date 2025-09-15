@@ -37,7 +37,9 @@ function ContentItem() {
     >
       <div className='flex flex-col'>
         <div className='flex text-xs h-4 text-gray-400'>
-          {postToolbarProps.type !== 'empty' &&
+          {(postToolbarProps.type === 'basic' ||
+            postToolbarProps.type === 'collapsed' ||
+            postToolbarProps.type === 'expanded') &&
             postToolbarProps.breadcrumb.map(item => {
               return (
                 <div key={item} className='flex items-center'>
