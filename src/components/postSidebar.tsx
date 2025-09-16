@@ -152,7 +152,7 @@ export default function PostSidebar({ posts }: { posts: PostItemProps[] }) {
         !isVisible && '-translate-x-full'
       )}
     >
-      <div className='flex flex-col w-full min-w-0 100dvh bg-gray-50/50 backdrop-blur-md border-r border-r-gray-50'>
+      <div className='flex flex-col w-full min-w-0 h-dvh bg-gray-50/50 backdrop-blur-md border-r border-r-gray-50'>
         <div className='flex w-full min-w-0 px-6 py-9'>
           <Link
             onClick={() => dispatch(setIsVisible(false))}
