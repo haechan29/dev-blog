@@ -2,6 +2,7 @@
 
 import { Heading } from '@/features/post/domain/model/post';
 import { toProps } from '@/features/post/domain/model/postToolbar';
+import { toggleIsVisible } from '@/lib/redux/postSidebarSlice';
 import { setType } from '@/lib/redux/postToolbarSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
@@ -10,11 +11,16 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostToolbar() {
+  const dispatch = useDispatch<AppDispatch>();
+
   return (
     <div className='block xl:hidden mb-4'>
       <div className='fixed top-0 left-0 right-0 backdrop-blur-md bg-white/80'>
         <div className='flex items-start pt-1 pb-4'>
-          <button className='flex shrink-0 px-2 pt-4 items-center justify-center'>
+          <button
+            onClick={() => dispatch(toggleIsVisible())}
+            className='flex shrink-0 px-2 pt-4 items-center justify-center'
+          >
             <Menu className='w-6 h-6' />
           </button>
           <ContentItem />

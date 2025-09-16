@@ -2,12 +2,16 @@
 
 import { PostItemProps } from '@/features/post/ui/postItemProps';
 import clsx from 'clsx';
-import { FileUser, Mail } from 'lucide-react';
+import { ChevronLeft, FileUser, Mail } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
 import TooltipItem from './tooltipItem';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/lib/redux/store';
+import useMediaQuery from '@/hooks/useMediaQuery';
+import { toggleIsVisible } from '@/lib/redux/postSidebarSlice';
 
 function Footer({ className }: { className: string }) {
   return (
@@ -53,6 +57,8 @@ export default function PostSidebar({ posts }: { posts: PostItemProps[] }) {
   const searchParams = useSearchParams();
   const selectedSlug = params.slug as string | undefined;
   const selectedTag = searchParams.get('tag') ?? null;
+  const postSidebar = useSelector((state: RootState) => state.postSidebar);
+  const isLargerThanXl = useMediaQuery('(min-width: 1280px)');
 
   const tagCount = useMemo(() => {
     const tagMap = posts
@@ -70,11 +76,21 @@ export default function PostSidebar({ posts }: { posts: PostItemProps[] }) {
       : null;
   }, [posts, selectedTag]);
 
+  const isVisible = useMemo(
+    () => isLargerThanXl || postSidebar.isVisible,
+    [postSidebar, isLargerThanXl]
+  );
+
   return (
-    <div className='fixed left-0 top-0 bottom-0 w-72 hidden xl:block'>
-      <div className='flex h-full flex-col bg-gray-50/50 border-r border-r-gray-50'>
-        <div className='px-6 py-9'>
-          <Link className='px-3 py-3 flex flex-col w-fit' href='/posts'>
+    <div
+      className={clsx(
+        'fixed left-0 top-0 bottom-0 w-72 transition-transform duration-300 ease-in-out',
+        !isVisible && '-translate-x-full'
+      )}
+    >
+      <div className='flex flex-col w-full min-w-0 h-screen bg-gray-50/50 backdrop-blur-md border-r border-r-gray-50'>
+        <div className='flex w-full min-w-0 px-6 py-9'>
+          <Link className='flex flex-col min-w-0 px-3 py-3' href='/posts'>
             <div className='text-2xl font-bold tracking-tight text-blue-500'>
               Haechan
             </div>
@@ -130,7 +146,7 @@ export default function PostSidebar({ posts }: { posts: PostItemProps[] }) {
             );
           })}
         </div>
-        <Footer className='py-12' />
+        <Footer />
       </div>
     </div>
   );

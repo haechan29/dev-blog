@@ -9,7 +9,7 @@ import {
   QueryClient,
 } from '@tanstack/react-query';
 
-export default async function BlogPage({
+export default async function PostPage({
   searchParams,
 }: {
   searchParams: Promise<{ tag?: string }>;
