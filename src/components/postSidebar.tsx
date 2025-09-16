@@ -7,16 +7,28 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
-import TooltipItem from './tooltipItem';
+import TooltipItem from '@/components/tooltipItem';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { toggleIsVisible } from '@/lib/redux/postSidebarSlice';
 import useIsMobile from '@/hooks/useIsMobile';
+import toast from 'react-hot-toast';
 
 function Footer() {
+  const mail = process.env.NEXT_PUBLIC_CONTACT_MAIL;
   const isMobile = useIsMobile();
   const dispatch = useDispatch<AppDispatch>();
+
+  const handleMailIconClick = async () => {
+    if (mail === undefined) return;
+    try {
+      await navigator.clipboard.writeText(mail);
+      toast.success(`${mail} 복사 완료`);
+    } catch (error) {
+      toast.error('복사 실패');
+    }
+  };
 
   return (
     <div className='flex w-full min-w-0 items-center px-6 py-12 gap-4'>
@@ -76,6 +88,7 @@ function Footer() {
             <TooltipItem text='haechan.im@gmail.com'>
               <button className='w-10 h-10 flex justify-center items-center cursor-pointer rounded-full hover:bg-blue-300 transition-colors duration-300 ease-in-out'>
                 <Mail className='w-5 h-5' />
+                onClick={handleMailIconClick}
               </button>
             </TooltipItem>
           )}
