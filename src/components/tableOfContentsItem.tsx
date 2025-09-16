@@ -1,10 +1,10 @@
 'use client';
 
 import { Heading } from '@/features/post/domain/model/post';
+import useMediaQuery from '@/hooks/useMediaQuery';
+import useThrottle from '@/hooks/useThrottle';
 import clsx from 'clsx';
 import { useCallback, useEffect, useState } from 'react';
-import useThrottle from '@/hooks/useThrottle';
-import useMediaQuery from '@/hooks/useMediaQuery';
 
 export default function TableOfContentsItem({
   headings,
@@ -65,7 +65,7 @@ export default function TableOfContentsItem({
     return () => {
       window.removeEventListener('scroll', throttledCheck);
     };
-  }, [isLargerThanXl, headings]);
+  }, [isLargerThanXl, headings, getActiveHeading, throttle100Ms]);
 
   const handleClick = (id: string) => {
     const element = document.getElementById(id);

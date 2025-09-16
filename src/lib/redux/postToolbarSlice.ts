@@ -1,6 +1,6 @@
 import { Heading } from '@/features/post/domain/model/post';
 import PostToolbar from '@/features/post/domain/model/postToolbar';
-import { createSlice, PayloadAction, Reducer } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: PostToolbar = {
   type: 'empty',

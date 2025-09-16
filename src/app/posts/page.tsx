@@ -33,10 +33,10 @@ export default async function PostPage({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <PostsDispatcher />
+      <PostsDispatcher tag={tag} />
       <div className='px-10 xl:px-20 py-8 flex flex-col'>
         {postProps.map(post => (
-          <PostPreviewItem key={post.slug} post={post} />
+          <PostPreviewItem key={post.slug} tag={tag} post={post} />
         ))}
       </div>
     </HydrationBoundary>

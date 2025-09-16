@@ -1,7 +1,7 @@
 import PostSidebar from '@/components/postSidebar';
-import { ReactNode } from 'react';
-import { fetchAllPosts } from '@/features/post/domain/service/postService';
 import PostToolbar from '@/components/postToolbar';
+import { fetchAllPosts } from '@/features/post/domain/service/postService';
+import { ReactNode, Suspense } from 'react';
 
 export default async function PostsLayout({
   children,
@@ -13,7 +13,9 @@ export default async function PostsLayout({
 
   return (
     <div className='min-h-screen bg-white'>
-      <PostToolbar />
+      <Suspense>
+        <PostToolbar />
+      </Suspense>
       <PostSidebar posts={postProps} />
       <div className='xl:mx-72'>{children}</div>
     </div>

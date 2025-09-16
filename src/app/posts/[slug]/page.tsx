@@ -1,14 +1,14 @@
-import TableOfContentsItem from '@/components/tableOfContentsItem';
-import { Suspense } from 'react';
-import { Post } from '@/features/post/domain/model/post';
-import { fetchPostBySlug } from '@/features/post/domain/service/postService';
 import CommentSection from '@/components/commentSection';
-import { ErrorBoundary } from 'react-error-boundary';
-import PostViewTracker from '@/components/postViewTracker';
 import LikeButtonItem from '@/components/likeButtonItem';
-import PostHeaderSection from '@/components/postHeaderSection';
 import PostContentSection from '@/components/postContentSection';
 import PostDispatcher from '@/components/postDispatcher';
+import PostHeaderSection from '@/components/postHeaderSection';
+import PostViewTracker from '@/components/postViewTracker';
+import TableOfContentsItem from '@/components/tableOfContentsItem';
+import { Post } from '@/features/post/domain/model/post';
+import { fetchPostBySlug } from '@/features/post/domain/service/postService';
+import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 
 export default async function PostPage({
   params,
@@ -22,7 +22,9 @@ export default async function PostPage({
   return (
     <div>
       <div className='px-10 xl:px-20 py-14'>
-        <PostDispatcher post={postProps} />
+        <Suspense>
+          <PostDispatcher post={postProps} />
+        </Suspense>
         <PostViewTracker postId={postProps.slug} />
 
         <PostHeaderSection post={postProps} className='mb-10' />

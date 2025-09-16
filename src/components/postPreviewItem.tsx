@@ -1,18 +1,20 @@
 'use client';
 
+import PostInfoItem from '@/components/postInfoItem';
 import { PostItemProps } from '@/features/post/ui/postItemProps';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import PostInfoItem from './postInfoItem';
-import { useSearchParams } from 'next/navigation';
 
-export default function PostPreviewItem({ post }: { post: PostItemProps }) {
+export default function PostPreviewItem({
+  tag,
+  post,
+}: {
+  tag: string | null;
+  post: PostItemProps;
+}) {
   const [isTextAreaExpanded, setIsTextAreaExpanded] = useState(false);
   const timerRef = useRef<number | undefined>(undefined);
-
-  const searchParams = useSearchParams();
-  const selectedTag = searchParams.get('tag') ?? null;
 
   useEffect(() => {
     return () => {
@@ -42,7 +44,7 @@ export default function PostPreviewItem({ post }: { post: PostItemProps }) {
   return (
     <div className={clsx('w-full py-8 border-b border-b-gray-200')}>
       <Link
-        href={`/posts/${post.slug}${selectedTag ? `?tag=${selectedTag}` : ''}`}
+        href={`/posts/${post.slug}${tag ? `?tag=${tag}` : ''}`}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
