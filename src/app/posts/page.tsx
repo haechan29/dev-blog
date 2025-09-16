@@ -1,4 +1,5 @@
 import PostPreviewItem from '@/components/postPreviewItem';
+import PostsDispatcher from '@/components/postsDispatcher';
 import { fetchAllPosts } from '@/features/post/domain/service/postService';
 import { PostItemProps } from '@/features/post/ui/postItemProps';
 import { fetchPostStat } from '@/features/postStat/domain/service/postStatService';
@@ -8,7 +9,7 @@ import {
   QueryClient,
 } from '@tanstack/react-query';
 
-export default async function BlogPage({
+export default async function PostPage({
   searchParams,
 }: {
   searchParams: Promise<{ tag?: string }>;
@@ -32,9 +33,10 @@ export default async function BlogPage({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className='py-8 flex flex-col'>
+      <PostsDispatcher tag={tag} />
+      <div className='px-10 xl:px-20 py-8 flex flex-col'>
         {postProps.map(post => (
-          <PostPreviewItem key={post.slug} post={post} />
+          <PostPreviewItem key={post.slug} tag={tag} post={post} />
         ))}
       </div>
     </HydrationBoundary>

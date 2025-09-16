@@ -67,10 +67,7 @@ export default function DeleteCommentDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent
-        showCloseButton={false}
-        className='min-w-2xl gap-0 rounded-sm'
-      >
+      <DialogContent showCloseButton={false} className='gap-0 rounded-sm'>
         <DialogTitle className='sr-only'>{'댓글 삭제 다이어로그'}</DialogTitle>
         <DialogDescription className='sr-only'>
           선택한 댓글을 삭제하기 위해 비밀번호를 입력해주세요.
@@ -81,7 +78,7 @@ export default function DeleteCommentDialog({
         </div>
         <input
           className={clsx(
-            'border p-3 mb-8 rounded-sm outline-none',
+            'w-full border p-3 mb-8 rounded-sm outline-none',
             isPasswordValid
               ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
               : 'border-red-400 animate-shake',
