@@ -12,42 +12,93 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { toggleIsVisible } from '@/lib/redux/postSidebarSlice';
+import useIsMobile from '@/hooks/useIsMobile';
 
-function Footer({ className }: { className: string }) {
+function Footer() {
+  const isMobile = useIsMobile();
+  const dispatch = useDispatch<AppDispatch>();
+
   return (
-    <div
-      className={clsx('flex justify-center items-center gap-x-2', className)}
-    >
-      <TooltipItem text='Github'>
-        <a
-          href='https://github.com/haechan29'
-          target='_blank'
-          rel='noopener noreferrer'
-          className='w-10 h-10 flex justify-center items-center rounded-full hover:bg-blue-300 transition-colors duration-300 ease-in-out'
-        >
-          <Image
-            width={20}
-            height={20}
-            src='/images/github.png'
-            alt='github icon'
-            className='rounded-full'
-          />
-        </a>
-      </TooltipItem>
-      <TooltipItem text='haechan.im@gmail.com'>
-        <button className='w-10 h-10 flex justify-center items-center cursor-pointer rounded-full hover:bg-blue-300 transition-colors duration-300 ease-in-out'>
-          <Mail className='w-5 h-5' />
-        </button>
-      </TooltipItem>
+    <div className='flex w-full min-w-0 items-center px-6 py-12 gap-4'>
+      <button
+        onClick={() => dispatch(toggleIsVisible())}
+        className='flex xl:hidden'
+      >
+        <ChevronLeft className='w-10 h-10 stroke-1 text-gray-900' />
+      </button>
+      <div className='flex flex-1 min-w-0 justify-center'>
+        <div className='flex min-w-0 gap-x-4'>
+          {isMobile ? (
+            <a
+              href='https://github.com/haechan29'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='w-10 h-10 flex justify-center items-center rounded-full hover:bg-blue-300 transition-colors duration-300 ease-in-out'
+            >
+              <div className='flex flex-col items-center min-w-0 gap-y-1'>
+                <Image
+                  width={16}
+                  height={16}
+                  src='/images/github.png'
+                  alt='github icon'
+                  className='rounded-full'
+                />
+                <div className='text-xs'>Github</div>
+              </div>
+            </a>
+          ) : (
+            <TooltipItem text='Github'>
+              <a
+                href='https://github.com/haechan29'
+                target='_blank'
+                rel='noopener noreferrer'
+                className='w-10 h-10 flex justify-center items-center rounded-full hover:bg-blue-300 transition-colors duration-300 ease-in-out'
+              >
+                <Image
+                  width={20}
+                  height={20}
+                  src='/images/github.png'
+                  alt='github icon'
+                  className='rounded-full'
+                />
+              </a>
+            </TooltipItem>
+          )}
 
-      <TooltipItem text='포트폴리오'>
-        <Link
-          href='/portfolio'
-          className='w-10 h-10 flex justify-center items-center cursor-pointer rounded-full hover:bg-blue-300 transition-colors duration-300 ease-in-out'
-        >
-          <FileUser className='w-5 h-5' />
-        </Link>
-      </TooltipItem>
+          {isMobile ? (
+            <button className='w-10 h-10 flex justify-center items-center cursor-pointer rounded-full hover:bg-blue-300 transition-colors duration-300 ease-in-out'>
+              <div className='flex flex-col items-center min-w-0 gap-y-1'>
+                <Mail className='w-4 h-4' />
+                <div className='text-xs'>Mail</div>
+              </div>
+            </button>
+          ) : (
+            <TooltipItem text='haechan.im@gmail.com'>
+              <button className='w-10 h-10 flex justify-center items-center cursor-pointer rounded-full hover:bg-blue-300 transition-colors duration-300 ease-in-out'>
+                <Mail className='w-5 h-5' />
+              </button>
+            </TooltipItem>
+          )}
+
+          {isMobile ? (
+            <button className='w-10 h-10 flex justify-center items-center cursor-pointer rounded-full hover:bg-blue-300 transition-colors duration-300 ease-in-out'>
+              <div className='flex flex-col items-center min-w-0 gap-y-1'>
+                <FileUser className='w-4 h-4' />
+                <div className='text-xs'>Portfolio</div>
+              </div>
+            </button>
+          ) : (
+            <TooltipItem text='포트폴리오'>
+              <Link
+                href='/portfolio'
+                className='w-10 h-10 flex justify-center items-center cursor-pointer rounded-full hover:bg-blue-300 transition-colors duration-300 ease-in-out'
+              >
+                <FileUser className='w-5 h-5' />
+              </Link>
+            </TooltipItem>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
