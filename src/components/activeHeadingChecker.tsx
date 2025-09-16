@@ -3,7 +3,7 @@
 import { Heading } from '@/features/post/domain/model/post';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import useThrottle from '@/hooks/useThrottle';
-import { setSelectedHeading, setTitle } from '@/lib/redux/postToolbarSlice';
+import { setSelectedHeading } from '@/lib/redux/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
@@ -48,7 +48,7 @@ export default function ActiveHeadingDetector({
     if (targetHeading !== null) {
       dispatch(setSelectedHeading(targetHeading));
     }
-  }, [headings, dispatch, getTargetHeading]);
+  }, [dispatch, getTargetHeading]);
 
   useEffect(() => {
     if (isLargerThanXl) return;
@@ -60,7 +60,7 @@ export default function ActiveHeadingDetector({
     return () => {
       window.removeEventListener('scroll', throttledUpdate);
     };
-  }, [isLargerThanXl, updateHeadings]);
+  }, [isLargerThanXl, throttle100Ms, updateHeadings]);
 
   return <></>;
 }

@@ -15,7 +15,7 @@ export default function PostsDispatcher() {
   useEffect(() => {
     dispatch(setTag(tag));
     dispatch(setType('minimal'));
-  }, []);
+  }, [dispatch, tag]);
 
   return <></>;
 }

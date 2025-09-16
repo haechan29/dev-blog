@@ -1,13 +1,13 @@
 'use client';
 
+import { PostItemProps } from '@/features/post/ui/postItemProps';
+import { setHeadings, setTag, setTitle } from '@/lib/redux/postToolbarSlice';
+import { AppDispatch } from '@/lib/redux/store';
+import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { AppDispatch } from '@/lib/redux/store';
-import { setHeadings, setTag, setTitle } from '@/lib/redux/postToolbarSlice';
-import { useSearchParams } from 'next/navigation';
-import { PostItemProps } from '@/features/post/ui/postItemProps';
 
-export default function postDispatcher({ post }: { post: PostItemProps }) {
+export default function PostDispatcher({ post }: { post: PostItemProps }) {
   const dispatch = useDispatch<AppDispatch>();
 
   const searchParams = useSearchParams();
@@ -16,11 +16,11 @@ export default function postDispatcher({ post }: { post: PostItemProps }) {
   useEffect(() => {
     dispatch(setTitle(post.title));
     dispatch(setHeadings(post.headings));
-  }, [post]);
+  }, [dispatch, post]);
 
   useEffect(() => {
     dispatch(setTag(tag));
-  }, []);
+  }, [dispatch, tag]);
 
   return <></>;
 }

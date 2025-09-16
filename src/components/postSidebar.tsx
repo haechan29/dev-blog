@@ -1,19 +1,19 @@
 'use client';
 
+import TooltipItem from '@/components/tooltipItem';
 import { PostItemProps } from '@/features/post/ui/postItemProps';
+import useIsMobile from '@/hooks/useIsMobile';
+import useMediaQuery from '@/hooks/useMediaQuery';
+import { setIsVisible } from '@/lib/redux/postSidebarSlice';
+import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { ChevronLeft, FileUser, Mail } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
-import TooltipItem from '@/components/tooltipItem';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '@/lib/redux/store';
-import useMediaQuery from '@/hooks/useMediaQuery';
-import { setIsVisible } from '@/lib/redux/postSidebarSlice';
-import useIsMobile from '@/hooks/useIsMobile';
 import toast from 'react-hot-toast';
+import { useDispatch, useSelector } from 'react-redux';
 
 function FooterItem() {
   const mail = process.env.NEXT_PUBLIC_CONTACT_MAIL;
@@ -26,7 +26,7 @@ function FooterItem() {
     try {
       await navigator.clipboard.writeText(mail);
       toast.success(`${mail} 복사 완료`);
-    } catch (error) {
+    } catch {
       toast.error('복사 실패');
     }
   };

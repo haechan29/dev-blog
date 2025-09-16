@@ -1,9 +1,9 @@
 'use client';
 
+import { setType } from '@/lib/redux/postToolbarSlice';
+import { AppDispatch } from '@/lib/redux/store';
 import { RefObject, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { AppDispatch } from '@/lib/redux/store';
-import { setType } from '@/lib/redux/postToolbarSlice';
 
 export default function HeaderSectionDetector({
   headerRef,
@@ -24,7 +24,7 @@ export default function HeaderSectionDetector({
       headerObserver.observe(headerRef.current);
     }
     return () => headerObserver.disconnect();
-  }, []);
+  }, [dispatch, headerRef]);
 
   return <></>;
 }

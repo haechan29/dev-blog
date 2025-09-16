@@ -65,7 +65,7 @@ function ContentItem() {
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [postToolbarProps, clickedHeading]);
+  }, [postToolbarProps, clickedHeading, dispatch]);
 
   return (
     <div className='flex flex-1 min-w-0 items-start'>
