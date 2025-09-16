@@ -9,11 +9,11 @@ const postSidebarSlice = createSlice({
   name: 'postSidebar',
   initialState,
   reducers: {
-    toggleIsVisible: state => {
-      state.isVisible = !state.isVisible;
+    setIsVisible: (state, action: PayloadAction<boolean>) => {
+      state.isVisible = action.payload;
     },
   },
 });
 
 export default postSidebarSlice.reducer;
-export const { toggleIsVisible } = postSidebarSlice.actions;
+export const { setIsVisible } = postSidebarSlice.actions;

@@ -11,7 +11,7 @@ import TooltipItem from '@/components/tooltipItem';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import useMediaQuery from '@/hooks/useMediaQuery';
-import { toggleIsVisible } from '@/lib/redux/postSidebarSlice';
+import { setIsVisible } from '@/lib/redux/postSidebarSlice';
 import useIsMobile from '@/hooks/useIsMobile';
 import toast from 'react-hot-toast';
 
@@ -34,7 +34,7 @@ function FooterItem() {
   return (
     <div className='flex w-full min-w-0 items-center px-6 py-12 gap-4'>
       <button
-        onClick={() => dispatch(toggleIsVisible())}
+        onClick={() => dispatch(setIsVisible(false))}
         className='flex xl:hidden'
       >
         <ChevronLeft className='w-10 h-10 stroke-1 text-gray-900' />
@@ -46,6 +46,7 @@ function FooterItem() {
             <TooltipItem text='Github'>
               <a
                 href={githubUrl}
+                onClick={() => dispatch(setIsVisible(false))}
                 target='_blank'
                 rel='noopener noreferrer'
                 className='w-10 h-10 flex min-w-0 justify-center items-center rounded-full hover:bg-blue-300 transition-colors duration-300 ease-in-out'
@@ -95,6 +96,7 @@ function FooterItem() {
           <TooltipItem text='포트폴리오'>
             <Link
               href='/portfolio'
+              onClick={() => dispatch(setIsVisible(false))}
               className='w-10 h-10 flex justify-center items-center cursor-pointer rounded-full hover:bg-blue-300 transition-colors duration-300 ease-in-out'
             >
               {isMobile ? (
@@ -118,6 +120,7 @@ export default function PostSidebar({ posts }: { posts: PostItemProps[] }) {
   const searchParams = useSearchParams();
   const selectedSlug = params.slug as string | undefined;
   const selectedTag = searchParams.get('tag') ?? null;
+  const dispatch = useDispatch<AppDispatch>();
   const postSidebar = useSelector((state: RootState) => state.postSidebar);
   const isLargerThanXl = useMediaQuery('(min-width: 1280px)');
 
@@ -151,7 +154,11 @@ export default function PostSidebar({ posts }: { posts: PostItemProps[] }) {
     >
       <div className='flex flex-col w-full min-w-0 h-screen bg-gray-50/50 backdrop-blur-md border-r border-r-gray-50'>
         <div className='flex w-full min-w-0 px-6 py-9'>
-          <Link className='flex flex-col min-w-0 px-3 py-3' href='/posts'>
+          <Link
+            onClick={() => dispatch(setIsVisible(false))}
+            className='flex flex-col min-w-0 px-3 py-3'
+            href='/posts'
+          >
             <div className='text-2xl font-bold tracking-tight text-blue-500'>
               Haechan
             </div>
@@ -193,6 +200,7 @@ export default function PostSidebar({ posts }: { posts: PostItemProps[] }) {
                       href={`/posts/${post.slug}${
                         selectedTag ? `?tag=${selectedTag}` : ''
                       }`}
+                      onClick={() => dispatch(setIsVisible(false))}
                       className={clsx(
                         'flex w-full py-3 pl-12 pr-9 hover:text-blue-500',
                         post.slug === selectedSlug
@@ -207,6 +215,7 @@ export default function PostSidebar({ posts }: { posts: PostItemProps[] }) {
             );
           })}
         </div>
+
         <FooterItem />
       </div>
     </div>

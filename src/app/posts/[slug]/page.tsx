@@ -1,5 +1,5 @@
 import TableOfContentsItem from '@/components/tableOfContentsItem';
-import { ReactNode, Suspense } from 'react';
+import { Suspense } from 'react';
 import { Post } from '@/features/post/domain/model/post';
 import { fetchPostBySlug } from '@/features/post/domain/service/postService';
 import CommentSection from '@/components/commentSection';

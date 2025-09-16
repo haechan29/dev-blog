@@ -2,7 +2,7 @@
 
 import { Heading } from '@/features/post/domain/model/post';
 import { toProps } from '@/features/post/domain/model/postToolbar';
-import { toggleIsVisible } from '@/lib/redux/postSidebarSlice';
+import { setIsVisible } from '@/lib/redux/postSidebarSlice';
 import { setType } from '@/lib/redux/postToolbarSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
@@ -18,10 +18,10 @@ export default function PostToolbar() {
       <div className='fixed top-0 left-0 right-0 backdrop-blur-md bg-white/80'>
         <div className='flex items-start pt-1 pb-4'>
           <button
-            onClick={() => dispatch(toggleIsVisible())}
+            onClick={() => dispatch(setIsVisible(true))}
             className='flex shrink-0 px-2 pt-4 items-center justify-center'
           >
-            <Menu className='w-6 h-6' />
+            <Menu className='w-6 h-6 text-gray-500' />
           </button>
           <ContentItem />
         </div>
@@ -138,7 +138,7 @@ function ContentItem() {
       >
         <ChevronDown
           className={clsx(
-            'w-6 h-6 transition-opacity|transform duration-300 ease-in-out',
+            'w-6 h-6 text-gray-500 transition-opacity|transform duration-300 ease-in-out',
             postToolbarProps.type === 'collapsed' ||
               postToolbarProps.type === 'expanded'
               ? 'opacity-100'

@@ -14,10 +14,13 @@ export default function postDispatcher({ post }: { post: PostItemProps }) {
   const tag = searchParams.get('tag');
 
   useEffect(() => {
-    dispatch(setTag(tag));
     dispatch(setTitle(post.title));
     dispatch(setHeadings(post.headings));
   }, [post]);
+
+  useEffect(() => {
+    dispatch(setTag(tag));
+  }, []);
 
   return <></>;
 }
