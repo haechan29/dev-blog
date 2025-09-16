@@ -48,7 +48,7 @@ function Footer({ className }: { className: string }) {
   );
 }
 
-export default function BlogSidebar({ posts }: { posts: PostItemProps[] }) {
+export default function PostSidebar({ posts }: { posts: PostItemProps[] }) {
   const params = useParams();
   const searchParams = useSearchParams();
   const selectedSlug = params.slug as string | undefined;

@@ -1,4 +1,4 @@
-import BlogSidebar from '@/components/blogSidebar';
+import PostSidebar from '@/components/postSidebar';
 import { ReactNode } from 'react';
 import { fetchAllPosts } from '@/features/post/domain/service/postService';
 import PostToolbar from '@/components/postToolbar';
@@ -14,7 +14,7 @@ export default async function PostsLayout({
   return (
     <div className='min-h-screen bg-white'>
       <PostToolbar />
-      <BlogSidebar posts={postProps} />
+      <PostSidebar posts={postProps} />
       <div className='xl:mx-72'>{children}</div>
     </div>
   );
