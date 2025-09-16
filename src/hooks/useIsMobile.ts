@@ -3,13 +3,13 @@
 import { useEffect, useState } from 'react';
 
 export default function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(
-    () => typeof window !== 'undefined' && 'ontouchstart' in window
-  );
+  const [isMobile, setIsMobile] = useState(false);
 
-  const checkDivice = () =>
-    setIsMobile(typeof window !== 'undefined' && 'ontouchstart' in window);
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const checkDivice = () => setIsMobile('ontouchstart' in window);
+    checkDivice();
     window.addEventListener('resize', checkDivice);
     return () => window.removeEventListener('resize', checkDivice);
   }, []);
