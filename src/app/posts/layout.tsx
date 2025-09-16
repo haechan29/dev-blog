@@ -13,10 +13,10 @@ export default async function PostsLayout({
 
   return (
     <div className='min-h-screen bg-white'>
+      <PostToolbar />
       <Suspense>
-        <PostToolbar />
+        <PostSidebar posts={postProps} />
       </Suspense>
-      <PostSidebar posts={postProps} />
       <div className='xl:mx-72'>{children}</div>
     </div>
   );
