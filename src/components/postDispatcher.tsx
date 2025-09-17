@@ -15,7 +15,7 @@ export default function PostDispatcher({ post }: { post: PostItemProps }) {
 
   useEffect(() => {
     dispatch(setTitle(post.title));
-    dispatch(setHeadings(post.headings));
+    dispatch(setHeadings(post.headings.filter(heading => heading.level === 1)));
   }, [dispatch, post]);
 
   useEffect(() => {

@@ -3,11 +3,15 @@
 import { Heading } from '@/features/post/domain/model/post';
 import { toProps } from '@/features/post/domain/model/postToolbar';
 import { setIsVisible } from '@/lib/redux/postSidebarSlice';
-import { setIsExpanded } from '@/lib/redux/postToolbarSlice';
+import {
+  setIsExpanded,
+  setSelectedHeading,
+} from '@/lib/redux/postToolbarSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
+import { scrollToElement } from '@/lib/scroll';
 import clsx from 'clsx';
 import { ChevronDown, ChevronRight, Menu } from 'lucide-react';
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostToolbar() {
@@ -23,8 +27,6 @@ export default function PostToolbar() {
       : [];
   }, [postToolbarProps]);
 
-  const clickedHeading = useRef<Heading | null>(null);
-
   const handleClick = (heading: Heading) => {
     if (postToolbarProps.mode === 'collapsed') {
       dispatch(setIsExpanded(true));
@@ -32,27 +34,20 @@ export default function PostToolbar() {
     if (postToolbarProps.mode === 'expanded') {
       const element = document.getElementById(heading.id);
       if (element) {
-        clickedHeading.current = heading;
-        element.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
+        scrollToElement(
+          element,
+          {
+            behavior: 'smooth',
+            block: 'start',
+          },
+          () => {
+            dispatch(setSelectedHeading(heading));
+            dispatch(setIsExpanded(false));
+          }
+        );
       }
     }
   };
-
-  useEffect(() => {
-    if (
-      postToolbarProps.mode === 'expanded' &&
-      clickedHeading.current?.text === postToolbarProps.title
-    ) {
-      const timer = setTimeout(() => {
-        dispatch(setIsExpanded(false));
-        clickedHeading.current = null;
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [postToolbarProps, clickedHeading, dispatch]);
 
   return (
     <div className='block xl:hidden mb-4'>
@@ -111,11 +106,7 @@ export default function PostToolbar() {
                           postToolbarProps.title === heading.text
                             ? 'text-gray-900 font-semibold'
                             : 'text-gray-400',
-                          postToolbarProps.mode === 'expanded' && 'my-0.5',
-                          postToolbarProps.mode === 'expanded' &&
-                            heading.level == 2
-                            ? 'pl-4'
-                            : heading.level == 3 && 'pl-8'
+                          postToolbarProps.mode === 'expanded' && 'my-0.5'
                         )}
                       >
                         {heading.text}
