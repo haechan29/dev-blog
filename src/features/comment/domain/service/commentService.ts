@@ -1,6 +1,6 @@
-import { Comment } from '@/features/comment/domain/model/comment';
 import * as CommentRepository from '@/features/comment/data/repository/commentRepository';
 import { toDomain } from '@/features/comment/domain/mapper/commentMapper';
+import { Comment } from '@/features/comment/domain/model/comment';
 
 export async function getComments(postId: string): Promise<Comment[]> {
   const comments = await CommentRepository.getComments(postId);

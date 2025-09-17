@@ -1,12 +1,13 @@
 'use client';
 
-import { Heart, Edit2, Trash2, Loader2 } from 'lucide-react';
 import DeleteCommentDialog from '@/components/deleteCommentDialog';
-import { useEffect, useState } from 'react';
-import clsx from 'clsx';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
 import { updateComment } from '@/features/comment/domain/service/commentService';
+import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import clsx from 'clsx';
+import { Edit2, Heart, Loader2, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 
 function ContentItem({
   comment,
@@ -46,6 +47,9 @@ function ContentItem({
         queryKey: ['posts', comment.postId, 'comments'],
       });
       setIsEditing(false);
+    },
+    onError: () => {
+      toast.error('댓글 수정 실패');
     },
   });
 
@@ -106,12 +110,15 @@ function ContentItem({
           <div className='flex space-x-2 text-sm'>
             <button
               onClick={handleEdit}
-              className='w-14 h-10 flex justify-center items-center bg-blue-600 text-white rounded-lg hover:bg-blue-500'
+              className={clsx(
+                'h-10 flex justify-center items-center px-4 text-white rounded-lg hover:bg-blue-500',
+                editComment.isPending ? 'bg-blue-500' : 'bg-blue-600'
+              )}
             >
               {editComment.isPending ? (
                 <Loader2 size={18} strokeWidth={2} className='animate-spin' />
               ) : (
-                '저장'
+                '댓글 수정'
               )}
             </button>
             <button

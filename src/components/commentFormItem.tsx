@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Loader2, Send } from 'lucide-react';
-import clsx from 'clsx';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import * as CommentService from '@/features/comment/domain/service/commentService';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import clsx from 'clsx';
+import { Loader2, Send } from 'lucide-react';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 export default function CommentFormItem({ postId }: { postId: string }) {
   const [authorName, setAuthorName] = useState('익명');
@@ -30,6 +31,9 @@ export default function CommentFormItem({ postId }: { postId: string }) {
       setAuthorName('익명');
       setContent('');
       setPassword('');
+    },
+    onError: () => {
+      toast.error('댓글 등록 실패');
     },
   });
 
@@ -119,7 +123,8 @@ export default function CommentFormItem({ postId }: { postId: string }) {
         <button
           onClick={handleSubmit}
           className={clsx(
-            'w-30 h-10 flex justify-center items-center text-white rounded-lg bg-blue-600 hover:bg-blue-500 cursor-pointer'
+            'h-10 flex justify-center items-center px-4 text-white rounded-lg hover:bg-blue-500 cursor-pointer',
+            createComment.isPending ? 'bg-blue-500' : 'bg-blue-600'
           )}
         >
           {createComment.isPending ? (
