@@ -3,9 +3,12 @@ import PostToolbar from '@/features/post/domain/model/postToolbar';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: PostToolbar = {
-  type: 'empty',
   tag: null,
   selectedHeading: null,
+  isInPostsPage: false,
+  isHeadingVisible: false,
+  isContentVisible: false,
+  isExpanded: false,
   headings: [],
 };
 
@@ -13,24 +16,41 @@ const postToolbarSlice = createSlice({
   name: 'postToolbar',
   initialState,
   reducers: {
-    setType: (state, action: PayloadAction<PostToolbar['type']>) => {
-      state.type = action.payload;
-    },
     setTag: (state, action: PayloadAction<string | null>) => {
       state.tag = action.payload;
-    },
-    setTitle: (state, action: PayloadAction<string>) => {
-      state.title = action.payload;
     },
     setSelectedHeading: (state, action: PayloadAction<Heading>) => {
       state.selectedHeading = action.payload;
     },
+    setIsInPostsPage: (state, action: PayloadAction<boolean>) => {
+      state.isInPostsPage = action.payload;
+    },
+    setIsHeadingVisible: (state, action: PayloadAction<boolean>) => {
+      state.isHeadingVisible = action.payload;
+    },
+    setIsContentVisible: (state, action: PayloadAction<boolean>) => {
+      state.isContentVisible = action.payload;
+    },
+    setIsExpanded: (state, action: PayloadAction<boolean>) => {
+      state.isExpanded = action.payload;
+    },
     setHeadings: (state, action: PayloadAction<Heading[]>) => {
       state.headings = action.payload;
+    },
+    setTitle: (state, action: PayloadAction<string>) => {
+      state.title = action.payload;
     },
   },
 });
 
 export default postToolbarSlice.reducer;
-export const { setType, setTag, setTitle, setSelectedHeading, setHeadings } =
-  postToolbarSlice.actions;
+export const {
+  setIsInPostsPage,
+  setIsHeadingVisible,
+  setIsContentVisible,
+  setIsExpanded,
+  setTag,
+  setTitle,
+  setSelectedHeading,
+  setHeadings,
+} = postToolbarSlice.actions;

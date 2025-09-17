@@ -3,7 +3,7 @@
 import { Heading } from '@/features/post/domain/model/post';
 import { toProps } from '@/features/post/domain/model/postToolbar';
 import { setIsVisible } from '@/lib/redux/postSidebarSlice';
-import { setType } from '@/lib/redux/postToolbarSlice';
+import { setIsExpanded } from '@/lib/redux/postToolbarSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { ChevronDown, ChevronRight, Menu } from 'lucide-react';
@@ -39,10 +39,10 @@ function ContentItem() {
   const clickedHeading = useRef<Heading | null>(null);
 
   const handleClick = (heading: Heading) => {
-    if (postToolbarProps.type === 'collapsed') {
-      dispatch(setType('expanded'));
+    if (postToolbarProps.mode === 'collapsed') {
+      dispatch(setIsExpanded(true));
     }
-    if (postToolbarProps.type === 'expanded') {
+    if (postToolbarProps.mode === 'expanded') {
       const element = document.getElementById(heading.id);
       if (element) {
         clickedHeading.current = heading;
@@ -56,11 +56,11 @@ function ContentItem() {
 
   useEffect(() => {
     if (
-      postToolbarProps.type === 'expanded' &&
+      postToolbarProps.mode === 'expanded' &&
       clickedHeading.current?.text === postToolbarProps.title
     ) {
       const timer = setTimeout(() => {
-        dispatch(setType('collapsed'));
+        dispatch(setIsExpanded(false));
         clickedHeading.current = null;
       }, 100);
       return () => clearTimeout(timer);
@@ -73,13 +73,13 @@ function ContentItem() {
         <div
           className={clsx(
             'flex flex-col w-full transition-opacity duration-300 ease-in-out',
-            postToolbarProps.type === 'empty' ? 'opacity-0' : 'opacity-100'
+            postToolbarProps.mode === 'empty' ? 'opacity-0' : 'opacity-100'
           )}
         >
           <div className='flex text-xs h-4 text-gray-400'>
-            {(postToolbarProps.type === 'basic' ||
-              postToolbarProps.type === 'collapsed' ||
-              postToolbarProps.type === 'expanded') &&
+            {(postToolbarProps.mode === 'basic' ||
+              postToolbarProps.mode === 'collapsed' ||
+              postToolbarProps.mode === 'expanded') &&
               postToolbarProps.breadcrumb.map(item => {
                 return (
                   <div key={item} className='flex items-center'>
@@ -89,13 +89,13 @@ function ContentItem() {
                 );
               })}
           </div>
-          {postToolbarProps.type === 'basic' && (
+          {postToolbarProps.mode === 'basic' && (
             <div className='font-semibold h-6 truncate'>
               {postToolbarProps.title}
             </div>
           )}
-          {(postToolbarProps.type === 'collapsed' ||
-            postToolbarProps.type === 'expanded') && (
+          {(postToolbarProps.mode === 'collapsed' ||
+            postToolbarProps.mode === 'expanded') && (
             <div className='flex flex-col'>
               {postToolbarProps.headings.map(heading => (
                 <button
@@ -103,18 +103,18 @@ function ContentItem() {
                   onClick={() => handleClick(heading)}
                   className={clsx(
                     'flex truncate transition-discrete|opacity duration-300 ease-in',
-                    postToolbarProps.type === 'expanded' ||
+                    postToolbarProps.mode === 'expanded' ||
                       postToolbarProps.title === heading.text
                       ? 'h-7 opacity-100'
                       : 'h-0 opacity-0',
                     postToolbarProps.title === heading.text
                       ? 'text-gray-900 font-semibold'
                       : 'text-gray-400',
-                    postToolbarProps.type === 'expanded' && 'py-0.5',
-                    postToolbarProps.type === 'expanded' &&
+                    postToolbarProps.mode === 'expanded' && 'py-0.5',
+                    postToolbarProps.mode === 'expanded' &&
                       heading.level == 2 &&
                       'pl-4',
-                    postToolbarProps.type === 'expanded' &&
+                    postToolbarProps.mode === 'expanded' &&
                       heading.level == 3 &&
                       'pl-8'
                   )}
@@ -128,22 +128,18 @@ function ContentItem() {
       </div>
       <button
         onClick={() =>
-          dispatch(
-            setType(
-              postToolbarProps.type === 'expanded' ? 'collapsed' : 'expanded'
-            )
-          )
+          dispatch(setIsExpanded(postToolbarProps.mode !== 'expanded'))
         }
         className='flex shrink-0 px-2 pt-4 items-center justify-center'
       >
         <ChevronDown
           className={clsx(
             'w-6 h-6 text-gray-500 transition-opacity|transform duration-300 ease-in-out',
-            postToolbarProps.type === 'collapsed' ||
-              postToolbarProps.type === 'expanded'
+            postToolbarProps.mode === 'collapsed' ||
+              postToolbarProps.mode === 'expanded'
               ? 'opacity-100'
               : 'opacity-0',
-            postToolbarProps.type === 'expanded' && '-rotate-180'
+            postToolbarProps.mode === 'expanded' && '-rotate-180'
           )}
         />
       </button>
