@@ -1,8 +1,8 @@
 'use client';
 
-import ActiveHeadingDetector from '@/components/activeHeadingChecker';
-import HeaderSectionDetector from '@/components/headerSectionDetector';
-import PostInfoItem from '@/components/postInfoItem';
+import ActiveHeadingDetector from '@/components/post/activeHeadingChecker';
+import HeaderSectionDetector from '@/components/post/headerSectionDetector';
+import PostInfoItem from '@/components/post/postInfoItem';
 import { PostItemProps } from '@/features/post/ui/postItemProps';
 import Link from 'next/link';
 import { useRef } from 'react';

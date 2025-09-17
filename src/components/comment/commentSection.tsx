@@ -1,4 +1,4 @@
-import CommentSectionClient from '@/components/commentSectionClient';
+import CommentSectionClient from '@/components/comment/commentSectionClient';
 import { getComments } from '@/features/comment/domain/service/commentService';
 import {
   dehydrate,

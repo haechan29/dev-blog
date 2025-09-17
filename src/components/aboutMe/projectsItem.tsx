@@ -1,14 +1,14 @@
 'use client';
 
 import { Project } from '@/features/project/domain/model/project';
+import { fetchProjects } from '@/features/project/domain/service/projectService';
 import { ProjectItemProps } from '@/features/project/ui/projectItemProps';
 import clsx from 'clsx';
-import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import ProjectDialog from './projectDialog';
-import { fetchProjects } from '@/features/project/domain/service/projectService';
 
 const PLATFORM_FILTERS: string[] = ['전체', 'Android', 'Web', 'Flutter'];
 

@@ -1,5 +1,5 @@
-import PostPreviewItem from '@/components/postPreviewItem';
-import PostsDispatcher from '@/components/postsDispatcher';
+import PostPreviewItem from '@/components/post/postPreviewItem';
+import PostsDispatcher from '@/components/post/postsDispatcher';
 import { fetchAllPosts } from '@/features/post/domain/service/postService';
 import { PostItemProps } from '@/features/post/ui/postItemProps';
 import { fetchPostStat } from '@/features/postStat/domain/service/postStatService';

@@ -1,6 +1,6 @@
 'use client';
 
-import PostInfoItem from '@/components/postInfoItem';
+import PostInfoItem from '@/components/post/postInfoItem';
 import { PostItemProps } from '@/features/post/ui/postItemProps';
 import clsx from 'clsx';
 import Link from 'next/link';

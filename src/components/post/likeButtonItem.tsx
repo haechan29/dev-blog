@@ -1,7 +1,7 @@
 'use client';
 
-import { fetchPostStat } from '@/features/postStat/domain/service/postStatService';
 import * as PostStatService from '@/features/postStat/domain/service/postStatService';
+import { fetchPostStat } from '@/features/postStat/domain/service/postStatService';
 import { PostStatItemProps } from '@/features/postStat/ui/postStatItemProps';
 import useThrottle from '@/hooks/useThrottle';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';

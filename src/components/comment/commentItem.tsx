@@ -1,6 +1,6 @@
 'use client';
 
-import DeleteCommentDialog from '@/components/deleteCommentDialog';
+import DeleteCommentDialog from '@/components/comment/deleteCommentDialog';
 import { updateComment } from '@/features/comment/domain/service/commentService';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
