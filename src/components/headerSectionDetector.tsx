@@ -1,6 +1,6 @@
 'use client';
 
-import { setType } from '@/lib/redux/postToolbarSlice';
+import { setIsHeadingVisible } from '@/lib/redux/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { RefObject, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
@@ -14,10 +14,9 @@ export default function HeaderSectionDetector({
 
   useEffect(() => {
     const headerObserver = new IntersectionObserver(
-      entries =>
-        dispatch(setType(entries[0].isIntersecting ? 'empty' : 'basic')),
+      entries => dispatch(setIsHeadingVisible(entries[0].isIntersecting)),
       {
-        rootMargin: '-80px 0px -100% 0px',
+        rootMargin: '0px 0px -50% 0px',
       }
     );
     if (headerRef.current) {

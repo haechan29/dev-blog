@@ -22,7 +22,7 @@ export default function ContentSectionDetector() {
         dispatch(setType(entries[0].isIntersecting ? 'collapsed' : 'basic'));
       },
       {
-        rootMargin: '-20px 0px -100% 0px',
+        rootMargin: '10% 0px -90% 0px',
       }
     );
     proseObserver.observe(proseElement);

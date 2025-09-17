@@ -19,12 +19,15 @@ export default function ActiveHeadingDetector({
   const isLargerThanXl = useMediaQuery('(min-width: 1280px)');
 
   const getTargetHeading = useCallback(() => {
+    if (typeof window === 'undefined') return null;
+    const vh = window.innerHeight;
+
     const targetElementsInVisibleArea = headings.filter(heading => {
       const element = document.getElementById(heading.id);
       if (!element) return false;
 
       const rect = element.getBoundingClientRect();
-      return rect.top >= 10 && rect.top <= 20;
+      return rect.top >= -0.1 * vh && rect.top <= 0.1 * vh;
     });
 
     if (targetElementsInVisibleArea.length > 0) {
@@ -33,7 +36,7 @@ export default function ActiveHeadingDetector({
 
     const allTargetElementsAbove = headings.filter(heading => {
       const element = document.getElementById(heading.id);
-      return element && element.getBoundingClientRect().top < 10;
+      return element && element.getBoundingClientRect().top <= 0.1 * vh;
     });
 
     if (allTargetElementsAbove.length > 0) {
