@@ -3,6 +3,7 @@
 import DeleteCommentDialog from '@/components/comment/deleteCommentDialog';
 import { updateComment } from '@/features/comment/domain/service/commentService';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Edit2, Heart, Loader2, Trash2 } from 'lucide-react';
@@ -24,6 +25,10 @@ function ContentItem({
   const [isContentValid, setIsContentValid] = useState(true);
 
   const queryClient = useQueryClient();
+  const [isLiked, setIsLiked] = useLocalStorage(
+    `comment-like-${comment.id}`,
+    false
+  );
 
   useEffect(() => {
     if (!isEditing) {
@@ -133,8 +138,19 @@ function ContentItem({
             {comment.content}
           </div>
           <div className='flex items-center space-x-4'>
-            <button className='flex items-center space-x-1 text-gray-500 hover:text-red-500 transition-colors'>
-              <Heart size={16} />
+            <button
+              onClick={() => setIsLiked(!isLiked)}
+              className='flex items-center space-x-1'
+            >
+              <Heart
+                size={16}
+                className={clsx(
+                  'transition-colors duration-300 ease-in-out hover:text-red-500',
+                  isLiked
+                    ? 'fill-red-500 text-red-500 animate-pop'
+                    : 'fill-white text-gray-500'
+                )}
+              />
               <span className='text-sm'>{comment.likeCount}</span>
             </button>
           </div>

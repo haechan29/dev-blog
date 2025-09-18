@@ -304,6 +304,20 @@ body {
   }
 }
 
+@keyframes pop {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
 .animate-shake {
   animation: shake 0.3s ease-in-out;
+}
+
+.animate-pop {
+  animation: pop 0.3s ease-in-out;
 }
