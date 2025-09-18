@@ -54,9 +54,7 @@ export default function DeleteCommentDialog({
       });
       setIsOpen(false);
     },
-    onError: () => {
-      toast.error('댓글 삭제 실패');
-    },
+    onError: error => toast.error(error.message),
   });
 
   const handleDelete = () => {

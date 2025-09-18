@@ -48,9 +48,7 @@ function ContentItem({
       });
       setIsEditing(false);
     },
-    onError: () => {
-      toast.error('댓글 수정 실패');
-    },
+    onError: error => toast.error(error.message),
   });
 
   const handleEdit = () => {

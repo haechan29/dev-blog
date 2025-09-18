@@ -34,8 +34,8 @@ async function fetchWithErrorHandling(url: string, options?: RequestInit) {
   const response = await fetch(baseUrl + url, options);
 
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`HTTP ${response.status}: ${errorText}`);
+    const errorData = await response.json();
+    throw new Error(errorData.error);
   }
 
   return response.json();
