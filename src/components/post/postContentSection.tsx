@@ -1,10 +1,10 @@
-import { MDXRemote } from 'next-mdx-remote/rsc';
-import rehypeSlug from 'rehype-slug';
-import rehypePrettyCode from 'rehype-pretty-code';
-import ToggleButtonItem from '@/components/toggleButtonItem';
-import { ReactNode } from 'react';
+import ContentSectionDetector from '@/components/post/contentSectionDetector';
+import ToggleButtonItem from '@/components/post/toggleButtonItem';
 import { PostItemProps } from '@/features/post/ui/postItemProps';
-import ContentSectionDetector from '@/components/contentSectionDetector';
+import { MDXRemote } from 'next-mdx-remote/rsc';
+import { ReactNode } from 'react';
+import rehypePrettyCode from 'rehype-pretty-code';
+import rehypeSlug from 'rehype-slug';
 
 const ExternalLink = ({ children, ...props }: { children: ReactNode }) => {
   return (

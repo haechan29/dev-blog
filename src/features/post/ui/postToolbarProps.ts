@@ -1,23 +1,23 @@
 import { Heading } from '@/features/post/domain/model/post';
 
-export type EmptyToolbarProps = { type: 'empty' };
+export type EmptyToolbarProps = { mode: 'empty' };
 export type MinimalToolbarProps = {
-  type: 'minimal';
+  mode: 'minimal';
   title: string | null;
 };
 export type BasicToolbarProps = {
-  type: 'basic';
+  mode: 'basic';
   breadcrumb: string[];
   title: string;
 };
 export type CollapsedToolbarProps = {
-  type: 'collapsed';
+  mode: 'collapsed';
   breadcrumb: string[];
   title: string;
   headings: Heading[];
 };
 export type ExpandedToolbarProps = {
-  type: 'expanded';
+  mode: 'expanded';
   breadcrumb: string[];
   title: string;
   headings: Heading[];

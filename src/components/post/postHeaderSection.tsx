@@ -1,10 +1,10 @@
 'use client';
 
+import ActiveHeadingDetector from '@/components/post/activeHeadingChecker';
+import HeaderSectionDetector from '@/components/post/headerSectionDetector';
+import PostInfoItem from '@/components/post/postInfoItem';
 import { PostItemProps } from '@/features/post/ui/postItemProps';
 import Link from 'next/link';
-import PostInfoItem from '@/components/postInfoItem';
-import ActiveHeadingDetector from '@/components/activeHeadingChecker';
-import HeaderSectionDetector from '@/components/headerSectionDetector';
 import { useRef } from 'react';
 
 export default function PostHeaderSection({
@@ -18,7 +18,9 @@ export default function PostHeaderSection({
 
   return (
     <section className={className}>
-      <ActiveHeadingDetector headings={post.headings} />
+      <ActiveHeadingDetector
+        headings={post.headings.filter(heading => heading.level === 1)}
+      />
       <HeaderSectionDetector headerRef={headerRef} />
 
       <div ref={headerRef}>

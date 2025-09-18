@@ -2,17 +2,18 @@
 
 import {
   Dialog,
-  DialogContent,
-  DialogTitle,
   DialogClose,
-  DialogTrigger,
+  DialogContent,
   DialogDescription,
+  DialogTitle,
+  DialogTrigger,
 } from '@/components/ui/dialog';
 import * as CommentService from '@/features/comment/domain/service/commentService';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
 import { ReactNode, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 
 export default function DeleteCommentDialog({
   postId,
@@ -53,6 +54,7 @@ export default function DeleteCommentDialog({
       });
       setIsOpen(false);
     },
+    onError: error => toast.error(error.message),
   });
 
   const handleDelete = () => {
@@ -94,7 +96,10 @@ export default function DeleteCommentDialog({
         />
         <div className='flex justify-between items-center'>
           <button
-            className='flex justify-center items-center w-20 h-10 rounded-sm font-bold text-white bg-red-600 hover:bg-red-500'
+            className={clsx(
+              'flex justify-center items-center px-6 h-10 rounded-sm font-bold text-white hover:bg-red-400',
+              deleteComment.isPending ? 'bg-red-400' : 'bg-red-600'
+            )}
             onClick={handleDelete}
           >
             {deleteComment.isPending ? (

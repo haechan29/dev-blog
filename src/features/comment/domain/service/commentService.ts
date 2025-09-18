@@ -1,10 +1,16 @@
-import { Comment } from '@/features/comment/domain/model/comment';
 import * as CommentRepository from '@/features/comment/data/repository/commentRepository';
 import { toDomain } from '@/features/comment/domain/mapper/commentMapper';
+import { Comment } from '@/features/comment/domain/model/comment';
 
 export async function getComments(postId: string): Promise<Comment[]> {
   const comments = await CommentRepository.getComments(postId);
-  return comments.map(comment => toDomain(comment));
+  return comments
+    .map(comment => toDomain(comment))
+    .sort((a: Comment, b: Comment) => {
+      if (a.likeCount > b.likeCount) return -1;
+      else if (a.likeCount < b.likeCount) return 1;
+      return a.createdAt > b.createdAt ? 1 : -1;
+    });
 }
 
 export async function createComment(params: {
@@ -33,4 +39,20 @@ export async function deleteComment(
   password: string
 ): Promise<void> {
   await CommentRepository.deleteComment(postId, commentId, password);
+}
+
+export async function incrementLikeCount(
+  postId: string,
+  commentId: number
+): Promise<Comment> {
+  const dto = await CommentRepository.incrementLikeCount(postId, commentId);
+  return toDomain(dto);
+}
+
+export async function decrementLikeCount(
+  postId: string,
+  commentId: number
+): Promise<Comment> {
+  const dto = await CommentRepository.decrementLikeCount(postId, commentId);
+  return toDomain(dto);
 }

@@ -11,7 +11,7 @@ import { ChevronLeft, FileUser, Mail } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -124,6 +124,10 @@ export default function PostSidebar({ posts }: { posts: PostItemProps[] }) {
   const postSidebar = useSelector((state: RootState) => state.postSidebar);
   const isLargerThanXl = useMediaQuery('(min-width: 1280px)');
 
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const start = useRef<[number, number] | null>(null);
+  const scrollDirection = useRef<'horizontal' | 'vertical' | null>(null);
+
   const tagCount = useMemo(() => {
     const tagMap = posts
       .flatMap(post => post.tags)
@@ -145,14 +149,80 @@ export default function PostSidebar({ posts }: { posts: PostItemProps[] }) {
     [postSidebar, isLargerThanXl]
   );
 
+  useEffect(() => {
+    const sidebar = sidebarRef.current;
+    if (!sidebar) return;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      start.current = [e.touches[0].clientX, e.touches[0].clientY];
+      sidebar.style.transition = 'none';
+      scrollDirection.current = null;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (start.current === null) return;
+
+      const [currentX, currentY] = [e.touches[0].clientX, e.touches[0].clientY];
+
+      if (!scrollDirection.current) {
+        const deltaX = currentX - start.current[0];
+        const deltaY = currentY - start.current[1];
+        scrollDirection.current =
+          Math.abs(deltaX) > Math.abs(deltaY) ? 'horizontal' : 'vertical';
+      }
+
+      if (scrollDirection.current === 'horizontal') {
+        e.preventDefault();
+        document.body.style.overflow = 'hidden';
+        const translateX = Math.min(currentX - start.current[0], 0);
+        sidebar.style.transform = `translateX(${translateX}px)`;
+      }
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (start.current === null) return;
+
+      if (scrollDirection.current === 'horizontal') {
+        const currentX = e.changedTouches[0].clientX;
+        const translateX = Math.min(currentX - start.current[0], 0);
+        const threshold = -sidebar.getBoundingClientRect().width * 0.3;
+
+        if (translateX > threshold) {
+          dispatch(setIsVisible(true));
+        } else {
+          dispatch(setIsVisible(false));
+        }
+      }
+
+      sidebar.style.transition = '';
+      sidebar.style.transform = '';
+      document.body.style.overflow = '';
+      start.current = null;
+      scrollDirection.current = null;
+    };
+
+    sidebar.addEventListener('touchstart', handleTouchStart, {
+      passive: false,
+    });
+    sidebar.addEventListener('touchmove', handleTouchMove, { passive: false });
+    sidebar.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+    return () => {
+      sidebar.removeEventListener('touchstart', handleTouchStart);
+      sidebar.removeEventListener('touchmove', handleTouchMove);
+      sidebar.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [dispatch]);
+
   return (
     <div
+      ref={sidebarRef}
       className={clsx(
         'fixed left-0 top-0 bottom-0 w-72 transition-transform duration-300 ease-in-out',
         !isVisible && '-translate-x-full'
       )}
     >
-      <div className='flex flex-col w-full min-w-0 h-screen bg-gray-50/50 backdrop-blur-md border-r border-r-gray-50'>
+      <div className='flex flex-col w-full min-w-0 h-dvh bg-gray-50/50 backdrop-blur-md border-r border-r-gray-50'>
         <div className='flex w-full min-w-0 px-6 py-9'>
           <Link
             onClick={() => dispatch(setIsVisible(false))}

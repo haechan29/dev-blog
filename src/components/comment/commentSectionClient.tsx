@@ -1,10 +1,10 @@
 'use client';
 
-import CommentFormItem from '@/components/commentFormItem';
-import { MessageCircle } from 'lucide-react';
-import CommentItem from '@/components/commentItem';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import CommentFormItem from '@/components/comment/commentFormItem';
+import CommentItem from '@/components/comment/commentItem';
 import { getComments } from '@/features/comment/domain/service/commentService';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { MessageCircle } from 'lucide-react';
 
 export default function CommentSectionClient({ slug }: { slug: string }) {
   const { data: comments } = useSuspenseQuery({

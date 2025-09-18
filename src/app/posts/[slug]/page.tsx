@@ -1,10 +1,10 @@
-import CommentSection from '@/components/commentSection';
-import LikeButtonItem from '@/components/likeButtonItem';
-import PostContentSection from '@/components/postContentSection';
-import PostDispatcher from '@/components/postDispatcher';
-import PostHeaderSection from '@/components/postHeaderSection';
-import PostViewTracker from '@/components/postViewTracker';
-import TableOfContentsItem from '@/components/tableOfContentsItem';
+import CommentSection from '@/components/comment/commentSection';
+import LikeButtonItem from '@/components/post/likeButtonItem';
+import PostContentSection from '@/components/post/postContentSection';
+import PostDispatcher from '@/components/post/postDispatcher';
+import PostHeaderSection from '@/components/post/postHeaderSection';
+import PostViewTracker from '@/components/post/postViewTracker';
+import TableOfContentsItem from '@/components/post/tableOfContentsItem';
 import { Post } from '@/features/post/domain/model/post';
 import { fetchPostBySlug } from '@/features/post/domain/service/postService';
 import { Suspense } from 'react';

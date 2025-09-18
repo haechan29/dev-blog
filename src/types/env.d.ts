@@ -12,6 +12,7 @@ export type Comment = {
   content: string;
   created_at: string;
   updated_at: string;
+  like_count: number;
 };
 
 export type PostStats = {

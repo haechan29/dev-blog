@@ -5,4 +5,5 @@ export type CommentItemProps = {
   content: string;
   createdAt: string;
   isUpdated: boolean;
+  likeCount: number;
 };

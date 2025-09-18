@@ -1,5 +1,5 @@
-import PostSidebar from '@/components/postSidebar';
-import PostToolbar from '@/components/postToolbar';
+import PostSidebar from '@/components/post/postSidebar';
+import PostToolbar from '@/components/post/postToolbar';
 import { fetchAllPosts } from '@/features/post/domain/service/postService';
 import { ReactNode, Suspense } from 'react';
 
