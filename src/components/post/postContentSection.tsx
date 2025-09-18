@@ -1,4 +1,5 @@
 import ContentSectionDetector from '@/components/post/contentSectionDetector';
+import PostSummarySection from '@/components/post/postSummarySection';
 import ToggleButtonItem from '@/components/post/toggleButtonItem';
 import { PostItemProps } from '@/features/post/ui/postItemProps';
 import { MDXRemote } from 'next-mdx-remote/rsc';
@@ -27,6 +28,7 @@ export default function PostContentSection({
       <MDXRemote
         source={post.content}
         components={{
+          PostSummarySection,
           ToggleButtonItem,
           a: ExternalLink,
         }}

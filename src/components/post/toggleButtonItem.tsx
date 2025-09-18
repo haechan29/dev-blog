@@ -5,11 +5,8 @@ import { ReactNode, useState } from 'react';
 
 export default function ToggleButtonItem({
   children,
-  className = '',
-  ...props
 }: {
   children: ReactNode;
-  className?: string;
 }) {
   const [isClicked, setIsClicked] = useState(false);
 
@@ -17,11 +14,9 @@ export default function ToggleButtonItem({
     <button
       onClick={() => setIsClicked(prev => !prev)}
       className={clsx(
-        className,
-        'px-1 rounded-sm transition-colors duration-300 ease-in-out',
+        'rounded-sm transition-colors duration-300 ease-in-out mb-2',
         !isClicked && 'bg-gray-200 text-transparent hover:bg-gray-300'
       )}
-      {...props}
     >
       {children}
     </button>
