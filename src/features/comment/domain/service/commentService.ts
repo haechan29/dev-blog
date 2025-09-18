@@ -40,3 +40,19 @@ export async function deleteComment(
 ): Promise<void> {
   await CommentRepository.deleteComment(postId, commentId, password);
 }
+
+export async function incrementLikeCount(
+  postId: string,
+  commentId: number
+): Promise<Comment> {
+  const dto = await CommentRepository.incrementLikeCount(postId, commentId);
+  return toDomain(dto);
+}
+
+export async function decrementLikeCount(
+  postId: string,
+  commentId: number
+): Promise<Comment> {
+  const dto = await CommentRepository.decrementLikeCount(postId, commentId);
+  return toDomain(dto);
+}

@@ -3,15 +3,16 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ postId: string }> }
+  { params }: { params: Promise<{ postId: string; commentId: string }> }
 ) {
   try {
-    const { postId } = await params;
+    const { postId, commentId } = await params;
 
     const { data: currentData, error: fetchError } = await supabase
-      .from('post_stats')
+      .from('comments')
       .select('like_count')
       .eq('post_id', postId)
+      .eq('id', commentId)
       .maybeSingle();
 
     if (fetchError) {
@@ -20,17 +21,18 @@ export async function POST(
 
     if (!currentData) {
       return NextResponse.json(
-        { error: `게시글 통계가 존재하지 않습니다. postId: ${postId}` },
+        { error: `댓글이 존재하지 않습니다. commentId: ${commentId}` },
         { status: 404 }
       );
     }
 
-    const newLikeCount = currentData.like_count + 1;
+    const newLikeCount = currentData.like_count - 1;
 
     const { data, error } = await supabase
-      .from('post_stats')
+      .from('comments')
       .update({ like_count: newLikeCount })
       .eq('post_id', postId)
+      .eq('id', commentId)
       .select()
       .single();
 
@@ -41,7 +43,7 @@ export async function POST(
     return NextResponse.json({ data });
   } catch {
     return NextResponse.json(
-      { error: '게시글 좋아요 수 증가 요청이 실패했습니다.' },
+      { error: '댓글 좋아요 수 증가 요청이 실패했습니다.' },
       { status: 500 }
     );
   }
