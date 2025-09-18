@@ -4,7 +4,13 @@ import { Comment } from '@/features/comment/domain/model/comment';
 
 export async function getComments(postId: string): Promise<Comment[]> {
   const comments = await CommentRepository.getComments(postId);
-  return comments.map(comment => toDomain(comment));
+  return comments
+    .map(comment => toDomain(comment))
+    .sort((a: Comment, b: Comment) => {
+      if (a.likeCount > b.likeCount) return -1;
+      else if (a.likeCount < b.likeCount) return 1;
+      return a.createdAt > b.createdAt ? 1 : -1;
+    });
 }
 
 export async function createComment(params: {
