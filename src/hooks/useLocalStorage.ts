@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export function useLocalStorage<T>(
   key: string,
@@ -14,14 +14,7 @@ export function useLocalStorage<T>(
   },
   syncAcrossTabs: boolean = false
 ): [T, (value: T) => void] {
-  const [storedValue, setStoredValue] = useState<T>(() => {
-    try {
-      const item = localStorage.getItem(key);
-      return item ? serializer.parse(item) : initialValue;
-    } catch {
-      return initialValue;
-    }
-  });
+  const [storedValue, setStoredValue] = useState(initialValue);
 
   const setValue = (value: T) => {
     try {
@@ -29,6 +22,18 @@ export function useLocalStorage<T>(
       localStorage.setItem(key, serializer.stringify(value));
     } catch {}
   };
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const item = localStorage.getItem(key);
+    if (item) {
+      try {
+        const newValue = serializer.parse(item);
+        setStoredValue(newValue);
+      } catch {}
+    }
+  }, [key, serializer]);
 
   useEffect(() => {
     if (!syncAcrossTabs) return;
