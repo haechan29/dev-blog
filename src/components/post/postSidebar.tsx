@@ -169,11 +169,11 @@ export default function PostSidebar({ posts }: { posts: PostItemProps[] }) {
         const deltaY = currentY - start.current[1];
         scrollDirection.current =
           Math.abs(deltaX) > Math.abs(deltaY) ? 'horizontal' : 'vertical';
+        e.preventDefault();
+        document.body.style.overflow = 'hidden';
       }
 
       if (scrollDirection.current === 'horizontal') {
-        e.preventDefault();
-        document.body.style.overflow = 'hidden';
         const translateX = Math.min(currentX - start.current[0], 0);
         sidebar.style.transform = `translateX(${translateX}px)`;
       }
