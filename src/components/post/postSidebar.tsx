@@ -11,7 +11,7 @@ import { ChevronLeft, FileUser, Mail } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -124,6 +124,40 @@ export default function PostSidebar({ posts }: { posts: PostItemProps[] }) {
   const postSidebar = useSelector((state: RootState) => state.postSidebar);
   const isLargerThanXl = useMediaQuery('(min-width: 1280px)');
 
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const startX = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    startX.current = e.touches[0].clientX;
+    if (sidebarRef.current) {
+      sidebarRef.current.style.transition = 'none';
+    }
+  };
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!sidebarRef.current || !startX.current) return;
+    const currentX = e.touches[0].clientX;
+    const translateX = Math.min(currentX - startX.current, 0);
+    sidebarRef.current.style.transform = `translateX(${translateX}px)`;
+  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!sidebarRef.current || !startX.current) return;
+
+    const currentX = e.changedTouches[0].clientX;
+    const translateX = Math.min(currentX - startX.current, 0);
+
+    const threshold = -sidebarRef.current.getBoundingClientRect().width * 0.3;
+
+    if (translateX > threshold) {
+      dispatch(setIsVisible(true));
+    } else {
+      dispatch(setIsVisible(false));
+    }
+
+    sidebarRef.current.style.transition = '';
+    sidebarRef.current.style.transform = '';
+    startX.current = null;
+  };
+
   const tagCount = useMemo(() => {
     const tagMap = posts
       .flatMap(post => post.tags)
@@ -147,6 +181,10 @@ export default function PostSidebar({ posts }: { posts: PostItemProps[] }) {
 
   return (
     <div
+      ref={sidebarRef}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
       className={clsx(
         'fixed left-0 top-0 bottom-0 w-72 transition-transform duration-300 ease-in-out',
         !isVisible && '-translate-x-full'
