@@ -135,7 +135,7 @@ function ContentItem({
           <div className='flex items-center space-x-4'>
             <button className='flex items-center space-x-1 text-gray-500 hover:text-red-500 transition-colors'>
               <Heart size={16} />
-              <span className='text-sm'>0</span>
+              <span className='text-sm'>{comment.likeCount}</span>
             </button>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase';
-import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   request: NextRequest,
@@ -17,7 +17,9 @@ export async function GET(
 
   const { data, error } = await supabase
     .from('comments')
-    .select('id, post_id, author_name, content, created_at, updated_at')
+    .select(
+      'id, post_id, author_name, content, created_at, updated_at, like_count'
+    )
     .eq('post_id', postId)
     .order('created_at', { ascending: true });
 
@@ -53,7 +55,9 @@ export async function POST(
         content,
         password_hash: passwordHash,
       })
-      .select('id, post_id, author_name, content, created_at, updated_at');
+      .select(
+        'id, post_id, author_name, content, created_at, updated_at, like_count'
+      );
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });

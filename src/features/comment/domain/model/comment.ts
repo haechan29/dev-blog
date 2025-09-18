@@ -7,7 +7,8 @@ export class Comment {
     public readonly authorName: string,
     public readonly content: string,
     public readonly createdAt: string,
-    public readonly updatedAt: string
+    public readonly updatedAt: string,
+    public readonly likeCount: number
   ) {}
 
   toProps(): CommentItemProps {
@@ -18,6 +19,7 @@ export class Comment {
       content: this.content,
       createdAt: formatTime(this.createdAt),
       isUpdated: this.createdAt !== this.updatedAt,
+      likeCount: this.likeCount,
     };
   }
 }

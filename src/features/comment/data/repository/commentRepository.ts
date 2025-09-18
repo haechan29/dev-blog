@@ -15,6 +15,7 @@ export async function getComments(
     content: comment.content,
     createdAt: comment.created_at,
     updatedAt: comment.updated_at,
+    likeCount: comment.like_count,
   }));
 }
 
@@ -28,7 +29,7 @@ export async function createComment({
   password: string;
 }): Promise<CommentResponseDto> {
   const response = await api.post(`/api/posts/${postId}/comments`, requestBody);
-  const comment = response.data;
+  const comment: Comment = response.data;
   return {
     id: comment.id,
     postId: comment.post_id,
@@ -36,6 +37,7 @@ export async function createComment({
     content: comment.content,
     createdAt: comment.created_at,
     updatedAt: comment.updated_at,
+    likeCount: comment.like_count,
   };
 }
 
@@ -53,7 +55,7 @@ export async function updateComment({
     `/api/posts/${postId}/comments/${commentId}`,
     requestBody
   );
-  const comment = response.data;
+  const comment: Comment = response.data;
   return {
     id: comment.id,
     postId: comment.post_id,
@@ -61,6 +63,7 @@ export async function updateComment({
     content: comment.content,
     createdAt: comment.created_at,
     updatedAt: comment.updated_at,
+    likeCount: comment.like_count,
   };
 }
 

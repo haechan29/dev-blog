@@ -5,4 +5,5 @@ export interface CommentResponseDto {
   content: string;
   createdAt: string;
   updatedAt: string;
+  likeCount: number;
 }

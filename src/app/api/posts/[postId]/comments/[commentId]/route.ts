@@ -40,7 +40,9 @@ export async function PUT(
         updated_at: new Date().toISOString(),
       })
       .eq('id', commentId)
-      .select('id, post_id, author_name, content, created_at, updated_at');
+      .select(
+        'id, post_id, author_name, content, created_at, updated_at, like_count'
+      );
 
     if (error) {
       return NextResponse.json(
