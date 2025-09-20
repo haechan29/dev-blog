@@ -4,6 +4,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 const initialState: PostViewer = {
   isCommentSectionVisible: false,
   isViewerMode: false,
+  currentIndex: 0,
 };
 
 const postViewerSlice = createSlice({
@@ -16,9 +17,12 @@ const postViewerSlice = createSlice({
     setIsViewerMode: (state, action: PayloadAction<boolean>) => {
       state.isViewerMode = action.payload;
     },
+    setCurrentIndex: (state, action: PayloadAction<number>) => {
+      state.currentIndex = action.payload;
+    },
   },
 });
 
 export default postViewerSlice.reducer;
-export const { setIsCommentSectionVisible, setIsViewerMode } =
+export const { setIsCommentSectionVisible, setIsViewerMode, setCurrentIndex } =
   postViewerSlice.actions;
