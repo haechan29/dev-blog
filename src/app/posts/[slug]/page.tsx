@@ -39,7 +39,7 @@ export default async function PostPage({
           </section>
         )}
 
-        <PostContentSection post={postProps} className='prose mb-20' />
+        <PostContentSection post={postProps} />
 
         <LikeButtonItem
           postId={post.slug}

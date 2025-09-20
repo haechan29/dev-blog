@@ -15,15 +15,9 @@ const ExternalLink = ({ children, ...props }: { children: ReactNode }) => {
   );
 };
 
-export default function PostContentSection({
-  post,
-  className,
-}: {
-  post: PostItemProps;
-  className?: string;
-}) {
+export default function PostContentSection({ post }: { post: PostItemProps }) {
   return (
-    <section className={className}>
+    <section className='prose mb-20'>
       <ContentSectionDetector />
       <MDXRemote
         source={post.content}
