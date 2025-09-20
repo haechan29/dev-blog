@@ -13,10 +13,9 @@ export default function CommentSectionDetector({
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    const commentSectionObserver = new IntersectionObserver(entries => {
-      dispatch(setIsCommentSectionVisible(entries[0].isIntersecting));
-      console.log(entries[0].isIntersecting);
-    });
+    const commentSectionObserver = new IntersectionObserver(entries =>
+      dispatch(setIsCommentSectionVisible(entries[0].isIntersecting))
+    );
     if (commentSectionRef.current) {
       commentSectionObserver.observe(commentSectionRef.current);
     }
