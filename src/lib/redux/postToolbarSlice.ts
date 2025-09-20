@@ -6,7 +6,7 @@ const initialState: PostToolbar = {
   tag: null,
   selectedHeading: null,
   isInPostsPage: false,
-  isHeadingVisible: false,
+  isHeaderVisible: false,
   isContentVisible: false,
   isExpanded: false,
   headings: [],
@@ -25,8 +25,8 @@ const postToolbarSlice = createSlice({
     setIsInPostsPage: (state, action: PayloadAction<boolean>) => {
       state.isInPostsPage = action.payload;
     },
-    setIsHeadingVisible: (state, action: PayloadAction<boolean>) => {
-      state.isHeadingVisible = action.payload;
+    setIsHeaderVisible: (state, action: PayloadAction<boolean>) => {
+      state.isHeaderVisible = action.payload;
     },
     setIsContentVisible: (state, action: PayloadAction<boolean>) => {
       state.isContentVisible = action.payload;
@@ -46,7 +46,7 @@ const postToolbarSlice = createSlice({
 export default postToolbarSlice.reducer;
 export const {
   setIsInPostsPage,
-  setIsHeadingVisible,
+  setIsHeaderVisible,
   setIsContentVisible,
   setIsExpanded,
   setTag,

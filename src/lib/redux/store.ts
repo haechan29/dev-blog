@@ -1,12 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-import postToolbarReducer from '@/lib/redux/postToolbarSlice';
 import postSidebarReducer from '@/lib/redux/postSidebarSlice';
+import postToolbarReducer from '@/lib/redux/postToolbarSlice';
+import postViewerReducer from '@/lib/redux/postViewerSlice';
 
 export const store = configureStore({
   reducer: {
     postToolbar: postToolbarReducer,
     postSidebar: postSidebarReducer,
+    postViewer: postViewerReducer,
   },
 });
 

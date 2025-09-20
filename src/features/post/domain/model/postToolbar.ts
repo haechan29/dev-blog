@@ -12,7 +12,7 @@ export default interface PostToolbar {
   tag: string | null;
   selectedHeading: Heading | null;
   isInPostsPage: boolean;
-  isHeadingVisible: boolean;
+  isHeaderVisible: boolean;
   isContentVisible: boolean;
   isExpanded: boolean;
   headings: Heading[];
@@ -65,7 +65,7 @@ export function toProps(postToolbar: PostToolbar): PostToolbarProps {
 
 function getMode(postToolbar: PostToolbar): PostToolbarMode {
   if (postToolbar.isInPostsPage) return 'minimal';
-  else if (postToolbar.isHeadingVisible) return 'empty';
+  else if (postToolbar.isHeaderVisible) return 'empty';
   else if (postToolbar.isContentVisible && postToolbar.isExpanded)
     return 'expanded';
   else if (postToolbar.isContentVisible && !postToolbar.isExpanded)
