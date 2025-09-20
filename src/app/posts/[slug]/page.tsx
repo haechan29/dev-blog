@@ -3,6 +3,7 @@ import LikeButtonItem from '@/components/post/likeButtonItem';
 import PostContentSection from '@/components/post/postContentSection';
 import PostDispatcher from '@/components/post/postDispatcher';
 import PostHeaderSection from '@/components/post/postHeaderSection';
+import PostViewerModeButton from '@/components/post/postViewerModeButton';
 import PostViewTracker from '@/components/post/postViewTracker';
 import TableOfContentsItem from '@/components/post/tableOfContentsItem';
 import { Post } from '@/features/post/domain/model/post';
@@ -26,6 +27,8 @@ export default async function PostPage({
           <PostDispatcher post={postProps} />
         </Suspense>
         <PostViewTracker postId={postProps.slug} />
+
+        <PostViewerModeButton />
 
         <PostHeaderSection post={postProps} className='mb-10' />
         <div className='w-full h-[1px] bg-gray-200 mb-10' />
