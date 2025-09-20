@@ -2,6 +2,7 @@
 
 import PostInfoItem from '@/components/post/postInfoItem';
 import { PostItemProps } from '@/features/post/ui/postItemProps';
+import useIsMobile from '@/hooks/useIsMobile';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
@@ -15,6 +16,7 @@ export default function PostPreviewItem({
 }) {
   const [isTextAreaExpanded, setIsTextAreaExpanded] = useState(false);
   const timerRef = useRef<number | undefined>(undefined);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     return () => {
@@ -25,6 +27,8 @@ export default function PostPreviewItem({
   }, []);
 
   const onMouseEnter = () => {
+    if (isMobile) return;
+
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
@@ -34,6 +38,8 @@ export default function PostPreviewItem({
   };
 
   const onMouseLeave = () => {
+    if (isMobile) return;
+
     if (timerRef.current) {
       clearTimeout(timerRef.current);
       timerRef.current = undefined;
@@ -54,10 +60,10 @@ export default function PostPreviewItem({
 
         <div
           className={clsx(
-            'mb-4 overflow-hidden break-keep transition-discrete duration-500 leading-6 ',
+            'mb-4 overflow-hidden break-keep transition-discrete duration-500 leading-6',
             'bg-gradient-to-b from-black via-black bg-clip-text text-transparent',
             isTextAreaExpanded
-              ? 'max-h-[432px] to-white '
+              ? 'max-h-[432px] to-white'
               : 'max-h-[72px] to-black'
           )}
         >
