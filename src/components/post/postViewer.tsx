@@ -13,6 +13,7 @@ import {
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { useEffect, useRef } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostViewer() {
@@ -58,8 +59,22 @@ export default function PostViewer() {
     const handleScroll = (event: WheelEvent) => {
       throttle100Ms(() => {
         if (event.deltaY > 0) {
+          if (postViewer.currentIndex == postViewer.totalPages - 1) {
+            toast.success('마지막 페이지입니다.', {
+              id: 'post-viewer',
+              toasterId: 'post-viewer',
+            });
+            return;
+          }
           dispatch(nextPage());
         } else if (event.deltaY < 0) {
+          if (postViewer.currentIndex == 0) {
+            toast.success('첫 페이지입니다.', {
+              id: 'post-viewer',
+              toasterId: 'post-viewer',
+            });
+            return;
+          }
           dispatch(previousPage());
         }
       });
@@ -73,7 +88,14 @@ export default function PostViewer() {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('wheel', handleScroll);
     };
-  }, [debounce3Seconds, dispatch, postViewer.isViewerMode, throttle100Ms]);
+  }, [
+    debounce3Seconds,
+    dispatch,
+    postViewer.currentIndex,
+    postViewer.isViewerMode,
+    postViewer.totalPages,
+    throttle100Ms,
+  ]);
 
   return (
     <div
@@ -85,6 +107,7 @@ export default function PostViewer() {
     >
       <PostViewerContent />
       <PostViewerControlBar />
+      <Toaster toasterId='post-viewer' />
     </div>
   );
 }
