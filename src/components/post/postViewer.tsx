@@ -2,7 +2,12 @@
 
 import PostViewerContent from '@/components/post/postViewerContent';
 import PostViewerControlBar from '@/components/post/postViewerControlBar';
-import { setIsViewerMode } from '@/lib/redux/postViewerSlice';
+import useDebounce from '@/hooks/useDebounce';
+import useThrottle from '@/hooks/useThrottle';
+import {
+  setIsControlBarVisible,
+  setIsViewerMode,
+} from '@/lib/redux/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { useEffect, useRef } from 'react';
@@ -12,6 +17,9 @@ export default function PostViewer() {
   const dispatch = useDispatch<AppDispatch>();
   const postViewer = useSelector((state: RootState) => state.postViewer);
   const postViewerRef = useRef<HTMLDivElement | null>(null);
+
+  const debounce3Seconds = useDebounce(3000);
+  const throttle100Ms = useThrottle(100);
 
   useEffect(() => {
     if (typeof document === 'undefined' || !postViewerRef.current) return;
@@ -24,6 +32,8 @@ export default function PostViewer() {
   }, [postViewer.isViewerMode]);
 
   useEffect(() => {
+    if (typeof document === 'undefined') return;
+
     const handleFullscreenChange = () => {
       if (!document.fullscreenElement && postViewer.isViewerMode) {
         dispatch(setIsViewerMode(false));
@@ -33,7 +43,21 @@ export default function PostViewer() {
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () =>
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, [postViewer.isViewerMode, dispatch]);
+  }, [dispatch, postViewer.isViewerMode]);
+
+  useEffect(() => {
+    const handleMouseMove = () => {
+      throttle100Ms(() => {
+        dispatch(setIsControlBarVisible(true));
+        debounce3Seconds(() => dispatch(setIsControlBarVisible(false)));
+      });
+    };
+
+    if (postViewer.isViewerMode) {
+      document.addEventListener('mousemove', handleMouseMove);
+    }
+    return () => document.removeEventListener('mousemove', handleMouseMove);
+  }, [debounce3Seconds, dispatch, postViewer.isViewerMode, throttle100Ms]);
 
   return (
     <div

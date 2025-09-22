@@ -11,7 +11,7 @@ export default function PostViewerControlBar() {
   const postViewer = useSelector((state: RootState) => state.postViewer);
 
   return (
-    <div className='fixed bottom-0 left-0 right-0 h-10'>
+    <div className='fixed bottom-0 left-0 right-0'>
       <div
         className={clsx(
           'flex w-full overflow-hidden justify-center items-center transition-discrete duration-300 ease-in-out',
