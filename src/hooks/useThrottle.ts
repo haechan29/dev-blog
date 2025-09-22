@@ -1,12 +1,12 @@
 'use client';
 
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
-export default function useThrottle<T>(timeoutInMillis: number) {
+export default function useThrottle(timeoutInMillis: number) {
   const lastCallTime = useRef<number>(0);
 
-  return [
-    (block: () => T) => {
+  const throttle = useCallback(
+    (block: () => void) => {
       const now = Date.now();
 
       if (now - lastCallTime.current >= timeoutInMillis) {
@@ -14,5 +14,8 @@ export default function useThrottle<T>(timeoutInMillis: number) {
         return block();
       }
     },
-  ];
+    [timeoutInMillis]
+  );
+
+  return throttle;
 }

@@ -12,7 +12,7 @@ export default function TableOfContentsItem({
   headings: Heading[];
 }) {
   const [activeId, setActiveId] = useState<string>('');
-  const [throttle100Ms] = useThrottle(100);
+  const throttle100Ms = useThrottle(100);
   const isLargerThanXl = useMediaQuery('(min-width: 1280px)');
 
   const getActiveHeading = useCallback(() => {

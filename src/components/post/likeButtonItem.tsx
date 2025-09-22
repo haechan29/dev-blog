@@ -17,7 +17,7 @@ export default function LikeButtonItem({
   className?: string;
 }) {
   const [heartFilled, setHeartFilled] = useState(false);
-  const [throttledCall] = useThrottle(1000);
+  const throttledCall = useThrottle(1000);
 
   const queryClient = useQueryClient();
 

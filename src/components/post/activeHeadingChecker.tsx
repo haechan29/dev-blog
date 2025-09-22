@@ -15,7 +15,7 @@ export default function ActiveHeadingDetector({
 }) {
   const dispatch = useDispatch<AppDispatch>();
 
-  const [throttle100Ms] = useThrottle(100);
+  const throttle100Ms = useThrottle(100);
   const isLargerThanXl = useMediaQuery('(min-width: 1280px)');
 
   const getTargetHeading = useCallback(() => {

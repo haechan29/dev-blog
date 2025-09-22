@@ -18,7 +18,7 @@ export default function CommentLikeButton({
     `comment-like-${comment.id}`,
     false
   );
-  const [throttle500Ms] = useThrottle(500);
+  const throttle500Ms = useThrottle(500);
 
   const incrementLikeCount = useMutation({
     mutationFn: () =>
