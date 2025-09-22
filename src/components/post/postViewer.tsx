@@ -2,12 +2,14 @@
 
 import PostViewerContent from '@/components/post/postViewerContent';
 import PostViewerControlBar from '@/components/post/postViewerControlBar';
-import { RootState } from '@/lib/redux/store';
+import { setIsViewerMode } from '@/lib/redux/postViewerSlice';
+import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostViewer() {
+  const dispatch = useDispatch<AppDispatch>();
   const postViewer = useSelector((state: RootState) => state.postViewer);
   const postViewerRef = useRef<HTMLDivElement | null>(null);
 
@@ -20,6 +22,18 @@ export default function PostViewer() {
       document.exitFullscreen();
     }
   }, [postViewer.isViewerMode]);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement && postViewer.isViewerMode) {
+        dispatch(setIsViewerMode(false));
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () =>
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, [postViewer.isViewerMode, dispatch]);
 
   return (
     <div
