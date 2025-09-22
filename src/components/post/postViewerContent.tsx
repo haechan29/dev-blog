@@ -1,10 +1,11 @@
 'use client';
 
 import { RootState } from '@/lib/redux/store';
+import clsx from 'clsx';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-export default function PostContentViewer() {
+export default function PostViewerContent() {
   const [oldPages, setOldPages] = useState<Element[][]>([]);
   const [isProcessing, setIsProcessing] = useState(true);
   const pageRef = useRef<HTMLDivElement | null>(null);
@@ -56,7 +57,6 @@ export default function PostContentViewer() {
   useEffect(() => {
     const page = pageRef.current;
     const oldPage = oldPages[postViewer.currentIndex];
-
     if (page && oldPage) {
       page.innerHTML = '';
       oldPage.forEach(element => {
@@ -67,12 +67,12 @@ export default function PostContentViewer() {
   }, [oldPages, postViewer.currentIndex]);
 
   return (
-    !isProcessing &&
-    postViewer.isViewerMode && (
-      <div
-        ref={pageRef}
-        className='prose fixed inset-0 z-50 overflow-y-auto bg-white'
-      />
-    )
+    <div
+      ref={pageRef}
+      className={clsx(
+        'prose flex flex-col flex-1',
+        isProcessing && 'opacity-0'
+      )}
+    />
   );
 }

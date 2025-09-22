@@ -1,4 +1,3 @@
-import PostContentViewer from '@/components/post/postContentViewer';
 import PostSummarySection from '@/components/post/postSummarySection';
 import ToggleButtonItem from '@/components/post/toggleButtonItem';
 import { MDXRemote } from 'next-mdx-remote/rsc';
@@ -16,24 +15,19 @@ const ExternalLink = ({ children, ...props }: { children: ReactNode }) => {
 
 export default function PostContentSection({ content }: { content: string }) {
   return (
-    <section className='mb-20'>
-      <div className='prose'>
-        <MDXRemote
-          source={content}
-          components={{
-            PostSummarySection,
-            ToggleButtonItem,
-            a: ExternalLink,
-          }}
-          options={{
-            mdxOptions: {
-              rehypePlugins: [rehypePrettyCode, rehypeSlug],
-            },
-          }}
-        />
-      </div>
-
-      <PostContentViewer />
+      <MDXRemote
+        source={content}
+        components={{
+          PostSummarySection,
+          ToggleButtonItem,
+          a: ExternalLink,
+        }}
+        options={{
+          mdxOptions: {
+            rehypePlugins: [rehypePrettyCode, rehypeSlug],
+          },
+        }}
+      />
     </section>
   );
 }

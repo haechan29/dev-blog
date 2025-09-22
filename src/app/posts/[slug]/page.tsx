@@ -4,6 +4,7 @@ import LikeButtonItem from '@/components/post/likeButtonItem';
 import PostContentSection from '@/components/post/postContentSection';
 import PostDispatcher from '@/components/post/postDispatcher';
 import PostHeaderSection from '@/components/post/postHeaderSection';
+import PostViewer from '@/components/post/postViewer';
 import PostViewerModeButton from '@/components/post/postViewerModeButton';
 import PostViewTracker from '@/components/post/postViewTracker';
 import TableOfContentsItem from '@/components/post/tableOfContentsItem';
@@ -31,6 +32,8 @@ export default async function PostPage({
         <ContentSectionDetector />
 
         <PostViewerModeButton />
+
+        <PostViewer />
 
         <PostHeaderSection post={postProps} className='mb-10' />
         <div className='w-full h-[1px] bg-gray-200 mb-10' />
