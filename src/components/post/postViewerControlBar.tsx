@@ -1,23 +1,54 @@
 'use client';
 
 import TooltipItem from '@/components/tooltipItem';
+import { AutoAdvance, toProps } from '@/features/post/domain/model/autoAdvance';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { setIsViewerMode } from '@/lib/redux/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { Ear, Minimize, Timer } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostViewerControlBar() {
-  const [isAutoPlay, setIsAutoPlay] = useState(false);
   const [isTTSPlaying, setIsTTSPlaying] = useState(false);
+  const [autoAdvance, setAutoAdvance] = useLocalStorage<AutoAdvance>(
+    'auto-advance-settings',
+    {
+      type: 'NotEnabled',
+    }
+  );
 
   const dispatch = useDispatch<AppDispatch>();
   const postViewer = useSelector((state: RootState) => state.postViewer);
 
+  const { isAutoAdvanceEnabled, autoAdvanceInterval } = useMemo(
+    () => toProps(autoAdvance),
+    [autoAdvance]
+  );
+
   const progress = useMemo(() => {
     return (postViewer.currentIndex / (postViewer.totalPages - 1)) * 100;
   }, [postViewer.currentIndex, postViewer.totalPages]);
+
+  const handleAutoAdvanceClick = useCallback(() => {
+    const intervals = [60, 90, 120];
+    const currentIndex =
+      autoAdvanceInterval !== undefined
+        ? intervals.indexOf(autoAdvanceInterval)
+        : -1;
+
+    if (currentIndex === intervals.length - 1) {
+      setAutoAdvance({
+        type: 'NotEnabled',
+      });
+    } else {
+      setAutoAdvance({
+        type: 'Enabled',
+        interval: intervals[currentIndex + 1],
+      });
+    }
+  }, [autoAdvanceInterval, setAutoAdvance]);
 
   return (
     <div
@@ -74,21 +105,25 @@ export default function PostViewerControlBar() {
             </button>
           </TooltipItem>
 
-          <TooltipItem text='자동재생'>
+          <TooltipItem text='자동 넘김'>
             <button
-              onClick={() => setIsAutoPlay(prev => !prev)}
+              onClick={handleAutoAdvanceClick}
               className='relative flex shrink-0 items-center p-2 cursor-pointer'
-              aria-label={isAutoPlay ? '자동 넘기기 중지' : '자동 넘기기 시작'}
+              aria-label={
+                isAutoAdvanceEnabled ? '자동 넘김 중지' : '자동 넘김 시작'
+              }
             >
               <Timer
                 className={clsx(
                   'w-6 h-6',
-                  isAutoPlay ? 'text-gray-900' : 'text-gray-400'
+                  isAutoAdvanceEnabled ? 'text-gray-900' : 'text-gray-400'
                 )}
               />
-              {isAutoPlay && (
+              {isAutoAdvanceEnabled && (
                 <div className='absolute top-[22px] left-[22px] flex justify-center items-center bg-white'>
-                  <div className='text-xs font-bold text-blue-600'>60</div>
+                  <div className='text-xs font-bold text-blue-600'>
+                    {autoAdvanceInterval}
+                  </div>
                 </div>
               )}
             </button>
