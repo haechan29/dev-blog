@@ -15,6 +15,7 @@ const ExternalLink = ({ children, ...props }: { children: ReactNode }) => {
 
 export default function PostContentSection({ content }: { content: string }) {
   return (
+    <section className='prose post-content mb-20'>
       <MDXRemote
         source={content}
         components={{

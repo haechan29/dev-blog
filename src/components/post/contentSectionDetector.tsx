@@ -10,7 +10,7 @@ export default function ContentSectionDetector() {
   const isInitialMount = useRef(true);
 
   useEffect(() => {
-    const proseElement = document.querySelector('.prose');
+    const proseElement = document.querySelector('.post-content');
     if (!proseElement) return;
 
     const proseObserver = new IntersectionObserver(

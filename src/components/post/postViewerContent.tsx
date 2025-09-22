@@ -13,7 +13,7 @@ export default function PostViewerContent() {
   const postViewer = useSelector((state: RootState) => state.postViewer);
 
   const parseProseSection = useCallback(() => {
-    const container = document.querySelector('.prose');
+    const container = document.querySelector('.post-content');
     if (!container) return;
 
     const children = Array.from(container.children);
