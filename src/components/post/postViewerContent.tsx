@@ -77,7 +77,7 @@ export default function PostViewerContent() {
     <div
       ref={pageRef}
       className={clsx(
-        'prose h-screen xl:mx-72 py-10',
+        'prose h-screen px-10 xl:mx-72 py-10',
         isProcessing && 'hidden'
       )}
     />
