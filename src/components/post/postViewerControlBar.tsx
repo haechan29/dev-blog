@@ -1,13 +1,17 @@
 'use client';
 
+import TooltipItem from '@/components/tooltipItem';
 import { setIsViewerMode } from '@/lib/redux/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
-import { Play } from 'lucide-react';
-import { useMemo } from 'react';
+import { Ear, Minimize, Timer } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostViewerControlBar() {
+  const [isAutoPlay, setIsAutoPlay] = useState(false);
+  const [isTTSPlaying, setIsTTSPlaying] = useState(false);
+
   const dispatch = useDispatch<AppDispatch>();
   const postViewer = useSelector((state: RootState) => state.postViewer);
 
@@ -16,40 +20,90 @@ export default function PostViewerControlBar() {
   }, [postViewer.currentIndex, postViewer.totalPages]);
 
   return (
-    <div className='fixed -bottom-16 left-0 right-0'>
-      <div
-        className={clsx(
-          'flex w-full flex-col transition-transform duration-300 ease-in-out',
-          postViewer.isControlBarVisible && '-translate-y-16'
-        )}
-      >
-        <div className='px-10'>
-          <div className='relative w-full h-0.5 bg-gray-200'>
-            <div
-              className='relative h-0.5 bg-blue-500'
-              style={{ width: `${progress}%` }}
-            >
-              <div className='absolute flex flex-col items-center gap-0.5 -bottom-1 -right-1.5'>
-                <div className='flex gap-0.5 text-xs text-black whitespace-norwrap'>
-                  <div>{postViewer.currentIndex + 1}</div>
-                  <div>/</div>
-                  <div>{postViewer.totalPages}</div>
-                </div>
-
-                <div className='w-3 h-3 bg-blue-500 rounded-full' />
-              </div>
-            </div>
+    <div
+      className={clsx(
+        'fixed bottom-0 left-0 right-0 flex flex-col bg-white/80 backdrop-blur-md',
+        'transition-transform|opacity duration-300 ease-in-out',
+        !postViewer.isControlBarVisible && 'translate-y-full opacity-0'
+      )}
+    >
+      <div className='px-10'>
+        <div className='relative w-full h-0.5 bg-gray-200'>
+          <div
+            className='relative h-0.5 bg-blue-500'
+            style={{ width: `${progress}%` }}
+          >
+            <div className='absolute w-3 h-3 -top-1 -right-1.5 bg-blue-500 rounded-full' />
           </div>
         </div>
+      </div>
 
-        <div className='flex w-full h-10 overflow-hidden justify-center items-center'>
+      <div className='flex w-full py-3 px-10 justify-between items-center'>
+        <div className='flex items-center gap-2'>
+          <div className='flex items-center text-sm whitespace-nowrap mr-4'>
+            <span>{postViewer.currentIndex + 1}</span>
+            <span className='mx-1'>/</span>
+            <span>{postViewer.totalPages}</span>
+          </div>
+
+          <TooltipItem text='음성'>
+            <button
+              onClick={() => setIsTTSPlaying(prev => !prev)}
+              className='relative flex shrink-0 items-center p-2 cursor-pointer'
+              aria-label={isTTSPlaying ? '음성 중지' : '음성 재생'}
+            >
+              <Ear
+                className={clsx(
+                  'w-6 h-6',
+                  isTTSPlaying ? 'text-gray-900' : 'text-gray-400'
+                )}
+              />
+              <div
+                className={clsx(
+                  'absolute top-2 right-1.5 flex justify-center items-center w-3 h-3 rounded-full',
+                  isTTSPlaying && 'bg-white'
+                )}
+              >
+                <div
+                  className={clsx(
+                    'w-2 h-2 rounded-full',
+                    isTTSPlaying && 'bg-blue-500'
+                  )}
+                />
+              </div>
+            </button>
+          </TooltipItem>
+
+          <TooltipItem text='자동재생'>
+            <button
+              onClick={() => setIsAutoPlay(prev => !prev)}
+              className='relative flex shrink-0 items-center p-2 cursor-pointer'
+              aria-label={isAutoPlay ? '자동 넘기기 중지' : '자동 넘기기 시작'}
+            >
+              <Timer
+                className={clsx(
+                  'w-6 h-6',
+                  isAutoPlay ? 'text-gray-900' : 'text-gray-400'
+                )}
+              />
+              {isAutoPlay && (
+                <div className='absolute top-[22px] left-[22px] flex justify-center items-center bg-white'>
+                  <div className='text-xs font-bold text-blue-600'>60</div>
+                </div>
+              )}
+            </button>
+          </TooltipItem>
+        </div>
+
+        <TooltipItem text='전체화면 해제'>
           <button
             onClick={() => dispatch(setIsViewerMode(false))}
-            className='flex shrink-0 p-2'
+            className='flex shrink-0 p-2 cursor-pointer'
+            aria-label='전체화면 끄기'
           >
-            <Play className='w-6 h-6' />
+            <Minimize className='w-6 h-6 hover:animate-pop hover:[--scale:0.8]' />
           </button>
-        </div>
+        </TooltipItem>
       </div>
     </div>
   );

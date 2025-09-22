@@ -310,14 +310,14 @@ body {
     transform: scale(1);
   }
   50% {
-    transform: scale(1.2);
+    transform: scale(var(--scale, 1.2));
   }
 }
 
-.animate-shake {
+@utility animate-shake {
   animation: shake 0.3s ease-in-out;
 }
 
-.animate-pop {
+@utility animate-pop {
   animation: pop 0.3s ease-in-out;
 }
