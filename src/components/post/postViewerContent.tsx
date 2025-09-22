@@ -14,7 +14,8 @@ export default function PostViewerContent() {
 
   const parseProseSection = useCallback(() => {
     const container = document.querySelector('.post-content');
-    if (!container) return;
+    const page = pageRef.current;
+    if (!container || !page) return;
 
     const children = Array.from(container.children);
     const pages: Element[][] = [];
@@ -29,7 +30,7 @@ export default function PostViewerContent() {
       const elementHeight = rect.height + marginTop + marginBottom;
 
       if (
-        currentHeight + elementHeight > window.innerHeight &&
+        currentHeight + elementHeight > window.screen.height - 80 &&
         currentPage.length > 0
       ) {
         pages.push([...currentPage]);
@@ -70,8 +71,8 @@ export default function PostViewerContent() {
     <div
       ref={pageRef}
       className={clsx(
-        'prose flex flex-col flex-1',
-        isProcessing && 'opacity-0'
+        'prose h-screen xl:mx-72 py-10',
+        isProcessing && 'hidden'
       )}
     />
   );

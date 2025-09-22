@@ -26,7 +26,7 @@ export default function PostViewer() {
       ref={postViewerRef}
       className={clsx(
         'bg-white flex flex-col',
-        !postViewer.isViewerMode && 'opacity-0'
+        !postViewer.isViewerMode && 'hidden'
       )}
     >
       <PostViewerContent />
