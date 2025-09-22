@@ -4,8 +4,9 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 const initialState: PostViewer = {
   isCommentSectionVisible: false,
   isViewerMode: false,
-  isControlBarVisible: false,
+  isControlBarVisible: true,
   currentIndex: 0,
+  totalPages: 0,
 };
 
 const postViewerSlice = createSlice({
@@ -24,6 +25,18 @@ const postViewerSlice = createSlice({
     setCurrentIndex: (state, action: PayloadAction<number>) => {
       state.currentIndex = action.payload;
     },
+    nextPage: state => {
+      state.currentIndex = Math.min(
+        state.totalPages - 1,
+        state.currentIndex + 1
+      );
+    },
+    previousPage: state => {
+      state.currentIndex = Math.max(0, state.currentIndex - 1);
+    },
+    setTotalPages: (state, action: PayloadAction<number>) => {
+      state.totalPages = action.payload;
+    },
   },
 });
 
@@ -33,4 +46,7 @@ export const {
   setIsViewerMode,
   setIsControlBarVisible,
   setCurrentIndex,
+  nextPage,
+  previousPage,
+  setTotalPages,
 } = postViewerSlice.actions;

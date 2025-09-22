@@ -3,4 +3,5 @@ export default interface PostViewerProps {
   isViewerMode: boolean;
   isControlBarVisible: boolean;
   currentIndex: number;
+  totalPages: number;
 }

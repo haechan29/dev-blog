@@ -1,15 +1,17 @@
 'use client';
 
-import { RootState } from '@/lib/redux/store';
+import { setCurrentIndex, setTotalPages } from '@/lib/redux/postViewerSlice';
+import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostViewerContent() {
   const [oldPages, setOldPages] = useState<Element[][]>([]);
   const [isProcessing, setIsProcessing] = useState(true);
   const pageRef = useRef<HTMLDivElement | null>(null);
 
+  const dispatch = useDispatch<AppDispatch>();
   const postViewer = useSelector((state: RootState) => state.postViewer);
 
   const parseProseSection = useCallback(() => {
@@ -46,9 +48,12 @@ export default function PostViewerContent() {
       pages.push(currentPage);
     }
 
+    dispatch(setTotalPages(pages.length));
+    dispatch(setCurrentIndex(0));
+
     setOldPages(pages);
     setIsProcessing(false);
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     const timer = setTimeout(parseProseSection, 100);
@@ -58,6 +63,7 @@ export default function PostViewerContent() {
   useEffect(() => {
     const page = pageRef.current;
     const oldPage = oldPages[postViewer.currentIndex];
+
     if (page && oldPage) {
       page.innerHTML = '';
       oldPage.forEach(element => {

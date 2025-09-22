@@ -5,6 +5,8 @@ import PostViewerControlBar from '@/components/post/postViewerControlBar';
 import useDebounce from '@/hooks/useDebounce';
 import useThrottle from '@/hooks/useThrottle';
 import {
+  nextPage,
+  previousPage,
   setIsControlBarVisible,
   setIsViewerMode,
 } from '@/lib/redux/postViewerSlice';
@@ -53,10 +55,24 @@ export default function PostViewer() {
       });
     };
 
+    const handleScroll = (event: WheelEvent) => {
+      throttle100Ms(() => {
+        if (event.deltaY > 0) {
+          dispatch(nextPage());
+        } else if (event.deltaY < 0) {
+          dispatch(previousPage());
+        }
+      });
+    };
+
     if (postViewer.isViewerMode) {
       document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('wheel', handleScroll);
     }
-    return () => document.removeEventListener('mousemove', handleMouseMove);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('wheel', handleScroll);
+    };
   }, [debounce3Seconds, dispatch, postViewer.isViewerMode, throttle100Ms]);
 
   return (

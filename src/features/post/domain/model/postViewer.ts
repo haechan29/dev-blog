@@ -5,6 +5,7 @@ export interface PostViewer {
   isViewerMode: boolean;
   isControlBarVisible: boolean;
   currentIndex: number;
+  totalPages: number;
 }
 
 export function toProps(postViewer: PostViewer): PostViewerProps {
@@ -13,5 +14,6 @@ export function toProps(postViewer: PostViewer): PostViewerProps {
     isViewerMode: postViewer.isViewerMode,
     isControlBarVisible: postViewer.isControlBarVisible,
     currentIndex: postViewer.currentIndex,
+    totalPages: postViewer.totalPages,
   };
 }
