@@ -3,11 +3,11 @@
 import TooltipItem from '@/components/tooltipItem';
 import { AutoAdvance, toProps } from '@/features/post/domain/model/autoAdvance';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { setIsViewerMode } from '@/lib/redux/postViewerSlice';
+import { nextPage, setIsViewerMode } from '@/lib/redux/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { Ear, Minimize, Timer } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostViewerControlBar() {
@@ -49,6 +49,23 @@ export default function PostViewerControlBar() {
       });
     }
   }, [autoAdvanceInterval, setAutoAdvance]);
+
+  useEffect(() => {
+    if (!isAutoAdvanceEnabled || !autoAdvanceInterval) return;
+    if (postViewer.currentIndex >= postViewer.totalPages - 1) return;
+
+    const timer = setTimeout(() => {
+      dispatch(nextPage());
+    }, autoAdvanceInterval * 1000);
+
+    return () => clearTimeout(timer);
+  }, [
+    dispatch,
+    isAutoAdvanceEnabled,
+    autoAdvanceInterval,
+    postViewer.currentIndex,
+    postViewer.totalPages,
+  ]);
 
   return (
     <div
