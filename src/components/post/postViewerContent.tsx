@@ -21,7 +21,9 @@ export default function PostViewerContent({
     const container = document.querySelector('.post-content');
     if (!container) return;
 
-    const children = Array.from(container.children);
+    const children = Array.from(container.children).filter(
+      child => !child.matches('.hide-fullscreen')
+    );
     const pages: Element[][] = [];
     let currentPage: Element[] = [];
     let currentHeight = 0;
