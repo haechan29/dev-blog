@@ -3,21 +3,23 @@
 import { setCurrentIndex, setTotalPages } from '@/lib/redux/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { RefObject, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-export default function PostViewerContent() {
+export default function PostViewerContent({
+  pageRef,
+}: {
+  pageRef: RefObject<HTMLDivElement | null>;
+}) {
   const [oldPages, setOldPages] = useState<Element[][]>([]);
   const [isProcessing, setIsProcessing] = useState(true);
-  const pageRef = useRef<HTMLDivElement | null>(null);
 
   const dispatch = useDispatch<AppDispatch>();
   const postViewer = useSelector((state: RootState) => state.postViewer);
 
   const parseProseSection = useCallback(() => {
     const container = document.querySelector('.post-content');
-    const page = pageRef.current;
-    if (!container || !page) return;
+    if (!container) return;
 
     const children = Array.from(container.children);
     const pages: Element[][] = [];
@@ -71,7 +73,7 @@ export default function PostViewerContent() {
         page.appendChild(clonedElement);
       });
     }
-  }, [oldPages, postViewer.currentIndex]);
+  }, [oldPages, pageRef, postViewer.currentIndex]);
 
   return (
     <div

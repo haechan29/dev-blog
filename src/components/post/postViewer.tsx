@@ -17,6 +17,8 @@ import toast, { Toaster } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostViewer() {
+  const pageRef = useRef<HTMLDivElement | null>(null);
+
   const dispatch = useDispatch<AppDispatch>();
   const postViewer = useSelector((state: RootState) => state.postViewer);
   const postViewerRef = useRef<HTMLDivElement | null>(null);
@@ -105,8 +107,8 @@ export default function PostViewer() {
         !postViewer.isViewerMode && 'hidden'
       )}
     >
-      <PostViewerContent />
-      <PostViewerControlBar />
+      <PostViewerContent pageRef={pageRef} />
+      <PostViewerControlBar pageRef={pageRef} />
       <Toaster toasterId='post-viewer' />
     </div>
   );

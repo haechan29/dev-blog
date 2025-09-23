@@ -5,12 +5,17 @@ import { AutoAdvance, toProps } from '@/features/post/domain/model/autoAdvance';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { nextPage, setIsViewerMode } from '@/lib/redux/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
+import { getKoreanVoice } from '@/lib/speech';
 import clsx from 'clsx';
 import { Ear, Minimize, Timer } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-export default function PostViewerControlBar() {
+export default function PostViewerControlBar({
+  pageRef,
+}: {
+  pageRef: RefObject<HTMLDivElement | null>;
+}) {
   const [isTTSPlaying, setIsTTSPlaying] = useState(false);
   const [autoAdvance, setAutoAdvance] = useLocalStorage<AutoAdvance>(
     'auto-advance-settings',
@@ -50,6 +55,48 @@ export default function PostViewerControlBar() {
     }
   }, [autoAdvanceInterval, setAutoAdvance]);
 
+  const startReading = useCallback(() => {
+    const page = pageRef.current;
+    if (!page) return;
+    const currentPageElements = page.children;
+    let elementIndex = 0;
+
+    const readNextElement = () => {
+      if (elementIndex >= currentPageElements.length) return;
+
+      const element = currentPageElements[elementIndex];
+
+      document
+        .querySelectorAll('.reading-highlight')
+        .forEach(el => el.classList.remove('reading-highlight'));
+
+      element.classList.add('reading-highlight');
+
+      const utterance = new SpeechSynthesisUtterance(element.textContent);
+      utterance.lang = 'ko-KR';
+      const krVoice = getKoreanVoice();
+      if (krVoice) {
+        utterance.voice = krVoice;
+      }
+      utterance.onend = () => {
+        elementIndex++;
+        readNextElement();
+      };
+
+      speechSynthesis.speak(utterance);
+    };
+
+    readNextElement();
+  }, [pageRef]);
+
+  const stopReading = useCallback(() => {
+    speechSynthesis.cancel();
+
+    document
+      .querySelectorAll('.reading-highlight')
+      .forEach(el => el.classList.remove('reading-highlight'));
+  }, []);
+
   useEffect(() => {
     if (!isAutoAdvanceEnabled || !autoAdvanceInterval) return;
     if (postViewer.currentIndex >= postViewer.totalPages - 1) return;
@@ -66,6 +113,18 @@ export default function PostViewerControlBar() {
     postViewer.currentIndex,
     postViewer.totalPages,
   ]);
+
+  useEffect(() => {
+    if (isTTSPlaying) {
+      startReading();
+    } else {
+      stopReading();
+    }
+  }, [isTTSPlaying, startReading, stopReading]);
+
+  useEffect(() => {
+    if (!postViewer.isViewerMode) stopReading();
+  }, [postViewer.isViewerMode, stopReading]);
 
   return (
     <div

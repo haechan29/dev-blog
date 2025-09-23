@@ -321,3 +321,11 @@ body {
 @utility animate-pop {
   animation: pop 0.3s ease-in-out;
 }
+
+.reading-highlight {
+  background: linear-gradient(120deg, #fef3c7 0%, #fcd34d 100%);
+  border-radius: 4px;
+  padding: 2px 4px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(252, 211, 77, 0.3);
+}
