@@ -117,6 +117,10 @@ body {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+.fullscreen {
+  --fullscreen-scale: 1.5;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

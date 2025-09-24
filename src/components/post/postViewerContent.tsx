@@ -6,6 +6,8 @@ import clsx from 'clsx';
 import { RefObject, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+const FULLSCREEN_SCALE = 1.5;
+
 export default function PostViewerContent({
   pageRef,
 }: {
@@ -35,7 +37,8 @@ export default function PostViewerContent({
 
       const elementHeight = getElementHeight(child);
       const exceedsPageHeight =
-        currentHeight + elementHeight > window.screen.height - 80;
+        currentHeight + elementHeight >
+        (window.screen.height - 80) / FULLSCREEN_SCALE;
 
       if ((isHeadingElement || exceedsPageHeight) && hasContent) {
         pages.push([...currentPage]);
@@ -83,9 +86,11 @@ export default function PostViewerContent({
     <div
       ref={pageRef}
       className={clsx(
-        'prose h-screen px-10 xl:mx-72 py-10',
+        'prose fullscreen w-[calc((100vw-20rem)/var(--fullscreen-scale))] h-screen mx-auto py-10',
+        'scale-[var(--fullscreen-scale)] origin-top',
         isProcessing && 'hidden'
       )}
+      style={{ '--fullscreen-scale': FULLSCREEN_SCALE }}
     />
   );
 }
