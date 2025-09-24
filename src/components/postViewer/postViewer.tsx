@@ -1,7 +1,7 @@
 'use client';
 
-import PostViewerContent from '@/components/post/postViewerContent';
-import PostViewerControlBar from '@/components/post/postViewerControlBar';
+import PostViewerContent from '@/components/postViewer/postViewerContent';
+import PostViewerControlBar from '@/components/postViewer/postViewerControlBar';
 import useDebounce from '@/hooks/useDebounce';
 import useThrottle from '@/hooks/useThrottle';
 import {
