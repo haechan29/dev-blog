@@ -1,12 +1,11 @@
 'use client';
 
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { setCurrentIndex, setTotalPages } from '@/lib/redux/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { RefObject, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-
-const FULLSCREEN_SCALE = 1.5;
 
 export default function PostViewerContent({
   pageRef,
@@ -18,6 +17,11 @@ export default function PostViewerContent({
 
   const dispatch = useDispatch<AppDispatch>();
   const postViewer = useSelector((state: RootState) => state.postViewer);
+
+  const [fullscreenScale, setFullscreenScale] = useLocalStorage(
+    'fullscreen-scale',
+    1.5
+  );
 
   const parseProseSection = useCallback(() => {
     const container = document.querySelector('.post-content');
@@ -38,7 +42,7 @@ export default function PostViewerContent({
       const elementHeight = getElementHeight(child);
       const exceedsPageHeight =
         currentHeight + elementHeight >
-        (window.screen.height - 80) / FULLSCREEN_SCALE;
+        (window.screen.height - 80) / fullscreenScale;
 
       if ((isHeadingElement || exceedsPageHeight) && hasContent) {
         pages.push([...currentPage]);
@@ -62,7 +66,7 @@ export default function PostViewerContent({
 
     setOldPages(pages);
     setIsProcessing(false);
-  }, [dispatch]);
+  }, [dispatch, fullscreenScale]);
 
   useEffect(() => {
     const timer = setTimeout(parseProseSection, 100);
@@ -90,7 +94,7 @@ export default function PostViewerContent({
         'scale-[var(--fullscreen-scale)] origin-top',
         isProcessing && 'hidden'
       )}
-      style={{ '--fullscreen-scale': FULLSCREEN_SCALE }}
+      style={{ '--fullscreen-scale': fullscreenScale }}
     />
   );
 }
