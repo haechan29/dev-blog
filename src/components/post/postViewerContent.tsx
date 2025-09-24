@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { setCurrentIndex, setTotalPages } from '@/lib/redux/postViewerSlice';
+import { setPageIndex, setTotalPages } from '@/lib/redux/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { RefObject, useCallback, useEffect, useState } from 'react';
@@ -62,7 +62,7 @@ export default function PostViewerContent({
     }
 
     dispatch(setTotalPages(pages.length));
-    dispatch(setCurrentIndex(0));
+    dispatch(setPageIndex(0));
 
     setOldPages(pages);
     setIsProcessing(false);

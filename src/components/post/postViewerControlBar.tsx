@@ -1,17 +1,15 @@
 'use client';
 
+import PostViewerTTSSection from '@/components/post/postViewerTTSSection';
 import TooltipItem from '@/components/tooltipItem';
 import { AutoAdvance, toProps } from '@/features/post/domain/model/autoAdvance';
 import { toProps as toPostViewerProps } from '@/features/post/domain/model/postViewer';
-import { TTS, toProps as toTTSProps } from '@/features/post/domain/model/tts';
-import useIsMobile from '@/hooks/useIsMobile';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { nextPage, setIsViewerMode } from '@/lib/redux/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
-import { getUtterance } from '@/lib/tts';
 import clsx from 'clsx';
-import { Headphones, Minimize, Timer } from 'lucide-react';
-import { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
+import { Minimize, Timer } from 'lucide-react';
+import { RefObject, useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostViewerControlBar({
@@ -19,9 +17,9 @@ export default function PostViewerControlBar({
 }: {
   pageRef: RefObject<HTMLDivElement | null>;
 }) {
-  const [tts, setTTS] = useState<TTS>({
-    mode: 'disabled',
-  });
+  const dispatch = useDispatch<AppDispatch>();
+  const postViewer = useSelector((state: RootState) => state.postViewer);
+
   const [autoAdvance, setAutoAdvance] = useLocalStorage<AutoAdvance>(
     'auto-advance-settings',
     {
@@ -29,12 +27,10 @@ export default function PostViewerControlBar({
     }
   );
 
-  const dispatch = useDispatch<AppDispatch>();
-  const { isViewerMode, isControlBarVisible, pageIndex, totalPages } =
-    useSelector((state: RootState) => toPostViewerProps(state.postViewer));
-  const isMobile = useIsMobile();
-
-  const ttsProps = useMemo(() => toTTSProps(tts), [tts]);
+  const { isViewerMode, isControlBarVisible, pageIndex, totalPages } = useMemo(
+    () => toPostViewerProps(postViewer),
+    [postViewer]
+  );
 
   const { isAutoAdvanceEnabled, autoAdvanceInterval } = useMemo(
     () => toProps(autoAdvance),
@@ -64,70 +60,6 @@ export default function PostViewerControlBar({
     }
   }, [autoAdvanceInterval, setAutoAdvance]);
 
-  const startReading = useCallback(
-    (elementIndex: number) => {
-      const page = pageRef.current;
-      if (!page) return;
-
-      const currentPageElements = page.children;
-      if (elementIndex >= currentPageElements.length) {
-        if (pageIndex < totalPages - 1) {
-          setTTS({
-            mode: 'changingPageTTS',
-          });
-        }
-        return;
-      }
-
-      const element = currentPageElements[elementIndex];
-
-      document
-        .querySelectorAll('.reading-highlight')
-        .forEach(el => el.classList.remove('reading-highlight'));
-
-      element.classList.add('reading-highlight');
-
-      const utterance = getUtterance(element.textContent);
-      utterance.onend = () => {
-        setTTS({
-          mode: 'playing',
-          elementIndex: elementIndex + 1,
-        });
-      };
-
-      speechSynthesis.speak(utterance);
-    },
-    [pageIndex, pageRef, totalPages]
-  );
-
-  const pauseReading = useCallback(() => {
-    speechSynthesis.resume();
-  }, []);
-
-  const stopReading = useCallback(() => {
-    speechSynthesis.cancel();
-
-    document
-      .querySelectorAll('.reading-highlight')
-      .forEach(el => el.classList.remove('reading-highlight'));
-  }, []);
-
-  const toggleTTS = useCallback(() => {
-    if (ttsProps.isEnabled) {
-      setTTS({ mode: 'disabled' });
-    } else {
-      setTTS({ mode: 'playing', elementIndex: 0 });
-    }
-  }, [ttsProps.isEnabled]);
-
-  const togglePlayback = useCallback(() => {
-    if (tts.mode === 'playing') {
-      setTTS({ ...tts, mode: 'paused' });
-    } else if (tts.mode === 'paused') {
-      setTTS({ ...tts, mode: 'playing' });
-    }
-  }, [tts]);
-
   useEffect(() => {
     if (!isAutoAdvanceEnabled || !autoAdvanceInterval) return;
     if (pageIndex >= totalPages - 1) return;
@@ -144,40 +76,6 @@ export default function PostViewerControlBar({
     pageIndex,
     totalPages,
   ]);
-
-  useEffect(() => {
-    const page = pageRef.current;
-    if (!page) return;
-
-    if (!ttsProps.isEnabled) {
-      stopReading();
-    } else if (ttsProps.isChangingPage) {
-      dispatch(nextPage());
-    } else if (ttsProps.isPlaying) {
-      startReading(ttsProps.elementIndex!);
-    } else {
-      pauseReading();
-    }
-  }, [ttsProps, pageRef, startReading, pauseReading, stopReading, dispatch]);
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (ttsProps.isChangingPage) {
-      timer = setTimeout(() =>
-        setTTS({
-          mode: 'playing',
-          elementIndex: 0,
-        })
-      );
-    }
-    return () => clearTimeout(timer);
-  }, [pageIndex, ttsProps.isChangingPage]);
-
-  useEffect(() => {
-    if (!isViewerMode) {
-      setTTS({ mode: 'disabled' });
-    }
-  }, [isViewerMode, stopReading]);
 
   return (
     <div
@@ -206,66 +104,35 @@ export default function PostViewerControlBar({
             <span>{totalPages}</span>
           </div>
 
-          <TooltipItem text='음성'>
+          <PostViewerTTSSection
+            pageRef={pageRef}
+            isViewerMode={isViewerMode}
+            pageIndex={pageIndex}
+          />
+
+          <TooltipItem text='자동 넘김'>
             <button
-              onClick={toggleTTS}
+              onClick={handleAutoAdvanceClick}
               className='relative flex shrink-0 items-center p-2 cursor-pointer'
-              aria-label={ttsProps.isEnabled ? '음성 중지' : '음성 재생'}
+              aria-label={
+                isAutoAdvanceEnabled ? '자동 넘김 중지' : '자동 넘김 시작'
+              }
             >
-              <Headphones
+              <Timer
                 className={clsx(
                   'w-6 h-6',
-                  ttsProps.isEnabled ? 'text-gray-900' : 'text-gray-400'
+                  isAutoAdvanceEnabled ? 'text-gray-900' : 'text-gray-400'
                 )}
               />
-              <div
-                className={clsx(
-                  'absolute top-2 right-1.5 flex justify-center items-center w-3 h-3 rounded-full',
-                  ttsProps.isEnabled && 'bg-white'
-                )}
-              >
-                <div
-                  className={clsx(
-                    'w-2 h-2 rounded-full',
-                    ttsProps.isEnabled && 'bg-blue-500'
-                  )}
-                />
-              </div>
+              {isAutoAdvanceEnabled && (
+                <div className='absolute top-[22px] left-[22px] flex justify-center items-center bg-white'>
+                  <div className='text-xs font-bold text-blue-600'>
+                    {autoAdvanceInterval}
+                  </div>
+                </div>
+              )}
             </button>
           </TooltipItem>
-
-          <div className='flex items-center gap-2'>{isMobile && <></>}</div>
-
-          <div
-            className={clsx(
-              'transition-opacity duration-300 ease-in-out',
-              ttsProps.isEnabled && 'opacity-0 pointer-none'
-            )}
-          >
-            <TooltipItem text='자동 넘김'>
-              <button
-                onClick={handleAutoAdvanceClick}
-                className='relative flex shrink-0 items-center p-2 cursor-pointer'
-                aria-label={
-                  isAutoAdvanceEnabled ? '자동 넘김 중지' : '자동 넘김 시작'
-                }
-              >
-                <Timer
-                  className={clsx(
-                    'w-6 h-6',
-                    isAutoAdvanceEnabled ? 'text-gray-900' : 'text-gray-400'
-                  )}
-                />
-                {isAutoAdvanceEnabled && (
-                  <div className='absolute top-[22px] left-[22px] flex justify-center items-center bg-white'>
-                    <div className='text-xs font-bold text-blue-600'>
-                      {autoAdvanceInterval}
-                    </div>
-                  </div>
-                )}
-              </button>
-            </TooltipItem>
-          </div>
         </div>
 
         <TooltipItem text='전체화면 해제'>

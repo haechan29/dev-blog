@@ -1,13 +1,6 @@
 import { Heading } from '@/features/post/domain/model/post';
 import { PostToolbarProps } from '@/features/post/ui/postToolbarProps';
 
-export type PostToolbarMode =
-  | 'empty'
-  | 'minimal'
-  | 'basic'
-  | 'collapsed'
-  | 'expanded';
-
 export default interface PostToolbar {
   tag: string | null;
   selectedHeading: Heading | null;
@@ -63,7 +56,7 @@ export function toProps(postToolbar: PostToolbar): PostToolbarProps {
   }
 }
 
-function getMode(postToolbar: PostToolbar): PostToolbarMode {
+function getMode(postToolbar: PostToolbar): PostToolbarProps['mode'] {
   if (postToolbar.isInPostsPage) return 'minimal';
   else if (postToolbar.isHeaderVisible) return 'empty';
   else if (postToolbar.isContentVisible && postToolbar.isExpanded)

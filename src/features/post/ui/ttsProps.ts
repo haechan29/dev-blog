@@ -1,6 +1,11 @@
-export default interface TTSProps {
-  isEnabled: boolean;
+export type DisabledTTSProps = {
+  mode: 'disabled';
+};
+
+export type EnabledTTSProps = {
+  mode: 'enabled';
   isPlaying: boolean;
-  isChangingPage: boolean;
-  elementIndex?: number;
-}
+  elementIndex: number;
+};
+
+export type TTSProps = DisabledTTSProps | EnabledTTSProps;

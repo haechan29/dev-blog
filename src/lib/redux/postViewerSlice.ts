@@ -22,7 +22,7 @@ const postViewerSlice = createSlice({
     setIsControlBarVisible: (state, action: PayloadAction<boolean>) => {
       state.isControlBarVisible = action.payload;
     },
-    setCurrentIndex: (state, action: PayloadAction<number>) => {
+    setPageIndex: (state, action: PayloadAction<number>) => {
       state.pageIndex = action.payload;
     },
     nextPage: state => {
@@ -42,7 +42,7 @@ export const {
   setIsCommentSectionVisible,
   setIsViewerMode,
   setIsControlBarVisible,
-  setCurrentIndex,
+  setPageIndex,
   nextPage,
   previousPage,
   setTotalPages,

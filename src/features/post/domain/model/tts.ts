@@ -1,33 +1,20 @@
-import TTSProps from '@/features/post/ui/ttsProps';
+import { TTSProps } from '@/features/post/ui/ttsProps';
 
-export type DisabledTTS = {
-  mode: 'disabled';
-};
-
-export type PlayingTTS = {
-  mode: 'playing';
+export interface TTS {
+  isEnabled: boolean;
+  isPlaying: boolean;
   elementIndex: number;
-};
-
-export type PausedTTS = {
-  mode: 'paused';
-  elementIndex: number;
-};
-
-export type ChangePageTTS = {
-  mode: 'changingPageTTS';
-};
-
-export type TTS = DisabledTTS | PlayingTTS | PausedTTS | ChangePageTTS;
+}
 
 export function toProps(tts: TTS): TTSProps {
-  return {
-    isEnabled: tts.mode !== 'disabled',
-    isPlaying: tts.mode === 'playing',
-    isChangingPage: tts.mode === 'changingPageTTS',
-    elementIndex:
-      tts.mode === 'playing' || tts.mode === 'paused'
-        ? tts.elementIndex
-        : undefined,
-  };
+  if (tts.isEnabled)
+    return {
+      mode: 'enabled',
+      isPlaying: tts.isPlaying,
+      elementIndex: tts.elementIndex,
+    };
+  else
+    return {
+      mode: 'disabled',
+    };
 }
