@@ -30,20 +30,11 @@ export default function PostViewerControlBar({
   );
 
   const dispatch = useDispatch<AppDispatch>();
-  const {
-    isViewerMode,
-    isControlBarVisible,
-    currentIndex: currentPageIndex,
-    totalPages,
-  } = useSelector((state: RootState) => toPostViewerProps(state.postViewer));
+  const { isViewerMode, isControlBarVisible, pageIndex, totalPages } =
+    useSelector((state: RootState) => toPostViewerProps(state.postViewer));
   const isMobile = useIsMobile();
 
-  const {
-    isEnabled: isTTSEnabled,
-    isPlaying: isTTSPlaying,
-    pageIndex,
-    elementIndex,
-  } = useMemo(() => toTTSProps(tts), [tts]);
+  const ttsProps = useMemo(() => toTTSProps(tts), [tts]);
 
   const { isAutoAdvanceEnabled, autoAdvanceInterval } = useMemo(
     () => toProps(autoAdvance),
@@ -51,8 +42,8 @@ export default function PostViewerControlBar({
   );
 
   const progress = useMemo(() => {
-    return (currentPageIndex / (totalPages - 1)) * 100;
-  }, [currentPageIndex, totalPages]);
+    return (pageIndex / (totalPages - 1)) * 100;
+  }, [pageIndex, totalPages]);
 
   const handleAutoAdvanceClick = useCallback(() => {
     const intervals = [60, 90, 120];
@@ -80,12 +71,9 @@ export default function PostViewerControlBar({
 
       const currentPageElements = page.children;
       if (elementIndex >= currentPageElements.length) {
-        if (currentPageIndex < totalPages - 1) {
-          dispatch(nextPage());
+        if (pageIndex < totalPages - 1) {
           setTTS({
-            mode: 'playing',
-            pageIndex: currentPageIndex + 1,
-            elementIndex: 0,
+            mode: 'changingPageTTS',
           });
         }
         return;
@@ -103,14 +91,13 @@ export default function PostViewerControlBar({
       utterance.onend = () => {
         setTTS({
           mode: 'playing',
-          pageIndex: currentPageIndex,
           elementIndex: elementIndex + 1,
         });
       };
 
       speechSynthesis.speak(utterance);
     },
-    [currentPageIndex, dispatch, pageRef, totalPages]
+    [pageIndex, pageRef, totalPages]
   );
 
   const pauseReading = useCallback(() => {
@@ -126,12 +113,12 @@ export default function PostViewerControlBar({
   }, []);
 
   const toggleTTS = useCallback(() => {
-    if (isTTSEnabled) {
+    if (ttsProps.isEnabled) {
       setTTS({ mode: 'disabled' });
     } else {
-      setTTS({ mode: 'playing', pageIndex: 0, elementIndex: 0 });
+      setTTS({ mode: 'playing', elementIndex: 0 });
     }
-  }, [isTTSEnabled]);
+  }, [ttsProps.isEnabled]);
 
   const togglePlayback = useCallback(() => {
     if (tts.mode === 'playing') {
@@ -143,7 +130,7 @@ export default function PostViewerControlBar({
 
   useEffect(() => {
     if (!isAutoAdvanceEnabled || !autoAdvanceInterval) return;
-    if (currentPageIndex >= totalPages - 1) return;
+    if (pageIndex >= totalPages - 1) return;
 
     const timer = setTimeout(() => {
       dispatch(nextPage());
@@ -154,7 +141,7 @@ export default function PostViewerControlBar({
     dispatch,
     isAutoAdvanceEnabled,
     autoAdvanceInterval,
-    currentPageIndex,
+    pageIndex,
     totalPages,
   ]);
 
@@ -162,22 +149,29 @@ export default function PostViewerControlBar({
     const page = pageRef.current;
     if (!page) return;
 
-    if (!isTTSEnabled) {
+    if (!ttsProps.isEnabled) {
       stopReading();
-    } else if (isTTSPlaying) {
-      startReading(elementIndex!);
+    } else if (ttsProps.isChangingPage) {
+      dispatch(nextPage());
+    } else if (ttsProps.isPlaying) {
+      startReading(ttsProps.elementIndex!);
     } else {
       pauseReading();
     }
-  }, [
-    elementIndex,
-    isTTSEnabled,
-    isTTSPlaying,
-    pageRef,
-    pauseReading,
-    startReading,
-    stopReading,
-  ]);
+  }, [ttsProps, pageRef, startReading, pauseReading, stopReading, dispatch]);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (ttsProps.isChangingPage) {
+      timer = setTimeout(() =>
+        setTTS({
+          mode: 'playing',
+          elementIndex: 0,
+        })
+      );
+    }
+    return () => clearTimeout(timer);
+  }, [pageIndex, ttsProps.isChangingPage]);
 
   useEffect(() => {
     if (!isViewerMode) {
@@ -207,7 +201,7 @@ export default function PostViewerControlBar({
       <div className='flex w-full py-3 px-10 justify-between items-center'>
         <div className='flex items-center gap-2'>
           <div className='flex items-center text-sm whitespace-nowrap mr-4'>
-            <span>{currentPageIndex + 1}</span>
+            <span>{pageIndex + 1}</span>
             <span className='mx-1'>/</span>
             <span>{totalPages}</span>
           </div>
@@ -216,24 +210,24 @@ export default function PostViewerControlBar({
             <button
               onClick={toggleTTS}
               className='relative flex shrink-0 items-center p-2 cursor-pointer'
-              aria-label={isTTSEnabled ? '음성 중지' : '음성 재생'}
+              aria-label={ttsProps.isEnabled ? '음성 중지' : '음성 재생'}
             >
               <Headphones
                 className={clsx(
                   'w-6 h-6',
-                  isTTSEnabled ? 'text-gray-900' : 'text-gray-400'
+                  ttsProps.isEnabled ? 'text-gray-900' : 'text-gray-400'
                 )}
               />
               <div
                 className={clsx(
                   'absolute top-2 right-1.5 flex justify-center items-center w-3 h-3 rounded-full',
-                  isTTSEnabled && 'bg-white'
+                  ttsProps.isEnabled && 'bg-white'
                 )}
               >
                 <div
                   className={clsx(
                     'w-2 h-2 rounded-full',
-                    isTTSEnabled && 'bg-blue-500'
+                    ttsProps.isEnabled && 'bg-blue-500'
                   )}
                 />
               </div>
@@ -245,7 +239,7 @@ export default function PostViewerControlBar({
           <div
             className={clsx(
               'transition-opacity duration-300 ease-in-out',
-              isTTSEnabled && 'opacity-0 pointer-none'
+              ttsProps.isEnabled && 'opacity-0 pointer-none'
             )}
           >
             <TooltipItem text='자동 넘김'>

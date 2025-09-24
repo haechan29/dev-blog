@@ -61,7 +61,7 @@ export default function PostViewer() {
     const handleScroll = (event: WheelEvent) => {
       throttle100Ms(() => {
         if (event.deltaY > 0) {
-          if (postViewer.currentIndex == postViewer.totalPages - 1) {
+          if (postViewer.pageIndex == postViewer.totalPages - 1) {
             toast.success('마지막 페이지입니다.', {
               id: 'post-viewer',
               toasterId: 'post-viewer',
@@ -70,7 +70,7 @@ export default function PostViewer() {
           }
           dispatch(nextPage());
         } else if (event.deltaY < 0) {
-          if (postViewer.currentIndex == 0) {
+          if (postViewer.pageIndex == 0) {
             toast.success('첫 페이지입니다.', {
               id: 'post-viewer',
               toasterId: 'post-viewer',
@@ -93,7 +93,7 @@ export default function PostViewer() {
   }, [
     debounce3Seconds,
     dispatch,
-    postViewer.currentIndex,
+    postViewer.pageIndex,
     postViewer.isViewerMode,
     postViewer.totalPages,
     throttle100Ms,

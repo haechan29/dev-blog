@@ -4,7 +4,7 @@ export interface PostViewer {
   isCommentSectionVisible: boolean;
   isViewerMode: boolean;
   isControlBarVisible: boolean;
-  currentIndex: number;
+  pageIndex: number;
   totalPages: number;
 }
 
@@ -13,7 +13,7 @@ export function toProps(postViewer: PostViewer): PostViewerProps {
     isButtonVisible: !postViewer.isCommentSectionVisible,
     isViewerMode: postViewer.isViewerMode,
     isControlBarVisible: postViewer.isControlBarVisible,
-    currentIndex: postViewer.currentIndex,
+    pageIndex: postViewer.pageIndex,
     totalPages: postViewer.totalPages,
   };
 }

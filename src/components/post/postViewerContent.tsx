@@ -75,7 +75,7 @@ export default function PostViewerContent({
 
   useEffect(() => {
     const page = pageRef.current;
-    const oldPage = oldPages[postViewer.currentIndex];
+    const oldPage = oldPages[postViewer.pageIndex];
 
     if (page && oldPage) {
       page.innerHTML = '';
@@ -84,7 +84,7 @@ export default function PostViewerContent({
         page.appendChild(clonedElement);
       });
     }
-  }, [oldPages, pageRef, postViewer.currentIndex]);
+  }, [oldPages, pageRef, postViewer.pageIndex]);
 
   return (
     <div
