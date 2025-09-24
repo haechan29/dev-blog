@@ -2,12 +2,15 @@
 
 import TooltipItem from '@/components/tooltipItem';
 import { AutoAdvance, toProps } from '@/features/post/domain/model/autoAdvance';
+import { toProps as toPostViewerProps } from '@/features/post/domain/model/postViewer';
+import { TTS, toProps as toTTSProps } from '@/features/post/domain/model/tts';
+import useIsMobile from '@/hooks/useIsMobile';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { nextPage, setIsViewerMode } from '@/lib/redux/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
-import { getKoreanVoice } from '@/lib/speech';
+import { getUtterance } from '@/lib/tts';
 import clsx from 'clsx';
-import { Ear, Minimize, Timer } from 'lucide-react';
+import { Headphones, Minimize, Timer } from 'lucide-react';
 import { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -16,7 +19,9 @@ export default function PostViewerControlBar({
 }: {
   pageRef: RefObject<HTMLDivElement | null>;
 }) {
-  const [isTTSPlaying, setIsTTSPlaying] = useState(false);
+  const [tts, setTTS] = useState<TTS>({
+    mode: 'disabled',
+  });
   const [autoAdvance, setAutoAdvance] = useLocalStorage<AutoAdvance>(
     'auto-advance-settings',
     {
@@ -25,7 +30,20 @@ export default function PostViewerControlBar({
   );
 
   const dispatch = useDispatch<AppDispatch>();
-  const postViewer = useSelector((state: RootState) => state.postViewer);
+  const {
+    isViewerMode,
+    isControlBarVisible,
+    currentIndex: currentPageIndex,
+    totalPages,
+  } = useSelector((state: RootState) => toPostViewerProps(state.postViewer));
+  const isMobile = useIsMobile();
+
+  const {
+    isEnabled: isTTSEnabled,
+    isPlaying: isTTSPlaying,
+    pageIndex,
+    elementIndex,
+  } = useMemo(() => toTTSProps(tts), [tts]);
 
   const { isAutoAdvanceEnabled, autoAdvanceInterval } = useMemo(
     () => toProps(autoAdvance),
@@ -33,8 +51,8 @@ export default function PostViewerControlBar({
   );
 
   const progress = useMemo(() => {
-    return (postViewer.currentIndex / (postViewer.totalPages - 1)) * 100;
-  }, [postViewer.currentIndex, postViewer.totalPages]);
+    return (currentPageIndex / (totalPages - 1)) * 100;
+  }, [currentPageIndex, totalPages]);
 
   const handleAutoAdvanceClick = useCallback(() => {
     const intervals = [60, 90, 120];
@@ -55,14 +73,23 @@ export default function PostViewerControlBar({
     }
   }, [autoAdvanceInterval, setAutoAdvance]);
 
-  const startReading = useCallback(() => {
-    const page = pageRef.current;
-    if (!page) return;
-    const currentPageElements = page.children;
-    let elementIndex = 0;
+  const startReading = useCallback(
+    (elementIndex: number) => {
+      const page = pageRef.current;
+      if (!page) return;
 
-    const readNextElement = () => {
-      if (elementIndex >= currentPageElements.length) return;
+      const currentPageElements = page.children;
+      if (elementIndex >= currentPageElements.length) {
+        if (currentPageIndex < totalPages - 1) {
+          dispatch(nextPage());
+          setTTS({
+            mode: 'playing',
+            pageIndex: currentPageIndex + 1,
+            elementIndex: 0,
+          });
+        }
+        return;
+      }
 
       const element = currentPageElements[elementIndex];
 
@@ -72,22 +99,23 @@ export default function PostViewerControlBar({
 
       element.classList.add('reading-highlight');
 
-      const utterance = new SpeechSynthesisUtterance(element.textContent);
-      utterance.lang = 'ko-KR';
-      const krVoice = getKoreanVoice();
-      if (krVoice) {
-        utterance.voice = krVoice;
-      }
+      const utterance = getUtterance(element.textContent);
       utterance.onend = () => {
-        elementIndex++;
-        readNextElement();
+        setTTS({
+          mode: 'playing',
+          pageIndex: currentPageIndex,
+          elementIndex: elementIndex + 1,
+        });
       };
 
       speechSynthesis.speak(utterance);
-    };
+    },
+    [currentPageIndex, dispatch, pageRef, totalPages]
+  );
 
-    readNextElement();
-  }, [pageRef]);
+  const pauseReading = useCallback(() => {
+    speechSynthesis.resume();
+  }, []);
 
   const stopReading = useCallback(() => {
     speechSynthesis.cancel();
@@ -97,9 +125,25 @@ export default function PostViewerControlBar({
       .forEach(el => el.classList.remove('reading-highlight'));
   }, []);
 
+  const toggleTTS = useCallback(() => {
+    if (isTTSEnabled) {
+      setTTS({ mode: 'disabled' });
+    } else {
+      setTTS({ mode: 'playing', pageIndex: 0, elementIndex: 0 });
+    }
+  }, [isTTSEnabled]);
+
+  const togglePlayback = useCallback(() => {
+    if (tts.mode === 'playing') {
+      setTTS({ ...tts, mode: 'paused' });
+    } else if (tts.mode === 'paused') {
+      setTTS({ ...tts, mode: 'playing' });
+    }
+  }, [tts]);
+
   useEffect(() => {
     if (!isAutoAdvanceEnabled || !autoAdvanceInterval) return;
-    if (postViewer.currentIndex >= postViewer.totalPages - 1) return;
+    if (currentPageIndex >= totalPages - 1) return;
 
     const timer = setTimeout(() => {
       dispatch(nextPage());
@@ -110,28 +154,43 @@ export default function PostViewerControlBar({
     dispatch,
     isAutoAdvanceEnabled,
     autoAdvanceInterval,
-    postViewer.currentIndex,
-    postViewer.totalPages,
+    currentPageIndex,
+    totalPages,
   ]);
 
   useEffect(() => {
-    if (isTTSPlaying) {
-      startReading();
-    } else {
+    const page = pageRef.current;
+    if (!page) return;
+
+    if (!isTTSEnabled) {
       stopReading();
+    } else if (isTTSPlaying) {
+      startReading(elementIndex!);
+    } else {
+      pauseReading();
     }
-  }, [isTTSPlaying, startReading, stopReading]);
+  }, [
+    elementIndex,
+    isTTSEnabled,
+    isTTSPlaying,
+    pageRef,
+    pauseReading,
+    startReading,
+    stopReading,
+  ]);
 
   useEffect(() => {
-    if (!postViewer.isViewerMode) stopReading();
-  }, [postViewer.isViewerMode, stopReading]);
+    if (!isViewerMode) {
+      setTTS({ mode: 'disabled' });
+    }
+  }, [isViewerMode, stopReading]);
 
   return (
     <div
       className={clsx(
         'fixed bottom-0 left-0 right-0 flex flex-col bg-white/80 backdrop-blur-md',
         'transition-transform|opacity duration-300 ease-in-out',
-        !postViewer.isControlBarVisible && 'translate-y-full opacity-0'
+        !isControlBarVisible && 'translate-y-full opacity-0'
       )}
     >
       <div className='px-10'>
@@ -148,62 +207,71 @@ export default function PostViewerControlBar({
       <div className='flex w-full py-3 px-10 justify-between items-center'>
         <div className='flex items-center gap-2'>
           <div className='flex items-center text-sm whitespace-nowrap mr-4'>
-            <span>{postViewer.currentIndex + 1}</span>
+            <span>{currentPageIndex + 1}</span>
             <span className='mx-1'>/</span>
-            <span>{postViewer.totalPages}</span>
+            <span>{totalPages}</span>
           </div>
 
           <TooltipItem text='음성'>
             <button
-              onClick={() => setIsTTSPlaying(prev => !prev)}
+              onClick={toggleTTS}
               className='relative flex shrink-0 items-center p-2 cursor-pointer'
-              aria-label={isTTSPlaying ? '음성 중지' : '음성 재생'}
+              aria-label={isTTSEnabled ? '음성 중지' : '음성 재생'}
             >
-              <Ear
+              <Headphones
                 className={clsx(
                   'w-6 h-6',
-                  isTTSPlaying ? 'text-gray-900' : 'text-gray-400'
+                  isTTSEnabled ? 'text-gray-900' : 'text-gray-400'
                 )}
               />
               <div
                 className={clsx(
                   'absolute top-2 right-1.5 flex justify-center items-center w-3 h-3 rounded-full',
-                  isTTSPlaying && 'bg-white'
+                  isTTSEnabled && 'bg-white'
                 )}
               >
                 <div
                   className={clsx(
                     'w-2 h-2 rounded-full',
-                    isTTSPlaying && 'bg-blue-500'
+                    isTTSEnabled && 'bg-blue-500'
                   )}
                 />
               </div>
             </button>
           </TooltipItem>
 
-          <TooltipItem text='자동 넘김'>
-            <button
-              onClick={handleAutoAdvanceClick}
-              className='relative flex shrink-0 items-center p-2 cursor-pointer'
-              aria-label={
-                isAutoAdvanceEnabled ? '자동 넘김 중지' : '자동 넘김 시작'
-              }
-            >
-              <Timer
-                className={clsx(
-                  'w-6 h-6',
-                  isAutoAdvanceEnabled ? 'text-gray-900' : 'text-gray-400'
-                )}
-              />
-              {isAutoAdvanceEnabled && (
-                <div className='absolute top-[22px] left-[22px] flex justify-center items-center bg-white'>
-                  <div className='text-xs font-bold text-blue-600'>
-                    {autoAdvanceInterval}
+          <div className='flex items-center gap-2'>{isMobile && <></>}</div>
+
+          <div
+            className={clsx(
+              'transition-opacity duration-300 ease-in-out',
+              isTTSEnabled && 'opacity-0 pointer-none'
+            )}
+          >
+            <TooltipItem text='자동 넘김'>
+              <button
+                onClick={handleAutoAdvanceClick}
+                className='relative flex shrink-0 items-center p-2 cursor-pointer'
+                aria-label={
+                  isAutoAdvanceEnabled ? '자동 넘김 중지' : '자동 넘김 시작'
+                }
+              >
+                <Timer
+                  className={clsx(
+                    'w-6 h-6',
+                    isAutoAdvanceEnabled ? 'text-gray-900' : 'text-gray-400'
+                  )}
+                />
+                {isAutoAdvanceEnabled && (
+                  <div className='absolute top-[22px] left-[22px] flex justify-center items-center bg-white'>
+                    <div className='text-xs font-bold text-blue-600'>
+                      {autoAdvanceInterval}
+                    </div>
                   </div>
-                </div>
-              )}
-            </button>
-          </TooltipItem>
+                )}
+              </button>
+            </TooltipItem>
+          </div>
         </div>
 
         <TooltipItem text='전체화면 해제'>
