@@ -6,10 +6,10 @@ import {
   TTS,
   toProps as toTTSProps,
 } from '@/features/postViewer/domain/model/tts';
+import useTTSPlayer from '@/features/postViewer/hooks/useTTSPlayer';
 import { TTSProps } from '@/features/postViewer/ui/ttsProps';
 import { nextPage, setAdvanceMode } from '@/lib/redux/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
-import { getUtterance } from '@/lib/tts';
 import clsx from 'clsx';
 import { Headphones, Pause, Play } from 'lucide-react';
 import {
@@ -22,7 +22,7 @@ import {
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-export default function PostViewerTTSSection({
+export default function TTSSection({
   pageRef,
   isViewerMode,
   pageIndex,
@@ -38,62 +38,8 @@ export default function PostViewerTTSSection({
   });
 
   const dispatch = useDispatch<AppDispatch>();
-
   const lastPageIndex = useRef(pageIndex);
-  const isPaused = useRef(false);
   const ttsProps = useMemo(() => toTTSProps(tts), [tts]);
-
-  const startReading = useCallback(
-    (elementIndex: number) => {
-      if (isPaused.current) {
-        speechSynthesis.resume();
-        isPaused.current = false;
-        return;
-      }
-
-      const page = pageRef.current;
-      if (!page) return;
-
-      const currentPageElements = page.children;
-      if (elementIndex >= currentPageElements.length) {
-        dispatch(nextPage());
-        return;
-      }
-
-      const element = currentPageElements[elementIndex];
-
-      document
-        .querySelectorAll('.reading-highlight')
-        .forEach(el => el.classList.remove('reading-highlight'));
-
-      element.classList.add('reading-highlight');
-
-      const utterance = getUtterance(element.textContent);
-      utterance.onend = () => {
-        setTTS(prev => ({
-          ...prev,
-          elementIndex: elementIndex + 1,
-        }));
-      };
-
-      speechSynthesis.cancel();
-      speechSynthesis.speak(utterance);
-    },
-    [dispatch, pageRef]
-  );
-
-  const pauseReading = useCallback(() => {
-    speechSynthesis.pause();
-    isPaused.current = true;
-  }, []);
-
-  const stopReading = useCallback(() => {
-    speechSynthesis.cancel();
-
-    document
-      .querySelectorAll('.reading-highlight')
-      .forEach(el => el.classList.remove('reading-highlight'));
-  }, []);
 
   const toggleIsEnabled = useCallback(() => {
     if (ttsProps.mode === 'enabled') {
@@ -115,6 +61,23 @@ export default function PostViewerTTSSection({
     if (ttsProps.mode !== 'enabled') return;
     setTTS(prev => ({ ...prev, isPlaying: !ttsProps.isPlaying }));
   }, [ttsProps]);
+
+  const onFinishElement = useCallback(
+    (nextElementIndex: number) =>
+      setTTS(prev => ({
+        ...prev,
+        elementIndex: nextElementIndex,
+      })),
+    []
+  );
+
+  const onFinishPage = useCallback(() => dispatch(nextPage()), [dispatch]);
+
+  const { startReading, pauseReading, stopReading } = useTTSPlayer({
+    pageRef,
+    onFinishElement,
+    onFinishPage,
+  });
 
   useEffect(() => {
     if (ttsProps.mode === 'disabled') stopReading();

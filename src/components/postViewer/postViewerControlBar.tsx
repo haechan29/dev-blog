@@ -1,6 +1,6 @@
 'use client';
 
-import PostViewerTTSSection from '@/components/postViewer/ttsSection';
+import TTSSection from '@/components/postViewer/ttsSection';
 import TooltipItem from '@/components/tooltipItem';
 import { toProps as toPostViewerProps } from '@/features/postViewer/domain/model/postViewer';
 import { setIsViewerMode } from '@/lib/redux/postViewerSlice';
@@ -58,7 +58,7 @@ export default function PostViewerControlBar({
             <span>{totalPages}</span>
           </div>
 
-          <PostViewerTTSSection
+          <TTSSection
             pageRef={pageRef}
             isViewerMode={isViewerMode}
             pageIndex={pageIndex}
