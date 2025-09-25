@@ -32,7 +32,7 @@ export default function useAutoAdvanceState() {
   );
 
   const cycleAutoAdvance = useCallback(() => {
-    const intervals = [1, 2, 3, 4];
+    const intervals = [60, 90, 120];
     const currentIndex =
       autoAdvanceInterval !== undefined
         ? intervals.indexOf(autoAdvanceInterval)
