@@ -1,11 +1,14 @@
 'use client';
 
 import TooltipItem from '@/components/tooltipItem';
-import { PostViewer } from '@/features/postViewer/domain/model/postViewer';
-import { TTS, toProps } from '@/features/postViewer/domain/model/tts';
-import useIsMobile from '@/hooks/useIsMobile';
+import { toProps as toPostViewerProps } from '@/features/postViewer/domain/model/postViewer';
+import {
+  TTS,
+  toProps as toTTSProps,
+} from '@/features/postViewer/domain/model/tts';
+import { TTSProps } from '@/features/postViewer/ui/ttsProps';
 import { nextPage, setAdvanceMode } from '@/lib/redux/postViewerSlice';
-import { AppDispatch } from '@/lib/redux/store';
+import { AppDispatch, RootState } from '@/lib/redux/store';
 import { getUtterance } from '@/lib/tts';
 import clsx from 'clsx';
 import { Headphones, Pause, Play } from 'lucide-react';
@@ -17,18 +20,16 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostViewerTTSSection({
   pageRef,
   isViewerMode,
   pageIndex,
-  advanceMode,
 }: {
   pageRef: RefObject<HTMLDivElement | null>;
   isViewerMode: boolean;
   pageIndex: number;
-  advanceMode: PostViewer['advanceMode'];
 }) {
   const [tts, setTTS] = useState<TTS>({
     isEnabled: false,
@@ -38,10 +39,9 @@ export default function PostViewerTTSSection({
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const isMobile = useIsMobile();
   const lastPageIndex = useRef(pageIndex);
   const isPaused = useRef(false);
-  const ttsProps = useMemo(() => toProps(tts), [tts]);
+  const ttsProps = useMemo(() => toTTSProps(tts), [tts]);
 
   const startReading = useCallback(
     (elementIndex: number) => {
@@ -88,7 +88,6 @@ export default function PostViewerTTSSection({
   }, []);
 
   const stopReading = useCallback(() => {
-    console.log('cancel');
     speechSynthesis.cancel();
 
     document
@@ -147,26 +146,9 @@ export default function PostViewerTTSSection({
     }
   }, [pageIndex, ttsProps]);
 
-  useEffect(() => {
-    if (advanceMode !== null && advanceMode !== 'tts') {
-      setTTS({
-        isEnabled: false,
-        isPlaying: false,
-        elementIndex: 0,
-      });
-    }
-  }, [advanceMode]);
-
-  useEffect(() => {
-    if (ttsProps.mode === 'enabled') {
-      dispatch(setAdvanceMode('tts'));
-    } else if (ttsProps.mode === 'disabled') {
-      dispatch(setAdvanceMode(null));
-    }
-  }, [dispatch, ttsProps.mode]);
-
   return (
     <div className='flex items-center gap-2'>
+      <AdvanceModeSync ttsProps={ttsProps} setTTS={setTTS} />
       <TooltipItem text='음성'>
         <button
           onClick={toggleIsEnabled}
@@ -232,8 +214,45 @@ export default function PostViewerTTSSection({
           </div>
         </button>
       </div>
-
-      {/* <div className='flex items-center gap-2'>{isMobile && <></>}</div> */}
     </div>
   );
+}
+
+function AdvanceModeSync({
+  ttsProps,
+  setTTS,
+}: {
+  ttsProps: TTSProps;
+  setTTS: (tts: TTS) => void;
+}) {
+  const dispatch = useDispatch<AppDispatch>();
+  const postViewer = useSelector((state: RootState) => state.postViewer);
+  const postViewerProps = useMemo(
+    () => toPostViewerProps(postViewer),
+    [postViewer]
+  );
+  const advanceMode = useMemo(
+    () => postViewerProps.advanceMode,
+    [postViewerProps.advanceMode]
+  );
+
+  useEffect(() => {
+    if (advanceMode !== null && advanceMode !== 'tts') {
+      setTTS({
+        isEnabled: false,
+        isPlaying: false,
+        elementIndex: 0,
+      });
+    }
+  }, [advanceMode, setTTS]);
+
+  useEffect(() => {
+    if (ttsProps.mode === 'enabled') {
+      dispatch(setAdvanceMode('tts'));
+    } else if (ttsProps.mode === 'disabled') {
+      dispatch(setAdvanceMode(null));
+    }
+  }, [dispatch, ttsProps.mode]);
+
+  return <></>;
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import PostViewerTTSSection from '@/components/postViewer/postViewerTTSSection';
+import PostViewerTTSSection from '@/components/postViewer/ttsSection';
 import TooltipItem from '@/components/tooltipItem';
 import { toProps as toPostViewerProps } from '@/features/postViewer/domain/model/postViewer';
 import { setIsViewerMode } from '@/lib/redux/postViewerSlice';
@@ -62,7 +62,6 @@ export default function PostViewerControlBar({
             pageRef={pageRef}
             isViewerMode={isViewerMode}
             pageIndex={pageIndex}
-            advanceMode={advanceMode}
           />
 
           <AutoAdvanceSection
