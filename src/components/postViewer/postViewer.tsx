@@ -23,8 +23,8 @@ export default function PostViewer() {
   const postViewer = useSelector((state: RootState) => state.postViewer);
   const postViewerRef = useRef<HTMLDivElement | null>(null);
 
-  const debounce3Seconds = useDebounce(3000);
-  const throttle100Ms = useThrottle(100);
+  const debounce = useDebounce();
+  const throttle = useThrottle();
 
   useEffect(() => {
     if (typeof document === 'undefined' || !postViewerRef.current) return;
@@ -52,14 +52,14 @@ export default function PostViewer() {
 
   useEffect(() => {
     const handleMouseMove = () => {
-      throttle100Ms(() => {
+      throttle(() => {
         dispatch(setIsControlBarVisible(true));
-        debounce3Seconds(() => dispatch(setIsControlBarVisible(false)));
-      });
+        debounce(() => dispatch(setIsControlBarVisible(false)), 3000);
+      }, 100);
     };
 
     const handleScroll = (event: WheelEvent) => {
-      throttle100Ms(() => {
+      throttle(() => {
         if (event.deltaY > 0) {
           if (postViewer.pageIndex == postViewer.totalPages - 1) {
             toast.success('마지막 페이지입니다.', {
@@ -79,7 +79,7 @@ export default function PostViewer() {
           }
           dispatch(previousPage());
         }
-      });
+      }, 100);
     };
 
     if (postViewer.isViewerMode) {
@@ -91,12 +91,12 @@ export default function PostViewer() {
       document.removeEventListener('wheel', handleScroll);
     };
   }, [
-    debounce3Seconds,
     dispatch,
     postViewer.pageIndex,
     postViewer.isViewerMode,
     postViewer.totalPages,
-    throttle100Ms,
+    throttle,
+    debounce,
   ]);
 
   return (
