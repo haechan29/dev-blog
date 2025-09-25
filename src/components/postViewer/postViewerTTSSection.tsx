@@ -37,16 +37,16 @@ export default function PostViewerTTSSection({
 
   const isMobile = useIsMobile();
   const lastPageIndex = useRef(pageIndex);
+  const isPaused = useRef(false);
   const ttsProps = useMemo(() => toProps(tts), [tts]);
 
   const startReading = useCallback(
     (elementIndex: number) => {
-      if (speechSynthesis.paused) {
+      if (isPaused.current) {
         speechSynthesis.resume();
+        isPaused.current = false;
         return;
       }
-
-      speechSynthesis.cancel();
 
       const page = pageRef.current;
       if (!page) return;
@@ -73,6 +73,7 @@ export default function PostViewerTTSSection({
         }));
       };
 
+      speechSynthesis.cancel();
       speechSynthesis.speak(utterance);
     },
     [dispatch, pageRef]
@@ -80,6 +81,7 @@ export default function PostViewerTTSSection({
 
   const pauseReading = useCallback(() => {
     speechSynthesis.pause();
+    isPaused.current = true;
   }, []);
 
   const stopReading = useCallback(() => {
