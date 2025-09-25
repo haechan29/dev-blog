@@ -180,14 +180,17 @@ export default function PostViewerTTSSection({
       <div
         className={clsx(
           'flex items-center',
-          'transition-opacity|discrete duration-300 ease-in-out',
-          ttsProps.mode !== 'enabled' &&
-            'opacity-0 pointer-events-none w-0 overflow-hidden'
+          'transition-opacity duration-300 ease-in-out',
+          ttsProps.mode !== 'enabled' && 'opacity-0 pointer-events-none'
         )}
       >
         <button
           onClick={toggleIsPlaying}
-          className='flex items-center p-2 cursor-pointer'
+          className={clsx(
+            'flex items-center cursor-pointer',
+            'transition-discrete duration-300 ease-in-out',
+            ttsProps.mode === 'enabled' ? 'w-10 p-2' : 'w-0 overflow-hidden'
+          )}
           aria-label='음성 일시정지'
         >
           <div className='relative w-6 h-6'>
@@ -203,7 +206,8 @@ export default function PostViewerTTSSection({
             <Pause
               className={clsx(
                 'absolute inset-0 transition-opacity duration-300 ease-in-out',
-                !(ttsProps.mode === 'enabled' && ttsProps.isPlaying) &&
+                ttsProps.mode === 'enabled' &&
+                  !ttsProps.isPlaying &&
                   'opacity-0 pointer-events-none'
               )}
             />
