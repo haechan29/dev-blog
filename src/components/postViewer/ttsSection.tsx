@@ -1,81 +1,30 @@
 'use client';
 
 import TooltipItem from '@/components/tooltipItem';
-import { toProps as toPostViewerProps } from '@/features/postViewer/domain/model/postViewer';
-import {
-  TTS,
-  toProps as toTTSProps,
-} from '@/features/postViewer/domain/model/tts';
 import useTTSPlayer from '@/features/postViewer/hooks/useTTSPlayer';
-import { TTSProps } from '@/features/postViewer/ui/ttsProps';
-import { nextPage, setAdvanceMode } from '@/lib/redux/postViewerSlice';
-import { AppDispatch, RootState } from '@/lib/redux/store';
+import useTTSState from '@/features/postViewer/hooks/useTTSState';
+import { nextPage } from '@/lib/redux/postViewerSlice';
+import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { Headphones, Pause, Play } from 'lucide-react';
-import {
-  RefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { RefObject, useCallback, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 
 export default function TTSSection({
   pageRef,
-  isViewerMode,
-  pageIndex,
 }: {
   pageRef: RefObject<HTMLDivElement | null>;
-  isViewerMode: boolean;
-  pageIndex: number;
 }) {
-  const [tts, setTTS] = useState<TTS>({
-    isEnabled: false,
-    isPlaying: false,
-    elementIndex: 0,
-  });
-
   const dispatch = useDispatch<AppDispatch>();
-  const lastPageIndex = useRef(pageIndex);
-  const ttsProps = useMemo(() => toTTSProps(tts), [tts]);
 
-  const toggleIsEnabled = useCallback(() => {
-    if (ttsProps.mode === 'enabled') {
-      setTTS({
-        isEnabled: false,
-        isPlaying: false,
-        elementIndex: 0,
-      });
-    } else if (ttsProps.mode === 'disabled') {
-      setTTS({
-        isEnabled: true,
-        isPlaying: true,
-        elementIndex: 0,
-      });
-    }
-  }, [ttsProps.mode]);
-
-  const toggleIsPlaying = useCallback(() => {
-    if (ttsProps.mode !== 'enabled') return;
-    setTTS(prev => ({ ...prev, isPlaying: !ttsProps.isPlaying }));
-  }, [ttsProps]);
-
-  const onFinishElement = useCallback(
-    (nextElementIndex: number) =>
-      setTTS(prev => ({
-        ...prev,
-        elementIndex: nextElementIndex,
-      })),
-    []
-  );
+  const { ttsProps, toggleIsEnabled, toggleIsPlaying, increaseElementIndex } =
+    useTTSState();
 
   const onFinishPage = useCallback(() => dispatch(nextPage()), [dispatch]);
 
   const { startReading, pauseReading, stopReading } = useTTSPlayer({
     pageRef,
-    onFinishElement,
+    onFinishElement: increaseElementIndex,
     onFinishPage,
   });
 
@@ -86,32 +35,8 @@ export default function TTSSection({
     else if (ttsProps.mode === 'enabled' && !ttsProps.isPlaying) pauseReading();
   }, [pageRef, pauseReading, startReading, stopReading, ttsProps]);
 
-  useEffect(() => {
-    if (!isViewerMode) {
-      setTTS({
-        isEnabled: false,
-        isPlaying: false,
-        elementIndex: 0,
-      });
-    }
-  }, [isViewerMode]);
-
-  useEffect(() => {
-    if (pageIndex === lastPageIndex.current) return;
-    lastPageIndex.current = pageIndex;
-
-    if (ttsProps.mode === 'enabled' && ttsProps.isPlaying) {
-      setTTS({
-        isEnabled: true,
-        isPlaying: true,
-        elementIndex: 0,
-      });
-    }
-  }, [pageIndex, ttsProps]);
-
   return (
     <div className='flex items-center gap-2'>
-      <AdvanceModeSync ttsProps={ttsProps} setTTS={setTTS} />
       <TooltipItem text='음성'>
         <button
           onClick={toggleIsEnabled}
@@ -179,43 +104,4 @@ export default function TTSSection({
       </div>
     </div>
   );
-}
-
-function AdvanceModeSync({
-  ttsProps,
-  setTTS,
-}: {
-  ttsProps: TTSProps;
-  setTTS: (tts: TTS) => void;
-}) {
-  const dispatch = useDispatch<AppDispatch>();
-  const postViewer = useSelector((state: RootState) => state.postViewer);
-  const postViewerProps = useMemo(
-    () => toPostViewerProps(postViewer),
-    [postViewer]
-  );
-  const advanceMode = useMemo(
-    () => postViewerProps.advanceMode,
-    [postViewerProps.advanceMode]
-  );
-
-  useEffect(() => {
-    if (advanceMode !== null && advanceMode !== 'tts') {
-      setTTS({
-        isEnabled: false,
-        isPlaying: false,
-        elementIndex: 0,
-      });
-    }
-  }, [advanceMode, setTTS]);
-
-  useEffect(() => {
-    if (ttsProps.mode === 'enabled') {
-      dispatch(setAdvanceMode('tts'));
-    } else if (ttsProps.mode === 'disabled') {
-      dispatch(setAdvanceMode(null));
-    }
-  }, [dispatch, ttsProps.mode]);
-
-  return <></>;
 }

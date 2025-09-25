@@ -58,17 +58,9 @@ export default function PostViewerControlBar({
             <span>{totalPages}</span>
           </div>
 
-          <TTSSection
-            pageRef={pageRef}
-            isViewerMode={isViewerMode}
-            pageIndex={pageIndex}
-          />
+          <TTSSection pageRef={pageRef} />
 
-          <AutoAdvanceSection
-            pageIndex={pageIndex}
-            totalPages={totalPages}
-            advanceMode={advanceMode}
-          />
+          <AutoAdvanceSection pageIndex={pageIndex} totalPages={totalPages} />
         </div>
 
         <TooltipItem text='전체화면 해제'>
