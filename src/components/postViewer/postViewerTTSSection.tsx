@@ -7,7 +7,7 @@ import { nextPage } from '@/lib/redux/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { getUtterance } from '@/lib/tts';
 import clsx from 'clsx';
-import { Headphones } from 'lucide-react';
+import { Headphones, Pause, Play } from 'lucide-react';
 import {
   RefObject,
   useCallback,
@@ -83,6 +83,7 @@ export default function PostViewerTTSSection({
   }, []);
 
   const stopReading = useCallback(() => {
+    console.log('cancel');
     speechSynthesis.cancel();
 
     document
@@ -90,7 +91,7 @@ export default function PostViewerTTSSection({
       .forEach(el => el.classList.remove('reading-highlight'));
   }, []);
 
-  const toggleTTS = useCallback(() => {
+  const toggleIsEnabled = useCallback(() => {
     if (ttsProps.mode === 'enabled') {
       setTTS({
         isEnabled: false,
@@ -145,12 +146,12 @@ export default function PostViewerTTSSection({
   }, [pageIndex, ttsProps]);
 
   return (
-    <div>
+    <div className='flex items-center gap-2'>
       <TooltipItem text='음성'>
         <button
-          onClick={toggleTTS}
+          onClick={toggleIsEnabled}
           className='relative flex shrink-0 items-center p-2 cursor-pointer'
-          aria-label={ttsProps.mode === 'enabled' ? '음성 중지' : '음성 재생'}
+          aria-label='음성 재생'
         >
           <Headphones
             className={clsx(
@@ -174,7 +175,41 @@ export default function PostViewerTTSSection({
         </button>
       </TooltipItem>
 
-      <div className='flex items-center gap-2'>{isMobile && <></>}</div>
+      <div
+        className={clsx(
+          'flex items-center',
+          'transition-opacity|discrete duration-300 ease-in-out',
+          ttsProps.mode !== 'enabled' &&
+            'opacity-0 pointer-events-none w-0 overflow-hidden'
+        )}
+      >
+        <button
+          onClick={toggleIsPlaying}
+          className='flex items-center p-2 cursor-pointer'
+          aria-label='음성 일시정지'
+        >
+          <div className='relative w-6 h-6'>
+            <Play
+              className={clsx(
+                'absolute inset-0 transition-opacity duration-300 button ease-in-out',
+                ttsProps.mode === 'enabled' &&
+                  ttsProps.isPlaying &&
+                  'opacity-0 pointer-events-none'
+              )}
+            />
+
+            <Pause
+              className={clsx(
+                'absolute inset-0 transition-opacity duration-300 ease-in-out',
+                !(ttsProps.mode === 'enabled' && ttsProps.isPlaying) &&
+                  'opacity-0 pointer-events-none'
+              )}
+            />
+          </div>
+        </button>
+      </div>
+
+      {/* <div className='flex items-center gap-2'>{isMobile && <></>}</div> */}
     </div>
   );
 }
