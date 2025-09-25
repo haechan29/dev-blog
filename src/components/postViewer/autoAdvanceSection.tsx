@@ -1,9 +1,13 @@
 'use client';
 
 import TooltipItem from '@/components/tooltipItem';
-import { AutoAdvance, toProps } from '@/features/post/domain/model/autoAdvance';
+import {
+  AutoAdvance,
+  toProps,
+} from '@/features/postViewer/domain/model/autoAdvance';
+import { PostViewer } from '@/features/postViewer/domain/model/postViewer';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { nextPage } from '@/lib/redux/postViewerSlice';
+import { nextPage, setAdvanceMode } from '@/lib/redux/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { Timer } from 'lucide-react';
@@ -13,16 +17,18 @@ import { useDispatch } from 'react-redux';
 export default function AutoAdvanceSection({
   pageIndex,
   totalPages,
+  advanceMode,
 }: {
   pageIndex: number;
   totalPages: number;
+  advanceMode: PostViewer['advanceMode'];
 }) {
   const dispatch = useDispatch<AppDispatch>();
 
   const [autoAdvance, setAutoAdvance] = useLocalStorage<AutoAdvance>(
     'auto-advance-settings',
     {
-      type: 'NotEnabled',
+      type: 'Disabled',
     }
   );
 
@@ -40,7 +46,7 @@ export default function AutoAdvanceSection({
 
     if (currentIndex === intervals.length - 1) {
       setAutoAdvance({
-        type: 'NotEnabled',
+        type: 'Disabled',
       });
     } else {
       setAutoAdvance({
@@ -66,6 +72,18 @@ export default function AutoAdvanceSection({
     pageIndex,
     totalPages,
   ]);
+
+  useEffect(() => {
+    dispatch(setAdvanceMode(isAutoAdvanceEnabled ? 'auto' : null));
+  }, [dispatch, isAutoAdvanceEnabled]);
+
+  useEffect(() => {
+    if (advanceMode !== null && advanceMode !== 'auto') {
+      setAutoAdvance({
+        type: 'Disabled',
+      });
+    }
+  }, [advanceMode, setAutoAdvance]);
 
   return (
     <TooltipItem text='자동 넘김'>

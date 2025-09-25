@@ -2,7 +2,7 @@
 
 import PostViewerTTSSection from '@/components/postViewer/postViewerTTSSection';
 import TooltipItem from '@/components/tooltipItem';
-import { toProps as toPostViewerProps } from '@/features/post/domain/model/postViewer';
+import { toProps as toPostViewerProps } from '@/features/postViewer/domain/model/postViewer';
 import { setIsViewerMode } from '@/lib/redux/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
@@ -19,10 +19,13 @@ export default function PostViewerControlBar({
   const dispatch = useDispatch<AppDispatch>();
   const postViewer = useSelector((state: RootState) => state.postViewer);
 
-  const { isViewerMode, isControlBarVisible, pageIndex, totalPages } = useMemo(
-    () => toPostViewerProps(postViewer),
-    [postViewer]
-  );
+  const {
+    isViewerMode,
+    isControlBarVisible,
+    pageIndex,
+    totalPages,
+    advanceMode,
+  } = useMemo(() => toPostViewerProps(postViewer), [postViewer]);
 
   const progress = useMemo(() => {
     return (pageIndex / (totalPages - 1)) * 100;
@@ -59,9 +62,14 @@ export default function PostViewerControlBar({
             pageRef={pageRef}
             isViewerMode={isViewerMode}
             pageIndex={pageIndex}
+            advanceMode={advanceMode}
           />
 
-          <AutoAdvanceSection pageIndex={pageIndex} totalPages={totalPages} />
+          <AutoAdvanceSection
+            pageIndex={pageIndex}
+            totalPages={totalPages}
+            advanceMode={advanceMode}
+          />
         </div>
 
         <TooltipItem text='전체화면 해제'>

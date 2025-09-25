@@ -1,4 +1,4 @@
-import PostViewerProps from '@/features/post/ui/postViewerProps';
+import PostViewerProps from '@/features/postViewer/ui/postViewerProps';
 
 export interface PostViewer {
   isCommentSectionVisible: boolean;
@@ -6,6 +6,7 @@ export interface PostViewer {
   isControlBarVisible: boolean;
   pageIndex: number;
   totalPages: number;
+  advanceMode: 'tts' | 'auto' | null;
 }
 
 export function toProps(postViewer: PostViewer): PostViewerProps {
@@ -15,5 +16,6 @@ export function toProps(postViewer: PostViewer): PostViewerProps {
     isControlBarVisible: postViewer.isControlBarVisible,
     pageIndex: postViewer.pageIndex,
     totalPages: postViewer.totalPages,
+    advanceMode: postViewer.advanceMode,
   };
 }

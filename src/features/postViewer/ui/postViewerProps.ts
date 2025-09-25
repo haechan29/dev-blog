@@ -4,4 +4,5 @@ export default interface PostViewerProps {
   isControlBarVisible: boolean;
   pageIndex: number;
   totalPages: number;
+  advanceMode: 'tts' | 'auto' | null;
 }

@@ -1,9 +1,10 @@
 'use client';
 
 import TooltipItem from '@/components/tooltipItem';
-import { TTS, toProps } from '@/features/post/domain/model/tts';
+import { PostViewer } from '@/features/postViewer/domain/model/postViewer';
+import { TTS, toProps } from '@/features/postViewer/domain/model/tts';
 import useIsMobile from '@/hooks/useIsMobile';
-import { nextPage } from '@/lib/redux/postViewerSlice';
+import { nextPage, setAdvanceMode } from '@/lib/redux/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { getUtterance } from '@/lib/tts';
 import clsx from 'clsx';
@@ -22,10 +23,12 @@ export default function PostViewerTTSSection({
   pageRef,
   isViewerMode,
   pageIndex,
+  advanceMode,
 }: {
   pageRef: RefObject<HTMLDivElement | null>;
   isViewerMode: boolean;
   pageIndex: number;
+  advanceMode: PostViewer['advanceMode'];
 }) {
   const [tts, setTTS] = useState<TTS>({
     isEnabled: false,
@@ -115,9 +118,6 @@ export default function PostViewerTTSSection({
   }, [ttsProps]);
 
   useEffect(() => {
-    const page = pageRef.current;
-    if (!page) return;
-
     if (ttsProps.mode === 'disabled') stopReading();
     else if (ttsProps.mode === 'enabled' && ttsProps.isPlaying)
       startReading(ttsProps.elementIndex);
@@ -146,6 +146,24 @@ export default function PostViewerTTSSection({
       });
     }
   }, [pageIndex, ttsProps]);
+
+  useEffect(() => {
+    if (advanceMode !== null && advanceMode !== 'tts') {
+      setTTS({
+        isEnabled: false,
+        isPlaying: false,
+        elementIndex: 0,
+      });
+    }
+  }, [advanceMode]);
+
+  useEffect(() => {
+    if (ttsProps.mode === 'enabled') {
+      dispatch(setAdvanceMode('tts'));
+    } else if (ttsProps.mode === 'disabled') {
+      dispatch(setAdvanceMode(null));
+    }
+  }, [dispatch, ttsProps.mode]);
 
   return (
     <div className='flex items-center gap-2'>

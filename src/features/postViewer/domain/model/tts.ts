@@ -1,4 +1,4 @@
-import { TTSProps } from '@/features/post/ui/ttsProps';
+import { TTSProps } from '@/features/postViewer/ui/ttsProps';
 
 export interface TTS {
   isEnabled: boolean;

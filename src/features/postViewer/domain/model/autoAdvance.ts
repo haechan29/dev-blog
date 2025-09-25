@@ -1,7 +1,7 @@
-import AutoAdvanceProps from '@/features/post/ui/autoAdvanceProps';
+import AutoAdvanceProps from '@/features/postViewer/ui/autoAdvanceProps';
 
-export type AutoAdvanceNotEnabled = {
-  type: 'NotEnabled';
+export type AutoAdvanceDisabled = {
+  type: 'Disabled';
 };
 
 export type AutoAdvanceEnabled = {
@@ -9,7 +9,7 @@ export type AutoAdvanceEnabled = {
   interval: number;
 };
 
-export type AutoAdvance = AutoAdvanceNotEnabled | AutoAdvanceEnabled;
+export type AutoAdvance = AutoAdvanceDisabled | AutoAdvanceEnabled;
 
 export function toProps(autoAdvance: AutoAdvance): AutoAdvanceProps {
   return {

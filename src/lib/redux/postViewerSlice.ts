@@ -1,4 +1,4 @@
-import { PostViewer } from '@/features/post/domain/model/postViewer';
+import { PostViewer } from '@/features/postViewer/domain/model/postViewer';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: PostViewer = {
@@ -7,6 +7,7 @@ const initialState: PostViewer = {
   isControlBarVisible: true,
   pageIndex: 0,
   totalPages: 0,
+  advanceMode: null,
 };
 
 const postViewerSlice = createSlice({
@@ -34,6 +35,12 @@ const postViewerSlice = createSlice({
     setTotalPages: (state, action: PayloadAction<number>) => {
       state.totalPages = action.payload;
     },
+    setAdvanceMode: (
+      state,
+      action: PayloadAction<PostViewer['advanceMode']>
+    ) => {
+      state.advanceMode = action.payload;
+    },
   },
 });
 
@@ -46,4 +53,5 @@ export const {
   nextPage,
   previousPage,
   setTotalPages,
+  setAdvanceMode,
 } = postViewerSlice.actions;

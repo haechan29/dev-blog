@@ -1,6 +1,6 @@
 'use client';
 
-import { toProps } from '@/features/post/domain/model/postViewer';
+import { toProps } from '@/features/postViewer/domain/model/postViewer';
 import { setIsViewerMode } from '@/lib/redux/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
