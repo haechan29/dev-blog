@@ -14,7 +14,7 @@ export default function ProgressSection() {
 
   const progress = useMemo(() => {
     if (!pageNumber || !totalPages) return null;
-    return ((pageNumber - 1) / (totalPages - 1)) * 100;
+    return ((pageNumber - 1) / (totalPages - 2)) * 100;
   }, [pageNumber, totalPages]);
 
   return (

@@ -6,36 +6,46 @@ import {
 } from '@/lib/redux/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { isAnyOf, Middleware } from '@reduxjs/toolkit';
+import toast from 'react-hot-toast';
 
 export const postViewerMiddleware: Middleware<
   unknown,
   RootState,
   AppDispatch
 > = store => next => action => {
-  if (isAnyOf(setPageIndex, setPaging)(action)) {
-    const state = store.getState();
-    const paging = state.postViewer.paging;
+  if (isAnyOf(setPageIndex)(action)) {
+    const paging = store.getState().postViewer.paging;
     if (!paging) return;
-    if (paging.index < 0 || paging.index >= paging.total) {
-      console.log('유효하지 않은 페이지');
-      return;
-    }
+
+    const pageIndex = action.payload;
+    if (pageIndex < 0 || pageIndex >= paging.total) return;
+  }
+  if (isAnyOf(setPaging)(action)) {
+    const paging = action.payload;
+    if (!paging) return next(action);
+
+    const { index, total } = paging;
+    if (index < 0 || index >= total) return;
   }
   if (isAnyOf(nextPage)(action)) {
-    const state = store.getState();
-    const paging = state.postViewer.paging;
+    const paging = store.getState().postViewer.paging;
     if (!paging) return;
     if (paging.index >= paging.total - 1) {
-      console.log('마지막 페이지');
+      toast.success('마지막 페이지입니다.', {
+        id: 'post-viewer',
+        toasterId: 'post-viewer',
+      });
       return;
     }
   }
   if (isAnyOf(previousPage)(action)) {
-    const state = store.getState();
-    const paging = state.postViewer.paging;
+    const paging = store.getState().postViewer.paging;
     if (!paging) return;
     if (paging.index <= 0) {
-      console.log('첫 페이지');
+      toast.success('첫 페이지입니다.', {
+        id: 'post-viewer',
+        toasterId: 'post-viewer',
+      });
       return;
     }
   }

@@ -18,7 +18,7 @@ export default function PageIndicatorSection() {
       <div className='flex items-center text-sm whitespace-nowrap mr-4'>
         <span>{pageNumber}</span>
         <span className='mx-1'>/</span>
-        <span>{totalPages}</span>
+        <span>{totalPages - 1}</span>
       </div>
     )
   );

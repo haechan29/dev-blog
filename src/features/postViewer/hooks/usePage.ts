@@ -38,7 +38,7 @@ export default function usePage() {
       excludeClassNames: ['hide-fullscreen'],
     });
 
-    dispatch(setPaging({ index: 0, total: pages.length - 1 }));
+    dispatch(setPaging({ index: 0, total: pages.length }));
     setPages(pages);
   }, [dispatch, fullscreenScale]);
 
