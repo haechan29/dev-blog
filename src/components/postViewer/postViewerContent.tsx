@@ -1,13 +1,8 @@
 'use client';
 
-import { parsePostIntoPages } from '@/features/postViewer/domain/lib/parse';
-import { Page } from '@/features/postViewer/domain/types/page';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { setPageIndex, setTotalPages } from '@/lib/redux/postViewerSlice';
-import { AppDispatch, RootState } from '@/lib/redux/store';
+import usePage from '@/features/postViewer/hooks/usePage';
 import clsx from 'clsx';
-import { RefObject, useCallback, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { RefObject, useEffect } from 'react';
 
 export default function PostViewerContent({
   postViewerContentRef,
@@ -18,65 +13,32 @@ export default function PostViewerContent({
   onContentClick: (event: React.MouseEvent<HTMLElement>) => void;
   onContentTouch: (event: React.TouchEvent<HTMLElement>) => void;
 }) {
-  const [pages, setPages] = useState<Page[]>([]);
-  const [isProcessing, setIsProcessing] = useState(true);
-
-  const dispatch = useDispatch<AppDispatch>();
-  const postViewer = useSelector((state: RootState) => state.postViewer);
-
-  const [fullscreenScale, setFullscreenScale] = useLocalStorage(
-    'fullscreen-scale',
-    1.5
-  );
-
-  const parsePost = useCallback(() => {
-    const postContainer = document.querySelector('.post-content');
-    if (!postContainer) return;
-
-    const pageHeight = (window.screen.height - 80) / fullscreenScale;
-    const pages = parsePostIntoPages({
-      postContainer,
-      pageHeight,
-      excludeClassNames: ['hide-fullscreen'],
-    });
-
-    dispatch(setTotalPages(pages.length));
-    dispatch(setPageIndex(0));
-
-    setPages(pages);
-    setIsProcessing(false);
-  }, [dispatch, fullscreenScale]);
-
-  useEffect(() => {
-    const timer = setTimeout(parsePost, 100);
-    return () => clearTimeout(timer);
-  }, [parsePost]);
+  const { page, fullscreenScale } = usePage();
 
   useEffect(() => {
     const content = postViewerContentRef.current;
-    const page = pages[postViewer.pageIndex];
+    if (!page || !content) return;
 
-    if (content && page) {
-      content.innerHTML = '';
-      page.forEach(element => {
-        const clonedElement = element.cloneNode(true);
-        content.appendChild(clonedElement);
-      });
-    }
-  }, [pages, postViewerContentRef, postViewer.pageIndex]);
+    content.innerHTML = '';
+    page.forEach(element => {
+      const clonedElement = element.cloneNode(true);
+      content.appendChild(clonedElement);
+    });
+  }, [page, postViewerContentRef]);
 
   return (
-    <div
-      ref={postViewerContentRef}
-      onClick={onContentClick}
-      onTouchEnd={onContentTouch}
-      className={clsx(
-        'prose fullscreen w-[calc(100vw/var(--fullscreen-scale))] h-[calc(100vh/var(--fullscreen-scale))]',
-        'px-[calc(5rem/var(--fullscreen-scale))] py-[calc(5rem/var(--fullscreen-scale))] mx-auto',
-        'scale-[var(--fullscreen-scale)] origin-top',
-        isProcessing && 'hidden'
-      )}
-      style={{ '--fullscreen-scale': fullscreenScale }}
-    />
+    page !== null && (
+      <div
+        ref={postViewerContentRef}
+        onClick={onContentClick}
+        onTouchEnd={onContentTouch}
+        className={clsx(
+          'prose fullscreen w-[calc(100vw/var(--fullscreen-scale))] h-[calc(100vh/var(--fullscreen-scale))]',
+          'px-[calc(5rem/var(--fullscreen-scale))] py-[calc(5rem/var(--fullscreen-scale))] mx-auto',
+          'scale-[var(--fullscreen-scale)] origin-top'
+        )}
+        style={{ '--fullscreen-scale': fullscreenScale }}
+      />
+    )
   );
 }
