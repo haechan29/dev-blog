@@ -5,8 +5,7 @@ const initialState: PostViewer = {
   isCommentSectionVisible: false,
   isViewerMode: false,
   isControlBarVisible: true,
-  pageIndex: 0,
-  totalPages: 0,
+  paging: null,
   advanceMode: null,
 };
 
@@ -24,16 +23,25 @@ const postViewerSlice = createSlice({
       state.isControlBarVisible = action.payload;
     },
     setPageIndex: (state, action: PayloadAction<number>) => {
-      state.pageIndex = action.payload;
+      state.paging = {
+        index: action.payload,
+        total: state.paging!.total,
+      };
     },
     nextPage: state => {
-      state.pageIndex = Math.min(state.totalPages - 1, state.pageIndex + 1);
+      state.paging = {
+        index: state.paging!.index + 1,
+        total: state.paging!.total,
+      };
     },
     previousPage: state => {
-      state.pageIndex = Math.max(0, state.pageIndex - 1);
+      state.paging = {
+        index: state.paging!.index - 1,
+        total: state.paging!.total,
+      };
     },
-    setTotalPages: (state, action: PayloadAction<number>) => {
-      state.totalPages = action.payload;
+    setPaging: (state, action: PayloadAction<PostViewer['paging']>) => {
+      state.paging = action.payload;
     },
     setAdvanceMode: (
       state,
@@ -52,6 +60,6 @@ export const {
   setPageIndex,
   nextPage,
   previousPage,
-  setTotalPages,
+  setPaging,
   setAdvanceMode,
 } = postViewerSlice.actions;

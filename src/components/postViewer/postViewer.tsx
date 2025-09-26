@@ -14,16 +14,13 @@ import {
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostViewer() {
   const dispatch = useDispatch<AppDispatch>();
   const postViewer = useSelector((state: RootState) => state.postViewer);
-  const { isViewerMode, pageIndex, totalPages } = useMemo(
-    () => toProps(postViewer),
-    [postViewer]
-  );
+  const { isViewerMode } = useMemo(() => toProps(postViewer), [postViewer]);
   const postViewerRef = useRef<HTMLDivElement | null>(null);
   const postViewerContentRef = useRef<HTMLDivElement | null>(null);
 
@@ -46,28 +43,18 @@ export default function PostViewer() {
   const handleScroll = useCallback(
     (event: WheelEvent) => {
       throttle(() => {
-        if (event.deltaY > 0) {
-          if (pageIndex == totalPages - 1) {
-            toast.success('마지막 페이지입니다.', {
-              id: 'post-viewer',
-              toasterId: 'post-viewer',
-            });
-            return;
-          }
+        const [isScrolledUp, isScrolledDown] = [
+          event.deltaY > 0,
+          event.deltaY < 0,
+        ];
+        if (isScrolledUp) {
           dispatch(nextPage());
-        } else if (event.deltaY < 0) {
-          if (pageIndex == 0) {
-            toast.success('첫 페이지입니다.', {
-              id: 'post-viewer',
-              toasterId: 'post-viewer',
-            });
-            return;
-          }
+        } else if (isScrolledDown) {
           dispatch(previousPage());
         }
       }, 100);
     },
-    [dispatch, pageIndex, throttle, totalPages]
+    [dispatch, throttle]
   );
 
   const handleNavigation = useCallback(
@@ -78,26 +65,12 @@ export default function PostViewer() {
       ];
 
       if (isLeftSideClicked) {
-        if (pageIndex == 0) {
-          toast.success('첫 페이지입니다.', {
-            id: 'post-viewer',
-            toasterId: 'post-viewer',
-          });
-          return;
-        }
         dispatch(previousPage());
       } else if (isRightSideClicked) {
-        if (pageIndex == totalPages - 1) {
-          toast.success('마지막 페이지입니다.', {
-            id: 'post-viewer',
-            toasterId: 'post-viewer',
-          });
-          return;
-        }
         dispatch(nextPage());
       }
     },
-    [dispatch, pageIndex, totalPages]
+    [dispatch]
   );
 
   const handleClick = useCallback(

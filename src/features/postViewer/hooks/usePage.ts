@@ -15,10 +15,11 @@ export default function usePage() {
 
   const [pages, setPages] = useState<Page[] | null>(null);
 
-  const { pageIndex } = useMemo(() => toProps(postViewer), [postViewer]);
+  const { pageNumber } = useMemo(() => toProps(postViewer), [postViewer]);
   const page = useMemo(
-    () => (pages !== null && pageIndex !== null ? pages[pageIndex] : null),
-    [pageIndex, pages]
+    () =>
+      pages !== null && pageNumber !== null ? pages[pageNumber - 1] : null,
+    [pageNumber, pages]
   );
 
   const [fullscreenScale, setFullscreenScale] = useLocalStorage(
@@ -37,7 +38,7 @@ export default function usePage() {
       excludeClassNames: ['hide-fullscreen'],
     });
 
-    dispatch(setPaging({ index: 0, total: pages.length }));
+    dispatch(setPaging({ index: 0, total: pages.length - 1 }));
     setPages(pages);
   }, [dispatch, fullscreenScale]);
 

@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 export default function useAutoAdvanceState() {
   const dispatch = useDispatch<AppDispatch>();
   const postViewer = useSelector((state: RootState) => state.postViewer);
-  const { pageIndex, totalPages, advanceMode } = useMemo(
+  const { pageNumber, totalPages, advanceMode } = useMemo(
     () => toPostViewerProps(postViewer),
     [postViewer]
   );
@@ -52,7 +52,8 @@ export default function useAutoAdvanceState() {
 
   useEffect(() => {
     if (!isAutoAdvanceEnabled || !autoAdvanceInterval) return;
-    if (pageIndex >= totalPages - 1) return;
+    if (pageNumber !== null && totalPages !== null && pageNumber >= totalPages)
+      return;
 
     const timer = setTimeout(() => {
       dispatch(nextPage());
@@ -63,7 +64,7 @@ export default function useAutoAdvanceState() {
     autoAdvanceInterval,
     dispatch,
     isAutoAdvanceEnabled,
-    pageIndex,
+    pageNumber,
     totalPages,
   ]);
 

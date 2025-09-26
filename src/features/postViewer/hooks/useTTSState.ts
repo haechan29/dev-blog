@@ -19,13 +19,13 @@ export default function useTTSState() {
 
   const dispatch = useDispatch<AppDispatch>();
   const postViewer = useSelector((state: RootState) => state.postViewer);
-  const { pageIndex, isViewerMode, advanceMode } = useMemo(
+  const { pageNumber, isViewerMode, advanceMode } = useMemo(
     () => toPostViewerProps(postViewer),
     [postViewer]
   );
   const ttsProps = useMemo(() => toTTSProps(tts), [tts]);
 
-  const lastPageIndex = useRef(pageIndex);
+  const lastPageNumber = useRef(pageNumber);
 
   const toggleIsEnabled = useCallback(() => {
     if (ttsProps.mode === 'enabled') {
@@ -68,8 +68,8 @@ export default function useTTSState() {
   }, [isViewerMode]);
 
   useEffect(() => {
-    if (pageIndex === lastPageIndex.current) return;
-    lastPageIndex.current = pageIndex;
+    if (pageNumber === lastPageNumber.current) return;
+    lastPageNumber.current = pageNumber;
 
     if (ttsProps.mode === 'enabled' && ttsProps.isPlaying) {
       setTTS({
@@ -78,7 +78,7 @@ export default function useTTSState() {
         elementIndex: 0,
       });
     }
-  }, [pageIndex, ttsProps]);
+  }, [pageNumber, ttsProps]);
 
   useEffect(() => {
     if (advanceMode !== null && advanceMode !== 'tts') {

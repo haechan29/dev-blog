@@ -7,16 +7,19 @@ import { useSelector } from 'react-redux';
 
 export default function PageIndicatorSection() {
   const postViewer = useSelector((state: RootState) => state.postViewer);
-  const { pageIndex, totalPages } = useMemo(
+  const { pageNumber, totalPages } = useMemo(
     () => toPostViewerProps(postViewer),
     [postViewer]
   );
 
   return (
-    <div className='flex items-center text-sm whitespace-nowrap mr-4'>
-      <span>{pageIndex + 1}</span>
-      <span className='mx-1'>/</span>
-      <span>{totalPages}</span>
-    </div>
+    pageNumber !== null &&
+    totalPages !== null && (
+      <div className='flex items-center text-sm whitespace-nowrap mr-4'>
+        <span>{pageNumber}</span>
+        <span className='mx-1'>/</span>
+        <span>{totalPages}</span>
+      </div>
+    )
   );
 }

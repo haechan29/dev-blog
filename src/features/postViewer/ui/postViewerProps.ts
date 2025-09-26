@@ -2,7 +2,7 @@ export default interface PostViewerProps {
   isButtonVisible: boolean;
   isViewerMode: boolean;
   isControlBarVisible: boolean;
-  pageIndex: number;
-  totalPages: number;
+  pageNumber: number | null;
+  totalPages: number | null;
   advanceMode: 'tts' | 'auto' | null;
 }

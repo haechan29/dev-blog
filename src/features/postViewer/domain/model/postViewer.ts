@@ -1,11 +1,11 @@
+import { Paing } from '@/features/postViewer/domain/types/paging';
 import PostViewerProps from '@/features/postViewer/ui/postViewerProps';
 
 export interface PostViewer {
   isCommentSectionVisible: boolean;
   isViewerMode: boolean;
   isControlBarVisible: boolean;
-  pageIndex: number;
-  totalPages: number;
+  paging: Paing | null;
   advanceMode: 'tts' | 'auto' | null;
 }
 
@@ -14,8 +14,8 @@ export function toProps(postViewer: PostViewer): PostViewerProps {
     isButtonVisible: !postViewer.isCommentSectionVisible,
     isViewerMode: postViewer.isViewerMode,
     isControlBarVisible: postViewer.isControlBarVisible,
-    pageIndex: postViewer.pageIndex,
-    totalPages: postViewer.totalPages,
+    pageNumber: postViewer.paging ? postViewer.paging.index + 1 : null,
+    totalPages: postViewer.paging ? postViewer.paging.total + 1 : null,
     advanceMode: postViewer.advanceMode,
   };
 }
