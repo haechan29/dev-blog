@@ -90,7 +90,8 @@ export default function PostViewerContent({
     <div
       ref={pageRef}
       className={clsx(
-        'prose fullscreen w-[calc((100vw-20rem)/var(--fullscreen-scale))] h-screen mx-auto py-10',
+        'prose fullscreen w-[calc(100vw/var(--fullscreen-scale))] h-[calc(100vh/var(--fullscreen-scale))]',
+        'px-[calc(5rem/var(--fullscreen-scale))] py-[calc(5rem/var(--fullscreen-scale))] mx-auto',
         'scale-[var(--fullscreen-scale)] origin-top',
         isProcessing && 'hidden'
       )}

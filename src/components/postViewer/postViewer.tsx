@@ -18,8 +18,6 @@ import toast, { Toaster } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostViewer() {
-  const pageRef = useRef<HTMLDivElement | null>(null);
-
   const dispatch = useDispatch<AppDispatch>();
   const postViewer = useSelector((state: RootState) => state.postViewer);
   const { isViewerMode, pageIndex, totalPages } = useMemo(
@@ -27,6 +25,7 @@ export default function PostViewer() {
     [postViewer]
   );
   const postViewerRef = useRef<HTMLDivElement | null>(null);
+  const postViewerContentRef = useRef<HTMLDivElement | null>(null);
 
   const debounce = useDebounce();
   const throttle = useThrottle();
@@ -71,6 +70,58 @@ export default function PostViewer() {
     [dispatch, pageIndex, throttle, totalPages]
   );
 
+  const handleNavigation = useCallback(
+    (clientX: number, clientWidth: number) => {
+      const [isLeftSideClicked, isRightSideClicked] = [
+        clientX < clientWidth / 2,
+        clientX > clientWidth / 2,
+      ];
+
+      if (isLeftSideClicked) {
+        if (pageIndex == 0) {
+          toast.success('첫 페이지입니다.', {
+            id: 'post-viewer',
+            toasterId: 'post-viewer',
+          });
+          return;
+        }
+        dispatch(previousPage());
+      } else if (isRightSideClicked) {
+        if (pageIndex == totalPages - 1) {
+          toast.success('마지막 페이지입니다.', {
+            id: 'post-viewer',
+            toasterId: 'post-viewer',
+          });
+          return;
+        }
+        dispatch(nextPage());
+      }
+    },
+    [dispatch, pageIndex, totalPages]
+  );
+
+  const handleClick = useCallback(
+    (event: React.MouseEvent) => {
+      if ('ontouchstart' in window) return; // block event handling on mobile
+
+      const { clientX } = event;
+      const { clientWidth } = event.currentTarget;
+
+      handleNavigation(clientX, clientWidth);
+    },
+    [handleNavigation]
+  );
+
+  const handleTouch = useCallback(
+    (event: React.TouchEvent) => {
+      const { clientX } = event.changedTouches[0];
+      const { clientWidth } = event.currentTarget;
+
+      handleNavigation(clientX, clientWidth);
+    },
+    [handleNavigation]
+  );
+
   useEffect(() => {
     if (typeof document === 'undefined' || !postViewerRef.current) return;
 
@@ -105,8 +156,12 @@ export default function PostViewer() {
       ref={postViewerRef}
       className={clsx('bg-white flex flex-col', !isViewerMode && 'hidden')}
     >
-      <PostViewerContent pageRef={pageRef} />
-      <PostViewerControlBar pageRef={pageRef} />
+      <PostViewerContent
+        postViewerContentRef={postViewerContentRef}
+        onContentClick={handleClick}
+        onContentTouch={handleTouch}
+      />
+      <PostViewerControlBar postViewerContentRef={postViewerContentRef} />
       <Toaster toasterId='post-viewer' />
     </div>
   );
