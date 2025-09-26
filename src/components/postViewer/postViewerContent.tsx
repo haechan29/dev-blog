@@ -1,5 +1,7 @@
 'use client';
 
+import { parsePostIntoPages } from '@/features/postViewer/domain/lib/parse';
+import { Page } from '@/features/postViewer/domain/types/page';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { setPageIndex, setTotalPages } from '@/lib/redux/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
@@ -8,11 +10,15 @@ import { RefObject, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostViewerContent({
-  pageRef,
+  postViewerContentRef,
+  onContentClick,
+  onContentTouch,
 }: {
-  pageRef: RefObject<HTMLDivElement | null>;
+  postViewerContentRef: RefObject<HTMLDivElement | null>;
+  onContentClick: (event: React.MouseEvent<HTMLElement>) => void;
+  onContentTouch: (event: React.TouchEvent<HTMLElement>) => void;
 }) {
-  const [oldPages, setOldPages] = useState<Element[][]>([]);
+  const [pages, setPages] = useState<Page[]>([]);
   const [isProcessing, setIsProcessing] = useState(true);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -23,72 +29,47 @@ export default function PostViewerContent({
     1.5
   );
 
-  const parseProseSection = useCallback(() => {
-    const container = document.querySelector('.post-content');
-    if (!container) return;
+  const parsePost = useCallback(() => {
+    const postContainer = document.querySelector('.post-content');
+    if (!postContainer) return;
 
-    const children = Array.from(container.children).filter(
-      child => !child.matches('.hide-fullscreen')
-    );
-    const pages: Element[][] = [];
-    let currentPage: Element[] = [];
-    let currentHeight = 0;
-
-    children.forEach(child => {
-      const isHeadingElement = child.matches('h1, h2, h3, h4, h5, h6');
-      const hasContent =
-        currentPage.length > 0 && !currentPage.every(isEmptyContent);
-
-      const elementHeight = getElementHeight(child);
-      const exceedsPageHeight =
-        currentHeight + elementHeight >
-        (window.screen.height - 80) / fullscreenScale;
-
-      if ((isHeadingElement || exceedsPageHeight) && hasContent) {
-        pages.push([...currentPage]);
-        currentPage = [];
-        currentHeight = 0;
-      }
-
-      if (!isHeadingElement) {
-        currentPage.push(child);
-        currentHeight += elementHeight;
-      }
+    const pageHeight = (window.screen.height - 80) / fullscreenScale;
+    const pages = parsePostIntoPages({
+      postContainer,
+      pageHeight,
+      excludeClassNames: ['hide-fullscreen'],
     });
-
-    const hasContent = !currentPage.every(isEmptyContent);
-    if (hasContent) {
-      pages.push(currentPage);
-    }
 
     dispatch(setTotalPages(pages.length));
     dispatch(setPageIndex(0));
 
-    setOldPages(pages);
+    setPages(pages);
     setIsProcessing(false);
   }, [dispatch, fullscreenScale]);
 
   useEffect(() => {
-    const timer = setTimeout(parseProseSection, 100);
+    const timer = setTimeout(parsePost, 100);
     return () => clearTimeout(timer);
-  }, [parseProseSection]);
+  }, [parsePost]);
 
   useEffect(() => {
-    const page = pageRef.current;
-    const oldPage = oldPages[postViewer.pageIndex];
+    const content = postViewerContentRef.current;
+    const page = pages[postViewer.pageIndex];
 
-    if (page && oldPage) {
-      page.innerHTML = '';
-      oldPage.forEach(element => {
+    if (content && page) {
+      content.innerHTML = '';
+      page.forEach(element => {
         const clonedElement = element.cloneNode(true);
-        page.appendChild(clonedElement);
+        content.appendChild(clonedElement);
       });
     }
-  }, [oldPages, pageRef, postViewer.pageIndex]);
+  }, [pages, postViewerContentRef, postViewer.pageIndex]);
 
   return (
     <div
-      ref={pageRef}
+      ref={postViewerContentRef}
+      onClick={onContentClick}
+      onTouchEnd={onContentTouch}
       className={clsx(
         'prose fullscreen w-[calc(100vw/var(--fullscreen-scale))] h-[calc(100vh/var(--fullscreen-scale))]',
         'px-[calc(5rem/var(--fullscreen-scale))] py-[calc(5rem/var(--fullscreen-scale))] mx-auto',
@@ -98,26 +79,4 @@ export default function PostViewerContent({
       style={{ '--fullscreen-scale': fullscreenScale }}
     />
   );
-}
-
-function getElementHeight(element: Element) {
-  const rect = element.getBoundingClientRect();
-  const style = window.getComputedStyle(element);
-  const marginTop = parseFloat(style.marginTop) || 0;
-  const marginBottom = parseFloat(style.marginBottom) || 0;
-  return rect.height + marginTop + marginBottom;
-}
-
-function isEmptyContent(element: Element) {
-  if (element.matches('br')) return true;
-
-  if (
-    element.matches('div, span, p') &&
-    element.textContent.trim() === '' &&
-    element.children.length === 0
-  ) {
-    return true;
-  }
-
-  return false;
 }

@@ -4,11 +4,11 @@ import { getUtterance } from '@/lib/tts';
 import { RefObject, useCallback, useRef } from 'react';
 
 export default function useTTSPlayer({
-  pageRef,
+  postViewerContentRef,
   onFinishElement,
   onFinishPage,
 }: {
-  pageRef: RefObject<HTMLDivElement | null>;
+  postViewerContentRef: RefObject<HTMLDivElement | null>;
   onFinishElement: (nextElementIndex: number) => void;
   onFinishPage: () => void;
 }) {
@@ -22,10 +22,10 @@ export default function useTTSPlayer({
         return;
       }
 
-      const page = pageRef.current;
-      if (!page) return;
+      const content = postViewerContentRef.current;
+      if (!content) return;
 
-      const currentPageElements = page.children;
+      const currentPageElements = content.children;
       if (elementIndex >= currentPageElements.length) {
         onFinishPage();
         return;
@@ -45,7 +45,7 @@ export default function useTTSPlayer({
       speechSynthesis.cancel();
       speechSynthesis.speak(utterance);
     },
-    [onFinishElement, onFinishPage, pageRef]
+    [onFinishElement, onFinishPage, postViewerContentRef]
   );
 
   const pauseReading = useCallback(() => {

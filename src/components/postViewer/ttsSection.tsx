@@ -11,9 +11,9 @@ import { RefObject, useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function TTSSection({
-  pageRef,
+  postViewerContentRef,
 }: {
-  pageRef: RefObject<HTMLDivElement | null>;
+  postViewerContentRef: RefObject<HTMLDivElement | null>;
 }) {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -23,7 +23,7 @@ export default function TTSSection({
   const onFinishPage = useCallback(() => dispatch(nextPage()), [dispatch]);
 
   const { startReading, pauseReading, stopReading } = useTTSPlayer({
-    pageRef,
+    postViewerContentRef,
     onFinishElement: increaseElementIndex,
     onFinishPage,
   });
@@ -33,7 +33,7 @@ export default function TTSSection({
     else if (ttsProps.mode === 'enabled' && ttsProps.isPlaying)
       startReading(ttsProps.elementIndex);
     else if (ttsProps.mode === 'enabled' && !ttsProps.isPlaying) pauseReading();
-  }, [pageRef, pauseReading, startReading, stopReading, ttsProps]);
+  }, [postViewerContentRef, pauseReading, startReading, stopReading, ttsProps]);
 
   return (
     <div className='flex items-center gap-2'>

@@ -12,9 +12,9 @@ import { RefObject, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export default function PostViewerControlBar({
-  pageRef,
+  postViewerContentRef,
 }: {
-  pageRef: RefObject<HTMLDivElement | null>;
+  postViewerContentRef: RefObject<HTMLDivElement | null>;
 }) {
   const postViewer = useSelector((state: RootState) => state.postViewer);
 
@@ -36,7 +36,7 @@ export default function PostViewerControlBar({
       <div className='flex w-full py-3 px-10 justify-between items-center'>
         <div className='flex items-center gap-2'>
           <PageIndicatorSection />
-          <TTSSection pageRef={pageRef} />
+          <TTSSection postViewerContentRef={postViewerContentRef} />
           <AutoAdvanceSection />
         </div>
 
