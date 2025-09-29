@@ -22,7 +22,7 @@ export default function PostViewerToolbar({
 }) {
   const dispatch = useDispatch<AppDispatch>();
   const postViewer = useSelector((state: RootState) => state.postViewer);
-  const { pageNumber, headingPageMapping } = useMemo(
+  const { pageNumber, headingPageMapping, areBarsVisible } = useMemo(
     () => toProps(postViewer),
     [postViewer]
   );
@@ -50,8 +50,9 @@ export default function PostViewerToolbar({
   return (
     <div
       className={clsx(
-        'fixed top-0 left-0 right-0 z-50 flex flex-col',
-        'px-10 py-3 backdrop-blur-md bg-white/80'
+        'fixed top-0 left-0 right-0 z-50 flex flex-col backdrop-blur-md bg-white/80 px-10 py-3',
+        'transition-opacity duration-300 ease-in-out',
+        !areBarsVisible && 'opacity-0'
       )}
     >
       {currentHeading !== null && (

@@ -5,7 +5,7 @@ import PostViewerProps from '@/features/postViewer/ui/postViewerProps';
 export interface PostViewer {
   isCommentSectionVisible: boolean;
   isViewerMode: boolean;
-  isControlBarVisible: boolean;
+  areBarsVisible: boolean;
   paging: Paing | null;
   advanceMode: 'tts' | 'auto' | null;
   fullscreenScale: number;
@@ -16,7 +16,7 @@ export function toProps(postViewer: PostViewer): PostViewerProps {
   return {
     isButtonVisible: !postViewer.isCommentSectionVisible,
     isViewerMode: postViewer.isViewerMode,
-    isControlBarVisible: postViewer.isControlBarVisible,
+    areBarsVisible: postViewer.areBarsVisible,
     pageNumber: postViewer.paging ? postViewer.paging.index + 1 : null,
     totalPages: postViewer.paging ? postViewer.paging.total + 1 : null,
     advanceMode: postViewer.advanceMode,

@@ -3,7 +3,7 @@ import { HeadingPageMapping } from '@/features/postViewer/domain/types/headingPa
 export default interface PostViewerProps {
   isButtonVisible: boolean;
   isViewerMode: boolean;
-  isControlBarVisible: boolean;
+  areBarsVisible: boolean;
   pageNumber: number | null;
   totalPages: number | null;
   advanceMode: 'tts' | 'auto' | null;

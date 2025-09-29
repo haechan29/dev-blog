@@ -5,7 +5,7 @@ import PostViewerControlBar from '@/components/postViewer/postViewerControlBar';
 import PostViewerToolbar from '@/components/postViewer/postViewerToolbar';
 import { PostItemProps } from '@/features/post/ui/postItemProps';
 import { toProps } from '@/features/postViewer/domain/model/postViewer';
-import { useControlBarAutoHide } from '@/features/postViewer/hooks/useControlBarAutoHide';
+import { useBarsAutoHide } from '@/features/postViewer/hooks/useBarsAutoHide';
 import { useFullscreen } from '@/features/postViewer/hooks/useFullscreen';
 import { useFullscreenScale } from '@/features/postViewer/hooks/useFullscreenScale';
 import usePostParsing from '@/features/postViewer/hooks/usePostParsing';
@@ -31,7 +31,7 @@ export default function PostViewer({
   useFullscreenScale();
   useFullscreen(postViewerRef);
   useViewerNavigation(postViewerContentRef);
-  useControlBarAutoHide();
+  useBarsAutoHide();
 
   return (
     <>

@@ -5,7 +5,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 const initialState: PostViewer = {
   isCommentSectionVisible: false,
   isViewerMode: false,
-  isControlBarVisible: true,
+  areBarsVisible: true,
   paging: null,
   advanceMode: null,
   fullscreenScale: 1.5,
@@ -21,8 +21,8 @@ const postViewerSlice = createSlice({
     setIsViewerMode: (state, action: PayloadAction<boolean>) => {
       state.isViewerMode = action.payload;
     },
-    setIsControlBarVisible: (state, action: PayloadAction<boolean>) => {
-      state.isControlBarVisible = action.payload;
+    setAreBarsVisible: (state, action: PayloadAction<boolean>) => {
+      state.areBarsVisible = action.payload;
     },
     setPageIndex: (state, action: PayloadAction<number>) => {
       state.paging = {
@@ -67,7 +67,7 @@ export default postViewerSlice.reducer;
 export const {
   setIsCommentSectionVisible,
   setIsViewerMode,
-  setIsControlBarVisible,
+  setAreBarsVisible,
   setPageIndex,
   nextPage,
   previousPage,
