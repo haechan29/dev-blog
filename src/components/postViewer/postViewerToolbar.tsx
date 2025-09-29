@@ -3,8 +3,8 @@
 import { Heading } from '@/features/post/domain/model/post';
 import { toProps } from '@/features/postViewer/domain/model/postViewer';
 import {
-  getHeadingByPage,
-  getPageByHeading,
+  getHeadingsByPage,
+  getPageByHeadingId,
 } from '@/features/postViewer/domain/types/headingPageMapping';
 import { setPageIndex } from '@/lib/redux/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
@@ -13,7 +13,7 @@ import { ChevronDown } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-export default function PostViewerHeader({
+export default function PostViewerToolbar({
   title,
   headings,
 }: {
@@ -32,63 +32,58 @@ export default function PostViewerHeader({
   const handleClick = (heading: Heading) => {
     if (!isExpanded || !headingPageMapping) return;
 
-    const pageIndex = getPageByHeading(headingPageMapping, heading.id);
+    const pageIndex = getPageByHeadingId(headingPageMapping, heading.id);
     if (pageIndex === undefined) return;
 
     dispatch(setPageIndex(pageIndex));
     setIsExpanded(false);
   };
 
-  const headingText = useMemo(() => {
+  const currentHeading = useMemo(() => {
     if (pageNumber === null || !headingPageMapping) return null;
 
-    const headingId = getHeadingByPage(headingPageMapping, pageNumber - 1);
-    const heading = headings.find(heading => heading.id === headingId);
-    return heading?.text ?? null;
-  }, [headingPageMapping, headings, pageNumber]);
+    const headings = getHeadingsByPage(headingPageMapping, pageNumber - 1);
+    if (!headings || headings.length === 0) return null;
+    return headings[0];
+  }, [headingPageMapping, pageNumber]);
 
   return (
     <div
       className={clsx(
-        'fixed top-0 left-0 right-0 z-50 flex flex-col min-w-0',
+        'fixed top-0 left-0 right-0 z-50 flex flex-col',
         'px-10 py-3 backdrop-blur-md bg-white/80'
       )}
     >
-      {headingText !== null && (
-        <div className={clsx('w-full text-ellipsis text-xs text-gray-400')}>
-          {title}
-        </div>
+      {currentHeading !== null && (
+        <div className={clsx('w-full truncate text-gray-400')}>{title}</div>
       )}
 
-      <div className='flex w-full min-w-0 items-start'>
+      <div className='flex w-full items-start'>
         <div className='flex flex-1 min-w-0'>
-          <div className='flex flex-col w-full transition-opacity duration-300 ease-in-out'>
-            <div className='font-semibold h-6 truncate'>
-              {headingText ?? title}
-            </div>
-
-            <div className='flex flex-col'>
-              {headings.map(heading => (
-                <button
-                  key={heading.id}
-                  onClick={() => handleClick(heading)}
-                  className={clsx(
-                    'flex truncate transition-discrete|opacity duration-300 ease-in',
-                    isExpanded || title === heading.text
-                      ? 'h-6 opacity-100'
-                      : 'h-0 opacity-0',
-                    title === heading.text
-                      ? 'text-gray-900 font-semibold'
-                      : 'text-gray-400',
-                    isExpanded && 'my-0.5'
-                  )}
-                >
-                  {heading.text}
-                </button>
-              ))}
-            </div>
+          <div className='flex flex-col min-w-0'>
+            {headings.map(heading => (
+              <button
+                key={heading.id}
+                onClick={() => handleClick(heading)}
+                className={clsx(
+                  'flex truncate text-xl transition-discrete|opacity duration-300 ease-in',
+                  isExpanded || currentHeading?.id === heading.id
+                    ? 'h-6 opacity-100'
+                    : 'h-0 opacity-0',
+                  currentHeading?.id === heading.id
+                    ? 'text-gray-900 font-bold'
+                    : 'text-gray-400',
+                  isExpanded && 'my-2',
+                  isExpanded && heading.level == 2 && 'ml-4',
+                  isExpanded && heading.level == 3 && 'ml-8'
+                )}
+              >
+                <span className='truncate'>{heading.text}</span>
+              </button>
+            ))}
           </div>
         </div>
+
         <button
           onClick={() => setIsExpanded(prev => !prev)}
           className='flex shrink-0 px-2 items-center justify-center'

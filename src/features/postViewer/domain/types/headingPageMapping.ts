@@ -1,23 +1,25 @@
+import { Heading } from '@/features/post/domain/model/post';
+
 export type HeadingPageMapping = {
-  headingToPage: Record<string, number>;
-  pageToHeading: Record<number, string>;
+  headingIdToPage: Record<string, number>;
+  pageToHeadings: Record<number, Heading[]>;
 };
 
-export function getPageByHeading(
+export function getPageByHeadingId(
   mapping: HeadingPageMapping,
   headingId: string
 ): number | undefined {
-  return mapping.headingToPage[headingId];
+  return mapping.headingIdToPage[headingId];
 }
 
-export function getHeadingByPage(
+export function getHeadingsByPage(
   mapping: HeadingPageMapping,
-  pageIndex: number
-): string | undefined {
-  const pageIndices = Object.keys(mapping.pageToHeading)
+  page: number
+): Heading[] | undefined {
+  const pageIndices = Object.keys(mapping.pageToHeadings)
     .map(Number)
-    .filter(page => page <= pageIndex)
+    .filter(p => p <= page)
     .sort((a, b) => b - a);
 
-  return mapping.pageToHeading[pageIndices[0]];
+  return mapping.pageToHeadings[pageIndices[0]];
 }

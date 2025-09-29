@@ -2,7 +2,7 @@
 
 import PostViewerContent from '@/components/postViewer/postViewerContent';
 import PostViewerControlBar from '@/components/postViewer/postViewerControlBar';
-import PostViewerHeader from '@/components/postViewer/postViewerToolbar';
+import PostViewerToolbar from '@/components/postViewer/postViewerToolbar';
 import { PostItemProps } from '@/features/post/ui/postItemProps';
 import { toProps } from '@/features/postViewer/domain/model/postViewer';
 import { useControlBarAutoHide } from '@/features/postViewer/hooks/useControlBarAutoHide';
@@ -38,9 +38,12 @@ export default function PostViewer({
       <Toaster toasterId='post-viewer' />
       <div
         ref={postViewerRef}
-        className={clsx('bg-white flex flex-col', !isViewerMode && 'hidden')}
+        className={clsx(
+          'bg-white flex flex-col w-screen',
+          !isViewerMode && 'hidden'
+        )}
       >
-        <PostViewerHeader {...postProps} />
+        <PostViewerToolbar {...postProps} />
         <PostViewerContent
           page={page}
           postViewerContentRef={postViewerContentRef}

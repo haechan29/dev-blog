@@ -1,6 +1,12 @@
+import { Heading } from '@/features/post/domain/model/post';
 import { HeadingPageMapping } from '@/features/postViewer/domain/types/headingPageMapping';
 import { Page } from '@/features/postViewer/domain/types/page';
 
+/**
+ * Parses post into pages and creates heading-page mapping.
+ * - Headings (h1-h6) trigger new pages and are not included in pages
+ * - New page created when content exceeds page height
+ */
 export function parsePost({
   postContainer,
   pageHeight,
@@ -13,44 +19,56 @@ export function parsePost({
   pages: Page[];
   headingPageMapping: HeadingPageMapping;
 } {
-  const headingToPage: Record<string, number> = {};
-  const pageToHeading: Record<number, string> = {};
+  const headingIdToPage: Record<string, number> = {};
+  const pageToHeadings: Record<number, Heading[]> = {};
 
   const pages: Page[] = [];
   let currentPage: Page = [];
   let currentHeight = 0;
 
-  for (const child of postContainer.children) {
-    const isFiltered = excludeClassNames.some(className =>
-      child.className.includes(className)
-    );
-    if (isFiltered) continue;
+  Array.from(postContainer.children)
+    .filter(
+      child =>
+        !excludeClassNames.every(className =>
+          child.className.includes(className)
+        )
+    )
+    .forEach(child => {
+      const elementHeight = getElementHeight(child);
+      const exceedsPageHeight = currentHeight + elementHeight > pageHeight;
+      const isHeadingElement = child.matches('h1, h2, h3, h4, h5, h6');
+      const hasNonEmptyContent =
+        currentPage.length > 0 && !currentPage.every(isEmptyContent);
 
-    const elementHeight = getElementHeight(child);
-    const exceedsPageHeight = currentHeight + elementHeight > pageHeight;
-    const isHeadingElement = child.matches('h1, h2, h3, h4, h5, h6');
-    const hasNonEmptyContent =
-      currentPage.length > 0 && !currentPage.every(isEmptyContent);
+      // heading belongs to next page if current page has content, otherwise current page.
+      if (isHeadingElement) {
+        const pageIndex = hasNonEmptyContent ? pages.length + 1 : pages.length;
+        const level = parseInt(child.tagName.substring(1));
 
-    if (isHeadingElement) {
-      const pageIndex = pages.length;
-      headingToPage[child.id] = pageIndex;
-      pageToHeading[pageIndex] = child.id;
-    }
+        headingIdToPage[child.id] = pageIndex;
+        if (!pageToHeadings[pageIndex]) {
+          pageToHeadings[pageIndex] = [];
+        }
+        pageToHeadings[pageIndex].push({
+          id: child.id,
+          text: child.textContent,
+          level,
+        });
+      }
 
-    // create new page if current page would overflow or hit heading
-    if ((exceedsPageHeight || isHeadingElement) && hasNonEmptyContent) {
-      pages.push([...currentPage]);
-      currentPage = [];
-      currentHeight = 0;
-    }
+      // create new page if current page would overflow or hit heading
+      if ((exceedsPageHeight || isHeadingElement) && hasNonEmptyContent) {
+        pages.push([...currentPage]);
+        currentPage = [];
+        currentHeight = 0;
+      }
 
-    // add non-heading elements to current page
-    if (!isHeadingElement) {
-      currentPage.push(child);
-      currentHeight += elementHeight;
-    }
-  }
+      // add non-heading elements to current page
+      if (!isHeadingElement) {
+        currentPage.push(child);
+        currentHeight += elementHeight;
+      }
+    });
 
   const hasNonEmptyContent =
     currentPage.length > 0 && !currentPage.every(isEmptyContent);
@@ -58,7 +76,10 @@ export function parsePost({
     pages.push(currentPage);
   }
 
-  return { pages, headingPageMapping: { headingToPage, pageToHeading } };
+  return {
+    pages,
+    headingPageMapping: { headingIdToPage, pageToHeadings },
+  };
 }
 
 function getElementHeight(element: Element) {
