@@ -1,14 +1,15 @@
 'use client';
 
+import { Page } from '@/features/postViewer/domain/types/page';
 import { getUtterance } from '@/lib/tts';
-import { RefObject, useCallback, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
 export default function useTTSPlayer({
-  postViewerContentRef,
+  page,
   onFinishElement,
   onFinishPage,
 }: {
-  postViewerContentRef: RefObject<HTMLDivElement | null>;
+  page: Page | null;
   onFinishElement: (nextElementIndex: number) => void;
   onFinishPage: () => void;
 }) {
@@ -16,22 +17,20 @@ export default function useTTSPlayer({
 
   const startReading = useCallback(
     (elementIndex: number) => {
+      if (!page) return;
+
       if (isPaused.current) {
         speechSynthesis.resume();
         isPaused.current = false;
         return;
       }
 
-      const content = postViewerContentRef.current;
-      if (!content) return;
-
-      const currentPageElements = content.children;
-      if (elementIndex >= currentPageElements.length) {
+      if (elementIndex >= page.length) {
         onFinishPage();
         return;
       }
 
-      const element = currentPageElements[elementIndex];
+      const element = page[elementIndex];
 
       document
         .querySelectorAll('.reading-highlight')
@@ -45,7 +44,7 @@ export default function useTTSPlayer({
       speechSynthesis.cancel();
       speechSynthesis.speak(utterance);
     },
-    [onFinishElement, onFinishPage, postViewerContentRef]
+    [onFinishElement, onFinishPage, page]
   );
 
   const pauseReading = useCallback(() => {

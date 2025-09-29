@@ -6,6 +6,7 @@ import { toProps } from '@/features/postViewer/domain/model/postViewer';
 import { useControlBarAutoHide } from '@/features/postViewer/hooks/useControlBarAutoHide';
 import { useFullscreen } from '@/features/postViewer/hooks/useFullscreen';
 import { useFullscreenScale } from '@/features/postViewer/hooks/useFullscreenScale';
+import usePostParsing from '@/features/postViewer/hooks/usePostParsing';
 import { useViewerNavigation } from '@/features/postViewer/hooks/useViewerNavigation';
 import { RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
@@ -19,19 +20,26 @@ export default function PostViewer() {
   const postViewerRef = useRef<HTMLDivElement | null>(null);
   const postViewerContentRef = useRef<HTMLDivElement | null>(null);
 
+  const { page } = usePostParsing();
+
   useFullscreenScale();
   useFullscreen(postViewerRef);
   useViewerNavigation(postViewerContentRef);
   useControlBarAutoHide();
 
   return (
-    <div
-      ref={postViewerRef}
-      className={clsx('bg-white flex flex-col', !isViewerMode && 'hidden')}
-    >
-      <PostViewerContent postViewerContentRef={postViewerContentRef} />
-      <PostViewerControlBar postViewerContentRef={postViewerContentRef} />
+    <>
       <Toaster toasterId='post-viewer' />
-    </div>
+      <div
+        ref={postViewerRef}
+        className={clsx('bg-white flex flex-col', !isViewerMode && 'hidden')}
+      >
+        <PostViewerContent
+          page={page}
+          postViewerContentRef={postViewerContentRef}
+        />
+        <PostViewerControlBar page={page} />
+      </div>
+    </>
   );
 }

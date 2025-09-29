@@ -6,16 +6,13 @@ import ExitFullscreenButton from '@/components/postViewer/exitFullscreenButton';
 import PageIndicatorSection from '@/components/postViewer/pageIndicatorSection';
 import TTSSection from '@/components/postViewer/ttsSection';
 import { toProps as toPostViewerProps } from '@/features/postViewer/domain/model/postViewer';
+import { Page } from '@/features/postViewer/domain/types/page';
 import { RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
-import { RefObject, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
-export default function PostViewerControlBar({
-  postViewerContentRef,
-}: {
-  postViewerContentRef: RefObject<HTMLDivElement | null>;
-}) {
+export default function PostViewerControlBar({ page }: { page: Page | null }) {
   const postViewer = useSelector((state: RootState) => state.postViewer);
 
   const { isControlBarVisible } = useMemo(
@@ -36,7 +33,7 @@ export default function PostViewerControlBar({
       <div className='flex w-full py-3 px-10 justify-between items-center'>
         <div className='flex items-center gap-2'>
           <PageIndicatorSection />
-          <TTSSection postViewerContentRef={postViewerContentRef} />
+          <TTSSection page={page} />
           <AutoAdvanceSection />
         </div>
 

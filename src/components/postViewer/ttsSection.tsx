@@ -1,20 +1,17 @@
 'use client';
 
 import TooltipItem from '@/components/tooltipItem';
+import { Page } from '@/features/postViewer/domain/types/page';
 import useTTSPlayer from '@/features/postViewer/hooks/useTTSPlayer';
 import useTTSState from '@/features/postViewer/hooks/useTTSState';
 import { nextPage } from '@/lib/redux/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { Headphones, Pause, Play } from 'lucide-react';
-import { RefObject, useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function TTSSection({
-  postViewerContentRef,
-}: {
-  postViewerContentRef: RefObject<HTMLDivElement | null>;
-}) {
+export default function TTSSection({ page }: { page: Page | null }) {
   const dispatch = useDispatch<AppDispatch>();
 
   const { ttsProps, toggleIsEnabled, toggleIsPlaying, increaseElementIndex } =
@@ -23,7 +20,7 @@ export default function TTSSection({
   const onFinishPage = useCallback(() => dispatch(nextPage()), [dispatch]);
 
   const { startReading, pauseReading, stopReading } = useTTSPlayer({
-    postViewerContentRef,
+    page,
     onFinishElement: increaseElementIndex,
     onFinishPage,
   });
@@ -33,7 +30,7 @@ export default function TTSSection({
     else if (ttsProps.mode === 'enabled' && ttsProps.isPlaying)
       startReading(ttsProps.elementIndex);
     else if (ttsProps.mode === 'enabled' && !ttsProps.isPlaying) pauseReading();
-  }, [postViewerContentRef, pauseReading, startReading, stopReading, ttsProps]);
+  }, [pauseReading, startReading, stopReading, ttsProps]);
 
   return (
     <div className='flex items-center gap-2'>

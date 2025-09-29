@@ -1,15 +1,21 @@
 'use client';
 
-import usePage from '@/features/postViewer/hooks/usePage';
+import { toProps } from '@/features/postViewer/domain/model/postViewer';
+import { Page } from '@/features/postViewer/domain/types/page';
+import { RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
-import { RefObject, useEffect } from 'react';
+import { RefObject, useEffect, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 
 export default function PostViewerContent({
+  page,
   postViewerContentRef,
 }: {
+  page: Page | null;
   postViewerContentRef: RefObject<HTMLDivElement | null>;
 }) {
-  const { page, fullscreenScale } = usePage();
+  const postViewer = useSelector((state: RootState) => state.postViewer);
+  const { fullscreenScale } = useMemo(() => toProps(postViewer), [postViewer]);
 
   useEffect(() => {
     const content = postViewerContentRef.current;

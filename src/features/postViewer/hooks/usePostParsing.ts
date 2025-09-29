@@ -8,13 +8,16 @@ import { AppDispatch, RootState } from '@/lib/redux/store';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-export default function usePostParsing(fullscreenScale: number) {
+export default function usePostParsing() {
   const dispatch = useDispatch<AppDispatch>();
   const postViewer = useSelector((state: RootState) => state.postViewer);
 
   const [pages, setPages] = useState<Page[] | null>(null);
 
-  const { pageNumber } = useMemo(() => toProps(postViewer), [postViewer]);
+  const { pageNumber, fullscreenScale } = useMemo(
+    () => toProps(postViewer),
+    [postViewer]
+  );
   const page = useMemo(() => {
     if (!pages || !pageNumber) return null;
     return pages[pageNumber - 1];
