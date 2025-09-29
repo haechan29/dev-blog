@@ -1,3 +1,4 @@
+import { HeadingPageMap } from '@/features/postViewer/domain/types/headingPageMap';
 import { Page } from '@/features/postViewer/domain/types/page';
 
 export function parsePostIntoPages({
@@ -8,12 +9,19 @@ export function parsePostIntoPages({
   postContainer: Element;
   pageHeight: number;
   excludeClassNames?: string[];
-}): Page[] {
+}): {
+  pages: Page[];
+  headingPageMap: HeadingPageMap;
+} {
   const pages: Page[] = [];
+  const headingPageMap: HeadingPageMap = {};
   let currentPage: Page = [];
   let currentHeight = 0;
 
-  for (const child of postContainer.children) {
+  const children = postContainer.children;
+
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i];
     const isFiltered = excludeClassNames.some(className =>
       child.className.includes(className)
     );
@@ -24,6 +32,10 @@ export function parsePostIntoPages({
     const isHeadingElement = child.matches('h1, h2, h3, h4, h5, h6');
     const hasNonEmptyContent =
       currentPage.length > 0 && !currentPage.every(isEmptyContent);
+
+    if (isHeadingElement) {
+      headingPageMap[child.id] = i;
+    }
 
     // create new page if current page would overflow or hit heading
     if ((exceedsPageHeight || isHeadingElement) && hasNonEmptyContent) {
@@ -45,7 +57,7 @@ export function parsePostIntoPages({
     pages.push(currentPage);
   }
 
-  return pages;
+  return { pages, headingPageMap };
 }
 
 function getElementHeight(element: Element) {

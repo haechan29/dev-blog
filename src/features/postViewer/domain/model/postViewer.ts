@@ -1,3 +1,4 @@
+import { HeadingPageMap } from '@/features/postViewer/domain/types/headingPageMap';
 import { Paing } from '@/features/postViewer/domain/types/paging';
 import PostViewerProps from '@/features/postViewer/ui/postViewerProps';
 
@@ -8,6 +9,7 @@ export interface PostViewer {
   paging: Paing | null;
   advanceMode: 'tts' | 'auto' | null;
   fullscreenScale: number;
+  headingPageMap?: HeadingPageMap;
 }
 
 export function toProps(postViewer: PostViewer): PostViewerProps {
@@ -19,5 +21,6 @@ export function toProps(postViewer: PostViewer): PostViewerProps {
     totalPages: postViewer.paging ? postViewer.paging.total + 1 : null,
     advanceMode: postViewer.advanceMode,
     fullscreenScale: postViewer.fullscreenScale,
+    headingPageMap: postViewer.headingPageMap,
   };
 }

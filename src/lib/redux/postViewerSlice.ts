@@ -1,4 +1,5 @@
 import { PostViewer } from '@/features/postViewer/domain/model/postViewer';
+import { HeadingPageMap } from '@/features/postViewer/domain/types/headingPageMap';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: PostViewer = {
@@ -7,6 +8,7 @@ const initialState: PostViewer = {
   isControlBarVisible: true,
   paging: null,
   advanceMode: null,
+  fullscreenScale: 1.5,
 };
 
 const postViewerSlice = createSlice({
@@ -52,6 +54,9 @@ const postViewerSlice = createSlice({
     setFullscreenScale: (state, action: PayloadAction<number>) => {
       state.fullscreenScale = action.payload;
     },
+    setHeadingPageMap: (state, action: PayloadAction<HeadingPageMap>) => {
+      state.headingPageMap = action.payload;
+    },
   },
 });
 
@@ -66,4 +71,5 @@ export const {
   setPaging,
   setAdvanceMode,
   setFullscreenScale,
+  setHeadingPageMap,
 } = postViewerSlice.actions;

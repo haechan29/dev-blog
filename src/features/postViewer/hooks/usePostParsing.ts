@@ -3,39 +3,36 @@
 import { parsePostIntoPages } from '@/features/postViewer/domain/lib/parse';
 import { toProps } from '@/features/postViewer/domain/model/postViewer';
 import { Page } from '@/features/postViewer/domain/types/page';
-import { setPaging } from '@/lib/redux/postViewerSlice';
+import { setHeadingPageMap, setPaging } from '@/lib/redux/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-export default function usePage() {
+export default function usePostParsing(fullscreenScale: number) {
   const dispatch = useDispatch<AppDispatch>();
   const postViewer = useSelector((state: RootState) => state.postViewer);
 
   const [pages, setPages] = useState<Page[] | null>(null);
 
-  const { pageNumber, fullscreenScale } = useMemo(
-    () => toProps(postViewer),
-    [postViewer]
-  );
-  const page = useMemo(
-    () =>
-      pages !== null && pageNumber !== null ? pages[pageNumber - 1] : null,
-    [pageNumber, pages]
-  );
+  const { pageNumber } = useMemo(() => toProps(postViewer), [postViewer]);
+  const page = useMemo(() => {
+    if (!pages || !pageNumber) return null;
+    return pages[pageNumber - 1];
+  }, [pageNumber, pages]);
 
   const parsePost = useCallback(() => {
     const postContainer = document.querySelector('.post-content');
     if (!postContainer) return;
 
     const pageHeight = (window.screen.height - 80) / fullscreenScale;
-    const pages = parsePostIntoPages({
+    const { pages, headingPageMap } = parsePostIntoPages({
       postContainer,
       pageHeight,
       excludeClassNames: ['hide-fullscreen'],
     });
 
     dispatch(setPaging({ index: 0, total: pages.length }));
+    dispatch(setHeadingPageMap(headingPageMap));
     setPages(pages);
   }, [dispatch, fullscreenScale]);
 
@@ -44,5 +41,5 @@ export default function usePage() {
     return () => clearTimeout(timer);
   }, [parsePost]);
 
-  return { page, fullscreenScale } as const;
+  return { page } as const;
 }
