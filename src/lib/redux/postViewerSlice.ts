@@ -6,6 +6,7 @@ const initialState: PostViewer = {
   isCommentSectionVisible: false,
   isViewerMode: false,
   areBarsVisible: true,
+  isToolbarExpanded: false,
   paging: null,
   advanceMode: null,
   fullscreenScale: 1.5,
@@ -23,6 +24,9 @@ const postViewerSlice = createSlice({
     },
     setAreBarsVisible: (state, action: PayloadAction<boolean>) => {
       state.areBarsVisible = action.payload;
+    },
+    setIsToolbarExpanded: (state, action: PayloadAction<boolean>) => {
+      state.isToolbarExpanded = action.payload;
     },
     setPageIndex: (state, action: PayloadAction<number>) => {
       state.paging = {
@@ -68,6 +72,7 @@ export const {
   setIsCommentSectionVisible,
   setIsViewerMode,
   setAreBarsVisible,
+  setIsToolbarExpanded,
   setPageIndex,
   nextPage,
   previousPage,

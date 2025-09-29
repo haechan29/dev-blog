@@ -6,6 +6,7 @@ export interface PostViewer {
   isCommentSectionVisible: boolean;
   isViewerMode: boolean;
   areBarsVisible: boolean;
+  isToolbarExpanded: boolean;
   paging: Paing | null;
   advanceMode: 'tts' | 'auto' | null;
   fullscreenScale: number;
@@ -17,6 +18,7 @@ export function toProps(postViewer: PostViewer): PostViewerProps {
     isButtonVisible: !postViewer.isCommentSectionVisible,
     isViewerMode: postViewer.isViewerMode,
     areBarsVisible: postViewer.areBarsVisible,
+    isToolbarExpanded: postViewer.isToolbarExpanded,
     pageNumber: postViewer.paging ? postViewer.paging.index + 1 : null,
     totalPages: postViewer.paging ? postViewer.paging.total + 1 : null,
     advanceMode: postViewer.advanceMode,
