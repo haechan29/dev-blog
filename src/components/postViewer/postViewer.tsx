@@ -95,6 +95,28 @@ export default function PostViewer() {
     [handleNavigation]
   );
 
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (
+        // don't handle keydown on input and text area
+        event.target instanceof HTMLInputElement ||
+        event.target instanceof HTMLTextAreaElement
+      ) {
+        return;
+      }
+
+      if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
+        dispatch(previousPage());
+      } else if (
+        event.key === 'ArrowRight' ||
+        event.key.toLowerCase() === 'd'
+      ) {
+        dispatch(nextPage());
+      }
+    },
+    [dispatch]
+  );
+
   useEffect(() => {
     if (typeof document === 'undefined' || !postViewerRef.current) return;
 
@@ -117,12 +139,14 @@ export default function PostViewer() {
     if (isViewerMode) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('wheel', handleScroll);
+      document.addEventListener('keydown', handleKeyDown);
     }
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('wheel', handleScroll);
+      document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [handleMouseMove, handleScroll, isViewerMode]);
+  }, [handleKeyDown, handleMouseMove, handleScroll, isViewerMode]);
 
   return (
     <div
