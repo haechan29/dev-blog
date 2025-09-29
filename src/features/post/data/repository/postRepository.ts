@@ -19,7 +19,7 @@ async function fetchPostBySlugInner(slug: string): Promise<PostDto> {
   };
 }
 
-async function fetchAllPosts(): Promise<PostDto[]> {
+export async function fetchAllPosts(): Promise<PostDto[]> {
   const files = await readdir(postsDirectory);
 
   const posts = await Promise.all(
