@@ -16,7 +16,7 @@ export const useControlBarAutoHide = () => {
   const debounce = useDebounce();
   const throttle = useThrottle();
 
-  const handleMouseMove = useCallback(() => {
+  const showControlBarAndHide = useCallback(() => {
     throttle(() => {
       dispatch(setIsControlBarVisible(true));
       debounce(() => dispatch(setIsControlBarVisible(false)), 3000);
@@ -25,10 +25,18 @@ export const useControlBarAutoHide = () => {
 
   useEffect(() => {
     if (isViewerMode) {
-      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('keydown', showControlBarAndHide);
+      document.addEventListener('mousemove', showControlBarAndHide);
+      document.addEventListener('wheel', showControlBarAndHide);
+      document.addEventListener('click', showControlBarAndHide);
+      document.addEventListener('touchend', showControlBarAndHide);
     }
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('keydown', showControlBarAndHide);
+      document.removeEventListener('mousemove', showControlBarAndHide);
+      document.removeEventListener('wheel', showControlBarAndHide);
+      document.removeEventListener('click', showControlBarAndHide);
+      document.removeEventListener('touchend', showControlBarAndHide);
     };
-  }, [handleMouseMove, isViewerMode]);
+  }, [showControlBarAndHide, isViewerMode]);
 };
