@@ -34,22 +34,21 @@ export default function PostViewer({
   useBarsAutoHide();
 
   return (
-    <>
+    <div
+      ref={postViewerRef}
+      className={clsx(
+        'bg-white flex flex-col w-screen h-screen',
+        !isViewerMode && 'hidden'
+      )}
+    >
       <Toaster toasterId='post-viewer' />
-      <div
-        ref={postViewerRef}
-        className={clsx(
-          'bg-white flex flex-col w-screen',
-          !isViewerMode && 'hidden'
-        )}
-      >
-        <PostViewerToolbar {...postProps} />
-        <PostViewerContent
-          page={page}
-          postViewerContentRef={postViewerContentRef}
-        />
-        <PostViewerControlBar page={page} />
-      </div>
-    </>
+
+      <PostViewerToolbar {...postProps} />
+      <PostViewerContent
+        page={page}
+        postViewerContentRef={postViewerContentRef}
+      />
+      <PostViewerControlBar page={page} />
+    </div>
   );
 }
