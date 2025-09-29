@@ -2,10 +2,8 @@
 
 import PostInfoItem from '@/components/post/postInfoItem';
 import { PostItemProps } from '@/features/post/ui/postItemProps';
-import useIsMobile from '@/hooks/useIsMobile';
 import clsx from 'clsx';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
 
 export default function PostPreviewItem({
   tag,
@@ -14,59 +12,14 @@ export default function PostPreviewItem({
   tag: string | null;
   post: PostItemProps;
 }) {
-  const [isTextAreaExpanded, setIsTextAreaExpanded] = useState(false);
-  const timerRef = useRef<number | undefined>(undefined);
-  const isMobile = useIsMobile();
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-    };
-  }, []);
-
-  const onMouseEnter = () => {
-    if (isMobile) return;
-
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-    }
-    timerRef.current = window.setTimeout(() => {
-      setIsTextAreaExpanded(true);
-    }, 500);
-  };
-
-  const onMouseLeave = () => {
-    if (isMobile) return;
-
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = undefined;
-    }
-    setIsTextAreaExpanded(false);
-  };
-
   return (
     <div className={clsx('w-full py-8 border-b border-b-gray-200')}>
-      <Link
-        href={`/posts/${post.slug}${tag ? `?tag=${tag}` : ''}`}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-      >
+      <Link href={`/posts/${post.slug}${tag ? `?tag=${tag}` : ''}`}>
         <div className='text-2xl font-semibold text-gray-900 mb-4 line-clamp-2'>
           {post.title}
         </div>
 
-        <div
-          className={clsx(
-            'mb-4 overflow-hidden break-keep transition-discrete duration-500 leading-6',
-            'bg-gradient-to-b from-black via-black bg-clip-text text-transparent',
-            isTextAreaExpanded
-              ? 'max-h-[432px] to-white'
-              : 'max-h-[72px] to-black'
-          )}
-        >
+        <div className='mb-4 break-keep leading-6 line-clamp-3'>
           {post.plainText}
         </div>
       </Link>
