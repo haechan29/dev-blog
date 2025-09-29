@@ -80,7 +80,7 @@ export default function IntroductionItem({
                   ease: 'easeOut',
                 }}
                 key={item.description}
-                className='relative basis-[380px] z-10'
+                className='relative basis-[380px] z-50'
               >
                 <div className='w-8 h-8 border-4 border-gray-300 bg-white rounded-full ml-4 mb-4' />
                 <div className='text-lg text-gray-500 ml-4 mb-1'>

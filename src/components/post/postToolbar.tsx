@@ -85,7 +85,9 @@ export default function PostToolbar() {
                     : 'opacity-100'
                 )}
               >
-                {postToolbarProps.mode === 'basic' && (
+                {((postToolbarProps.mode === 'minimal' &&
+                  postToolbarProps.title !== null) ||
+                  postToolbarProps.mode === 'basic') && (
                   <div className='font-semibold h-6 truncate'>
                     {postToolbarProps.title}
                   </div>

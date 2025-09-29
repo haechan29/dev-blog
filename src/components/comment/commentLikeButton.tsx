@@ -7,6 +7,7 @@ import useThrottle from '@/hooks/useThrottle';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Heart } from 'lucide-react';
+import { useCallback } from 'react';
 
 export default function CommentLikeButton({
   comment,
@@ -18,7 +19,7 @@ export default function CommentLikeButton({
     `comment-like-${comment.id}`,
     false
   );
-  const [throttle500Ms] = useThrottle(500);
+  const throttle = useThrottle();
 
   const incrementLikeCount = useMutation({
     mutationFn: () =>
@@ -106,22 +107,21 @@ export default function CommentLikeButton({
     },
   });
 
+  const toggleIsLiked = useCallback(() => {
+    throttle(() => {
+      if (isLiked) {
+        decrementLikeCount.mutate();
+        setIsLiked(false);
+      } else {
+        incrementLikeCount.mutate();
+        setIsLiked(true);
+      }
+    }, 500);
+  }, [decrementLikeCount, incrementLikeCount, isLiked, setIsLiked, throttle]);
+
   return (
     <div className='flex items-center space-x-4'>
-      <button
-        onClick={() => {
-          throttle500Ms(() => {
-            if (isLiked) {
-              decrementLikeCount.mutate();
-              setIsLiked(false);
-            } else {
-              incrementLikeCount.mutate();
-              setIsLiked(true);
-            }
-          });
-        }}
-        className='flex items-center space-x-1'
-      >
+      <button onClick={toggleIsLiked} className='flex items-center space-x-1'>
         <Heart
           size={16}
           className={clsx(

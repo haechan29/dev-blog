@@ -169,11 +169,11 @@ export default function PostSidebar({ posts }: { posts: PostItemProps[] }) {
         const deltaY = currentY - start.current[1];
         scrollDirection.current =
           Math.abs(deltaX) > Math.abs(deltaY) ? 'horizontal' : 'vertical';
+        e.preventDefault();
+        document.body.style.overflow = 'hidden';
       }
 
       if (scrollDirection.current === 'horizontal') {
-        e.preventDefault();
-        document.body.style.overflow = 'hidden';
         const translateX = Math.min(currentX - start.current[0], 0);
         sidebar.style.transform = `translateX(${translateX}px)`;
       }
@@ -218,11 +218,11 @@ export default function PostSidebar({ posts }: { posts: PostItemProps[] }) {
     <div
       ref={sidebarRef}
       className={clsx(
-        'fixed left-0 top-0 bottom-0 w-72 transition-transform duration-300 ease-in-out',
+        'fixed z-50 left-0 top-0 bottom-0 w-72 transition-transform duration-300 ease-in-out',
         !isVisible && '-translate-x-full'
       )}
     >
-      <div className='flex flex-col w-full min-w-0 h-dvh bg-gray-50/50 backdrop-blur-md border-r border-r-gray-50'>
+      <div className='flex flex-col w-full min-w-0 h-dvh bg-[#fafbfc] border-r border-r-gray-50'>
         <div className='flex w-full min-w-0 px-6 py-9'>
           <Link
             onClick={() => dispatch(setIsVisible(false))}

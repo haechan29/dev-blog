@@ -12,7 +12,7 @@ export default function TableOfContentsItem({
   headings: Heading[];
 }) {
   const [activeId, setActiveId] = useState<string>('');
-  const [throttle100Ms] = useThrottle(100);
+  const throttle = useThrottle();
   const isLargerThanXl = useMediaQuery('(min-width: 1280px)');
 
   const getActiveHeading = useCallback(() => {
@@ -59,13 +59,13 @@ export default function TableOfContentsItem({
 
     checkActiveHeading();
 
-    const throttledCheck = () => throttle100Ms(checkActiveHeading);
+    const throttledCheck = () => throttle(checkActiveHeading, 100);
     window.addEventListener('scroll', throttledCheck);
 
     return () => {
       window.removeEventListener('scroll', throttledCheck);
     };
-  }, [isLargerThanXl, headings, getActiveHeading, throttle100Ms]);
+  }, [isLargerThanXl, headings, getActiveHeading, throttle]);
 
   const handleClick = (id: string) => {
     const element = document.getElementById(id);

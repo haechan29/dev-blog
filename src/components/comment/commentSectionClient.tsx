@@ -2,11 +2,15 @@
 
 import CommentFormItem from '@/components/comment/commentFormItem';
 import CommentItem from '@/components/comment/commentItem';
+import CommentSectionDetector from '@/components/comment/commentSectionDetector';
 import { getComments } from '@/features/comment/domain/service/commentService';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { MessageCircle } from 'lucide-react';
+import { useRef } from 'react';
 
 export default function CommentSectionClient({ slug }: { slug: string }) {
+  const commentSectionRef = useRef<HTMLDivElement | null>(null);
+
   const { data: comments } = useSuspenseQuery({
     queryKey: ['posts', slug, 'comments'],
     queryFn: async () => {
@@ -16,7 +20,9 @@ export default function CommentSectionClient({ slug }: { slug: string }) {
   });
 
   return (
-    <section>
+    <div ref={commentSectionRef}>
+      <CommentSectionDetector commentSectionRef={commentSectionRef} />
+
       <div className='text-xl font-bold text-gray-900 mb-8'>
         댓글 {comments.length}개
       </div>
@@ -34,6 +40,6 @@ export default function CommentSectionClient({ slug }: { slug: string }) {
           ))
         )}
       </div>
-    </section>
+    </div>
   );
 }

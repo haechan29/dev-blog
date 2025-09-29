@@ -15,7 +15,7 @@ export default function ActiveHeadingDetector({
 }) {
   const dispatch = useDispatch<AppDispatch>();
 
-  const [throttle100Ms] = useThrottle(100);
+  const throttle = useThrottle();
   const isLargerThanXl = useMediaQuery('(min-width: 1280px)');
 
   const getTargetHeading = useCallback(() => {
@@ -57,13 +57,13 @@ export default function ActiveHeadingDetector({
     if (isLargerThanXl) return;
 
     updateHeadings();
-    const throttledUpdate = () => throttle100Ms(updateHeadings);
+    const throttledUpdate = () => throttle(updateHeadings, 100);
     window.addEventListener('scroll', throttledUpdate);
 
     return () => {
       window.removeEventListener('scroll', throttledUpdate);
     };
-  }, [isLargerThanXl, throttle100Ms, updateHeadings]);
+  }, [isLargerThanXl, throttle, updateHeadings]);
 
   return <></>;
 }

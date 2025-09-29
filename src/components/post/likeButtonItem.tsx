@@ -7,7 +7,7 @@ import useThrottle from '@/hooks/useThrottle';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Heart } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 export default function LikeButtonItem({
   postId,
@@ -17,7 +17,7 @@ export default function LikeButtonItem({
   className?: string;
 }) {
   const [heartFilled, setHeartFilled] = useState(false);
-  const [throttledCall] = useThrottle(1000);
+  const throttle = useThrottle();
 
   const queryClient = useQueryClient();
 
@@ -60,18 +60,18 @@ export default function LikeButtonItem({
     },
   });
 
-  const handleClick = () => {
-    throttledCall(() => {
+  const handleClick = useCallback(() => {
+    throttle(() => {
       setHeartFilled(true);
       incrementLikeCount.mutate();
-    });
-  };
+    }, 1000);
+  }, [incrementLikeCount, throttle]);
 
-  const handleFillingHeart = () => {
+  const handleFillingHeart = useCallback(() => {
     if (heartFilled) {
       setTimeout(() => setHeartFilled(false), 300);
     }
-  };
+  }, [heartFilled]);
 
   return (
     <div className={className}>

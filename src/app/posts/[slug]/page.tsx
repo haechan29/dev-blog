@@ -1,10 +1,13 @@
 import CommentSection from '@/components/comment/commentSection';
+import ContentSectionDetector from '@/components/post/contentSectionDetector';
 import LikeButtonItem from '@/components/post/likeButtonItem';
 import PostContentSection from '@/components/post/postContentSection';
 import PostDispatcher from '@/components/post/postDispatcher';
 import PostHeaderSection from '@/components/post/postHeaderSection';
 import PostViewTracker from '@/components/post/postViewTracker';
 import TableOfContentsItem from '@/components/post/tableOfContentsItem';
+import PostViewer from '@/components/postViewer/postViewer';
+import PostViewerModeButton from '@/components/postViewer/postViewerModeButton';
 import { Post } from '@/features/post/domain/model/post';
 import { fetchPostBySlug } from '@/features/post/domain/service/postService';
 import { Suspense } from 'react';
@@ -26,6 +29,11 @@ export default async function PostPage({
           <PostDispatcher post={postProps} />
         </Suspense>
         <PostViewTracker postId={postProps.slug} />
+        <ContentSectionDetector />
+
+        <PostViewerModeButton />
+
+        <PostViewer postProps={postProps} />
 
         <PostHeaderSection post={postProps} className='mb-10' />
         <div className='w-full h-[1px] bg-gray-200 mb-10' />
@@ -39,7 +47,7 @@ export default async function PostPage({
           </section>
         )}
 
-        <PostContentSection post={postProps} className='prose mb-20' />
+        <PostContentSection content={postProps.content} />
 
         <LikeButtonItem
           postId={post.slug}

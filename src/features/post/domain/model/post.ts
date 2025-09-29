@@ -1,5 +1,8 @@
+import {
+  extractHeadings,
+  extractPlainText,
+} from '@/features/post/domain/lib/parse';
 import { PostItemProps } from '@/features/post/ui/postItemProps';
-import { extractHeadings, extractPlainText } from '@/lib/posts';
 
 export type Heading = {
   id: string;
