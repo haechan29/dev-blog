@@ -3,7 +3,6 @@
 import { parsePostIntoPages } from '@/features/postViewer/domain/lib/parse';
 import { toProps } from '@/features/postViewer/domain/model/postViewer';
 import { Page } from '@/features/postViewer/domain/types/page';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { setPaging } from '@/lib/redux/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -15,16 +14,14 @@ export default function usePage() {
 
   const [pages, setPages] = useState<Page[] | null>(null);
 
-  const { pageNumber } = useMemo(() => toProps(postViewer), [postViewer]);
+  const { pageNumber, fullscreenScale } = useMemo(
+    () => toProps(postViewer),
+    [postViewer]
+  );
   const page = useMemo(
     () =>
       pages !== null && pageNumber !== null ? pages[pageNumber - 1] : null,
     [pageNumber, pages]
-  );
-
-  const [fullscreenScale, setFullscreenScale] = useLocalStorage(
-    'fullscreen-scale',
-    1.5
   );
 
   const parsePost = useCallback(() => {

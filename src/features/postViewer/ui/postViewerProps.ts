@@ -5,4 +5,5 @@ export default interface PostViewerProps {
   pageNumber: number | null;
   totalPages: number | null;
   advanceMode: 'tts' | 'auto' | null;
+  fullscreenScale: number;
 }

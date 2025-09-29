@@ -5,6 +5,7 @@ import PostViewerControlBar from '@/components/postViewer/postViewerControlBar';
 import { toProps } from '@/features/postViewer/domain/model/postViewer';
 import { useControlBarAutoHide } from '@/features/postViewer/hooks/useControlBarAutoHide';
 import { useFullscreen } from '@/features/postViewer/hooks/useFullscreen';
+import { useFullscreenScale } from '@/features/postViewer/hooks/useFullscreenScale';
 import { useViewerNavigation } from '@/features/postViewer/hooks/useViewerNavigation';
 import { RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
@@ -18,6 +19,7 @@ export default function PostViewer() {
   const postViewerRef = useRef<HTMLDivElement | null>(null);
   const postViewerContentRef = useRef<HTMLDivElement | null>(null);
 
+  useFullscreenScale();
   useFullscreen(postViewerRef);
   useViewerNavigation(postViewerContentRef);
   useControlBarAutoHide();

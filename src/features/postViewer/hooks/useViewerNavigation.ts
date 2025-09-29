@@ -56,7 +56,11 @@ export const useViewerNavigation = (
   );
 
   const handleNavigation = useCallback(
-    (clientX: number, clientWidth: number) => {
+    ({ clientX }: { clientX: number }) => {
+      const content = contentRef.current;
+      if (!content) return null;
+
+      const clientWidth = content.getBoundingClientRect().width;
       const [isLeftSideClicked, isRightSideClicked] = [
         clientX < clientWidth / 2,
         clientX > clientWidth / 2,
@@ -68,27 +72,21 @@ export const useViewerNavigation = (
         dispatch(nextPage());
       }
     },
-    [dispatch]
+    [contentRef, dispatch]
   );
 
   const handleClick = useCallback(
     (event: MouseEvent) => {
       if ('ontouchstart' in window) return; // block event handling on mobile
 
-      const { clientX } = event;
-      const { clientWidth } = event.currentTarget as HTMLElement;
-
-      handleNavigation(clientX, clientWidth);
+      handleNavigation(event);
     },
     [handleNavigation]
   );
 
   const handleTouch = useCallback(
     (event: TouchEvent) => {
-      const { clientX } = event.changedTouches[0];
-      const { clientWidth } = event.currentTarget as HTMLElement;
-
-      handleNavigation(clientX, clientWidth);
+      handleNavigation(event.changedTouches[0]);
     },
     [handleNavigation]
   );

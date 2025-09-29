@@ -7,6 +7,7 @@ export interface PostViewer {
   isControlBarVisible: boolean;
   paging: Paing | null;
   advanceMode: 'tts' | 'auto' | null;
+  fullscreenScale: number;
 }
 
 export function toProps(postViewer: PostViewer): PostViewerProps {
@@ -17,5 +18,6 @@ export function toProps(postViewer: PostViewer): PostViewerProps {
     pageNumber: postViewer.paging ? postViewer.paging.index + 1 : null,
     totalPages: postViewer.paging ? postViewer.paging.total + 1 : null,
     advanceMode: postViewer.advanceMode,
+    fullscreenScale: postViewer.fullscreenScale,
   };
 }

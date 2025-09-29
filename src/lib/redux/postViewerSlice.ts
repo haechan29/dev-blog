@@ -49,6 +49,9 @@ const postViewerSlice = createSlice({
     ) => {
       state.advanceMode = action.payload;
     },
+    setFullscreenScale: (state, action: PayloadAction<number>) => {
+      state.fullscreenScale = action.payload;
+    },
   },
 });
 
@@ -62,4 +65,5 @@ export const {
   previousPage,
   setPaging,
   setAdvanceMode,
+  setFullscreenScale,
 } = postViewerSlice.actions;
