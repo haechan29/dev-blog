@@ -3,11 +3,10 @@
 import PostViewerContent from '@/components/postViewer/postViewerContent';
 import PostViewerControlBar from '@/components/postViewer/postViewerControlBar';
 import { toProps } from '@/features/postViewer/domain/model/postViewer';
+import { useViewerNavigation } from '@/features/postViewer/hooks/useViewerNavigation';
 import useDebounce from '@/hooks/useDebounce';
 import useThrottle from '@/hooks/useThrottle';
 import {
-  nextPage,
-  previousPage,
   setIsControlBarVisible,
   setIsViewerMode,
 } from '@/lib/redux/postViewerSlice';
@@ -27,6 +26,8 @@ export default function PostViewer() {
   const debounce = useDebounce();
   const throttle = useThrottle();
 
+  useViewerNavigation(postViewerContentRef);
+
   const handleFullscreenChange = useCallback(() => {
     if (!document.fullscreenElement && isViewerMode) {
       dispatch(setIsViewerMode(false));
@@ -39,83 +40,6 @@ export default function PostViewer() {
       debounce(() => dispatch(setIsControlBarVisible(false)), 3000);
     }, 100);
   }, [debounce, dispatch, throttle]);
-
-  const handleScroll = useCallback(
-    (event: WheelEvent) => {
-      throttle(() => {
-        const [isScrolledUp, isScrolledDown] = [
-          event.deltaY > 0,
-          event.deltaY < 0,
-        ];
-        if (isScrolledUp) {
-          dispatch(nextPage());
-        } else if (isScrolledDown) {
-          dispatch(previousPage());
-        }
-      }, 100);
-    },
-    [dispatch, throttle]
-  );
-
-  const handleNavigation = useCallback(
-    (clientX: number, clientWidth: number) => {
-      const [isLeftSideClicked, isRightSideClicked] = [
-        clientX < clientWidth / 2,
-        clientX > clientWidth / 2,
-      ];
-
-      if (isLeftSideClicked) {
-        dispatch(previousPage());
-      } else if (isRightSideClicked) {
-        dispatch(nextPage());
-      }
-    },
-    [dispatch]
-  );
-
-  const handleClick = useCallback(
-    (event: React.MouseEvent) => {
-      if ('ontouchstart' in window) return; // block event handling on mobile
-
-      const { clientX } = event;
-      const { clientWidth } = event.currentTarget;
-
-      handleNavigation(clientX, clientWidth);
-    },
-    [handleNavigation]
-  );
-
-  const handleTouch = useCallback(
-    (event: React.TouchEvent) => {
-      const { clientX } = event.changedTouches[0];
-      const { clientWidth } = event.currentTarget;
-
-      handleNavigation(clientX, clientWidth);
-    },
-    [handleNavigation]
-  );
-
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent) => {
-      if (
-        // don't handle keydown on input and text area
-        event.target instanceof HTMLInputElement ||
-        event.target instanceof HTMLTextAreaElement
-      ) {
-        return;
-      }
-
-      if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
-        dispatch(previousPage());
-      } else if (
-        event.key === 'ArrowRight' ||
-        event.key.toLowerCase() === 'd'
-      ) {
-        dispatch(nextPage());
-      }
-    },
-    [dispatch]
-  );
 
   useEffect(() => {
     if (typeof document === 'undefined' || !postViewerRef.current) return;
@@ -138,26 +62,18 @@ export default function PostViewer() {
   useEffect(() => {
     if (isViewerMode) {
       document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('wheel', handleScroll);
-      document.addEventListener('keydown', handleKeyDown);
     }
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('wheel', handleScroll);
-      document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [handleKeyDown, handleMouseMove, handleScroll, isViewerMode]);
+  }, [handleMouseMove, isViewerMode]);
 
   return (
     <div
       ref={postViewerRef}
       className={clsx('bg-white flex flex-col', !isViewerMode && 'hidden')}
     >
-      <PostViewerContent
-        postViewerContentRef={postViewerContentRef}
-        onContentClick={handleClick}
-        onContentTouch={handleTouch}
-      />
+      <PostViewerContent postViewerContentRef={postViewerContentRef} />
       <PostViewerControlBar postViewerContentRef={postViewerContentRef} />
       <Toaster toasterId='post-viewer' />
     </div>

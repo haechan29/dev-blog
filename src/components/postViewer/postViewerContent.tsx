@@ -6,12 +6,8 @@ import { RefObject, useEffect } from 'react';
 
 export default function PostViewerContent({
   postViewerContentRef,
-  onContentClick,
-  onContentTouch,
 }: {
   postViewerContentRef: RefObject<HTMLDivElement | null>;
-  onContentClick: (event: React.MouseEvent<HTMLElement>) => void;
-  onContentTouch: (event: React.TouchEvent<HTMLElement>) => void;
 }) {
   const { page, fullscreenScale } = usePage();
 
@@ -30,8 +26,6 @@ export default function PostViewerContent({
     page !== null && (
       <div
         ref={postViewerContentRef}
-        onClick={onContentClick}
-        onTouchEnd={onContentTouch}
         className={clsx(
           'prose fullscreen w-[calc(100vw/var(--fullscreen-scale))] h-[calc(100vh/var(--fullscreen-scale))]',
           'px-[calc(5rem/var(--fullscreen-scale))] py-[calc(5rem/var(--fullscreen-scale))] mx-auto',
