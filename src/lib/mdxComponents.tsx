@@ -11,7 +11,7 @@ const ExternalLink = ({ children, ...props }: { children: ReactNode }) => {
   );
 };
 
-export const compoenents = {
+export const components = {
   PostSummarySection,
   ToggleButtonItem,
   HideFullscreen,
