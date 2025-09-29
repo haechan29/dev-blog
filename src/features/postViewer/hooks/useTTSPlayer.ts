@@ -1,7 +1,7 @@
 'use client';
 
+import { getUtterance } from '@/features/postViewer/domain/lib/tts';
 import { Page } from '@/features/postViewer/domain/types/page';
-import { getUtterance } from '@/lib/tts';
 import { useCallback, useRef } from 'react';
 
 export default function useTTSPlayer({

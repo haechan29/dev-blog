@@ -23,14 +23,14 @@ export default function PostViewerControlBar({ page }: { page: Page | null }) {
   return (
     <div
       className={clsx(
-        'fixed bottom-0 left-0 right-0 flex flex-col bg-white/80 backdrop-blur-md',
+        'fixed bottom-0 left-0 right-0 z-50 flex flex-col bg-white/80 backdrop-blur-md px-10',
         'transition-transform|opacity duration-300 ease-in-out',
         !isControlBarVisible && 'translate-y-full opacity-0'
       )}
     >
       <ProgressSection />
 
-      <div className='flex w-full py-3 px-10 justify-between items-center'>
+      <div className='flex w-full mb-3 justify-between items-center'>
         <div className='flex items-center gap-2'>
           <PageIndicatorSection />
           <TTSSection page={page} />

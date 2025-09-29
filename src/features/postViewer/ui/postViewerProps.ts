@@ -1,4 +1,4 @@
-import { HeadingPageMap } from '@/features/postViewer/domain/types/headingPageMap';
+import { HeadingPageMapping } from '@/features/postViewer/domain/types/headingPageMapping';
 
 export default interface PostViewerProps {
   isButtonVisible: boolean;
@@ -8,5 +8,5 @@ export default interface PostViewerProps {
   totalPages: number | null;
   advanceMode: 'tts' | 'auto' | null;
   fullscreenScale: number;
-  headingPageMap?: HeadingPageMap;
+  headingPageMapping?: HeadingPageMapping;
 }

@@ -1,9 +1,9 @@
 'use client';
 
-import { parsePostIntoPages } from '@/features/postViewer/domain/lib/parse';
+import { parsePost as parsePostInner } from '@/features/postViewer/domain/lib/parse';
 import { toProps } from '@/features/postViewer/domain/model/postViewer';
 import { Page } from '@/features/postViewer/domain/types/page';
-import { setHeadingPageMap, setPaging } from '@/lib/redux/postViewerSlice';
+import { setHeadingPageMapping, setPaging } from '@/lib/redux/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -28,14 +28,14 @@ export default function usePostParsing() {
     if (!postContainer) return;
 
     const pageHeight = (window.screen.height - 80) / fullscreenScale;
-    const { pages, headingPageMap } = parsePostIntoPages({
+    const { pages, headingPageMapping } = parsePostInner({
       postContainer,
       pageHeight,
       excludeClassNames: ['hide-fullscreen'],
     });
 
     dispatch(setPaging({ index: 0, total: pages.length }));
-    dispatch(setHeadingPageMap(headingPageMap));
+    dispatch(setHeadingPageMapping(headingPageMapping));
     setPages(pages);
   }, [dispatch, fullscreenScale]);
 

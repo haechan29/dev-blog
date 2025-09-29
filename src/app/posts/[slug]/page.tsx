@@ -33,7 +33,7 @@ export default async function PostPage({
 
         <PostViewerModeButton />
 
-        <PostViewer />
+        <PostViewer postProps={postProps} />
 
         <PostHeaderSection post={postProps} className='mb-10' />
         <div className='w-full h-[1px] bg-gray-200 mb-10' />

@@ -19,7 +19,7 @@ export default function ProgressSection() {
 
   return (
     progress !== null && (
-      <div className='px-10'>
+      <div className='mb-3'>
         <div className='relative w-full h-0.5 bg-gray-200'>
           <div
             className='relative h-0.5 bg-blue-500'
