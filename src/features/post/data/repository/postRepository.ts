@@ -1,8 +1,7 @@
-import path from 'path';
+import { PostDto } from '@/features/post/data/dto/postDto';
 import { readdir, readFile } from 'fs/promises';
 import matter from 'gray-matter';
-import { unstable_cache } from 'next/cache';
-import { PostDto } from '@/features/post/data/dto/postDto';
+import path from 'path';
 
 const postsDirectory = path.join(process.cwd(), 'src/posts');
 
@@ -20,7 +19,7 @@ async function fetchPostBySlugInner(slug: string): Promise<PostDto> {
   };
 }
 
-async function fetchAllPostsInner(): Promise<PostDto[]> {
+async function fetchAllPosts(): Promise<PostDto[]> {
   const files = await readdir(postsDirectory);
 
   const posts = await Promise.all(
@@ -39,12 +38,6 @@ async function fetchAllPostsInner(): Promise<PostDto[]> {
 
   return posts.filter(post => post !== null);
 }
-
-export const fetchAllPosts = unstable_cache(
-  fetchAllPostsInner,
-  ['getAllPosts'],
-  { revalidate: 3600 }
-);
 
 export async function fetchPostBySlug(slug: string): Promise<PostDto> {
   const posts = await fetchAllPosts();
