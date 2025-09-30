@@ -1,6 +1,6 @@
 'use client';
 
-import { Heading } from '@/features/post/domain/model/post';
+import Heading from '@/features/post/domain/model/heading';
 import { toProps } from '@/features/postViewer/domain/model/postViewer';
 import useToolbar from '@/features/postViewer/hooks/useToolbar';
 import { RootState } from '@/lib/redux/store';

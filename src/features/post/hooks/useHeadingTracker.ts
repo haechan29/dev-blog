@@ -1,6 +1,6 @@
 'use client';
 
-import { Heading } from '@/features/post/domain/model/post';
+import Heading from '@/features/post/domain/model/heading';
 import useThrottle from '@/hooks/useThrottle';
 import { setSelectedHeading } from '@/lib/redux/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';

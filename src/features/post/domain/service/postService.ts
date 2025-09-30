@@ -6,7 +6,7 @@ export async function fetchAllPosts() {
   const dtos = await PostRespository.fetchAllPosts();
   return dtos
     .map(dto => toDomain(dto))
-    .sort((a, b) => a.date < b.date ? 1 : -1);
+    .sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
 export async function fetchPostBySlug(slug: string): Promise<Post> {

@@ -1,4 +1,4 @@
-import { Heading } from '@/features/post/domain/model/post';
+import Heading from '@/features/post/domain/model/heading';
 import { HeadingPageMapping } from '@/features/postViewer/domain/types/headingPageMapping';
 import { Page } from '@/features/postViewer/domain/types/page';
 

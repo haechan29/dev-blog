@@ -1,4 +1,4 @@
-import { Heading } from '@/features/post/domain/model/post';
+import Heading from '@/features/post/domain/model/heading';
 
 export type HeadingPageMapping = {
   headingIdToPage: Record<string, number>;

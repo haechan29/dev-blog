@@ -1,4 +1,4 @@
-import { Heading } from '@/features/post/domain/model/post';
+import Heading from '@/features/post/domain/model/heading';
 
 export type PostItemProps = {
   slug: string;
@@ -8,4 +8,4 @@ export type PostItemProps = {
   content: string;
   headings: Heading[];
   plainText: string;
-}
+};

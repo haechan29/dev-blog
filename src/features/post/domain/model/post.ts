@@ -4,12 +4,6 @@ import {
 } from '@/features/post/domain/lib/parse';
 import { PostItemProps } from '@/features/post/ui/postItemProps';
 
-export type Heading = {
-  id: string;
-  text: string;
-  level: number;
-};
-
 export class Post {
   constructor(
     public readonly slug: string,

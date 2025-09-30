@@ -1,4 +1,4 @@
-import { Heading } from '@/features/post/domain/model/post';
+import Heading from '@/features/post/domain/model/heading';
 import PostToolbar from '@/features/post/domain/model/postToolbar';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { Heading } from '@/features/post/domain/model/post';
+import Heading from '@/features/post/domain/model/heading';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import useThrottle from '@/hooks/useThrottle';
 import clsx from 'clsx';

@@ -1,4 +1,4 @@
-import { Heading } from '@/features/post/domain/model/post';
+import Heading from '@/features/post/domain/model/heading';
 import { PostToolbarProps } from '@/features/post/ui/postToolbarProps';
 
 export default interface PostToolbar {
