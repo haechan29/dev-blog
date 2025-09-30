@@ -8,7 +8,7 @@ import { Maximize } from 'lucide-react';
 import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-export default function PostViewerModeButton() {
+export default function EnterFullscreenButton() {
   const dispatch = useDispatch<AppDispatch>();
   const postViewer = useSelector((state: RootState) => state.postViewer);
   const postViewerProps = useMemo(() => toProps(postViewer), [postViewer]);

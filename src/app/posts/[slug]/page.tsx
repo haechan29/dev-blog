@@ -1,12 +1,11 @@
 import CommentSection from '@/components/comment/commentSection';
 import LikeButtonItem from '@/components/post/likeButtonItem';
 import PostContentSection from '@/components/post/postContentSection';
-import PostDispatcher from '@/components/post/postDispatcher';
 import PostHeaderSection from '@/components/post/postHeaderSection';
-import PostViewTracker from '@/components/post/postViewTracker';
+import PostPageClient from '@/components/post/postPageClient';
 import TableOfContentsItem from '@/components/post/tableOfContentsItem';
+import EnterFullscreenButton from '@/components/postViewer/enterFullscreenButton';
 import PostViewer from '@/components/postViewer/postViewer';
-import PostViewerModeButton from '@/components/postViewer/postViewerModeButton';
 import { Post } from '@/features/post/domain/model/post';
 import { fetchPostBySlug } from '@/features/post/domain/service/postService';
 import { Suspense } from 'react';
@@ -22,16 +21,12 @@ export default async function PostPage({
   const postProps = (post as Post).toProps();
 
   return (
-    <div>
+    <>
+      <PostViewer postProps={postProps} />
+      <PostPageClient post={postProps} />
+
       <div className='px-10 xl:px-20 py-14'>
-        <Suspense>
-          <PostDispatcher post={postProps} />
-        </Suspense>
-        <PostViewTracker postId={postProps.slug} />
-
-        <PostViewerModeButton />
-
-        <PostViewer postProps={postProps} />
+        <EnterFullscreenButton />
 
         <PostHeaderSection post={postProps} className='mb-10' />
         <div className='w-full h-[1px] bg-gray-200 mb-10' />
@@ -47,10 +42,7 @@ export default async function PostPage({
 
         <PostContentSection content={postProps.content} />
 
-        <LikeButtonItem
-          postId={post.slug}
-          className='flex justify-center mb-20'
-        />
+        <LikeButtonItem postId={post.slug} />
 
         <ErrorBoundary fallback={<div></div>}>
           <Suspense fallback={<div></div>}>
@@ -58,6 +50,6 @@ export default async function PostPage({
           </Suspense>
         </ErrorBoundary>
       </div>
-    </div>
+    </>
   );
 }

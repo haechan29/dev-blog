@@ -4,11 +4,20 @@ import { Heading } from '@/features/post/domain/model/post';
 import useThrottle from '@/hooks/useThrottle';
 import { setSelectedHeading } from '@/lib/redux/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function useHeadingTracker(headings: Heading[]) {
+export default function useHeadingTracker({
+  headings,
+}: {
+  headings: Heading[];
+}) {
   const dispatch = useDispatch<AppDispatch>();
+
+  const filteredHeadings = useMemo(
+    () => headings.filter(heading => heading.level === 1),
+    [headings]
+  );
 
   const throttle = useThrottle();
 
@@ -16,7 +25,7 @@ export default function useHeadingTracker(headings: Heading[]) {
     if (typeof window === 'undefined') return null;
     const vh = window.innerHeight;
 
-    const targetElementsInVisibleArea = headings.filter(heading => {
+    const targetElementsInVisibleArea = filteredHeadings.filter(heading => {
       const element = document.getElementById(heading.id);
       if (!element) return false;
 
@@ -28,7 +37,7 @@ export default function useHeadingTracker(headings: Heading[]) {
       return targetElementsInVisibleArea[0];
     }
 
-    const allTargetElementsAbove = headings.filter(heading => {
+    const allTargetElementsAbove = filteredHeadings.filter(heading => {
       const element = document.getElementById(heading.id);
       return element && element.getBoundingClientRect().top <= 0.1 * vh;
     });
@@ -38,7 +47,7 @@ export default function useHeadingTracker(headings: Heading[]) {
     }
 
     return null;
-  }, [headings]);
+  }, [filteredHeadings]);
 
   const updateHeadings = useCallback(() => {
     throttle(() => {
@@ -56,5 +65,5 @@ export default function useHeadingTracker(headings: Heading[]) {
     return () => {
       window.removeEventListener('scroll', updateHeadings);
     };
-  }, [throttle, updateHeadings]);
+  }, [updateHeadings]);
 }
