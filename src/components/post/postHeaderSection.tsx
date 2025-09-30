@@ -1,8 +1,7 @@
 'use client';
 
-import ActiveHeadingDetector from '@/components/post/activeHeadingChecker';
-import HeaderSectionDetector from '@/components/post/headerSectionDetector';
 import PostInfoItem from '@/components/post/postInfoItem';
+import useHeaderTracker from '@/features/post/hooks/useHeaderTracker';
 import { PostItemProps } from '@/features/post/ui/postItemProps';
 import Link from 'next/link';
 import { useRef } from 'react';
@@ -16,13 +15,10 @@ export default function PostHeaderSection({
 }) {
   const headerRef = useRef(null);
 
+  useHeaderTracker(headerRef);
+
   return (
     <section className={className}>
-      <ActiveHeadingDetector
-        headings={post.headings.filter(heading => heading.level === 1)}
-      />
-      <HeaderSectionDetector headerRef={headerRef} />
-
       <div ref={headerRef}>
         <div className='text-3xl font-bold mb-6'>{post.title}</div>
         <div className='flex flex-wrap gap-3 mb-6'>

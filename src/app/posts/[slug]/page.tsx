@@ -1,5 +1,4 @@
 import CommentSection from '@/components/comment/commentSection';
-import ContentSectionDetector from '@/components/post/contentSectionDetector';
 import LikeButtonItem from '@/components/post/likeButtonItem';
 import PostContentSection from '@/components/post/postContentSection';
 import PostDispatcher from '@/components/post/postDispatcher';
@@ -29,7 +28,6 @@ export default async function PostPage({
           <PostDispatcher post={postProps} />
         </Suspense>
         <PostViewTracker postId={postProps.slug} />
-        <ContentSectionDetector />
 
         <PostViewerModeButton />
 

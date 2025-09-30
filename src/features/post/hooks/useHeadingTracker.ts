@@ -1,22 +1,16 @@
 'use client';
 
 import { Heading } from '@/features/post/domain/model/post';
-import useMediaQuery from '@/hooks/useMediaQuery';
 import useThrottle from '@/hooks/useThrottle';
 import { setSelectedHeading } from '@/lib/redux/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function ActiveHeadingDetector({
-  headings,
-}: {
-  headings: Heading[];
-}) {
+export default function useHeadingTracker(headings: Heading[]) {
   const dispatch = useDispatch<AppDispatch>();
 
   const throttle = useThrottle();
-  const isLargerThanXl = useMediaQuery('(min-width: 1280px)');
 
   const getTargetHeading = useCallback(() => {
     if (typeof window === 'undefined') return null;
@@ -47,23 +41,20 @@ export default function ActiveHeadingDetector({
   }, [headings]);
 
   const updateHeadings = useCallback(() => {
-    const targetHeading = getTargetHeading();
-    if (targetHeading !== null) {
+    throttle(() => {
+      const targetHeading = getTargetHeading();
+      if (!targetHeading) return;
+
       dispatch(setSelectedHeading(targetHeading));
-    }
-  }, [dispatch, getTargetHeading]);
+    }, 1000);
+  }, [dispatch, getTargetHeading, throttle]);
 
   useEffect(() => {
-    if (isLargerThanXl) return;
-
     updateHeadings();
-    const throttledUpdate = () => throttle(updateHeadings, 100);
-    window.addEventListener('scroll', throttledUpdate);
+    window.addEventListener('scroll', updateHeadings);
 
     return () => {
-      window.removeEventListener('scroll', throttledUpdate);
+      window.removeEventListener('scroll', updateHeadings);
     };
-  }, [isLargerThanXl, throttle, updateHeadings]);
-
-  return <></>;
+  }, [throttle, updateHeadings]);
 }
