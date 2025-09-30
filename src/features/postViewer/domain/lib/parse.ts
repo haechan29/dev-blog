@@ -28,6 +28,20 @@ export function parsePost({
 
   let wasLastElementPaged = false;
 
+  function registerHeading(element: Element, pageIndex: number) {
+    const level = parseInt(element.tagName.substring(1));
+
+    headingIdToPage[element.id] = pageIndex;
+    if (!pageToHeadings[pageIndex]) {
+      pageToHeadings[pageIndex] = [];
+    }
+    pageToHeadings[pageIndex].push({
+      id: element.id,
+      text: element.textContent,
+      level,
+    });
+  }
+
   Array.from(postContainer.children)
     .filter(
       child =>
@@ -43,54 +57,31 @@ export function parsePost({
         currentPage.length > 0 && !currentPage.every(isEmptyContent);
 
       if (isPagedElement) {
+        // save current page before creating paged element
         if (hasNonEmptyContent) {
           pages.push([...currentPage]);
           currentPage = [];
           currentHeight = 0;
         }
 
-        const pagedClone = child.cloneNode(true) as Element;
-        pagedClone.className = 'flex flex-col w-full';
-
-        const wrapper = document.createElement('div');
-        wrapper.className =
-          'flex flex-1 min-h-0 items-center justify-center *:w-full *:h-full *:object-contain';
-
-        // move child of paged into wrapper
-        while (pagedClone.firstChild) {
-          wrapper.appendChild(pagedClone.firstChild);
-        }
-        pagedClone.appendChild(wrapper);
-
-        pages.push([pagedClone]);
+        const pagedElement = createPagedElement(child);
+        pages.push([pagedElement]);
       } else if (isCaptionElement && wasLastElementPaged) {
+        // split caption into sentences and create separate page for each
         const sentences = getSentences(child);
+
         const lastPage = pages.pop()!;
         const pagedElement = lastPage[0];
 
-        sentences.forEach(sentence => {
-          const pagedClone = pagedElement.cloneNode(true) as Element;
-
-          const sentenceElement = document.createElement('p');
-          sentenceElement.textContent = sentence;
-          pagedClone.appendChild(sentenceElement);
-
-          pages.push([pagedClone]);
-        });
+        const pagedElements = createPagedElementsWithCaption(
+          pagedElement,
+          sentences
+        );
+        pagedElements.forEach(pagedElement => pages.push([pagedElement]));
       } else if (isHeadingElement) {
         // heading belongs to next page if current page has content, otherwise current page.
         const pageIndex = hasNonEmptyContent ? pages.length + 1 : pages.length;
-        const level = parseInt(child.tagName.substring(1));
-
-        headingIdToPage[child.id] = pageIndex;
-        if (!pageToHeadings[pageIndex]) {
-          pageToHeadings[pageIndex] = [];
-        }
-        pageToHeadings[pageIndex].push({
-          id: child.id,
-          text: child.textContent,
-          level,
-        });
+        registerHeading(child, pageIndex);
 
         if (hasNonEmptyContent) {
           pages.push([...currentPage]);
@@ -128,10 +119,39 @@ export function parsePost({
   };
 }
 
-function getSentences(caption: Element): string[] {
-  const text = caption.textContent || '';
+function createPagedElement(element: Element): Element {
+  const clone = element.cloneNode(true) as Element;
+  clone.className = 'flex flex-col w-full';
+
+  const wrapper = document.createElement('div');
+  wrapper.className =
+    'flex flex-1 min-h-0 items-center justify-center *:w-full *:h-full *:object-contain';
+
+  // wrap original content for proper flex layout
+  while (clone.firstChild) {
+    wrapper.appendChild(clone.firstChild);
+  }
+  clone.appendChild(wrapper);
+  return clone;
+}
+
+function createPagedElementsWithCaption(
+  pagedElement: Element,
+  captions: string[]
+): Element[] {
+  return captions.map(caption => {
+    const pagedClone = pagedElement.cloneNode(true) as Element;
+    const sentenceElement = document.createElement('p');
+    sentenceElement.textContent = caption;
+    pagedClone.appendChild(sentenceElement);
+    return pagedClone;
+  });
+}
+
+function getSentences(element: Element): string[] {
+  const text = element.textContent || '';
   return text
-    .split(/[.!?]+\s*/)
+    .split(/(?<=[.!?])\s+/) // split sentences by punctuation marks (., !, ?)
     .map(s => s.trim())
     .filter(s => s.length > 0);
 }
