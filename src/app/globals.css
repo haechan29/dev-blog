@@ -117,10 +117,6 @@ body {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-.fullscreen {
-  --fullscreen-scale: 1.5;
-}
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -324,6 +320,10 @@ body {
 
 @utility animate-pop {
   animation: pop 0.3s ease-in-out;
+}
+
+.fullscreen {
+  --fullscreen-scale: 1.5;
 }
 
 .reading-highlight {

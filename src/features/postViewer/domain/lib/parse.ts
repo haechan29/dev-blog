@@ -26,6 +26,8 @@ export function parsePost({
   let currentPage: Page = [];
   let currentHeight = 0;
 
+  let wasLastElementPaged = false;
+
   Array.from(postContainer.children)
     .filter(
       child =>
@@ -34,14 +36,49 @@ export function parsePost({
         )
     )
     .forEach(child => {
-      const elementHeight = getElementHeight(child);
-      const exceedsPageHeight = currentHeight + elementHeight > pageHeight;
+      const isPagedElement = child.classList.contains('paged');
+      const isCaptionElement = child.classList.contains('caption');
       const isHeadingElement = child.matches('h1, h2, h3, h4, h5, h6');
       const hasNonEmptyContent =
         currentPage.length > 0 && !currentPage.every(isEmptyContent);
 
-      // heading belongs to next page if current page has content, otherwise current page.
-      if (isHeadingElement) {
+      if (isPagedElement) {
+        if (hasNonEmptyContent) {
+          pages.push([...currentPage]);
+          currentPage = [];
+          currentHeight = 0;
+        }
+
+        const pagedClone = child.cloneNode(true) as Element;
+        pagedClone.className = 'flex flex-col w-full';
+
+        const wrapper = document.createElement('div');
+        wrapper.className =
+          'flex flex-1 min-h-0 items-center justify-center *:w-full *:h-full *:object-contain';
+
+        // move child of paged into wrapper
+        while (pagedClone.firstChild) {
+          wrapper.appendChild(pagedClone.firstChild);
+        }
+        pagedClone.appendChild(wrapper);
+
+        pages.push([pagedClone]);
+      } else if (isCaptionElement && wasLastElementPaged) {
+        const sentences = getSentences(child);
+        const lastPage = pages.pop()!;
+        const pagedElement = lastPage[0];
+
+        sentences.forEach(sentence => {
+          const pagedClone = pagedElement.cloneNode(true) as Element;
+
+          const sentenceElement = document.createElement('p');
+          sentenceElement.textContent = sentence;
+          pagedClone.appendChild(sentenceElement);
+
+          pages.push([pagedClone]);
+        });
+      } else if (isHeadingElement) {
+        // heading belongs to next page if current page has content, otherwise current page.
         const pageIndex = hasNonEmptyContent ? pages.length + 1 : pages.length;
         const level = parseInt(child.tagName.substring(1));
 
@@ -54,20 +91,29 @@ export function parsePost({
           text: child.textContent,
           level,
         });
-      }
 
-      // create new page if current page would overflow or hit heading
-      if ((exceedsPageHeight || isHeadingElement) && hasNonEmptyContent) {
-        pages.push([...currentPage]);
-        currentPage = [];
-        currentHeight = 0;
-      }
+        if (hasNonEmptyContent) {
+          pages.push([...currentPage]);
+          currentPage = [];
+          currentHeight = 0;
+        }
+      } else {
+        const elementHeight = getElementHeight(child);
+        const exceedsPageHeight = currentHeight + elementHeight > pageHeight;
 
-      // add non-heading elements to current page
-      if (!isHeadingElement) {
+        // create new page if current page would overflow or hit heading
+        if (exceedsPageHeight && hasNonEmptyContent) {
+          pages.push([...currentPage]);
+          currentPage = [];
+          currentHeight = 0;
+        }
+
+        // add non-heading elements to current page
         currentPage.push(child);
         currentHeight += elementHeight;
       }
+
+      wasLastElementPaged = isPagedElement;
     });
 
   const hasNonEmptyContent =
@@ -80,6 +126,14 @@ export function parsePost({
     pages,
     headingPageMapping: { headingIdToPage, pageToHeadings },
   };
+}
+
+function getSentences(caption: Element): string[] {
+  const text = caption.textContent || '';
+  return text
+    .split(/[.!?]+\s*/)
+    .map(s => s.trim())
+    .filter(s => s.length > 0);
 }
 
 function getElementHeight(element: Element) {
