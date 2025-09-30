@@ -1,7 +1,7 @@
 'use client';
 
 import TooltipItem from '@/components/tooltipItem';
-import { PostItemProps } from '@/features/post/ui/postItemProps';
+import { PostProps } from '@/features/post/ui/postProps';
 import useIsMobile from '@/hooks/useIsMobile';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { setIsVisible } from '@/lib/redux/postSidebarSlice';
@@ -115,11 +115,12 @@ function FooterItem() {
   );
 }
 
-export default function PostSidebar({ posts }: { posts: PostItemProps[] }) {
+export default function PostSidebar({ posts }: { posts: PostProps[] }) {
   const params = useParams();
   const searchParams = useSearchParams();
   const selectedSlug = params.slug as string | undefined;
   const selectedTag = searchParams.get('tag') ?? null;
+
   const dispatch = useDispatch<AppDispatch>();
   const postSidebar = useSelector((state: RootState) => state.postSidebar);
   const isLargerThanXl = useMediaQuery('(min-width: 1280px)');

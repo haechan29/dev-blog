@@ -4,9 +4,9 @@ import useContentTracker from '@/features/post/hooks/useContentTracker';
 import useHeadingTracker from '@/features/post/hooks/useHeadingTracker';
 import useToolbarSync from '@/features/post/hooks/useToolbarSync';
 import useViewTracker from '@/features/post/hooks/useViewTracker';
-import { PostItemProps } from '@/features/post/ui/postItemProps';
+import { PostProps } from '@/features/post/ui/postProps';
 
-export default function PostPageClient({ post }: { post: PostItemProps }) {
+export default function PostPageClient({ post }: { post: PostProps }) {
   useContentTracker();
   useHeadingTracker(post);
   useToolbarSync(post);

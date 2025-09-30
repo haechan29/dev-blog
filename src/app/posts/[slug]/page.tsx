@@ -6,8 +6,8 @@ import PostPageClient from '@/components/post/postPageClient';
 import TableOfContentsItem from '@/components/post/tableOfContentsItem';
 import EnterFullscreenButton from '@/components/postViewer/enterFullscreenButton';
 import PostViewer from '@/components/postViewer/postViewer';
-import { Post } from '@/features/post/domain/model/post';
 import { fetchPostBySlug } from '@/features/post/domain/service/postService';
+import { createPostProps } from '@/features/post/ui/postProps';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
@@ -18,38 +18,36 @@ export default async function PostPage({
 }) {
   const { slug } = await params;
   const post = await fetchPostBySlug(slug);
-  const postProps = (post as Post).toProps();
+  const postProps = createPostProps(post);
 
   return (
-    <>
-      <PostViewer postProps={postProps} />
+    <div className='px-10 xl:px-20 py-14'>
+      <PostViewer post={postProps} />
       <PostPageClient post={postProps} />
 
-      <div className='px-10 xl:px-20 py-14'>
-        <EnterFullscreenButton />
+      <EnterFullscreenButton />
 
-        <PostHeaderSection post={postProps} className='mb-10' />
-        <div className='w-full h-[1px] bg-gray-200 mb-10' />
+      <PostHeaderSection post={postProps} />
+      <div className='w-full h-[1px] bg-gray-200 mb-10' />
 
-        {postProps.headings.length > 0 && (
-          <section className='mb-10 xl:mb-0'>
-            <div className='block xl:hidden text-xl xl:text-2xl font-bold text-gray-900 mt-4 mb-2 leading-tight'>
-              목차
-            </div>
-            <TableOfContentsItem headings={postProps.headings} />
-          </section>
-        )}
+      {postProps.headings.length > 0 && (
+        <section className='mb-10 xl:mb-0'>
+          <div className='block xl:hidden text-xl xl:text-2xl font-bold text-gray-900 mt-4 mb-2 leading-tight'>
+            목차
+          </div>
+          <TableOfContentsItem headings={postProps.headings} />
+        </section>
+      )}
 
-        <PostContentSection content={postProps.content} />
+      <PostContentSection content={postProps.content} />
 
-        <LikeButtonItem postId={post.slug} />
+      <LikeButtonItem postId={postProps.slug} />
 
-        <ErrorBoundary fallback={<div></div>}>
-          <Suspense fallback={<div></div>}>
-            <CommentSection slug={slug} />
-          </Suspense>
-        </ErrorBoundary>
-      </div>
-    </>
+      <ErrorBoundary fallback={<div></div>}>
+        <Suspense fallback={<div></div>}>
+          <CommentSection slug={slug} />
+        </Suspense>
+      </ErrorBoundary>
+    </div>
   );
 }

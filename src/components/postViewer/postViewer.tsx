@@ -3,7 +3,7 @@
 import PostViewerContent from '@/components/postViewer/postViewerContent';
 import PostViewerControlBar from '@/components/postViewer/postViewerControlBar';
 import PostViewerToolbar from '@/components/postViewer/postViewerToolbar';
-import { PostItemProps } from '@/features/post/ui/postItemProps';
+import { PostProps } from '@/features/post/ui/postProps';
 import { toProps } from '@/features/postViewer/domain/model/postViewer';
 import { useBarsAutoHide } from '@/features/postViewer/hooks/useBarsAutoHide';
 import { useFullscreen } from '@/features/postViewer/hooks/useFullscreen';
@@ -16,11 +16,7 @@ import { useMemo, useRef } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 
-export default function PostViewer({
-  postProps,
-}: {
-  postProps: PostItemProps;
-}) {
+export default function PostViewer({ post }: { post: PostProps }) {
   const postViewer = useSelector((state: RootState) => state.postViewer);
   const { isViewerMode } = useMemo(() => toProps(postViewer), [postViewer]);
   const postViewerRef = useRef<HTMLDivElement | null>(null);
@@ -43,7 +39,7 @@ export default function PostViewer({
     >
       <Toaster toasterId='post-viewer' />
 
-      <PostViewerToolbar {...postProps} />
+      <PostViewerToolbar {...post} />
       <PostViewerContent
         page={page}
         postViewerContentRef={postViewerContentRef}

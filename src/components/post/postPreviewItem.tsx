@@ -1,7 +1,7 @@
 'use client';
 
 import PostInfoItem from '@/components/post/postInfoItem';
-import { PostItemProps } from '@/features/post/ui/postItemProps';
+import { PostProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
 import Link from 'next/link';
 
@@ -10,7 +10,7 @@ export default function PostPreviewItem({
   post,
 }: {
   tag: string | null;
-  post: PostItemProps;
+  post: PostProps;
 }) {
   return (
     <div className={clsx('w-full py-8 border-b border-b-gray-200')}>

@@ -1,6 +1,6 @@
 'use client';
 
-import { PostItemProps } from '@/features/post/ui/postItemProps';
+import { PostProps } from '@/features/post/ui/postProps';
 import {
   setHeadings,
   setIsInPostsPage,
@@ -12,7 +12,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function useToolbarSync(post?: PostItemProps) {
+export default function useToolbarSync(post?: PostProps) {
   const dispatch = useDispatch<AppDispatch>();
 
   const searchParams = useSearchParams();

@@ -1,7 +1,7 @@
 import PostPreviewItem from '@/components/post/postPreviewItem';
 import PostsPageClient from '@/components/post/postsPageClient';
 import { fetchAllPosts } from '@/features/post/domain/service/postService';
-import { PostItemProps } from '@/features/post/ui/postItemProps';
+import { createPostProps, PostProps } from '@/features/post/ui/postProps';
 import { fetchPostStat } from '@/features/postStat/domain/service/postStatService';
 import {
   dehydrate,
@@ -21,9 +21,9 @@ export default async function PostsPage({
   const filteredPosts = tag
     ? posts.filter(post => post.tags?.includes(tag))
     : posts;
-  const postProps = filteredPosts.map(post => post.toProps());
+  const postProps = filteredPosts.map(createPostProps);
 
-  const prefetchStat = (post: PostItemProps) =>
+  const prefetchStat = (post: PostProps) =>
     queryClient.prefetchQuery({
       queryKey: ['posts', post.slug, 'stats'],
       queryFn: () => fetchPostStat(post.slug).then(stat => stat.toProps()),
