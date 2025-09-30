@@ -7,7 +7,7 @@ import TableOfContentsItem from '@/components/post/tableOfContentsItem';
 import EnterFullscreenButton from '@/components/postViewer/enterFullscreenButton';
 import PostViewer from '@/components/postViewer/postViewer';
 import { fetchPostBySlug } from '@/features/post/domain/service/postService';
-import { createPostProps } from '@/features/post/ui/postProps';
+import { createProps } from '@/features/post/ui/postProps';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
@@ -18,7 +18,7 @@ export default async function PostPage({
 }) {
   const { slug } = await params;
   const post = await fetchPostBySlug(slug);
-  const postProps = createPostProps(post);
+  const postProps = createProps(post);
 
   return (
     <div className='px-10 xl:px-20 py-14'>

@@ -13,7 +13,7 @@ export type PostProps = {
   plainText: string;
 };
 
-export function createPostProps(post: Post): PostProps {
+export function createProps(post: Post): PostProps {
   return {
     slug: post.slug,
     title: post.title,

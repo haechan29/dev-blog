@@ -1,7 +1,7 @@
-import PostSidebarProps from '@/features/post/ui/postSidebarProps';
+import PostSidebar from '@/features/post/domain/model/postSidebar';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-const initialState: PostSidebarProps = {
+const initialState: PostSidebar = {
   isVisible: false,
 };
 
