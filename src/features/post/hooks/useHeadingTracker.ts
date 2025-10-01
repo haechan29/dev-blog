@@ -4,7 +4,7 @@ import Heading from '@/features/post/domain/model/heading';
 import useThrottle from '@/hooks/useThrottle';
 import { setCurrentHeading } from '@/lib/redux/postPositionSlice';
 import { AppDispatch } from '@/lib/redux/store';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function useHeadingTracker({
@@ -13,47 +13,42 @@ export default function useHeadingTracker({
   headings: Heading[];
 }) {
   const dispatch = useDispatch<AppDispatch>();
-
-  const filteredHeadings = useMemo(
-    () => headings.filter(heading => heading.level === 1),
-    [headings]
-  );
-
   const throttle = useThrottle();
 
   const getTargetHeading = useCallback(() => {
     if (typeof window === 'undefined') return null;
     const vh = window.innerHeight;
+    const threshold = 0.1 * vh;
 
-    const targetElementsInVisibleArea = filteredHeadings.filter(heading => {
+    const targetElementsInVisibleArea = headings.filter(heading => {
       const element = document.getElementById(heading.id);
       if (!element) return false;
 
       const rect = element.getBoundingClientRect();
-      return rect.top >= -0.1 * vh && rect.top <= 0.1 * vh;
+      return Math.abs(rect.top) <= threshold;
     });
 
     if (targetElementsInVisibleArea.length > 0) {
       return targetElementsInVisibleArea[0];
     }
 
-    const allTargetElementsAbove = filteredHeadings.filter(heading => {
+    const allTargetElementsAbove = headings.filter(heading => {
       const element = document.getElementById(heading.id);
       return element && element.getBoundingClientRect().top <= 0.1 * vh;
     });
+
+    if (allTargetElementsAbove.length >= headings.length) return null;
 
     if (allTargetElementsAbove.length > 0) {
       return allTargetElementsAbove[allTargetElementsAbove.length - 1];
     }
 
     return null;
-  }, [filteredHeadings]);
+  }, [headings]);
 
   const updateHeadings = useCallback(() => {
     throttle(() => {
       const targetHeading = getTargetHeading();
-      if (!targetHeading) return;
-
       dispatch(setCurrentHeading(targetHeading));
     }, 1000);
   }, [dispatch, getTargetHeading, throttle]);

@@ -12,7 +12,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function useToolbarSync(post?: PostProps) {
+export default function usePostToolbarSync(post?: PostProps) {
   const dispatch = useDispatch<AppDispatch>();
 
   const searchParams = useSearchParams();
