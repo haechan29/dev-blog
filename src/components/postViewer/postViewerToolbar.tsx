@@ -1,13 +1,10 @@
 'use client';
 
 import Heading from '@/features/post/domain/model/heading';
-import { toProps } from '@/features/postViewer/domain/model/postViewer';
-import useToolbar from '@/features/postViewer/hooks/useToolbar';
-import { RootState } from '@/lib/redux/store';
+import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
+import useViewerToolbar from '@/features/postViewer/hooks/useViewerToolbar';
 import clsx from 'clsx';
 import { ChevronDown } from 'lucide-react';
-import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 
 export default function PostViewerToolbar({
   title,
@@ -16,10 +13,9 @@ export default function PostViewerToolbar({
   title: string;
   headings: Heading[];
 }) {
-  const postViewer = useSelector((state: RootState) => state.postViewer);
-  const { areBarsVisible } = useMemo(() => toProps(postViewer), [postViewer]);
-  const { isExpanded, heading, toggleIsExpanded, handleContentClick } =
-    useToolbar();
+  const { areBarsVisible } = usePostViewer();
+  const { isExpanded, currentHeading, toggleIsExpanded, handleContentClick } =
+    useViewerToolbar();
 
   return (
     <div
@@ -29,12 +25,12 @@ export default function PostViewerToolbar({
         !areBarsVisible && 'opacity-0'
       )}
     >
-      <Title title={title} heading={heading} />
+      <Title title={title} heading={currentHeading} />
 
       <div className='flex w-full items-start'>
         <Content
           isExpanded={isExpanded}
-          heading={heading}
+          heading={currentHeading}
           headings={headings}
           onContentClick={handleContentClick}
         />

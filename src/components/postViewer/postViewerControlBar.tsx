@@ -5,20 +5,12 @@ import AutoAdvanceSection from '@/components/postViewer/autoAdvanceSection';
 import ExitFullscreenButton from '@/components/postViewer/exitFullscreenButton';
 import PageIndicatorSection from '@/components/postViewer/pageIndicatorSection';
 import TTSSection from '@/components/postViewer/ttsSection';
-import { toProps as toPostViewerProps } from '@/features/postViewer/domain/model/postViewer';
 import { Page } from '@/features/postViewer/domain/types/page';
-import { RootState } from '@/lib/redux/store';
+import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import clsx from 'clsx';
-import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 
 export default function PostViewerControlBar({ page }: { page: Page | null }) {
-  const postViewer = useSelector((state: RootState) => state.postViewer);
-
-  const { areBarsVisible } = useMemo(
-    () => toPostViewerProps(postViewer),
-    [postViewer]
-  );
+  const { areBarsVisible } = usePostViewer();
 
   return (
     <div

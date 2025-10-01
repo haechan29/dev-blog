@@ -60,10 +60,10 @@ export default function useHeadingTracker({
 
   useEffect(() => {
     updateHeadings();
-    window.addEventListener('scroll', updateHeadings);
+    document.addEventListener('scroll', updateHeadings);
 
     return () => {
-      window.removeEventListener('scroll', updateHeadings);
+      document.removeEventListener('scroll', updateHeadings);
     };
   }, [updateHeadings]);
 }

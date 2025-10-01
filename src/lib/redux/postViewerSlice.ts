@@ -6,7 +6,6 @@ const initialState: PostViewer = {
   isViewerMode: false,
   areBarsVisible: true,
   isToolbarExpanded: false,
-  paging: null,
   advanceMode: null,
   fullscreenScale: 1.5,
 };

@@ -1,16 +1,10 @@
 'use client';
 
-import { toProps as toPostViewerProps } from '@/features/postViewer/domain/model/postViewer';
-import { RootState } from '@/lib/redux/store';
+import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 
 export default function ProgressSection() {
-  const postViewer = useSelector((state: RootState) => state.postViewer);
-  const { pageNumber, totalPages } = useMemo(
-    () => toPostViewerProps(postViewer),
-    [postViewer]
-  );
+  const { pageNumber, totalPages } = usePostViewer();
 
   const progress = useMemo(() => {
     if (!pageNumber || !totalPages) return null;

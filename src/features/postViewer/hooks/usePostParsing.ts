@@ -1,28 +1,25 @@
 'use client';
 
 import { parsePost as parsePostInner } from '@/features/postViewer/domain/lib/parse';
-import { toProps } from '@/features/postViewer/domain/model/postViewer';
 import { Page } from '@/features/postViewer/domain/types/page';
+import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import {
   setCurrentPageIndex,
   setHeadingPageMapping,
   setTotalPage,
 } from '@/lib/redux/postPositionSlice';
 import {} from '@/lib/redux/postViewerSlice';
-import { AppDispatch, RootState } from '@/lib/redux/store';
+import { AppDispatch } from '@/lib/redux/store';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 export default function usePostParsing() {
   const dispatch = useDispatch<AppDispatch>();
-  const postViewer = useSelector((state: RootState) => state.postViewer);
 
   const [pages, setPages] = useState<Page[] | null>(null);
 
-  const { pageNumber, fullscreenScale } = useMemo(
-    () => toProps(postViewer),
-    [postViewer]
-  );
+  const { pageNumber, fullscreenScale } = usePostViewer();
+
   const page = useMemo(() => {
     if (!pages || !pageNumber) return null;
     return pages[pageNumber - 1];
@@ -39,8 +36,8 @@ export default function usePostParsing() {
       excludeClassNames: ['hide-fullscreen'],
     });
 
-    dispatch(setCurrentPageIndex(0));
     dispatch(setTotalPage(pages.length));
+    dispatch(setCurrentPageIndex(0));
     dispatch(setHeadingPageMapping(headingPageMapping));
     setPages(pages);
   }, [dispatch, fullscreenScale]);

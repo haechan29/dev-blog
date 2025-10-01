@@ -1,14 +1,14 @@
 'use client';
 
-import { toProps as toPostViewerProps } from '@/features/postViewer/domain/model/postViewer';
 import {
   TTS,
   toProps as toTTSProps,
 } from '@/features/postViewer/domain/model/tts';
+import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import { setAdvanceMode } from '@/lib/redux/postViewerSlice';
-import { AppDispatch, RootState } from '@/lib/redux/store';
+import { AppDispatch } from '@/lib/redux/store';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 export default function useTTSState() {
   const [tts, setTTS] = useState<TTS>({
@@ -18,11 +18,7 @@ export default function useTTSState() {
   });
 
   const dispatch = useDispatch<AppDispatch>();
-  const postViewer = useSelector((state: RootState) => state.postViewer);
-  const { pageNumber, isViewerMode, advanceMode } = useMemo(
-    () => toPostViewerProps(postViewer),
-    [postViewer]
-  );
+  const { pageNumber, isViewerMode, advanceMode } = usePostViewer();
   const ttsProps = useMemo(() => toTTSProps(tts), [tts]);
 
   const lastPageNumber = useRef(pageNumber);
