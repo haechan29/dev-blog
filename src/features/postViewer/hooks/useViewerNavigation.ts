@@ -2,7 +2,7 @@
 
 import { toProps } from '@/features/postViewer/domain/model/postViewer';
 import useThrottle from '@/hooks/useThrottle';
-import { nextPage, previousPage } from '@/lib/redux/postViewerSlice';
+import { nextPage, previousPage } from '@/lib/redux/postPositionSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { RefObject, useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';

@@ -2,7 +2,7 @@
 
 import Heading from '@/features/post/domain/model/heading';
 import useThrottle from '@/hooks/useThrottle';
-import { selectHeading } from '@/lib/redux/headingSlice';
+import { setCurrentHeading } from '@/lib/redux/postPositionSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
@@ -54,7 +54,7 @@ export default function useHeadingTracker({
       const targetHeading = getTargetHeading();
       if (!targetHeading) return;
 
-      dispatch(selectHeading(targetHeading));
+      dispatch(setCurrentHeading(targetHeading));
     }, 1000);
   }, [dispatch, getTargetHeading, throttle]);
 

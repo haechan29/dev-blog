@@ -6,7 +6,7 @@ import {
   getHeadingsByPage,
   getPageByHeadingId,
 } from '@/features/postViewer/domain/types/headingPageMapping';
-import { setPageIndex } from '@/lib/redux/postViewerSlice';
+import { setCurrentPageIndex } from '@/lib/redux/postPositionSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -35,7 +35,7 @@ export default function useHeading() {
       const pageIndex = getPageByHeadingId(headingPageMapping, item.id);
       if (pageIndex === undefined) return;
 
-      dispatch(setPageIndex(pageIndex));
+      dispatch(setCurrentPageIndex(pageIndex));
     },
     [dispatch, heading, headingPageMapping]
   );

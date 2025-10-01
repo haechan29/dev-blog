@@ -6,7 +6,8 @@ import {
 } from '@/features/postViewer/domain/model/autoAdvance';
 import { toProps as toPostViewerProps } from '@/features/postViewer/domain/model/postViewer';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { nextPage, setAdvanceMode } from '@/lib/redux/postViewerSlice';
+import { nextPage } from '@/lib/redux/postPositionSlice';
+import { setAdvanceMode } from '@/lib/redux/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';

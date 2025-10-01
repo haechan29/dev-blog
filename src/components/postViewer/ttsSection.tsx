@@ -4,7 +4,7 @@ import TooltipItem from '@/components/tooltipItem';
 import { Page } from '@/features/postViewer/domain/types/page';
 import useTTSPlayer from '@/features/postViewer/hooks/useTTSPlayer';
 import useTTSState from '@/features/postViewer/hooks/useTTSState';
-import { nextPage } from '@/lib/redux/postViewerSlice';
+import { nextPage } from '@/lib/redux/postPositionSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { Headphones, Pause, Play } from 'lucide-react';

@@ -2,7 +2,7 @@
 
 import Heading from '@/features/post/domain/model/heading';
 import usePostToolbar from '@/features/post/hooks/usePostToolbar';
-import { selectHeading } from '@/lib/redux/headingSlice';
+import { setCurrentHeading } from '@/lib/redux/postPositionSlice';
 import { setIsVisible } from '@/lib/redux/postSidebarSlice';
 import { setIsExpanded } from '@/lib/redux/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
@@ -38,7 +38,7 @@ export default function PostToolbar() {
             block: 'start',
           },
           () => {
-            dispatch(selectHeading(heading));
+            dispatch(setCurrentHeading(heading));
             dispatch(setIsExpanded(false));
           }
         );

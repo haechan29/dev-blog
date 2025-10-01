@@ -33,10 +33,10 @@ export type PostToolbarProps =
 
 export function createProps({
   postToolbar,
-  selectedHeading,
+  currentHeading,
 }: {
   postToolbar: PostToolbar;
-  selectedHeading: Heading | null;
+  currentHeading: Heading | null;
 }): PostToolbarProps {
   const mode = getMode(postToolbar);
   switch (mode) {
@@ -59,7 +59,7 @@ export function createProps({
       const items = [
         postToolbar.tag,
         postToolbar.title!,
-        selectedHeading?.text,
+        currentHeading?.text,
       ].filter(item => item != null);
       const lastItem = items.pop()!;
       return {
@@ -75,7 +75,7 @@ export function createProps({
         breadcrumb: postToolbar.tag
           ? [postToolbar.tag, postToolbar.title!]
           : [postToolbar.title!],
-        title: selectedHeading!.text,
+        title: currentHeading!.text,
         headings: postToolbar.headings,
       };
   }

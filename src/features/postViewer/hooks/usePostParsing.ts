@@ -3,7 +3,12 @@
 import { parsePost as parsePostInner } from '@/features/postViewer/domain/lib/parse';
 import { toProps } from '@/features/postViewer/domain/model/postViewer';
 import { Page } from '@/features/postViewer/domain/types/page';
-import { setHeadingPageMapping, setPaging } from '@/lib/redux/postViewerSlice';
+import {
+  setCurrentPageIndex,
+  setHeadingPageMapping,
+  setTotalPage,
+} from '@/lib/redux/postPositionSlice';
+import {} from '@/lib/redux/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -34,7 +39,8 @@ export default function usePostParsing() {
       excludeClassNames: ['hide-fullscreen'],
     });
 
-    dispatch(setPaging({ index: 0, total: pages.length }));
+    dispatch(setCurrentPageIndex(0));
+    dispatch(setTotalPage(pages.length));
     dispatch(setHeadingPageMapping(headingPageMapping));
     setPages(pages);
   }, [dispatch, fullscreenScale]);
