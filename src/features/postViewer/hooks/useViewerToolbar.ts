@@ -19,10 +19,10 @@ export default function useViewerToolbar() {
 
   const handleContentClick = useCallback(
     (heading: Heading) => {
-      if (isToolbarExpanded) setCurrentHeading(heading);
+      if (isToolbarExpanded) dispatch(setCurrentHeading(heading));
       toggleIsExpanded();
     },
-    [isToolbarExpanded, toggleIsExpanded]
+    [dispatch, isToolbarExpanded, toggleIsExpanded]
   );
 
   return {

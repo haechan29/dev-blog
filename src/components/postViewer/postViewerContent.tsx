@@ -35,7 +35,7 @@ export default function PostViewerContent({
         'pb-[calc(var(--padding-bottom)/var(--fullscreen-scale))]',
         'pl-[calc(var(--padding-left)/var(--fullscreen-scale))]',
         'scale-[var(--fullscreen-scale)] origin-top',
-        page === null && 'invisible'
+        page === null && 'hidden'
       )}
       style={{
         '--fullscreen-scale': fullscreenScale,

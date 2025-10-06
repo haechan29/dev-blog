@@ -107,9 +107,12 @@ export function parsePost({
           currentHeight = 0;
         }
 
-        // add non-heading elements to current page
-        currentPage.push(child);
-        currentHeight += elementHeight;
+        const shouldAddElement =
+          currentPage.length !== 0 || !isEmptyContent(child);
+        if (shouldAddElement) {
+          currentPage.push(child);
+          currentHeight += elementHeight;
+        }
       }
 
       wasLastElementPaged = isPagedElement;
