@@ -7,13 +7,19 @@ import PageIndicatorSection from '@/components/postViewer/pageIndicatorSection';
 import TTSSection from '@/components/postViewer/ttsSection';
 import { Page } from '@/features/postViewer/domain/types/page';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
+import { setIsMouseOnControlBar } from '@/lib/redux/postViewerSlice';
+import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
+import { useDispatch } from 'react-redux';
 
 export default function PostViewerControlBar({ page }: { page: Page | null }) {
+  const dispatch = useDispatch<AppDispatch>();
   const { areBarsVisible } = usePostViewer();
 
   return (
     <div
+      onMouseEnter={() => dispatch(setIsMouseOnControlBar(true))}
+      onMouseLeave={() => dispatch(setIsMouseOnControlBar(false))}
       className={clsx(
         'fixed bottom-0 left-0 right-0 z-50 flex flex-col bg-white/80 backdrop-blur-md px-10',
         'transition-transform|opacity duration-300 ease-in-out',

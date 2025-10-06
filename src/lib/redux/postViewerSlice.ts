@@ -5,7 +5,6 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 const initialState: PostViewer = {
   isCommentSectionVisible: false,
   isViewerMode: false,
-  areBarsVisible: true,
   isToolbarExpanded: false,
   advanceMode: null,
   fullscreenScale: 1.5,
@@ -15,6 +14,9 @@ const initialState: PostViewer = {
     bottom: 5,
     left: 5,
   },
+  isMouseOnToolbar: false,
+  isMouseOnControlBar: false,
+  isMouseMoved: false,
 };
 
 const postViewerSlice = createSlice({
@@ -26,9 +28,6 @@ const postViewerSlice = createSlice({
     },
     setIsViewerMode: (state, action: PayloadAction<boolean>) => {
       state.isViewerMode = action.payload;
-    },
-    setAreBarsVisible: (state, action: PayloadAction<boolean>) => {
-      state.areBarsVisible = action.payload;
     },
     setIsToolbarExpanded: (state, action: PayloadAction<boolean>) => {
       state.isToolbarExpanded = action.payload;
@@ -45,6 +44,15 @@ const postViewerSlice = createSlice({
     setPaddingInRem: (state, action: PayloadAction<Padding>) => {
       state.paddingInRem = action.payload;
     },
+    setIsMouseOnToolbar: (state, action: PayloadAction<boolean>) => {
+      state.isMouseOnToolbar = action.payload;
+    },
+    setIsMouseOnControlBar: (state, action: PayloadAction<boolean>) => {
+      state.isMouseOnControlBar = action.payload;
+    },
+    setIsMouseMoved: (state, action: PayloadAction<boolean>) => {
+      state.isMouseMoved = action.payload;
+    },
   },
 });
 
@@ -52,9 +60,11 @@ export default postViewerSlice.reducer;
 export const {
   setIsCommentSectionVisible,
   setIsViewerMode,
-  setAreBarsVisible,
   setIsToolbarExpanded,
   setAdvanceMode,
   setFullscreenScale,
   setPaddingInRem,
+  setIsMouseOnToolbar,
+  setIsMouseOnControlBar,
+  setIsMouseMoved,
 } = postViewerSlice.actions;

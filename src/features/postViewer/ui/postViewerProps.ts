@@ -25,9 +25,11 @@ export function createProps({
 }): PostViewerProps {
   return {
     isButtonVisible: !postViewer.isCommentSectionVisible,
-    isViewerMode: postViewer.isViewerMode,
-    areBarsVisible: postViewer.areBarsVisible,
-    isToolbarExpanded: postViewer.isToolbarExpanded,
+    areBarsVisible:
+      postViewer.isMouseOnToolbar ||
+      postViewer.isMouseOnControlBar ||
+      postViewer.isMouseMoved ||
+      postViewer.isToolbarExpanded,
     pageNumber:
       postPosition.currentPageIndex !== null
         ? postPosition.currentPageIndex + 1
@@ -35,8 +37,6 @@ export function createProps({
     totalPages:
       postPosition.totalPage !== null ? postPosition.totalPage + 1 : null,
     currentHeading: postPosition.currentHeading,
-    advanceMode: postViewer.advanceMode,
-    fullscreenScale: postViewer.fullscreenScale,
-    paddingInRem: postViewer.paddingInRem,
+    ...postViewer,
   };
 }
