@@ -1,6 +1,7 @@
 import Heading from '@/features/post/domain/model/heading';
 import { HeadingPageMapping } from '@/features/postViewer/domain/types/headingPageMapping';
 import { Page } from '@/features/postViewer/domain/types/page';
+import { getIntrinsicSize } from '@/lib/dom';
 
 /**
  * Parses post into pages and creates heading-page mapping.
@@ -9,11 +10,13 @@ import { Page } from '@/features/postViewer/domain/types/page';
  */
 export function parsePost({
   postContainer,
-  pageHeight,
+  containerWidth,
+  containerHeight,
   excludeClassNames = [],
 }: {
   postContainer: Element;
-  pageHeight: number;
+  containerWidth: number;
+  containerHeight: number;
   excludeClassNames?: string[];
 }): {
   pages: Page[];
@@ -64,7 +67,11 @@ export function parsePost({
           currentHeight = 0;
         }
 
-        const pagedElement = createPagedElement(child);
+        const pagedElement = createPagedElement(
+          child,
+          containerWidth,
+          containerHeight
+        );
         pages.push([pagedElement]);
       } else if (isCaptionElement && wasLastElementPaged) {
         // split caption into sentences and create separate page for each
@@ -90,7 +97,8 @@ export function parsePost({
         }
       } else {
         const elementHeight = getElementHeight(child);
-        const exceedsPageHeight = currentHeight + elementHeight > pageHeight;
+        const exceedsPageHeight =
+          currentHeight + elementHeight > containerHeight;
 
         // create new page if current page would overflow or hit heading
         if (exceedsPageHeight && hasNonEmptyContent) {
@@ -119,20 +127,26 @@ export function parsePost({
   };
 }
 
-function createPagedElement(element: Element): Element {
-  const clone = element.cloneNode(true) as Element;
-  clone.className = 'flex flex-col w-full';
+function createPagedElement(
+  element: Element,
+  containerWidth: number,
+  containerHeight: number
+): Element {
+  const container = document.createElement('div');
+  container.className =
+    'relative w-full h-full flex justify-center items-center';
 
-  const wrapper = document.createElement('div');
-  wrapper.className =
-    'flex flex-1 min-h-0 items-center justify-center *:w-full *:h-full *:object-contain';
+  const child = element.firstChild as HTMLElement;
+  if (child) {
+    const clone = child.cloneNode(true) as HTMLElement;
 
-  // wrap original content for proper flex layout
-  while (clone.firstChild) {
-    wrapper.appendChild(clone.firstChild);
+    const { width, height } = getIntrinsicSize(clone);
+    const scale = Math.min(containerWidth / width, containerHeight / height);
+    clone.style.setProperty('--scale', scale.toString());
+    clone.className += ' scale-[var(--scale)] origin-center';
+    container.appendChild(clone);
   }
-  clone.appendChild(wrapper);
-  return clone;
+  return container;
 }
 
 function createPagedElementsWithCaption(
@@ -141,9 +155,17 @@ function createPagedElementsWithCaption(
 ): Element[] {
   return captions.map(caption => {
     const pagedClone = pagedElement.cloneNode(true) as Element;
-    const sentenceElement = document.createElement('p');
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'absolute left-0 right-0 bottom-0 flex justify-center';
+
+    const sentenceElement = document.createElement('div');
+    sentenceElement.className =
+      'bg-black/70 text-white text-center break-keep text-balance px-2 py-1';
     sentenceElement.textContent = caption;
-    pagedClone.appendChild(sentenceElement);
+
+    wrapper.appendChild(sentenceElement);
+    pagedClone.appendChild(wrapper);
     return pagedClone;
   });
 }

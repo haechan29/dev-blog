@@ -9,6 +9,7 @@ import { useFullscreen } from '@/features/postViewer/hooks/useFullscreen';
 import { useFullscreenScale } from '@/features/postViewer/hooks/useFullscreenScale';
 import usePostParsing from '@/features/postViewer/hooks/usePostParsing';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
+import usePostViewerSize from '@/features/postViewer/hooks/usePostViewerSize';
 import { useViewerNavigation } from '@/features/postViewer/hooks/useViewerNavigation';
 import clsx from 'clsx';
 import { useRef } from 'react';
@@ -19,7 +20,8 @@ export default function PostViewer({ post }: { post: PostProps }) {
   const postViewerRef = useRef<HTMLDivElement | null>(null);
   const postViewerContentRef = useRef<HTMLDivElement | null>(null);
 
-  const { page } = usePostParsing();
+  const postViewerSize = usePostViewerSize(postViewerContentRef);
+  const { page } = usePostParsing(postViewerSize);
 
   useFullscreenScale();
   useFullscreen(postViewerRef);
@@ -30,8 +32,8 @@ export default function PostViewer({ post }: { post: PostProps }) {
     <div
       ref={postViewerRef}
       className={clsx(
-        'bg-white flex flex-col w-screen h-screen',
-        !isViewerMode && 'invisible'
+        'absolute inset-0 z-50 w-screen h-screen bg-white flex flex-col',
+        !isViewerMode && 'opacity-0 pointer-events-none'
       )}
     >
       <Toaster toasterId='post-viewer' />

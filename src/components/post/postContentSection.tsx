@@ -6,7 +6,7 @@ import remarkBreaks from 'remark-breaks';
 
 export default function PostContentSection({ content }: { content: string }) {
   return (
-    <section className='prose post-content mb-20'>
+    <div className='prose post-content mb-20'>
       <MDXRemote
         source={content}
         components={components}
@@ -17,6 +17,6 @@ export default function PostContentSection({ content }: { content: string }) {
           },
         }}
       />
-    </section>
+    </div>
   );
 }
