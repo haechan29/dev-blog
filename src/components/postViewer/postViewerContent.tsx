@@ -12,7 +12,7 @@ export default function PostViewerContent({
   page: Page | null;
   postViewerContentRef: RefObject<HTMLDivElement | null>;
 }) {
-  const { fullscreenScale } = usePostViewer();
+  const { fullscreenScale, paddingInRem } = usePostViewer();
 
   useEffect(() => {
     const content = postViewerContentRef.current;
@@ -26,16 +26,24 @@ export default function PostViewerContent({
   }, [page, postViewerContentRef]);
 
   return (
-    page !== null && (
-      <div
-        ref={postViewerContentRef}
-        className={clsx(
-          'prose fullscreen w-[calc(100vw/var(--fullscreen-scale))] h-[calc(100vh/var(--fullscreen-scale))]',
-          'px-[calc(5rem/var(--fullscreen-scale))] py-[calc(5rem/var(--fullscreen-scale))] mx-auto',
-          'scale-[var(--fullscreen-scale)] origin-top'
-        )}
-        style={{ '--fullscreen-scale': fullscreenScale }}
-      />
-    )
+    <div
+      ref={postViewerContentRef}
+      className={clsx(
+        'prose fullscreen w-[calc(100vw/var(--fullscreen-scale))] h-[calc(100vh/var(--fullscreen-scale))] mx-auto',
+        'pt-[calc(var(--padding-top)/var(--fullscreen-scale))]',
+        'pr-[calc(var(--padding-right)/var(--fullscreen-scale))]',
+        'pb-[calc(var(--padding-bottom)/var(--fullscreen-scale))]',
+        'pl-[calc(var(--padding-left)/var(--fullscreen-scale))]',
+        'scale-[var(--fullscreen-scale)] origin-top',
+        page === null && 'invisible'
+      )}
+      style={{
+        '--fullscreen-scale': fullscreenScale,
+        '--padding-top': `${paddingInRem.top}rem`,
+        '--padding-right': `${paddingInRem.right}rem`,
+        '--padding-bottom': `${paddingInRem.bottom}rem`,
+        '--padding-left': `${paddingInRem.left}rem`,
+      }}
+    />
   );
 }

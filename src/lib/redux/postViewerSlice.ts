@@ -1,4 +1,5 @@
 import { PostViewer } from '@/features/postViewer/domain/model/postViewer';
+import { Padding } from '@/types/padding';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: PostViewer = {
@@ -8,6 +9,12 @@ const initialState: PostViewer = {
   isToolbarExpanded: false,
   advanceMode: null,
   fullscreenScale: 1.5,
+  paddingInRem: {
+    top: 5,
+    right: 5,
+    bottom: 5,
+    left: 5,
+  },
 };
 
 const postViewerSlice = createSlice({
@@ -35,6 +42,9 @@ const postViewerSlice = createSlice({
     setFullscreenScale: (state, action: PayloadAction<number>) => {
       state.fullscreenScale = action.payload;
     },
+    setPaddingInRem: (state, action: PayloadAction<Padding>) => {
+      state.paddingInRem = action.payload;
+    },
   },
 });
 
@@ -46,4 +56,5 @@ export const {
   setIsToolbarExpanded,
   setAdvanceMode,
   setFullscreenScale,
+  setPaddingInRem,
 } = postViewerSlice.actions;

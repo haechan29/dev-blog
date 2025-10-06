@@ -1,3 +1,5 @@
+import { Padding } from '@/types/padding';
+
 export interface PostViewer {
   isCommentSectionVisible: boolean;
   isViewerMode: boolean;
@@ -5,4 +7,5 @@ export interface PostViewer {
   isToolbarExpanded: boolean;
   advanceMode: 'tts' | 'auto' | null;
   fullscreenScale: number;
+  paddingInRem: Padding;
 }
