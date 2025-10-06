@@ -44,5 +44,5 @@ export function extractPlainText(content: string): string {
     .replace(/\n+/g, ' ') // 개행 제거
     .replace(/\s+/g, ' ') // 중복 공백 제거
     .trim()
-    .substring(0, 200);
+    .substring(0, 500);
 }
