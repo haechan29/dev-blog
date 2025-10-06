@@ -38,6 +38,7 @@ function NavCategory({ tag, count }: { tag: string; count: number }) {
 
   const categoryUrl = useMemo(() => {
     let categoryUrl = '/posts';
+    if (currentSlug) categoryUrl += `/${currentSlug}`;
     if (currentSlug || !isTagSelected) categoryUrl += `?tag=${tag}`;
     return categoryUrl;
   }, [currentSlug, isTagSelected, tag]);
