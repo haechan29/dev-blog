@@ -1,20 +1,32 @@
 'use client';
 
 import { incrementViewCount } from '@/features/postStat/domain/service/postStatService';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 
 export default function useViewTracker({ slug }: { slug: string }) {
-  const [lastViewTime, setLastViewTime] = useLocalStorage(
-    `post-view-${slug}`,
-    0
-  );
+  const key = `post-view-${slug}`;
+
+  const getLastViewTime = useCallback(() => {
+    const item = localStorage.getItem(key);
+    if (item) {
+      try {
+        return JSON.parse(item) as number;
+      } catch {}
+    }
+  }, [key]);
+
+  const setLastViewTime = useCallback(() => {
+    const now = Date.now();
+    localStorage.setItem(key, JSON.stringify(now));
+  }, [key]);
 
   useEffect(() => {
     const now = Date.now();
-    if (now - lastViewTime >= 1000 * 60 * 60) {
+    const lastViewTime = getLastViewTime();
+
+    if (lastViewTime === undefined || now - lastViewTime >= 1000 * 60 * 60) {
       incrementViewCount(slug);
-      setLastViewTime(now);
+      setLastViewTime();
     }
-  }, [lastViewTime, slug, setLastViewTime]);
+  }, [getLastViewTime, setLastViewTime, slug]);
 }
