@@ -1,6 +1,7 @@
 'use client';
 
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
+import { setCurrentPageIndex } from '@/lib/redux/postPositionSlice';
 import { setIsViewerMode } from '@/lib/redux/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { RefObject, useCallback, useEffect } from 'react';
@@ -10,7 +11,7 @@ export const useFullscreen = (
   postViewerRef: RefObject<HTMLDivElement | null>
 ) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { isViewerMode } = usePostViewer();
+  const { isViewerMode, pageNumber } = usePostViewer();
 
   const handleFullscreenChange = useCallback(() => {
     if (!document.fullscreenElement && isViewerMode) {
@@ -27,6 +28,14 @@ export const useFullscreen = (
       document.exitFullscreen();
     }
   }, [isViewerMode, postViewerRef]);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+
+    if (isViewerMode && pageNumber === null) {
+      dispatch(setCurrentPageIndex(0));
+    }
+  }, [dispatch, isViewerMode, pageNumber]);
 
   useEffect(() => {
     if (typeof document === 'undefined') return;

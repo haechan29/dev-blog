@@ -4,7 +4,6 @@ import { parsePost as parsePostInner } from '@/features/postViewer/domain/lib/pa
 import { Page } from '@/features/postViewer/domain/types/page';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import {
-  setCurrentPageIndex,
   setHeadingPageMapping,
   setTotalPage,
 } from '@/lib/redux/postPositionSlice';
@@ -39,7 +38,6 @@ export default function usePostParsing(postViewerSize: Size | null) {
     });
 
     dispatch(setTotalPage(pages.length));
-    dispatch(setCurrentPageIndex(0));
     dispatch(setHeadingPageMapping(headingPageMapping));
     setPages(pages);
   }, [dispatch, postViewerSize]);
