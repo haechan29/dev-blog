@@ -43,8 +43,8 @@ export default function PostViewer({ post }: { post: PostProps }) {
         }, 100);
       }}
       className={clsx(
-        'w-screen h-screen bg-white flex flex-col',
-        !isViewerMode && 'hidden'
+        'w-screen h-dvh bg-white flex flex-col',
+        isViewerMode ? 'fixed inset-0 overflow-y-auto' : 'hidden'
       )}
     >
       <Toaster toasterId='post-viewer' />

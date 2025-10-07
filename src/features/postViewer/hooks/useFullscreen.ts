@@ -1,6 +1,7 @@
 'use client';
 
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
+import { supportsFullscreen } from '@/lib/browser';
 import { setIsViewerMode } from '@/lib/redux/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { RefObject, useCallback, useEffect } from 'react';
@@ -19,10 +20,13 @@ export const useFullscreen = (
   }, [dispatch, isViewerMode]);
 
   useEffect(() => {
-    if (typeof document === 'undefined' || !postViewerRef.current) return;
+    const postViewer = postViewerRef.current;
+    if (typeof document === 'undefined' || !postViewer) return;
+
+    if (!supportsFullscreen) return;
 
     if (isViewerMode) {
-      postViewerRef.current.requestFullscreen();
+      postViewer.requestFullscreen();
     } else if (document.fullscreenElement) {
       document.exitFullscreen();
     }
