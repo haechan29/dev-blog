@@ -10,7 +10,7 @@ export const useFullscreen = (
   postViewerRef: RefObject<HTMLDivElement | null>
 ) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { isViewerMode, pageNumber } = usePostViewer();
+  const { isViewerMode } = usePostViewer();
 
   const handleFullscreenChange = useCallback(() => {
     if (!document.fullscreenElement && isViewerMode) {
