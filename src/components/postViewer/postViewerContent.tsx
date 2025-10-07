@@ -1,11 +1,9 @@
 'use client';
 
-import { toProps } from '@/features/postViewer/domain/model/postViewer';
 import { Page } from '@/features/postViewer/domain/types/page';
-import { RootState } from '@/lib/redux/store';
+import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import clsx from 'clsx';
-import { RefObject, useEffect, useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { RefObject, useEffect } from 'react';
 
 export default function PostViewerContent({
   page,
@@ -14,31 +12,41 @@ export default function PostViewerContent({
   page: Page | null;
   postViewerContentRef: RefObject<HTMLDivElement | null>;
 }) {
-  const postViewer = useSelector((state: RootState) => state.postViewer);
-  const { fullscreenScale } = useMemo(() => toProps(postViewer), [postViewer]);
+  const { fullscreenScale, paddingInRem } = usePostViewer();
 
   useEffect(() => {
+    if (typeof document === 'undefined') return;
+
     const content = postViewerContentRef.current;
     if (!page || !content) return;
 
     content.innerHTML = '';
+    const fragment = document.createDocumentFragment();
     page.forEach(element => {
-      const clonedElement = element.cloneNode(true);
-      content.appendChild(clonedElement);
+      fragment.appendChild(element);
     });
+    content.appendChild(fragment);
   }, [page, postViewerContentRef]);
 
   return (
-    page !== null && (
-      <div
-        ref={postViewerContentRef}
-        className={clsx(
-          'prose fullscreen w-[calc(100vw/var(--fullscreen-scale))] h-[calc(100vh/var(--fullscreen-scale))]',
-          'px-[calc(5rem/var(--fullscreen-scale))] py-[calc(5rem/var(--fullscreen-scale))] mx-auto',
-          'scale-[var(--fullscreen-scale)] origin-top'
-        )}
-        style={{ '--fullscreen-scale': fullscreenScale }}
-      />
-    )
+    <div
+      ref={postViewerContentRef}
+      className={clsx(
+        'prose relative w-[calc(100vw/var(--fullscreen-scale))] h-[calc(100vh/var(--fullscreen-scale))] mx-auto',
+        'pt-[calc(var(--padding-top)/var(--fullscreen-scale))]',
+        'pr-[calc(var(--padding-right)/var(--fullscreen-scale))]',
+        'pb-[calc(var(--padding-bottom)/var(--fullscreen-scale))]',
+        'pl-[calc(var(--padding-left)/var(--fullscreen-scale))]',
+        'scale-[var(--fullscreen-scale)] origin-top',
+        page === null && 'hidden'
+      )}
+      style={{
+        '--fullscreen-scale': fullscreenScale,
+        '--padding-top': `${paddingInRem.top}rem`,
+        '--padding-right': `${paddingInRem.right}rem`,
+        '--padding-bottom': `${paddingInRem.bottom}rem`,
+        '--padding-left': `${paddingInRem.left}rem`,
+      }}
+    />
   );
 }

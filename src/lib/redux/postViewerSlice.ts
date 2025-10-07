@@ -1,15 +1,22 @@
 import { PostViewer } from '@/features/postViewer/domain/model/postViewer';
-import { HeadingPageMapping } from '@/features/postViewer/domain/types/headingPageMapping';
+import { Padding } from '@/types/padding';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: PostViewer = {
   isCommentSectionVisible: false,
   isViewerMode: false,
-  areBarsVisible: true,
   isToolbarExpanded: false,
-  paging: null,
   advanceMode: null,
   fullscreenScale: 1.5,
+  paddingInRem: {
+    top: 5,
+    right: 5,
+    bottom: 5,
+    left: 5,
+  },
+  isMouseOnToolbar: false,
+  isMouseOnControlBar: false,
+  isMouseMoved: false,
 };
 
 const postViewerSlice = createSlice({
@@ -22,32 +29,8 @@ const postViewerSlice = createSlice({
     setIsViewerMode: (state, action: PayloadAction<boolean>) => {
       state.isViewerMode = action.payload;
     },
-    setAreBarsVisible: (state, action: PayloadAction<boolean>) => {
-      state.areBarsVisible = action.payload;
-    },
     setIsToolbarExpanded: (state, action: PayloadAction<boolean>) => {
       state.isToolbarExpanded = action.payload;
-    },
-    setPageIndex: (state, action: PayloadAction<number>) => {
-      state.paging = {
-        index: action.payload,
-        total: state.paging!.total,
-      };
-    },
-    nextPage: state => {
-      state.paging = {
-        index: state.paging!.index + 1,
-        total: state.paging!.total,
-      };
-    },
-    previousPage: state => {
-      state.paging = {
-        index: state.paging!.index - 1,
-        total: state.paging!.total,
-      };
-    },
-    setPaging: (state, action: PayloadAction<PostViewer['paging']>) => {
-      state.paging = action.payload;
     },
     setAdvanceMode: (
       state,
@@ -58,11 +41,17 @@ const postViewerSlice = createSlice({
     setFullscreenScale: (state, action: PayloadAction<number>) => {
       state.fullscreenScale = action.payload;
     },
-    setHeadingPageMapping: (
-      state,
-      action: PayloadAction<HeadingPageMapping>
-    ) => {
-      state.headingPageMapping = action.payload;
+    setPaddingInRem: (state, action: PayloadAction<Padding>) => {
+      state.paddingInRem = action.payload;
+    },
+    setIsMouseOnToolbar: (state, action: PayloadAction<boolean>) => {
+      state.isMouseOnToolbar = action.payload;
+    },
+    setIsMouseOnControlBar: (state, action: PayloadAction<boolean>) => {
+      state.isMouseOnControlBar = action.payload;
+    },
+    setIsMouseMoved: (state, action: PayloadAction<boolean>) => {
+      state.isMouseMoved = action.payload;
     },
   },
 });
@@ -71,13 +60,11 @@ export default postViewerSlice.reducer;
 export const {
   setIsCommentSectionVisible,
   setIsViewerMode,
-  setAreBarsVisible,
   setIsToolbarExpanded,
-  setPageIndex,
-  nextPage,
-  previousPage,
-  setPaging,
   setAdvanceMode,
   setFullscreenScale,
-  setHeadingPageMapping,
+  setPaddingInRem,
+  setIsMouseOnToolbar,
+  setIsMouseOnControlBar,
+  setIsMouseMoved,
 } = postViewerSlice.actions;

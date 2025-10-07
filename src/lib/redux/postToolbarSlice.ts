@@ -1,10 +1,9 @@
-import { Heading } from '@/features/post/domain/model/post';
+import Heading from '@/features/post/domain/model/heading';
 import PostToolbar from '@/features/post/domain/model/postToolbar';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: PostToolbar = {
   tag: null,
-  selectedHeading: null,
   isInPostsPage: false,
   isHeaderVisible: false,
   isContentVisible: false,
@@ -18,9 +17,6 @@ const postToolbarSlice = createSlice({
   reducers: {
     setTag: (state, action: PayloadAction<string | null>) => {
       state.tag = action.payload;
-    },
-    setSelectedHeading: (state, action: PayloadAction<Heading>) => {
-      state.selectedHeading = action.payload;
     },
     setIsInPostsPage: (state, action: PayloadAction<boolean>) => {
       state.isInPostsPage = action.payload;
@@ -51,6 +47,5 @@ export const {
   setIsExpanded,
   setTag,
   setTitle,
-  setSelectedHeading,
   setHeadings,
 } = postToolbarSlice.actions;

@@ -1,14 +1,13 @@
-import { toProps } from '@/features/postViewer/domain/model/postViewer';
+import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { setFullscreenScale } from '@/lib/redux/postViewerSlice';
-import { AppDispatch, RootState } from '@/lib/redux/store';
-import { useEffect, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '@/lib/redux/store';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 
 export const useFullscreenScale = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const postViewer = useSelector((state: RootState) => state.postViewer);
-  const { fullscreenScale } = useMemo(() => toProps(postViewer), [postViewer]);
+  const { fullscreenScale } = usePostViewer();
 
   const [fullscreenScaleLocal, setFullscreenScaleLocal] = useLocalStorage(
     'fullscreen-scale',

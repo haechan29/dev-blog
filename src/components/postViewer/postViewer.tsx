@@ -3,53 +3,60 @@
 import PostViewerContent from '@/components/postViewer/postViewerContent';
 import PostViewerControlBar from '@/components/postViewer/postViewerControlBar';
 import PostViewerToolbar from '@/components/postViewer/postViewerToolbar';
-import { PostItemProps } from '@/features/post/ui/postItemProps';
-import { toProps } from '@/features/postViewer/domain/model/postViewer';
-import { useBarsAutoHide } from '@/features/postViewer/hooks/useBarsAutoHide';
+import { PostProps } from '@/features/post/ui/postProps';
 import { useFullscreen } from '@/features/postViewer/hooks/useFullscreen';
 import { useFullscreenScale } from '@/features/postViewer/hooks/useFullscreenScale';
 import usePostParsing from '@/features/postViewer/hooks/usePostParsing';
+import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
+import usePostViewerSize from '@/features/postViewer/hooks/usePostViewerSize';
 import { useViewerNavigation } from '@/features/postViewer/hooks/useViewerNavigation';
-import { RootState } from '@/lib/redux/store';
+import useDebounce from '@/hooks/useDebounce';
+import useThrottle from '@/hooks/useThrottle';
+import { setIsMouseMoved } from '@/lib/redux/postViewerSlice';
+import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
-import { useMemo, useRef } from 'react';
+import { useRef } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
-export default function PostViewer({
-  postProps,
-}: {
-  postProps: PostItemProps;
-}) {
-  const postViewer = useSelector((state: RootState) => state.postViewer);
-  const { isViewerMode } = useMemo(() => toProps(postViewer), [postViewer]);
+export default function PostViewer({ post }: { post: PostProps }) {
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { isViewerMode } = usePostViewer();
   const postViewerRef = useRef<HTMLDivElement | null>(null);
   const postViewerContentRef = useRef<HTMLDivElement | null>(null);
+  const throttle = useThrottle();
+  const debounce = useDebounce();
 
-  const { page } = usePostParsing();
+  const postViewerSize = usePostViewerSize(postViewerContentRef);
+  const { page } = usePostParsing(postViewerSize);
 
   useFullscreenScale();
   useFullscreen(postViewerRef);
   useViewerNavigation(postViewerContentRef);
-  useBarsAutoHide();
 
   return (
-    <>
+    <div
+      ref={postViewerRef}
+      onMouseMove={() => {
+        throttle(() => {
+          dispatch(setIsMouseMoved(true));
+          debounce(() => dispatch(setIsMouseMoved(false)), 2000);
+        }, 100);
+      }}
+      className={clsx(
+        'w-screen h-screen bg-white flex flex-col',
+        !isViewerMode && 'hidden'
+      )}
+    >
       <Toaster toasterId='post-viewer' />
-      <div
-        ref={postViewerRef}
-        className={clsx(
-          'bg-white flex flex-col w-screen',
-          !isViewerMode && 'hidden'
-        )}
-      >
-        <PostViewerToolbar {...postProps} />
-        <PostViewerContent
-          page={page}
-          postViewerContentRef={postViewerContentRef}
-        />
-        <PostViewerControlBar page={page} />
-      </div>
-    </>
+
+      <PostViewerToolbar {...post} />
+      <PostViewerContent
+        page={page}
+        postViewerContentRef={postViewerContentRef}
+      />
+      <PostViewerControlBar page={page} />
+    </div>
   );
 }

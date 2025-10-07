@@ -1,33 +1,31 @@
 'use client';
 
-import { Heading } from '@/features/post/domain/model/post';
-import useMediaQuery from '@/hooks/useMediaQuery';
+import Heading from '@/features/post/domain/model/heading';
 import useThrottle from '@/hooks/useThrottle';
-import { setSelectedHeading } from '@/lib/redux/postToolbarSlice';
+import { setCurrentHeading } from '@/lib/redux/postPositionSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function ActiveHeadingDetector({
+export default function useHeadingTracker({
   headings,
 }: {
   headings: Heading[];
 }) {
   const dispatch = useDispatch<AppDispatch>();
-
   const throttle = useThrottle();
-  const isLargerThanXl = useMediaQuery('(min-width: 1280px)');
 
   const getTargetHeading = useCallback(() => {
     if (typeof window === 'undefined') return null;
     const vh = window.innerHeight;
+    const threshold = 0.1 * vh;
 
     const targetElementsInVisibleArea = headings.filter(heading => {
       const element = document.getElementById(heading.id);
       if (!element) return false;
 
       const rect = element.getBoundingClientRect();
-      return rect.top >= -0.1 * vh && rect.top <= 0.1 * vh;
+      return Math.abs(rect.top) <= threshold;
     });
 
     if (targetElementsInVisibleArea.length > 0) {
@@ -39,6 +37,8 @@ export default function ActiveHeadingDetector({
       return element && element.getBoundingClientRect().top <= 0.1 * vh;
     });
 
+    if (allTargetElementsAbove.length >= headings.length) return null;
+
     if (allTargetElementsAbove.length > 0) {
       return allTargetElementsAbove[allTargetElementsAbove.length - 1];
     }
@@ -47,23 +47,18 @@ export default function ActiveHeadingDetector({
   }, [headings]);
 
   const updateHeadings = useCallback(() => {
-    const targetHeading = getTargetHeading();
-    if (targetHeading !== null) {
-      dispatch(setSelectedHeading(targetHeading));
-    }
-  }, [dispatch, getTargetHeading]);
+    throttle(() => {
+      const targetHeading = getTargetHeading();
+      dispatch(setCurrentHeading(targetHeading));
+    }, 1000);
+  }, [dispatch, getTargetHeading, throttle]);
 
   useEffect(() => {
-    if (isLargerThanXl) return;
-
     updateHeadings();
-    const throttledUpdate = () => throttle(updateHeadings, 100);
-    window.addEventListener('scroll', throttledUpdate);
+    document.addEventListener('scroll', updateHeadings);
 
     return () => {
-      window.removeEventListener('scroll', throttledUpdate);
+      document.removeEventListener('scroll', updateHeadings);
     };
-  }, [isLargerThanXl, throttle, updateHeadings]);
-
-  return <></>;
+  }, [updateHeadings]);
 }

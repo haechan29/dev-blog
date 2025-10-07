@@ -5,11 +5,11 @@ import { Page } from '@/features/postViewer/domain/types/page';
 import { useCallback, useRef } from 'react';
 
 export default function useTTSPlayer({
-  page,
+  readablePage,
   onFinishElement,
   onFinishPage,
 }: {
-  page: Page | null;
+  readablePage: Page | null;
   onFinishElement: (nextElementIndex: number) => void;
   onFinishPage: () => void;
 }) {
@@ -17,7 +17,7 @@ export default function useTTSPlayer({
 
   const startReading = useCallback(
     (elementIndex: number) => {
-      if (!page) return;
+      if (!readablePage) return;
 
       if (isPaused.current) {
         speechSynthesis.resume();
@@ -25,26 +25,29 @@ export default function useTTSPlayer({
         return;
       }
 
-      if (elementIndex >= page.length) {
+      if (elementIndex >= readablePage.length) {
         onFinishPage();
         return;
       }
 
-      const element = page[elementIndex];
+      readablePage.forEach((element, index) => {
+        element.classList.remove('tts-reading-active', 'tts-reading-inactive');
 
-      document
-        .querySelectorAll('.reading-highlight')
-        .forEach(el => el.classList.remove('reading-highlight'));
+        if (index === elementIndex) {
+          element.classList.add('tts-reading-active');
+        } else {
+          element.classList.add('tts-reading-inactive');
+        }
+      });
 
-      element.classList.add('reading-highlight');
-
+      const element = readablePage[elementIndex];
       const utterance = getUtterance(element.textContent);
       utterance.onend = () => onFinishElement(elementIndex + 1);
 
       speechSynthesis.cancel();
       speechSynthesis.speak(utterance);
     },
-    [onFinishElement, onFinishPage, page]
+    [onFinishElement, onFinishPage, readablePage]
   );
 
   const pauseReading = useCallback(() => {
@@ -55,10 +58,12 @@ export default function useTTSPlayer({
   const stopReading = useCallback(() => {
     speechSynthesis.cancel();
 
-    document
-      .querySelectorAll('.reading-highlight')
-      .forEach(el => el.classList.remove('reading-highlight'));
-  }, []);
+    if (readablePage) {
+      readablePage.forEach(element => {
+        element.classList.remove('tts-reading-active', 'tts-reading-inactive');
+      });
+    }
+  }, [readablePage]);
 
   return { startReading, pauseReading, stopReading } as const;
 }

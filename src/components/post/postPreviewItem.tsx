@@ -1,30 +1,60 @@
 'use client';
 
 import PostInfoItem from '@/components/post/postInfoItem';
-import { PostItemProps } from '@/features/post/ui/postItemProps';
+import { PostProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
 import Link from 'next/link';
+import { useMemo, useState } from 'react';
 
 export default function PostPreviewItem({
   tag,
   post,
 }: {
   tag: string | null;
-  post: PostItemProps;
+  post: PostProps;
 }) {
+  const [isHovered, setIsHovered] = useState(false);
+  const contentScale = useMemo(() => (isHovered ? 1.2 : 1), [isHovered]);
+
   return (
-    <div className={clsx('w-full py-8 border-b border-b-gray-200')}>
-      <Link href={`/posts/${post.slug}${tag ? `?tag=${tag}` : ''}`}>
-        <div className='text-2xl font-semibold text-gray-900 mb-4 line-clamp-2'>
+    <div
+      className='w-full py-8 border-b border-b-gray-200 text-gray-900'
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <Link
+        href={`/posts/${post.slug}${tag ? `?tag=${tag}` : ''}`}
+        className='text-gray-900'
+      >
+        <div className='text-2xl font-semibold mb-4 line-clamp-2'>
           {post.title}
         </div>
 
-        <div className='mb-4 break-keep leading-6 line-clamp-3'>
-          {post.plainText}
+        <div className='relative mb-4 h-18'>
+          <div
+            className={clsx(
+              'absolute left-0 top-0 leading-6',
+              'transition-transform|discrete duration-300 ease-in-out',
+              'scale-[var(--content-scale)] origin-top-left',
+              'w-[calc(100%/var(--content-scale))]',
+              isHovered ? 'h-30 line-clamp-5' : 'h-18 line-clamp-3'
+            )}
+            style={{
+              '--content-scale': contentScale,
+            }}
+          >
+            {post.plainText}
+          </div>
         </div>
       </Link>
 
-      <div className='flex flex-wrap gap-2 mb-4'>
+      <div
+        className={clsx(
+          'flex flex-wrap gap-2 mb-4',
+          'transition-opacity duration-300 ease-in-out',
+          isHovered && 'opacity-0 pointer-events-none'
+        )}
+      >
         {post.tags.map(tag => (
           <Link
             href={`/posts?tag=${tag}`}
@@ -36,7 +66,7 @@ export default function PostPreviewItem({
         ))}
       </div>
 
-      <PostInfoItem post={post} />
+      <PostInfoItem isVisible={!isHovered} post={post} />
     </div>
   );
 }

@@ -1,23 +1,25 @@
 'use client';
 
 import { parsePost as parsePostInner } from '@/features/postViewer/domain/lib/parse';
-import { toProps } from '@/features/postViewer/domain/model/postViewer';
 import { Page } from '@/features/postViewer/domain/types/page';
-import { setHeadingPageMapping, setPaging } from '@/lib/redux/postViewerSlice';
-import { AppDispatch, RootState } from '@/lib/redux/store';
+import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
+import {
+  setHeadingPageMapping,
+  setTotalPage,
+} from '@/lib/redux/postPositionSlice';
+import {} from '@/lib/redux/postViewerSlice';
+import { AppDispatch } from '@/lib/redux/store';
+import { Size } from '@/types/size';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
-export default function usePostParsing() {
+export default function usePostParsing(postViewerSize: Size | null) {
   const dispatch = useDispatch<AppDispatch>();
-  const postViewer = useSelector((state: RootState) => state.postViewer);
 
   const [pages, setPages] = useState<Page[] | null>(null);
 
-  const { pageNumber, fullscreenScale } = useMemo(
-    () => toProps(postViewer),
-    [postViewer]
-  );
+  const { pageNumber } = usePostViewer();
+
   const page = useMemo(() => {
     if (!pages || !pageNumber) return null;
     return pages[pageNumber - 1];
@@ -25,19 +27,20 @@ export default function usePostParsing() {
 
   const parsePost = useCallback(() => {
     const postContainer = document.querySelector('.post-content');
-    if (!postContainer) return;
+    if (!postViewerSize || !postContainer) return;
+    const { width: containerWidth, height: containerHeight } = postViewerSize;
 
-    const pageHeight = (window.screen.height - 80) / fullscreenScale;
     const { pages, headingPageMapping } = parsePostInner({
       postContainer,
-      pageHeight,
+      containerWidth,
+      containerHeight,
       excludeClassNames: ['hide-fullscreen'],
     });
 
-    dispatch(setPaging({ index: 0, total: pages.length }));
+    dispatch(setTotalPage(pages.length));
     dispatch(setHeadingPageMapping(headingPageMapping));
     setPages(pages);
-  }, [dispatch, fullscreenScale]);
+  }, [dispatch, postViewerSize]);
 
   useEffect(() => {
     const timer = setTimeout(parsePost, 100);

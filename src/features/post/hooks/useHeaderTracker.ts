@@ -5,11 +5,9 @@ import { AppDispatch } from '@/lib/redux/store';
 import { RefObject, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function HeaderSectionDetector({
-  headerRef,
-}: {
-  headerRef: RefObject<null>;
-}) {
+export default function useHeaderTracker(
+  headerRef: RefObject<HTMLDivElement | null>
+) {
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
@@ -24,6 +22,4 @@ export default function HeaderSectionDetector({
     }
     return () => headerObserver.disconnect();
   }, [dispatch, headerRef]);
-
-  return <></>;
 }

@@ -1,37 +1,34 @@
 'use client';
 
-import { Heading } from '@/features/post/domain/model/post';
-import { toProps } from '@/features/post/domain/model/postToolbar';
+import Heading from '@/features/post/domain/model/heading';
+import usePostToolbar from '@/features/post/hooks/usePostToolbar';
+import { setCurrentHeading } from '@/lib/redux/postPositionSlice';
 import { setIsVisible } from '@/lib/redux/postSidebarSlice';
-import {
-  setIsExpanded,
-  setSelectedHeading,
-} from '@/lib/redux/postToolbarSlice';
-import { AppDispatch, RootState } from '@/lib/redux/store';
+import { setIsExpanded } from '@/lib/redux/postToolbarSlice';
+import { AppDispatch } from '@/lib/redux/store';
 import { scrollToElement } from '@/lib/scroll';
 import clsx from 'clsx';
 import { ChevronDown, ChevronRight, Menu } from 'lucide-react';
 import { useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 export default function PostToolbar() {
   const dispatch = useDispatch<AppDispatch>();
-  const postToolbar = useSelector((state: RootState) => state.postToolbar);
-  const postToolbarProps = useMemo(() => toProps(postToolbar), [postToolbar]);
+  const postToolbar = usePostToolbar();
 
   const breadcrumb = useMemo(() => {
-    return postToolbarProps.mode === 'basic' ||
-      postToolbarProps.mode === 'collapsed' ||
-      postToolbarProps.mode === 'expanded'
-      ? postToolbarProps.breadcrumb
+    return postToolbar.mode === 'basic' ||
+      postToolbar.mode === 'collapsed' ||
+      postToolbar.mode === 'expanded'
+      ? postToolbar.breadcrumb
       : [];
-  }, [postToolbarProps]);
+  }, [postToolbar]);
 
   const handleClick = (heading: Heading) => {
-    if (postToolbarProps.mode === 'collapsed') {
+    if (postToolbar.mode === 'collapsed') {
       dispatch(setIsExpanded(true));
     }
-    if (postToolbarProps.mode === 'expanded') {
+    if (postToolbar.mode === 'expanded') {
       const element = document.getElementById(heading.id);
       if (element) {
         scrollToElement(
@@ -41,7 +38,7 @@ export default function PostToolbar() {
             block: 'start',
           },
           () => {
-            dispatch(setSelectedHeading(heading));
+            dispatch(setCurrentHeading(heading));
             dispatch(setIsExpanded(false));
           }
         );
@@ -80,35 +77,33 @@ export default function PostToolbar() {
               <div
                 className={clsx(
                   'flex flex-col w-full transition-opacity duration-300 ease-in-out',
-                  postToolbarProps.mode === 'empty'
-                    ? 'opacity-0'
-                    : 'opacity-100'
+                  postToolbar.mode === 'empty' ? 'opacity-0' : 'opacity-100'
                 )}
               >
-                {((postToolbarProps.mode === 'minimal' &&
-                  postToolbarProps.title !== null) ||
-                  postToolbarProps.mode === 'basic') && (
+                {((postToolbar.mode === 'minimal' &&
+                  postToolbar.title !== null) ||
+                  postToolbar.mode === 'basic') && (
                   <div className='font-semibold h-6 truncate'>
-                    {postToolbarProps.title}
+                    {postToolbar.title}
                   </div>
                 )}
-                {(postToolbarProps.mode === 'collapsed' ||
-                  postToolbarProps.mode === 'expanded') && (
+                {(postToolbar.mode === 'collapsed' ||
+                  postToolbar.mode === 'expanded') && (
                   <div className='flex flex-col'>
-                    {postToolbarProps.headings.map(heading => (
+                    {postToolbar.headings.map(heading => (
                       <button
                         key={heading.id}
                         onClick={() => handleClick(heading)}
                         className={clsx(
                           'flex truncate transition-discrete|opacity duration-300 ease-in',
-                          postToolbarProps.mode === 'expanded' ||
-                            postToolbarProps.title === heading.text
+                          postToolbar.mode === 'expanded' ||
+                            postToolbar.title === heading.text
                             ? 'h-6 opacity-100'
                             : 'h-0 opacity-0',
-                          postToolbarProps.title === heading.text
+                          postToolbar.title === heading.text
                             ? 'text-gray-900 font-semibold'
                             : 'text-gray-400',
-                          postToolbarProps.mode === 'expanded' && 'my-0.5'
+                          postToolbar.mode === 'expanded' && 'my-0.5'
                         )}
                       >
                         {heading.text}
@@ -120,18 +115,18 @@ export default function PostToolbar() {
             </div>
             <button
               onClick={() =>
-                dispatch(setIsExpanded(postToolbarProps.mode !== 'expanded'))
+                dispatch(setIsExpanded(postToolbar.mode !== 'expanded'))
               }
               className='flex shrink-0 px-2 items-center justify-center'
             >
               <ChevronDown
                 className={clsx(
                   'w-6 h-6 text-gray-500 transition-opacity|transform duration-300 ease-in-out',
-                  postToolbarProps.mode === 'collapsed' ||
-                    postToolbarProps.mode === 'expanded'
+                  postToolbar.mode === 'collapsed' ||
+                    postToolbar.mode === 'expanded'
                     ? 'opacity-100'
                     : 'opacity-0',
-                  postToolbarProps.mode === 'expanded' && '-rotate-180'
+                  postToolbar.mode === 'expanded' && '-rotate-180'
                 )}
               />
             </button>

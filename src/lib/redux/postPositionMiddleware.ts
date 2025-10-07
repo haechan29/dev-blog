@@ -1,25 +1,20 @@
 import {
   nextPage,
   previousPage,
-  setPageIndex,
-  setPaging,
-} from '@/lib/redux/postViewerSlice';
+  setCurrentPageIndex,
+} from '@/lib/redux/postPositionSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { MiddlewareParams } from '@/types/middlewareParams';
 import { isAnyOf, Middleware } from '@reduxjs/toolkit';
 import toast from 'react-hot-toast';
 
-export const postViewerMiddleware: Middleware<
+export const postPositionMiddleware: Middleware<
   unknown,
   RootState,
   AppDispatch
 > = store => next => action => {
-  if (isAnyOf(setPageIndex)(action)) {
-    return handleSetPageIndex({ store, next, action });
-  }
-
-  if (isAnyOf(setPaging)(action)) {
-    return handleSetPaging({ store, next, action });
+  if (isAnyOf(setCurrentPageIndex)(action)) {
+    return handleSetCurrentPageIndex({ store, next, action });
   }
 
   if (isAnyOf(nextPage)(action)) {
@@ -33,30 +28,17 @@ export const postViewerMiddleware: Middleware<
   return next(action);
 };
 
-function handleSetPageIndex({
+function handleSetCurrentPageIndex({
   store,
   next,
   action,
-}: MiddlewareParams<ReturnType<typeof setPageIndex>>) {
-  const paging = store.getState().postViewer.paging;
-  if (!paging) return;
+}: MiddlewareParams<ReturnType<typeof setCurrentPageIndex>>) {
+  const totalPage = store.getState().postPosition.totalPage;
+  if (totalPage === null) return;
 
   const pageIndex = action.payload;
-  if (pageIndex < 0 || pageIndex >= paging.total) return;
-
-  return next(action);
-}
-
-function handleSetPaging({
-  store,
-  next,
-  action,
-}: MiddlewareParams<ReturnType<typeof setPaging>>) {
-  const paging = action.payload;
-  if (!paging) return next(action);
-
-  const { index, total } = paging;
-  if (index < 0 || index >= total) return;
+  if (pageIndex === null) return;
+  if (pageIndex < 0 || pageIndex >= totalPage) return;
 
   return next(action);
 }
@@ -66,9 +48,11 @@ function handleNextPage({
   next,
   action,
 }: MiddlewareParams<ReturnType<typeof nextPage>>) {
-  const paging = store.getState().postViewer.paging;
-  if (!paging) return;
-  if (paging.index >= paging.total - 1) {
+  const totalPage = store.getState().postPosition.totalPage;
+  const currentPageIndex = store.getState().postPosition.currentPageIndex;
+  if (totalPage === null || currentPageIndex === null) return;
+
+  if (currentPageIndex >= totalPage - 1) {
     toast.success('마지막 페이지입니다.', {
       id: 'post-viewer',
       toasterId: 'post-viewer',
@@ -84,9 +68,10 @@ function handlePreviousPage({
   next,
   action,
 }: MiddlewareParams<ReturnType<typeof previousPage>>) {
-  const paging = store.getState().postViewer.paging;
-  if (!paging) return;
-  if (paging.index <= 0) {
+  const currentPageIndex = store.getState().postPosition.currentPageIndex;
+  if (currentPageIndex === null) return;
+
+  if (currentPageIndex <= 0) {
     toast.success('첫 페이지입니다.', {
       id: 'post-viewer',
       toasterId: 'post-viewer',

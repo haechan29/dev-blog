@@ -1,16 +1,9 @@
 'use client';
 
-import { toProps as toPostViewerProps } from '@/features/postViewer/domain/model/postViewer';
-import { RootState } from '@/lib/redux/store';
-import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 
 export default function PageIndicatorSection() {
-  const postViewer = useSelector((state: RootState) => state.postViewer);
-  const { pageNumber, totalPages } = useMemo(
-    () => toPostViewerProps(postViewer),
-    [postViewer]
-  );
+  const { pageNumber, totalPages } = usePostViewer();
 
   return (
     pageNumber !== null &&

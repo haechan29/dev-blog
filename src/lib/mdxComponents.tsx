@@ -1,6 +1,7 @@
-import HideFullscreen from '@/components/post//hideFullscreen';
+import Caption from '@/components/mdx/caption';
+import HideFullscreen from '@/components/mdx/hideFullscreen';
+import Paged from '@/components/mdx/paged';
 import PostSummarySection from '@/components/post/postSummarySection';
-import ToggleButtonItem from '@/components/post/toggleButtonItem';
 import { ReactNode } from 'react';
 
 const ExternalLink = ({ children, ...props }: { children: ReactNode }) => {
@@ -11,9 +12,10 @@ const ExternalLink = ({ children, ...props }: { children: ReactNode }) => {
   );
 };
 
-export const compoenents = {
+export const components = {
   PostSummarySection,
-  ToggleButtonItem,
   HideFullscreen,
+  Paged,
+  Caption,
   a: ExternalLink,
 };

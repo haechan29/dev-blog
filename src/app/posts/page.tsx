@@ -1,7 +1,7 @@
 import PostPreviewItem from '@/components/post/postPreviewItem';
-import PostsDispatcher from '@/components/post/postsDispatcher';
+import PostsPageClient from '@/components/post/postsPageClient';
 import { fetchAllPosts } from '@/features/post/domain/service/postService';
-import { PostItemProps } from '@/features/post/ui/postItemProps';
+import { createProps, PostProps } from '@/features/post/ui/postProps';
 import { fetchPostStat } from '@/features/postStat/domain/service/postStatService';
 import {
   dehydrate,
@@ -9,7 +9,7 @@ import {
   QueryClient,
 } from '@tanstack/react-query';
 
-export default async function PostPage({
+export default async function PostsPage({
   searchParams,
 }: {
   searchParams: Promise<{ tag?: string }>;
@@ -21,9 +21,9 @@ export default async function PostPage({
   const filteredPosts = tag
     ? posts.filter(post => post.tags?.includes(tag))
     : posts;
-  const postProps = filteredPosts.map(post => post.toProps());
+  const postProps = filteredPosts.map(createProps);
 
-  const prefetchStat = (post: PostItemProps) =>
+  const prefetchStat = (post: PostProps) =>
     queryClient.prefetchQuery({
       queryKey: ['posts', post.slug, 'stats'],
       queryFn: () => fetchPostStat(post.slug).then(stat => stat.toProps()),
@@ -32,13 +32,16 @@ export default async function PostPage({
   await Promise.allSettled(postProps.map(prefetchStat));
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <PostsDispatcher tag={tag} />
-      <div className='px-10 xl:px-20 py-8 flex flex-col'>
-        {postProps.map(post => (
-          <PostPreviewItem key={post.slug} tag={tag} post={post} />
-        ))}
-      </div>
-    </HydrationBoundary>
+    <>
+      <PostsPageClient />
+
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <div className='px-10 xl:px-20 py-8 flex flex-col'>
+          {postProps.map(post => (
+            <PostPreviewItem key={post.slug} tag={tag} post={post} />
+          ))}
+        </div>
+      </HydrationBoundary>
+    </>
   );
 }

@@ -1,18 +1,17 @@
 'use client';
 
-import { toProps } from '@/features/postViewer/domain/model/postViewer';
+import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import useThrottle from '@/hooks/useThrottle';
-import { nextPage, previousPage } from '@/lib/redux/postViewerSlice';
-import { AppDispatch, RootState } from '@/lib/redux/store';
-import { RefObject, useCallback, useEffect, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { nextPage, previousPage } from '@/lib/redux/postPositionSlice';
+import { AppDispatch } from '@/lib/redux/store';
+import { RefObject, useCallback, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 
 export const useViewerNavigation = (
   contentRef: RefObject<HTMLDivElement | null>
 ) => {
   const dispatch = useDispatch<AppDispatch>();
-  const postViewer = useSelector((state: RootState) => state.postViewer);
-  const { isViewerMode } = useMemo(() => toProps(postViewer), [postViewer]);
+  const { isViewerMode } = usePostViewer();
 
   const throttle = useThrottle();
 

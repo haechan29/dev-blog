@@ -9,13 +9,7 @@ import clsx from 'clsx';
 import { Heart } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 
-export default function LikeButtonItem({
-  postId,
-  className,
-}: {
-  postId: string;
-  className?: string;
-}) {
+export default function LikeButtonItem({ postId }: { postId: string }) {
   const [heartFilled, setHeartFilled] = useState(false);
   const throttle = useThrottle();
 
@@ -74,7 +68,7 @@ export default function LikeButtonItem({
   }, [heartFilled]);
 
   return (
-    <div className={className}>
+    <div className='flex justify-center mb-20'>
       <button
         onClick={handleClick}
         className={clsx(

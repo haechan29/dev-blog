@@ -4,20 +4,17 @@ import {
   AutoAdvance,
   toProps as toAutoAdvanceProps,
 } from '@/features/postViewer/domain/model/autoAdvance';
-import { toProps as toPostViewerProps } from '@/features/postViewer/domain/model/postViewer';
+import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { nextPage, setAdvanceMode } from '@/lib/redux/postViewerSlice';
-import { AppDispatch, RootState } from '@/lib/redux/store';
+import { nextPage } from '@/lib/redux/postPositionSlice';
+import { setAdvanceMode } from '@/lib/redux/postViewerSlice';
+import { AppDispatch } from '@/lib/redux/store';
 import { useCallback, useEffect, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 export default function useAutoAdvanceState() {
   const dispatch = useDispatch<AppDispatch>();
-  const postViewer = useSelector((state: RootState) => state.postViewer);
-  const { pageNumber, totalPages, advanceMode } = useMemo(
-    () => toPostViewerProps(postViewer),
-    [postViewer]
-  );
+  const { pageNumber, totalPages, advanceMode } = usePostViewer();
 
   const [autoAdvance, setAutoAdvance] = useLocalStorage<AutoAdvance>(
     'auto-advance-settings',

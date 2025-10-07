@@ -5,7 +5,7 @@ import { AppDispatch } from '@/lib/redux/store';
 import { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function ContentSectionDetector() {
+export default function useContentTracker() {
   const dispatch = useDispatch<AppDispatch>();
   const isInitialMount = useRef(true);
 
@@ -28,6 +28,4 @@ export default function ContentSectionDetector() {
     proseObserver.observe(proseElement);
     return () => proseObserver.disconnect();
   }, [dispatch]);
-
-  return <></>;
 }
