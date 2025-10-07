@@ -15,14 +15,17 @@ export default function PostViewerContent({
   const { fullscreenScale, paddingInRem } = usePostViewer();
 
   useEffect(() => {
+    if (typeof document === 'undefined') return;
+
     const content = postViewerContentRef.current;
     if (!page || !content) return;
 
     content.innerHTML = '';
+    const fragment = document.createDocumentFragment();
     page.forEach(element => {
-      const clonedElement = element.cloneNode(true);
-      content.appendChild(clonedElement);
+      fragment.appendChild(element);
     });
+    content.appendChild(fragment);
   }, [page, postViewerContentRef]);
 
   return (

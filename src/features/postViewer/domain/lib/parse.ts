@@ -124,8 +124,12 @@ export function parsePost({
     pages.push(currentPage);
   }
 
+  const clonedPages = pages.map(page =>
+    page.map(element => element.cloneNode(true) as Element)
+  );
+
   return {
-    pages,
+    pages: clonedPages,
     headingPageMapping: { headingIdToPage, pageToHeadings },
   };
 }
