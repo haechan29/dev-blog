@@ -1,6 +1,7 @@
 'use client';
 
 import TooltipItem from '@/components/tooltipItem';
+import { isReadable } from '@/features/postViewer/domain/lib/tts';
 import { Page } from '@/features/postViewer/domain/types/page';
 import useTTSPlayer from '@/features/postViewer/hooks/useTTSPlayer';
 import useTTSState from '@/features/postViewer/hooks/useTTSState';
@@ -8,11 +9,13 @@ import { nextPage } from '@/lib/redux/postPositionSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { Headphones, Pause, Play } from 'lucide-react';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function TTSSection({ page }: { page: Page | null }) {
   const dispatch = useDispatch<AppDispatch>();
+
+  const readablePage = useMemo(() => page?.filter(isReadable) ?? [], [page]);
 
   const { ttsProps, toggleIsEnabled, toggleIsPlaying, increaseElementIndex } =
     useTTSState();
@@ -20,7 +23,7 @@ export default function TTSSection({ page }: { page: Page | null }) {
   const onFinishPage = useCallback(() => dispatch(nextPage()), [dispatch]);
 
   const { startReading, pauseReading, stopReading } = useTTSPlayer({
-    page,
+    readablePage,
     onFinishElement: increaseElementIndex,
     onFinishPage,
   });

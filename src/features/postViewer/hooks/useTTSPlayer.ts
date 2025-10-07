@@ -5,11 +5,11 @@ import { Page } from '@/features/postViewer/domain/types/page';
 import { useCallback, useRef } from 'react';
 
 export default function useTTSPlayer({
-  page,
+  readablePage,
   onFinishElement,
   onFinishPage,
 }: {
-  page: Page | null;
+  readablePage: Page | null;
   onFinishElement: (nextElementIndex: number) => void;
   onFinishPage: () => void;
 }) {
@@ -17,7 +17,7 @@ export default function useTTSPlayer({
 
   const startReading = useCallback(
     (elementIndex: number) => {
-      if (!page) return;
+      if (!readablePage) return;
 
       if (isPaused.current) {
         speechSynthesis.resume();
@@ -25,12 +25,12 @@ export default function useTTSPlayer({
         return;
       }
 
-      if (elementIndex >= page.length) {
+      if (elementIndex >= readablePage.length) {
         onFinishPage();
         return;
       }
 
-      page.forEach((element, index) => {
+      readablePage.forEach((element, index) => {
         element.classList.remove('tts-reading-active', 'tts-reading-inactive');
 
         if (index === elementIndex) {
@@ -40,14 +40,14 @@ export default function useTTSPlayer({
         }
       });
 
-      const element = page[elementIndex];
+      const element = readablePage[elementIndex];
       const utterance = getUtterance(element.textContent);
       utterance.onend = () => onFinishElement(elementIndex + 1);
 
       speechSynthesis.cancel();
       speechSynthesis.speak(utterance);
     },
-    [onFinishElement, onFinishPage, page]
+    [onFinishElement, onFinishPage, readablePage]
   );
 
   const pauseReading = useCallback(() => {
@@ -58,12 +58,12 @@ export default function useTTSPlayer({
   const stopReading = useCallback(() => {
     speechSynthesis.cancel();
 
-    if (page) {
-      page.forEach(element => {
+    if (readablePage) {
+      readablePage.forEach(element => {
         element.classList.remove('tts-reading-active', 'tts-reading-inactive');
       });
     }
-  }, [page]);
+  }, [readablePage]);
 
   return { startReading, pauseReading, stopReading } as const;
 }

@@ -74,17 +74,17 @@ export function parsePost({
         );
         pages.push([pagedElement]);
       } else if (isCaptionElement && wasLastElementPaged) {
-        // split caption into sentences and create separate page for each
-        const sentences = getSentences(child);
-
         const lastPage = pages.pop()!;
         const pagedElement = lastPage[0];
 
-        const pagedElements = createPagedElementsWithCaption(
-          pagedElement,
-          sentences
-        );
-        pagedElements.forEach(pagedElement => pages.push([pagedElement]));
+        // split caption into sentences and create separate page for each
+        const sentences = getSentences(child);
+        sentences.forEach(sentence => {
+          const pagedElementClone = pagedElement.cloneNode(true) as HTMLElement;
+          const captionElement = createCaptionElement(child, sentence);
+
+          pages.push([pagedElementClone, captionElement]);
+        });
       } else if (isHeadingElement) {
         // heading belongs to next page if current page has content, otherwise current page.
         const pageIndex = hasNonEmptyContent ? pages.length + 1 : pages.length;
@@ -139,11 +139,10 @@ function createPagedElement(
   containerWidth: number,
   containerHeight: number
 ): Element {
-  const container = document.createElement('div');
-  container.className =
-    'relative w-full h-full flex justify-center items-center';
+  const pagedClone = element.cloneNode(false) as HTMLElement;
+  pagedClone.className += ' w-full h-full flex justify-center items-center';
 
-  const child = element.firstChild as HTMLElement;
+  const child = element.firstElementChild as HTMLElement;
   if (child) {
     const clone = child.cloneNode(true) as HTMLElement;
 
@@ -151,30 +150,23 @@ function createPagedElement(
     const scale = Math.min(containerWidth / width, containerHeight / height);
     clone.style.setProperty('--scale', scale.toString());
     clone.className += ' scale-[var(--scale)] origin-center';
-    container.appendChild(clone);
+
+    pagedClone.appendChild(clone);
   }
-  return container;
+  return pagedClone;
 }
 
-function createPagedElementsWithCaption(
-  pagedElement: Element,
-  captions: string[]
-): Element[] {
-  return captions.map(caption => {
-    const pagedClone = pagedElement.cloneNode(true) as Element;
+function createCaptionElement(element: Element, sentence: string) {
+  const captionElement = document.createElement('div');
+  captionElement.className =
+    'absolute left-0 right-0 bottom-6 flex justify-center';
 
-    const wrapper = document.createElement('div');
-    wrapper.className = 'absolute left-0 right-0 bottom-0 flex justify-center';
-
-    const sentenceElement = document.createElement('div');
-    sentenceElement.className =
-      'bg-black/70 text-white text-center break-keep text-balance px-2 py-1';
-    sentenceElement.textContent = caption;
-
-    wrapper.appendChild(sentenceElement);
-    pagedClone.appendChild(wrapper);
-    return pagedClone;
-  });
+  const content = document.createElement('div');
+  content.className =
+    'bg-black/70 text-white text-center break-keep text-balance px-2 py-1';
+  content.textContent = sentence;
+  captionElement.appendChild(content);
+  return captionElement;
 }
 
 function getSentences(element: Element): string[] {
