@@ -1,38 +1,27 @@
 'use client';
 
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { getContentSize } from '@/lib/dom';
-import {} from '@/lib/redux/postViewerSlice';
+import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
+import useFullscreenSize from '@/hooks/useFullscreenSize';
+import { remToPx } from '@/lib/dom';
 import { Size } from '@/types/size';
-import { RefObject, useCallback, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-export default function usePostViewerSize(
-  postViewerContentRef: RefObject<HTMLDivElement | null>
-) {
-  const [postViewerSize, setPostViewerSize] = useLocalStorage<Size | null>(
-    'post-viewer-size',
-    null
-  );
+export default function usePostViewerSize() {
+  const [postViewerSize, setPostViewerSize] = useState<Size | null>(null);
 
-  const handleFullscreenChange = useCallback(() => {
-    if (typeof window === 'undefined') return;
-
-    if (!postViewerSize && document.fullscreenElement) {
-      setTimeout(() => {
-        const postViewerContent = postViewerContentRef.current;
-        if (!postViewerContent) return;
-        setPostViewerSize(getContentSize(postViewerContent));
-      }, 100);
-    }
-  }, [postViewerContentRef, postViewerSize, setPostViewerSize]);
+  const fullscreenSize = useFullscreenSize();
+  const { fullscreenScale, paddingInRem } = usePostViewer();
 
   useEffect(() => {
-    if (typeof document === 'undefined') return;
+    if (!fullscreenSize) return;
 
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () =>
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, [handleFullscreenChange]);
+    const { width, height } = fullscreenSize;
+    const { top, right, bottom, left } = paddingInRem;
+    setPostViewerSize({
+      width: (width - remToPx(right + left)) / fullscreenScale,
+      height: (height - remToPx(top + bottom)) / fullscreenScale,
+    });
+  }, [fullscreenScale, fullscreenSize, paddingInRem]);
 
   return postViewerSize;
 }

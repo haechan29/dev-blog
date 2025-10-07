@@ -3,22 +3,23 @@
 import { parsePost as parsePostInner } from '@/features/postViewer/domain/lib/parse';
 import { Page } from '@/features/postViewer/domain/types/page';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
+import usePostViewerSize from '@/features/postViewer/hooks/usePostViewerSize';
 import {
   setHeadingPageMapping,
   setTotalPage,
 } from '@/lib/redux/postPositionSlice';
 import {} from '@/lib/redux/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
-import { Size } from '@/types/size';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function usePostParsing(postViewerSize: Size | null) {
+export default function usePostParsing() {
   const dispatch = useDispatch<AppDispatch>();
 
   const [pages, setPages] = useState<Page[] | null>(null);
 
   const { pageNumber } = usePostViewer();
+  const postViewerSize = usePostViewerSize();
 
   const page = useMemo(() => {
     if (!pages || !pageNumber) return null;

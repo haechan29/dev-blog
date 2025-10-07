@@ -33,3 +33,7 @@ export function getIntrinsicSize(element: HTMLElement): Size {
 
   return { width, height };
 }
+
+export function remToPx(rem: number): number {
+  return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
+}

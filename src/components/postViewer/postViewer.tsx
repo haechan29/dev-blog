@@ -8,7 +8,6 @@ import { useFullscreen } from '@/features/postViewer/hooks/useFullscreen';
 import { useFullscreenScale } from '@/features/postViewer/hooks/useFullscreenScale';
 import usePostParsing from '@/features/postViewer/hooks/usePostParsing';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
-import usePostViewerSize from '@/features/postViewer/hooks/usePostViewerSize';
 import { useViewerNavigation } from '@/features/postViewer/hooks/useViewerNavigation';
 import useDebounce from '@/hooks/useDebounce';
 import useThrottle from '@/hooks/useThrottle';
@@ -28,8 +27,7 @@ export default function PostViewer({ post }: { post: PostProps }) {
   const throttle = useThrottle();
   const debounce = useDebounce();
 
-  const postViewerSize = usePostViewerSize(postViewerContentRef);
-  const { page } = usePostParsing(postViewerSize);
+  const { page } = usePostParsing();
 
   useFullscreenScale();
   useFullscreen(postViewerRef);
