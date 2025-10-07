@@ -1,6 +1,6 @@
 'use client';
 
-import useIsMobile from '@/hooks/useIsMobile';
+import { isMobile } from '@/lib/device';
 import { useMemo, useState } from 'react';
 
 interface TooltipProps {
@@ -14,13 +14,9 @@ export default function TooltipItem({
   children,
   position = 'top',
 }: TooltipProps) {
-  const isMobile = useIsMobile();
   const [isHovered, setIsHovered] = useState(false);
 
-  const isVisible = useMemo(
-    () => !isMobile && isHovered,
-    [isMobile, isHovered]
-  );
+  const isVisible = useMemo(() => !isMobile && isHovered, [isHovered]);
 
   const positionClasses = {
     top: 'bottom-full left-1/2 transform -translate-x-1/2 mb-2',

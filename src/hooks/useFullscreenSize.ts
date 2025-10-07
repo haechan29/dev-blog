@@ -1,5 +1,6 @@
 'use client';
 
+import { supportsFullscreen } from '@/lib/browser';
 import { Size } from '@/types/size';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -19,12 +20,25 @@ export default function useFullscreenSize() {
   }, [fullscreenSize]);
 
   useEffect(() => {
-    if (typeof document === 'undefined') return;
+    if (typeof document === 'undefined' || typeof window === 'undefined')
+      return;
 
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () =>
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, [handleFullscreenChange]);
+    if (supportsFullscreen) {
+      document.addEventListener('fullscreenchange', handleFullscreenChange);
+      return () =>
+        document.removeEventListener(
+          'fullscreenchange',
+          handleFullscreenChange
+        );
+    } else {
+      if (!fullscreenSize) {
+        setFullscreenSize({
+          width: window.innerWidth,
+          height: window.innerHeight,
+        });
+      }
+    }
+  }, [fullscreenSize, handleFullscreenChange]);
 
   return fullscreenSize;
 }

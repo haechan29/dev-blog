@@ -1,7 +1,7 @@
 'use client';
 
 import TooltipItem from '@/components/tooltipItem';
-import useIsMobile from '@/hooks/useIsMobile';
+import { isMobile } from '@/lib/device';
 import { setIsVisible } from '@/lib/redux/postSidebarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { ChevronLeft, FileUser, Mail } from 'lucide-react';
@@ -13,7 +13,6 @@ import { useDispatch } from 'react-redux';
 export default function PostSidebarFooter() {
   const mail = process.env.NEXT_PUBLIC_CONTACT_MAIL;
   const githubUrl = process.env.NEXT_PUBLIC_GITHUB_URL;
-  const isMobile = useIsMobile();
   const dispatch = useDispatch<AppDispatch>();
 
   const handleMailIconClick = async () => {

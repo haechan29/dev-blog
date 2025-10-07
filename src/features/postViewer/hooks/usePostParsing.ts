@@ -22,7 +22,7 @@ export default function usePostParsing() {
   const postViewerSize = usePostViewerSize();
 
   const page = useMemo(() => {
-    if (!pages || !pageNumber) return null;
+    if (!pages || pageNumber === null) return null;
     return pages[pageNumber - 1];
   }, [pageNumber, pages]);
 
