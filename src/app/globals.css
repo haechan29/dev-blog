@@ -326,10 +326,13 @@ body {
   --fullscreen-scale: 1.5;
 }
 
-.reading-highlight {
-  background: linear-gradient(120deg, #fef3c7 0%, #fcd34d 100%);
-  border-radius: 4px;
-  padding: 2px 4px;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(252, 211, 77, 0.3);
+.tts-reading-active,
+.tts-reading-active * {
+  font-weight: 500 !important; /* medium */
+  transition: color 0.3s ease-in-out, font-weight 0.3s ease-in-out !important;
+}
+.tts-reading-inactive,
+.tts-reading-inactive * {
+  color: oklch(70.7% 0.022 261.325) !important; /* gray-400 */
+  transition: color 0.3s ease-in-out !important;
 }

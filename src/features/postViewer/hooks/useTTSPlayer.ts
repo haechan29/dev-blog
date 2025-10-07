@@ -30,14 +30,17 @@ export default function useTTSPlayer({
         return;
       }
 
+      page.forEach((element, index) => {
+        element.classList.remove('tts-reading-active', 'tts-reading-inactive');
+
+        if (index === elementIndex) {
+          element.classList.add('tts-reading-active');
+        } else {
+          element.classList.add('tts-reading-inactive');
+        }
+      });
+
       const element = page[elementIndex];
-
-      document
-        .querySelectorAll('.reading-highlight')
-        .forEach(el => el.classList.remove('reading-highlight'));
-
-      element.classList.add('reading-highlight');
-
       const utterance = getUtterance(element.textContent);
       utterance.onend = () => onFinishElement(elementIndex + 1);
 
@@ -55,10 +58,12 @@ export default function useTTSPlayer({
   const stopReading = useCallback(() => {
     speechSynthesis.cancel();
 
-    document
-      .querySelectorAll('.reading-highlight')
-      .forEach(el => el.classList.remove('reading-highlight'));
-  }, []);
+    if (page) {
+      page.forEach(element => {
+        element.classList.remove('tts-reading-active', 'tts-reading-inactive');
+      });
+    }
+  }, [page]);
 
   return { startReading, pauseReading, stopReading } as const;
 }
