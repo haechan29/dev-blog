@@ -32,7 +32,7 @@ export default function PostViewerContent({
     <div
       ref={postViewerContentRef}
       className={clsx(
-        'prose fullscreen w-[calc(100vw/var(--fullscreen-scale))] h-[calc(100vh/var(--fullscreen-scale))] mx-auto',
+        'prose relative w-[calc(100vw/var(--fullscreen-scale))] h-[calc(100vh/var(--fullscreen-scale))] mx-auto',
         'pt-[calc(var(--padding-top)/var(--fullscreen-scale))]',
         'pr-[calc(var(--padding-right)/var(--fullscreen-scale))]',
         'pb-[calc(var(--padding-bottom)/var(--fullscreen-scale))]',

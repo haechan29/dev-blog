@@ -322,10 +322,6 @@ body {
   animation: pop 0.3s ease-in-out;
 }
 
-.fullscreen {
-  --fullscreen-scale: 1.5;
-}
-
 .tts-reading-active,
 .tts-reading-active * {
   font-weight: 500 !important; /* medium */

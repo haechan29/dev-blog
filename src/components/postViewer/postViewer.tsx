@@ -45,7 +45,7 @@ export default function PostViewer({ post }: { post: PostProps }) {
         }, 100);
       }}
       className={clsx(
-        'absolute inset-0 z-50 w-screen h-screen bg-white flex flex-col',
+        'w-screen h-screen bg-white flex flex-col',
         !isViewerMode && 'hidden'
       )}
     >
