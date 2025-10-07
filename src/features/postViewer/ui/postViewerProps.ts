@@ -31,11 +31,13 @@ export function createProps({
       postViewer.isMouseMoved ||
       postViewer.isToolbarExpanded,
     pageNumber:
-      postPosition.currentPageIndex !== null
-        ? postPosition.currentPageIndex + 1
+      postPosition.pagination !== null
+        ? postPosition.pagination.current + 1
         : null,
     totalPages:
-      postPosition.totalPage !== null ? postPosition.totalPage + 1 : null,
+      postPosition.pagination !== null
+        ? postPosition.pagination.total + 1
+        : null,
     currentHeading: postPosition.currentHeading,
     ...postViewer,
   };

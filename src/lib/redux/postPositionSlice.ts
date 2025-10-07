@@ -1,16 +1,15 @@
 import Heading from '@/features/post/domain/model/heading';
-import PostPosition from '@/features/post/domain/model/postPosition';
-import {
-  getHeadingsByPage,
-  getPageByHeadingId,
-  HeadingPageMapping,
-} from '@/features/postViewer/domain/types/headingPageMapping';
+import PostPosition, {
+  syncHeadingWithPage,
+  syncPageWithHeading,
+} from '@/features/post/domain/model/postPosition';
+import { HeadingPageMapping } from '@/features/postViewer/domain/types/headingPageMapping';
+import { Pagination } from '@/features/postViewer/domain/types/pagination';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: PostPosition = {
   currentHeading: null,
-  currentPageIndex: null,
-  totalPage: null,
+  pagination: null,
   headingPageMapping: null,
 };
 
@@ -21,53 +20,41 @@ const postPositionSlice = createSlice({
     setCurrentHeading: (state, action: PayloadAction<Heading | null>) => {
       state.currentHeading = action.payload;
 
-      // sync current page index with current heading
-      if (!action.payload || !state.headingPageMapping) return;
-      const page = getPageByHeadingId(
-        state.headingPageMapping,
-        action.payload.id
-      );
-      if (page === undefined) return;
-      state.currentPageIndex = page;
+      const postPosition = syncPageWithHeading(state);
+      if (postPosition) state.pagination = postPosition.pagination;
     },
-    setCurrentPageIndex: (state, action: PayloadAction<number | null>) => {
-      state.currentPageIndex = action.payload;
+    setPagination: (state, action: PayloadAction<Pagination | null>) => {
+      state.pagination = action.payload;
 
-      // sync current heading with current page index
-      if (action.payload === null || !state.headingPageMapping) return;
-      const headings = getHeadingsByPage(
-        state.headingPageMapping,
-        action.payload
-      );
-      if (!headings || headings.length === 0) return;
-      state.currentHeading = headings[0];
+      const postPosition = syncHeadingWithPage(state);
+      if (postPosition) state.currentHeading = postPosition.currentHeading;
     },
-    setTotalPage: (state, action: PayloadAction<number | null>) => {
-      state.totalPage = action.payload;
+    setCurrentPageIndex: (state, action: PayloadAction<number>) => {
+      state.pagination = {
+        ...state.pagination!,
+        current: action.payload,
+      };
+
+      const postPosition = syncHeadingWithPage(state);
+      if (postPosition) state.currentHeading = postPosition.currentHeading;
     },
     nextPage: state => {
-      state.currentPageIndex = state.currentPageIndex! + 1;
+      state.pagination = {
+        ...state.pagination!,
+        current: state.pagination!.current + 1,
+      };
 
-      // sync current heading with current page index
-      if (!state.headingPageMapping) return;
-      const headings = getHeadingsByPage(
-        state.headingPageMapping,
-        state.currentPageIndex!
-      );
-      if (!headings || headings.length === 0) return;
-      state.currentHeading = headings[0];
+      const postPosition = syncHeadingWithPage(state);
+      if (postPosition) state.currentHeading = postPosition.currentHeading;
     },
     previousPage: state => {
-      state.currentPageIndex = state.currentPageIndex! - 1;
+      state.pagination = {
+        ...state.pagination!,
+        current: state.pagination!.current - 1,
+      };
 
-      // sync current heading with current page index
-      if (!state.headingPageMapping) return;
-      const headings = getHeadingsByPage(
-        state.headingPageMapping,
-        state.currentPageIndex!
-      );
-      if (!headings || headings.length === 0) return;
-      state.currentHeading = headings[0];
+      const postPosition = syncHeadingWithPage(state);
+      if (postPosition) state.currentHeading = postPosition.currentHeading;
     },
     setHeadingPageMapping: (
       state,
@@ -81,8 +68,8 @@ const postPositionSlice = createSlice({
 export default postPositionSlice.reducer;
 export const {
   setCurrentHeading,
+  setPagination,
   setCurrentPageIndex,
-  setTotalPage,
   nextPage,
   previousPage,
   setHeadingPageMapping,

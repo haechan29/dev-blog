@@ -6,7 +6,7 @@ import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import usePostViewerSize from '@/features/postViewer/hooks/usePostViewerSize';
 import {
   setHeadingPageMapping,
-  setTotalPage,
+  setPagination,
 } from '@/lib/redux/postPositionSlice';
 import {} from '@/lib/redux/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
@@ -38,8 +38,8 @@ export default function usePostParsing() {
       excludeClassNames: ['hide-fullscreen'],
     });
 
-    dispatch(setTotalPage(pages.length));
     dispatch(setHeadingPageMapping(headingPageMapping));
+    dispatch(setPagination({ current: 0, total: pages.length }));
     setPages(pages);
   }, [dispatch, postViewerSize]);
 
