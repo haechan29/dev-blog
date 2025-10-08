@@ -1,5 +1,6 @@
 'use client';
 
+import { supportsFullscreen } from '@/lib/browser';
 import { nextPage, previousPage } from '@/lib/redux/postPositionSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { MouseEvent, TouchEvent, useCallback } from 'react';
@@ -11,16 +12,19 @@ export const useClickTouchNavigation = () => {
   const handleNavigation = useCallback(
     ({
       clientX,
+      clientY,
       currentTarget,
     }: {
       clientX: number;
+      clientY: number;
       currentTarget: HTMLDivElement;
     }) => {
-      const clientWidth = currentTarget.getBoundingClientRect().width;
-      const [isLeftSideClicked, isRightSideClicked] = [
-        clientX < clientWidth / 2,
-        clientX > clientWidth / 2,
-      ];
+      const { width: clientWidth, height: clientHeight } =
+        currentTarget.getBoundingClientRect();
+
+      const [isLeftSideClicked, isRightSideClicked] = supportsFullscreen
+        ? [clientX < clientWidth / 2, clientX > clientWidth / 2]
+        : [clientY < clientHeight / 2, clientY > clientHeight / 2];
 
       if (isLeftSideClicked) {
         dispatch(previousPage());
@@ -44,6 +48,7 @@ export const useClickTouchNavigation = () => {
     (event: TouchEvent<HTMLDivElement>) => {
       handleNavigation({
         clientX: event.changedTouches[0].clientX,
+        clientY: event.changedTouches[0].clientY,
         currentTarget: event.currentTarget,
       });
     },
