@@ -11,7 +11,6 @@ import { useViewerFullscreen } from '@/features/postViewer/hooks/useViewerFullsc
 import { useViewerNavigation } from '@/features/postViewer/hooks/useViewerNavigation';
 import useDebounce from '@/hooks/useDebounce';
 import useThrottle from '@/hooks/useThrottle';
-import { supportsFullscreen } from '@/lib/browser';
 import { setIsMouseMoved } from '@/lib/redux/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
@@ -44,12 +43,8 @@ export default function PostViewer({ post }: { post: PostProps }) {
         }, 100);
       }}
       className={clsx(
-        'fixed inset-0 flex flex-col overflow-auto bg-white transition-opacity|transform duration-300 ease-in-out',
-        supportsFullscreen ? 'w-screen h-dvh' : 'w-[100dvh] h-[100dvw]',
-        !isViewerMode && 'opacity-0 pointer-events-none',
-        !supportsFullscreen &&
-          isViewerMode &&
-          'rotate-90 origin-top-left translate-x-[100dvw]'
+        'w-screen h-dvh fixed inset-0 flex flex-col overflow-auto bg-white',
+        !isViewerMode && 'hidden'
       )}
     >
       <Toaster toasterId='post-viewer' />
