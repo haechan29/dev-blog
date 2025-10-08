@@ -32,9 +32,10 @@ export default function useFullscreenSize() {
         );
     } else {
       if (!fullscreenSize) {
+        // for 90° rotated layout: swap width/height since viewport dimensions are inverted
         setFullscreenSize({
-          width: window.innerWidth,
-          height: window.innerHeight,
+          width: window.innerHeight,
+          height: window.innerWidth,
         });
       }
     }
