@@ -81,7 +81,7 @@ export function parsePost({
         const sentences = getSentences(child);
         sentences.forEach(sentence => {
           const pagedElementClone = pagedElement.cloneNode(true) as HTMLElement;
-          const captionElement = createCaptionElement(child, sentence);
+          const captionElement = createCaptionElement(sentence);
 
           pages.push([pagedElementClone, captionElement]);
         });
@@ -156,10 +156,10 @@ function createPagedElement(
   return pagedClone;
 }
 
-function createCaptionElement(element: Element, sentence: string) {
+function createCaptionElement(sentence: string) {
   const captionElement = document.createElement('div');
   captionElement.className =
-    'absolute left-0 right-0 bottom-14 flex justify-center';
+    'absolute left-0 right-0 bottom-6 flex justify-center';
 
   const content = document.createElement('div');
   content.className =

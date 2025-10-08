@@ -4,11 +4,12 @@ import PostViewerContainer from '@/components/postViewer/postViewerContainer';
 import PostViewerControlBar from '@/components/postViewer/postViewerControlBar';
 import PostViewerToolbar from '@/components/postViewer/postViewerToolbar';
 import { PostProps } from '@/features/post/ui/postProps';
+import { useClickTouchNavigation as useClickTouchNavigationHandlers } from '@/features/postViewer/hooks/useClickTouchNavigation';
 import { useFullscreenScale } from '@/features/postViewer/hooks/useFullscreenScale';
+import useKeyboardWheelNavigation from '@/features/postViewer/hooks/useKeyboardWheelNavigation';
 import usePostParsing from '@/features/postViewer/hooks/usePostParsing';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import { useViewerFullscreen } from '@/features/postViewer/hooks/useViewerFullscreen';
-import { useViewerNavigation } from '@/features/postViewer/hooks/useViewerNavigation';
 import useDebounce from '@/hooks/useDebounce';
 import useThrottle from '@/hooks/useThrottle';
 import { setIsMouseMoved } from '@/lib/redux/postViewerSlice';
@@ -23,15 +24,16 @@ export default function PostViewer({ post }: { post: PostProps }) {
 
   const { isViewerMode } = usePostViewer();
   const postViewerRef = useRef<HTMLDivElement | null>(null);
-  const postViewerContainerRef = useRef<HTMLDivElement | null>(null);
   const throttle = useThrottle();
   const debounce = useDebounce();
 
   const { page } = usePostParsing();
 
+  const navigationHandlers = useClickTouchNavigationHandlers();
+  useKeyboardWheelNavigation();
+
   useFullscreenScale();
   useViewerFullscreen(postViewerRef);
-  useViewerNavigation(postViewerContainerRef);
 
   return (
     <div
@@ -50,10 +52,7 @@ export default function PostViewer({ post }: { post: PostProps }) {
       <Toaster toasterId='post-viewer' />
 
       <PostViewerToolbar {...post} />
-      <PostViewerContainer
-        page={page}
-        postViewerContainerRef={postViewerContainerRef}
-      />
+      <PostViewerContainer page={page} {...navigationHandlers} />
       <PostViewerControlBar page={page} />
     </div>
   );

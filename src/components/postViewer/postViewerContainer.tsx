@@ -2,24 +2,28 @@
 
 import { Page } from '@/features/postViewer/domain/types/page';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
-import useViewerContainerSize from '@/features/postViewer/hooks/useViewerContainerSize';
+import useFullscreenSize from '@/hooks/useFullscreenSize';
 import clsx from 'clsx';
-import { RefObject, useEffect } from 'react';
+import { MouseEvent, TouchEvent, useEffect, useRef } from 'react';
 
 export default function PostViewerContainer({
   page,
-  postViewerContainerRef,
+  onClick,
+  onTouchEnd,
 }: {
   page: Page | null;
-  postViewerContainerRef: RefObject<HTMLDivElement | null>;
+  onClick: (event: MouseEvent<HTMLDivElement>) => void;
+  onTouchEnd: (event: TouchEvent<HTMLDivElement>) => void;
 }) {
-  const { fullscreenScale } = usePostViewer();
-  const containerSize = useViewerContainerSize();
+  const { fullscreenScale, paddingInRem } = usePostViewer();
+  const fullscreenSize = useFullscreenSize();
+
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
 
-    const container = postViewerContainerRef.current;
+    const container = containerRef.current;
     if (!page || !container) return;
 
     container.innerHTML = '';
@@ -28,13 +32,14 @@ export default function PostViewerContainer({
       fragment.appendChild(element);
     });
     container.appendChild(fragment);
-  }, [page, postViewerContainerRef]);
+  }, [page]);
 
   return (
-    containerSize &&
-    page && (
+    fullscreenSize && (
       <div
-        ref={postViewerContainerRef}
+        ref={containerRef}
+        onClick={onClick}
+        onTouchEnd={onTouchEnd}
         className={clsx(
           'prose absolute inset-0 m-auto',
           'w-[calc(var(--fullscreen-width)/var(--fullscreen-scale))]',

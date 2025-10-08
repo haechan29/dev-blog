@@ -9,5 +9,5 @@ import { ReactNode } from 'react';
  * - Result: 3 pages, each showing the image with one sentence
  */
 export default function Caption({ children }: { children: ReactNode }) {
-  return <div className='caption'>{children}</div>;
+  return <p className='caption'>{children}</p>;
 }

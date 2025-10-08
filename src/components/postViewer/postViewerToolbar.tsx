@@ -26,7 +26,7 @@ export default function PostViewerToolbar({
       onMouseEnter={() => dispatch(setIsMouseOnToolbar(true))}
       onMouseLeave={() => dispatch(setIsMouseOnToolbar(false))}
       className={clsx(
-        'fixed top-0 left-0 right-0 z-50 flex flex-col backdrop-blur-md bg-white/80 px-10 py-3',
+        'absolute top-0 left-0 right-0 z-50 flex flex-col backdrop-blur-md bg-white/80 px-10 py-3',
         'transition-opacity duration-300 ease-in-out',
         !areBarsVisible && 'opacity-0'
       )}

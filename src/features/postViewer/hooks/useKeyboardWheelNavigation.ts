@@ -4,12 +4,10 @@ import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import useThrottle from '@/hooks/useThrottle';
 import { nextPage, previousPage } from '@/lib/redux/postPositionSlice';
 import { AppDispatch } from '@/lib/redux/store';
-import { RefObject, useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-export const useViewerNavigation = (
-  containerRef: RefObject<HTMLDivElement | null>
-) => {
+export default function useKeyboardWheelNavigation() {
   const dispatch = useDispatch<AppDispatch>();
   const { isViewerMode } = usePostViewer();
 
@@ -54,42 +52,6 @@ export const useViewerNavigation = (
     [dispatch]
   );
 
-  const handleNavigation = useCallback(
-    ({ clientX }: { clientX: number }) => {
-      const container = containerRef.current;
-      if (!container) return null;
-
-      const clientWidth = container.getBoundingClientRect().width;
-      const [isLeftSideClicked, isRightSideClicked] = [
-        clientX < clientWidth / 2,
-        clientX > clientWidth / 2,
-      ];
-
-      if (isLeftSideClicked) {
-        dispatch(previousPage());
-      } else if (isRightSideClicked) {
-        dispatch(nextPage());
-      }
-    },
-    [containerRef, dispatch]
-  );
-
-  const handleClick = useCallback(
-    (event: MouseEvent) => {
-      if ('ontouchstart' in window) return; // block event handling on mobile
-
-      handleNavigation(event);
-    },
-    [handleNavigation]
-  );
-
-  const handleTouch = useCallback(
-    (event: TouchEvent) => {
-      handleNavigation(event.changedTouches[0]);
-    },
-    [handleNavigation]
-  );
-
   useEffect(() => {
     if (isViewerMode) {
       document.addEventListener('wheel', handleScroll);
@@ -100,18 +62,4 @@ export const useViewerNavigation = (
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [handleKeyDown, handleScroll, isViewerMode]);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    if (isViewerMode) {
-      container.addEventListener('click', handleClick);
-      container.addEventListener('touchend', handleTouch);
-    }
-    return () => {
-      container.removeEventListener('click', handleClick);
-      container.removeEventListener('touchend', handleTouch);
-    };
-  }, [containerRef, isViewerMode, handleClick, handleTouch]);
-};
+}

@@ -21,7 +21,7 @@ export default function PostViewerControlBar({ page }: { page: Page | null }) {
       onMouseEnter={() => dispatch(setIsMouseOnControlBar(true))}
       onMouseLeave={() => dispatch(setIsMouseOnControlBar(false))}
       className={clsx(
-        'fixed bottom-0 left-0 right-0 z-50 flex flex-col bg-white/80 backdrop-blur-md px-10',
+        'absolute bottom-0 left-0 right-0 z-50 flex flex-col bg-white/80 backdrop-blur-md px-10',
         'transition-transform|opacity duration-300 ease-in-out',
         !areBarsVisible && 'translate-y-full opacity-0'
       )}
