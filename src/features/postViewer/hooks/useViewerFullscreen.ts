@@ -7,7 +7,7 @@ import { AppDispatch } from '@/lib/redux/store';
 import { RefObject, useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-export const useFullscreen = (
+export const useViewerFullscreen = (
   postViewerRef: RefObject<HTMLDivElement | null>
 ) => {
   const dispatch = useDispatch<AppDispatch>();

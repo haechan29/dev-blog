@@ -4,10 +4,10 @@ import PostViewerContent from '@/components/postViewer/postViewerContent';
 import PostViewerControlBar from '@/components/postViewer/postViewerControlBar';
 import PostViewerToolbar from '@/components/postViewer/postViewerToolbar';
 import { PostProps } from '@/features/post/ui/postProps';
-import { useFullscreen } from '@/features/postViewer/hooks/useFullscreen';
 import { useFullscreenScale } from '@/features/postViewer/hooks/useFullscreenScale';
 import usePostParsing from '@/features/postViewer/hooks/usePostParsing';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
+import { useViewerFullscreen } from '@/features/postViewer/hooks/useViewerFullscreen';
 import { useViewerNavigation } from '@/features/postViewer/hooks/useViewerNavigation';
 import useDebounce from '@/hooks/useDebounce';
 import useThrottle from '@/hooks/useThrottle';
@@ -31,7 +31,7 @@ export default function PostViewer({ post }: { post: PostProps }) {
   const { page } = usePostParsing();
 
   useFullscreenScale();
-  useFullscreen(postViewerRef);
+  useViewerFullscreen(postViewerRef);
   useViewerNavigation(postViewerContentRef);
 
   return (
