@@ -1,7 +1,6 @@
 'use client';
 
 import TooltipItem from '@/components/tooltipItem';
-import { isMobile } from '@/lib/device';
 import { setIsVisible } from '@/lib/redux/postSidebarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { ChevronLeft, FileUser, Mail } from 'lucide-react';
@@ -45,26 +44,16 @@ export default function PostSidebarFooter() {
                 rel='noopener noreferrer'
                 className='w-10 h-10 flex min-w-0 justify-center items-center rounded-full hover:bg-blue-300 transition-colors duration-300 ease-in-out'
               >
-                {isMobile ? (
-                  <div className='flex flex-col items-center min-w-0 gap-y-1'>
-                    <Image
-                      width={16}
-                      height={16}
-                      src='/images/github.png'
-                      alt='github icon'
-                      className='rounded-full'
-                    />
-                    <div className='text-xs'>Github</div>
-                  </div>
-                ) : (
+                <div className='flex flex-col items-center min-w-0 gap-y-1'>
                   <Image
                     width={20}
                     height={20}
                     src='/images/github.png'
                     alt='github icon'
-                    className='rounded-full'
+                    className='w-4 h-4 can-hover:w-5 can-hover:h-5 rounded-full'
                   />
-                )}
+                  <div className='text-xs can-hover:hidden'>Github</div>
+                </div>
               </a>
             </TooltipItem>
           )}
@@ -75,14 +64,10 @@ export default function PostSidebarFooter() {
                 onClick={handleMailIconClick}
                 className='w-10 h-10 flex justify-center items-center cursor-pointer rounded-full hover:bg-blue-300 transition-colors duration-300 ease-in-out'
               >
-                {isMobile ? (
-                  <div className='flex flex-col items-center min-w-0 gap-y-1'>
-                    <Mail className='w-4 h-4' />
-                    <div className='text-xs'>Mail</div>
-                  </div>
-                ) : (
-                  <Mail className='w-5 h-5' />
-                )}
+                <div className='flex flex-col items-center min-w-0 gap-y-1'>
+                  <Mail className='w-4 h-4 can-hover:w-5 can-hover:h-5' />
+                  <div className='text-xs can-hover:hidden'>Mail</div>
+                </div>
               </button>
             </TooltipItem>
           )}
@@ -93,14 +78,10 @@ export default function PostSidebarFooter() {
               onClick={() => dispatch(setIsVisible(false))}
               className='w-10 h-10 flex justify-center items-center cursor-pointer rounded-full hover:bg-blue-300 transition-colors duration-300 ease-in-out'
             >
-              {isMobile ? (
-                <div className='flex flex-col items-center min-w-0 gap-y-1'>
-                  <FileUser className='w-4 h-4' />
-                  <div className='text-xs'>Portfolio</div>
-                </div>
-              ) : (
-                <FileUser className='w-5 h-5' />
-              )}
+              <div className='flex flex-col items-center min-w-0 gap-y-1'>
+                <FileUser className='w-4 h-4 can-hover:w-5 can-hover:h-5' />
+                <div className='text-xs can-hover:hidden'>Portfolio</div>
+              </div>
             </Link>
           </TooltipItem>
         </div>

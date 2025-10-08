@@ -322,6 +322,12 @@ body {
   animation: pop 0.3s ease-in-out;
 }
 
+@custom-variant can-hover {
+  @media (hover: hover) {
+    @slot;
+  }
+}
+
 .tts-reading-active,
 .tts-reading-active * {
   font-weight: 500 !important; /* medium */
