@@ -1,7 +1,6 @@
 'use client';
 
 import { Page } from '@/features/postViewer/domain/types/page';
-import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import useFullscreenSize from '@/hooks/useFullscreenSize';
 import clsx from 'clsx';
 import { MouseEvent, TouchEvent, useEffect, useRef } from 'react';
@@ -15,7 +14,6 @@ export default function PostViewerContainer({
   onClick: (event: MouseEvent<HTMLDivElement>) => void;
   onTouchEnd: (event: TouchEvent<HTMLDivElement>) => void;
 }) {
-  const { fullscreenScale, paddingInRem } = usePostViewer();
   const fullscreenSize = useFullscreenSize();
 
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -42,23 +40,18 @@ export default function PostViewerContainer({
         onTouchEnd={onTouchEnd}
         className={clsx(
           'prose absolute inset-0 m-auto',
-          'w-[calc(var(--fullscreen-width)/var(--fullscreen-scale))]',
-          'h-[calc(var(--fullscreen-height)/var(--fullscreen-scale))]',
-          'pt-[calc(var(--padding-top)/var(--fullscreen-scale))]',
-          'pr-[calc(var(--padding-right)/var(--fullscreen-scale))]',
-          'pb-[calc(var(--padding-bottom)/var(--fullscreen-scale))]',
-          'pl-[calc(var(--padding-left)/var(--fullscreen-scale))]',
-          'scale-[var(--fullscreen-scale)]',
+          'w-[calc(var(--fullscreen-width)/var(--container-scale))]',
+          'h-[calc(var(--fullscreen-height)/var(--container-scale))]',
+          'pt-[calc(var(--container-padding)/var(--container-scale))]',
+          'pr-[calc(var(--container-padding)/var(--container-scale))]',
+          'pb-[calc(var(--container-padding)/var(--container-scale))]',
+          'pl-[calc(var(--container-padding)/var(--container-scale))]',
+          'scale-[var(--container-scale)]',
           !page && 'hidden'
         )}
         style={{
           '--fullscreen-width': `${fullscreenSize.width}px`,
           '--fullscreen-height': `${fullscreenSize.height}px`,
-          '--padding-top': `${paddingInRem.top}rem`,
-          '--padding-right': `${paddingInRem.right}rem`,
-          '--padding-bottom': `${paddingInRem.bottom}rem`,
-          '--padding-left': `${paddingInRem.left}rem`,
-          '--fullscreen-scale': fullscreenScale,
         }}
       />
     )
