@@ -3,7 +3,7 @@
 import { parsePost as parsePostInner } from '@/features/postViewer/domain/lib/parse';
 import { Page } from '@/features/postViewer/domain/types/page';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
-import usePostViewerSize from '@/features/postViewer/hooks/usePostViewerSize';
+import useViewerContainerSize from '@/features/postViewer/hooks/useViewerContainerSize';
 import {
   setHeadingPageMapping,
   setPagination,
@@ -19,7 +19,7 @@ export default function usePostParsing() {
   const [pages, setPages] = useState<Page[] | null>(null);
 
   const { pageNumber } = usePostViewer();
-  const postViewerSize = usePostViewerSize();
+  const containerSize = useViewerContainerSize();
 
   const page = useMemo(() => {
     if (!pages || pageNumber === null) return null;
@@ -28,8 +28,8 @@ export default function usePostParsing() {
 
   const parsePost = useCallback(() => {
     const postContainer = document.querySelector('.post-content');
-    if (!postViewerSize || !postContainer) return;
-    const { width: containerWidth, height: containerHeight } = postViewerSize;
+    if (!containerSize || !postContainer) return;
+    const { width: containerWidth, height: containerHeight } = containerSize;
 
     const { pages, headingPageMapping } = parsePostInner({
       postContainer,
@@ -41,7 +41,7 @@ export default function usePostParsing() {
     dispatch(setHeadingPageMapping(headingPageMapping));
     dispatch(setPagination({ current: 0, total: pages.length }));
     setPages(pages);
-  }, [dispatch, postViewerSize]);
+  }, [dispatch, containerSize]);
 
   useEffect(() => {
     const timer = setTimeout(parsePost, 100);

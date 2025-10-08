@@ -1,6 +1,6 @@
 'use client';
 
-import PostViewerContent from '@/components/postViewer/postViewerContent';
+import PostViewerContainer from '@/components/postViewer/postViewerContainer';
 import PostViewerControlBar from '@/components/postViewer/postViewerControlBar';
 import PostViewerToolbar from '@/components/postViewer/postViewerToolbar';
 import { PostProps } from '@/features/post/ui/postProps';
@@ -23,7 +23,7 @@ export default function PostViewer({ post }: { post: PostProps }) {
 
   const { isViewerMode } = usePostViewer();
   const postViewerRef = useRef<HTMLDivElement | null>(null);
-  const postViewerContentRef = useRef<HTMLDivElement | null>(null);
+  const postViewerContainerRef = useRef<HTMLDivElement | null>(null);
   const throttle = useThrottle();
   const debounce = useDebounce();
 
@@ -31,7 +31,7 @@ export default function PostViewer({ post }: { post: PostProps }) {
 
   useFullscreenScale();
   useViewerFullscreen(postViewerRef);
-  useViewerNavigation(postViewerContentRef);
+  useViewerNavigation(postViewerContainerRef);
 
   return (
     <div
@@ -43,16 +43,16 @@ export default function PostViewer({ post }: { post: PostProps }) {
         }, 100);
       }}
       className={clsx(
-        'w-screen h-dvh fixed inset-0 flex flex-col overflow-auto bg-white',
+        'w-screen h-dvh fixed inset-0 bg-white',
         !isViewerMode && 'hidden'
       )}
     >
       <Toaster toasterId='post-viewer' />
 
       <PostViewerToolbar {...post} />
-      <PostViewerContent
+      <PostViewerContainer
         page={page}
-        postViewerContentRef={postViewerContentRef}
+        postViewerContainerRef={postViewerContainerRef}
       />
       <PostViewerControlBar page={page} />
     </div>

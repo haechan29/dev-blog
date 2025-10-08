@@ -8,7 +8,7 @@ import { RefObject, useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
 export const useViewerNavigation = (
-  contentRef: RefObject<HTMLDivElement | null>
+  containerRef: RefObject<HTMLDivElement | null>
 ) => {
   const dispatch = useDispatch<AppDispatch>();
   const { isViewerMode } = usePostViewer();
@@ -56,10 +56,10 @@ export const useViewerNavigation = (
 
   const handleNavigation = useCallback(
     ({ clientX }: { clientX: number }) => {
-      const content = contentRef.current;
-      if (!content) return null;
+      const container = containerRef.current;
+      if (!container) return null;
 
-      const clientWidth = content.getBoundingClientRect().width;
+      const clientWidth = container.getBoundingClientRect().width;
       const [isLeftSideClicked, isRightSideClicked] = [
         clientX < clientWidth / 2,
         clientX > clientWidth / 2,
@@ -71,7 +71,7 @@ export const useViewerNavigation = (
         dispatch(nextPage());
       }
     },
-    [contentRef, dispatch]
+    [containerRef, dispatch]
   );
 
   const handleClick = useCallback(
@@ -102,16 +102,16 @@ export const useViewerNavigation = (
   }, [handleKeyDown, handleScroll, isViewerMode]);
 
   useEffect(() => {
-    const content = contentRef.current;
-    if (!content) return;
+    const container = containerRef.current;
+    if (!container) return;
 
     if (isViewerMode) {
-      content.addEventListener('click', handleClick);
-      content.addEventListener('touchend', handleTouch);
+      container.addEventListener('click', handleClick);
+      container.addEventListener('touchend', handleTouch);
     }
     return () => {
-      content.removeEventListener('click', handleClick);
-      content.removeEventListener('touchend', handleTouch);
+      container.removeEventListener('click', handleClick);
+      container.removeEventListener('touchend', handleTouch);
     };
-  }, [contentRef, isViewerMode, handleClick, handleTouch]);
+  }, [containerRef, isViewerMode, handleClick, handleTouch]);
 };
