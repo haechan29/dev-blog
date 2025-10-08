@@ -1,5 +1,4 @@
 import { PostViewer } from '@/features/postViewer/domain/model/postViewer';
-import { Padding } from '@/types/padding';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: PostViewer = {
@@ -7,13 +6,6 @@ const initialState: PostViewer = {
   isViewerMode: false,
   isToolbarExpanded: false,
   advanceMode: null,
-  fullscreenScale: 1.5,
-  paddingInRem: {
-    top: 5,
-    right: 5,
-    bottom: 5,
-    left: 5,
-  },
   isMouseOnToolbar: false,
   isMouseOnControlBar: false,
   isMouseMoved: false,
@@ -38,12 +30,6 @@ const postViewerSlice = createSlice({
     ) => {
       state.advanceMode = action.payload;
     },
-    setFullscreenScale: (state, action: PayloadAction<number>) => {
-      state.fullscreenScale = action.payload;
-    },
-    setPaddingInRem: (state, action: PayloadAction<Padding>) => {
-      state.paddingInRem = action.payload;
-    },
     setIsMouseOnToolbar: (state, action: PayloadAction<boolean>) => {
       state.isMouseOnToolbar = action.payload;
     },
@@ -62,8 +48,6 @@ export const {
   setIsViewerMode,
   setIsToolbarExpanded,
   setAdvanceMode,
-  setFullscreenScale,
-  setPaddingInRem,
   setIsMouseOnToolbar,
   setIsMouseOnControlBar,
   setIsMouseMoved,

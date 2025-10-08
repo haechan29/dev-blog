@@ -5,7 +5,6 @@ import PostViewerControlBar from '@/components/postViewer/postViewerControlBar';
 import PostViewerToolbar from '@/components/postViewer/postViewerToolbar';
 import { PostProps } from '@/features/post/ui/postProps';
 import { useClickTouchNavigation as useClickTouchNavigationHandlers } from '@/features/postViewer/hooks/useClickTouchNavigation';
-import { useFullscreenScale } from '@/features/postViewer/hooks/useFullscreenScale';
 import useKeyboardWheelNavigation from '@/features/postViewer/hooks/useKeyboardWheelNavigation';
 import usePostParsing from '@/features/postViewer/hooks/usePostParsing';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
@@ -32,7 +31,6 @@ export default function PostViewer({ post }: { post: PostProps }) {
   const navigationHandlers = useClickTouchNavigationHandlers();
   useKeyboardWheelNavigation();
 
-  useFullscreenScale();
   useViewerFullscreen(postViewerRef);
 
   return (

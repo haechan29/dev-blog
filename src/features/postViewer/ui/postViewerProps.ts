@@ -1,7 +1,6 @@
 import Heading from '@/features/post/domain/model/heading';
 import PostPosition from '@/features/post/domain/model/postPosition';
 import { PostViewer } from '@/features/postViewer/domain/model/postViewer';
-import { Padding } from '@/types/padding';
 
 export default interface PostViewerProps {
   isButtonVisible: boolean;
@@ -12,8 +11,6 @@ export default interface PostViewerProps {
   totalPages: number | null;
   currentHeading: Heading | null;
   advanceMode: 'tts' | 'auto' | null;
-  fullscreenScale: number;
-  paddingInRem: Padding;
 }
 
 export function createProps({
