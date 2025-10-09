@@ -21,33 +21,36 @@ export default async function PostPage({
   const postProps = createProps(post);
 
   return (
-    <div className='px-10 xl:px-20 py-14'>
+    <>
       <PostViewer post={postProps} />
-      <PostPageClient post={postProps} />
 
-      <EnterFullscreenButton />
+      <div className='px-10 xl:px-20 py-14'>
+        <PostPageClient post={postProps} />
 
-      <PostHeaderSection post={postProps} />
-      <div className='w-full h-[1px] bg-gray-200 mb-10' />
+        <EnterFullscreenButton />
 
-      {postProps.headings.length > 0 && (
-        <section className='mb-10 xl:mb-0'>
-          <div className='block xl:hidden text-xl xl:text-2xl font-bold text-gray-900 mt-4 mb-2 leading-tight'>
-            목차
-          </div>
-          <TableOfContentsItem headings={postProps.headings} />
-        </section>
-      )}
+        <PostHeaderSection post={postProps} />
+        <div className='w-full h-[1px] bg-gray-200 mb-10' />
 
-      <PostContentSection content={postProps.content} />
+        {postProps.headings.length > 0 && (
+          <section className='mb-10 xl:mb-0'>
+            <div className='block xl:hidden text-xl xl:text-2xl font-bold text-gray-900 mt-4 mb-2 leading-tight'>
+              목차
+            </div>
+            <TableOfContentsItem headings={postProps.headings} />
+          </section>
+        )}
 
-      <LikeButtonItem postId={postProps.slug} />
+        <PostContentSection content={postProps.content} />
 
-      <ErrorBoundary fallback={<div></div>}>
-        <Suspense fallback={<div></div>}>
-          <CommentSection slug={slug} />
-        </Suspense>
-      </ErrorBoundary>
-    </div>
+        <LikeButtonItem postId={postProps.slug} />
+
+        <ErrorBoundary fallback={<div></div>}>
+          <Suspense fallback={<div></div>}>
+            <CommentSection slug={slug} />
+          </Suspense>
+        </ErrorBoundary>
+      </div>
+    </>
   );
 }

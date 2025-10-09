@@ -7,9 +7,9 @@ import { AppDispatch } from '@/lib/redux/store';
 import { RefObject, useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-export const useViewerFullscreen = (
+export default function useViewerFullscreen(
   postViewerRef: RefObject<HTMLDivElement | null>
-) => {
+) {
   const dispatch = useDispatch<AppDispatch>();
   const { isViewerMode } = usePostViewer();
   const { requestFullscreen, exitFullscreen } = useFullscreen(postViewerRef);
@@ -37,4 +37,4 @@ export const useViewerFullscreen = (
     return () =>
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, [handleFullscreenChange]);
-};
+}
