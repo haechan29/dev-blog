@@ -3,10 +3,12 @@
 import Heading from '@/features/post/domain/model/heading';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import useViewerToolbar from '@/features/postViewer/hooks/useViewerToolbar';
+import { canTouch } from '@/lib/browser';
 import { setIsMouseOnToolbar } from '@/lib/redux/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { ChevronDown } from 'lucide-react';
+import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function PostViewerToolbar({
@@ -21,10 +23,20 @@ export default function PostViewerToolbar({
   const { isExpanded, currentHeading, toggleIsExpanded, handleContentClick } =
     useViewerToolbar();
 
+  const handleMouseEnter = useCallback(() => {
+    if (canTouch) return;
+    dispatch(setIsMouseOnToolbar(true));
+  }, [dispatch]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (canTouch) return;
+    dispatch(setIsMouseOnToolbar(false));
+  }, [dispatch]);
+
   return (
     <div
-      onMouseEnter={() => dispatch(setIsMouseOnToolbar(true))}
-      onMouseLeave={() => dispatch(setIsMouseOnToolbar(false))}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       className={clsx(
         'absolute top-0 left-0 right-0 z-50 flex flex-col backdrop-blur-md bg-white/80 px-10 py-3',
         'transition-opacity duration-300 ease-in-out',

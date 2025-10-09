@@ -1,6 +1,6 @@
 'use client';
 
-import { supportsFullscreen } from '@/lib/browser';
+import { canTouch, supportsFullscreen } from '@/lib/browser';
 import { nextPage, previousPage } from '@/lib/redux/postPositionSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { MouseEvent, TouchEvent, useCallback } from 'react';
@@ -37,7 +37,7 @@ export const useClickTouchNavigation = () => {
 
   const onClick = useCallback(
     (event: MouseEvent<HTMLDivElement>) => {
-      if ('ontouchstart' in window) return; // block event handling on mobile
+      if (canTouch) return;
 
       handleNavigation(event);
     },

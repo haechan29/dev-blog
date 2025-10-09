@@ -11,6 +11,7 @@ import useViewerFullscreen from '@/features/postViewer/hooks/useViewerFullscreen
 import useViewerTransition from '@/features/postViewer/hooks/useViewerTransition';
 import useDebounce from '@/hooks/useDebounce';
 import useThrottle from '@/hooks/useThrottle';
+import { canTouch } from '@/lib/browser';
 import { setIsMouseMoved } from '@/lib/redux/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { useCallback, useRef } from 'react';
@@ -25,6 +26,8 @@ export default function PostViewer({ post }: { post: PostProps }) {
   const debounce = useDebounce();
 
   const handleMouseMove = useCallback(() => {
+    if (canTouch) return;
+
     throttle(() => {
       dispatch(setIsMouseMoved(true));
       debounce(() => dispatch(setIsMouseMoved(false)), 2000);
