@@ -43,7 +43,7 @@ export default function PostViewer({ post }: { post: PostProps }) {
     <div
       ref={postViewerRef}
       onMouseMove={handleMouseMove}
-      className='w-screen h-dvh inset-0 fixed bg-white opacity-0 pointer-events-none'
+      className='w-screen h-dvh inset-0 fixed z-40 bg-white opacity-0 pointer-events-none'
     >
       <Toaster toasterId='post-viewer' />
 
