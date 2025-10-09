@@ -88,21 +88,21 @@ function Content({
   onContentClick: (heading: Heading) => void;
 }) {
   return (
-    <div className='flex flex-1 min-w-0 px-2'>
+    <div className='flex flex-1 min-w-0 px-2 max-h-40 md:max-h-60 lg:max-h-80 overflow-y-auto scrollbar-hide'>
       <div className='flex flex-col w-full'>
         {headings.map(item => (
           <button
             key={item.id}
             onClick={() => onContentClick(item)}
             className={clsx(
-              'flex w-full text-base md:text-lg lg:text-xl truncate transition-discrete|opacity duration-300 ease-in',
+              'w-full text-base md:text-lg lg:text-xl text-left transition-discrete|opacity duration-300 ease-in',
               isExpanded || heading?.id === item.id
                 ? 'h-6 opacity-100'
                 : 'h-0 opacity-0',
               heading?.id === item.id
                 ? 'text-gray-900 font-bold'
                 : 'text-gray-400',
-              isExpanded && 'my-2',
+              isExpanded && 'my-1 md:my-2',
               isExpanded && item.level === 2 && 'pl-4',
               isExpanded && item.level === 3 && 'pl-8'
             )}

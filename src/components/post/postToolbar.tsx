@@ -73,7 +73,7 @@ export default function PostToolbar() {
             >
               <Menu className='w-6 h-6 text-gray-500' />
             </button>
-            <div className='flex flex-1 min-w-0'>
+            <div className='flex flex-1 min-w-0 max-h-60 overflow-auto scrollbar-hide'>
               <div
                 className={clsx(
                   'flex flex-col w-full transition-opacity duration-300 ease-in-out',
@@ -95,7 +95,7 @@ export default function PostToolbar() {
                         key={heading.id}
                         onClick={() => handleClick(heading)}
                         className={clsx(
-                          'flex truncate transition-discrete|opacity duration-300 ease-in',
+                          'truncate text-left transition-discrete|opacity duration-300 ease-in',
                           postToolbar.mode === 'expanded' ||
                             postToolbar.title === heading.text
                             ? 'h-6 opacity-100'
@@ -103,7 +103,7 @@ export default function PostToolbar() {
                           postToolbar.title === heading.text
                             ? 'text-gray-900 font-semibold'
                             : 'text-gray-400',
-                          postToolbar.mode === 'expanded' && 'my-0.5'
+                          postToolbar.mode === 'expanded' && 'my-1'
                         )}
                       >
                         {heading.text}
