@@ -1,13 +1,16 @@
 'use client';
 
+import useDebounce from '@/hooks/useDebounce';
 import { canTouch, supportsFullscreen } from '@/lib/browser';
 import { nextPage, previousPage } from '@/lib/redux/postPositionSlice';
+import { setIsTouched } from '@/lib/redux/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { MouseEvent, TouchEvent, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
 export const useClickTouchNavigation = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const debounce = useDebounce();
 
   const handleNavigation = useCallback(
     ({
@@ -46,13 +49,16 @@ export const useClickTouchNavigation = () => {
 
   const onTouchEnd = useCallback(
     (event: TouchEvent<HTMLDivElement>) => {
+      dispatch(setIsTouched(true));
+      debounce(() => dispatch(setIsTouched(false)), 2000);
+
       handleNavigation({
         clientX: event.changedTouches[0].clientX,
         clientY: event.changedTouches[0].clientY,
         currentTarget: event.currentTarget,
       });
     },
-    [handleNavigation]
+    [debounce, dispatch, handleNavigation]
   );
 
   return { onClick, onTouchEnd } as const;
