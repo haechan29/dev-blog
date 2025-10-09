@@ -291,6 +291,10 @@ body {
   }
 }
 
+.icon {
+  @apply w-5 h-5 md:w-6 md:h-6;
+}
+
 @keyframes shake {
   0%,
   100% {

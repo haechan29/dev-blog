@@ -36,7 +36,7 @@ export default function TTSSection({ page }: { page: Page | null }) {
   }, [pauseReading, startReading, stopReading, ttsProps]);
 
   return (
-    <div className='flex items-center gap-2'>
+    <div className='flex items-center'>
       <TooltipItem text='음성'>
         <button
           onClick={toggleIsEnabled}
@@ -45,7 +45,7 @@ export default function TTSSection({ page }: { page: Page | null }) {
         >
           <Headphones
             className={clsx(
-              'w-6 h-6',
+              'icon',
               ttsProps.mode === 'enabled' ? 'text-gray-900' : 'text-gray-400'
             )}
           />
@@ -65,43 +65,35 @@ export default function TTSSection({ page }: { page: Page | null }) {
         </button>
       </TooltipItem>
 
-      <div
+      <button
+        onClick={toggleIsPlaying}
         className={clsx(
-          'flex items-center',
-          'transition-opacity duration-300 ease-in-out',
-          ttsProps.mode !== 'enabled' && 'opacity-0 pointer-events-none'
+          'relative cursor-pointer overflow-hidden',
+          'transition-opacity|discrete duration-300 ease-in-out',
+          ttsProps.mode === 'enabled'
+            ? 'w-9 h-9 md:w-10 md:h-10 p-2 ml-2'
+            : 'w-0 h-0 opacity-0 pointer-events-none'
         )}
+        aria-label='음성 일시정지'
       >
-        <button
-          onClick={toggleIsPlaying}
+        <Play
           className={clsx(
-            'flex items-center cursor-pointer',
-            'transition-discrete duration-300 ease-in-out',
-            ttsProps.mode === 'enabled' ? 'w-10 p-2' : 'w-0 overflow-hidden'
+            'absolute icon m-auto inset-0 transition-opacity duration-300 button ease-in-out',
+            ttsProps.mode === 'enabled' &&
+              ttsProps.isPlaying &&
+              'opacity-0 pointer-events-none'
           )}
-          aria-label='음성 일시정지'
-        >
-          <div className='relative w-6 h-6'>
-            <Play
-              className={clsx(
-                'absolute inset-0 transition-opacity duration-300 button ease-in-out',
-                ttsProps.mode === 'enabled' &&
-                  ttsProps.isPlaying &&
-                  'opacity-0 pointer-events-none'
-              )}
-            />
+        />
 
-            <Pause
-              className={clsx(
-                'absolute inset-0 transition-opacity duration-300 ease-in-out',
-                ttsProps.mode === 'enabled' &&
-                  !ttsProps.isPlaying &&
-                  'opacity-0 pointer-events-none'
-              )}
-            />
-          </div>
-        </button>
-      </div>
+        <Pause
+          className={clsx(
+            'absolute icon m-auto inset-0 transition-opacity duration-300 ease-in-out',
+            ttsProps.mode === 'enabled' &&
+              !ttsProps.isPlaying &&
+              'opacity-0 pointer-events-none'
+          )}
+        />
+      </button>
     </div>
   );
 }

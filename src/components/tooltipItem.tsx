@@ -30,11 +30,11 @@ export default function TooltipItem({
   };
 
   return (
-    <div className='relative inline-block'>
+    <div className='relative inline-block group'>
       {children}
       <div
         className={clsx(
-          'absolute z-50 hidden hover:block',
+          'absolute z-50 hidden group-hover:block',
           positionClasses[position]
         )}
       >

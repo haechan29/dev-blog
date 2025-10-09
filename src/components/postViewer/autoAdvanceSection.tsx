@@ -18,7 +18,7 @@ export default function AutoAdvanceSection() {
       >
         <Timer
           className={clsx(
-            'w-6 h-6',
+            'icon',
             isAutoAdvanceEnabled ? 'text-gray-900' : 'text-gray-400'
           )}
         />

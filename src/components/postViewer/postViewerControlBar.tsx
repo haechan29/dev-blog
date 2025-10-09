@@ -33,9 +33,9 @@ export default function PostViewerControlBar({ page }: { page: Page | null }) {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className={clsx(
-        'absolute bottom-0 left-0 right-0 z-50 flex flex-col bg-white/80 backdrop-blur-md px-10',
+        'absolute bottom-0 left-0 right-0 z-50 flex flex-col bg-white/80 backdrop-blur-md px-2 md:px-4 lg:px-6',
         'transition-transform|opacity duration-300 ease-in-out',
-        !areBarsVisible && 'translate-y-full opacity-0'
+        !areBarsVisible && 'translate-y-full opacity-0 pointer-events-none'
       )}
     >
       <ProgressSection />
