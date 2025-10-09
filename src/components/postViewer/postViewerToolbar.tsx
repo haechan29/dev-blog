@@ -38,9 +38,9 @@ export default function PostViewerToolbar({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className={clsx(
-        'absolute top-0 left-0 right-0 z-50 flex flex-col backdrop-blur-md bg-white/80 px-10 py-3',
+        'absolute top-0 left-0 right-0 z-50 flex flex-col backdrop-blur-md bg-white/80 px-2 md:px-4 lg:px-6 py-3',
         'transition-opacity duration-300 ease-in-out',
-        !areBarsVisible && 'opacity-0'
+        !areBarsVisible && 'opacity-0 pointer-events-none'
       )}
     >
       <Title title={title} heading={currentHeading} />
@@ -65,7 +65,13 @@ export default function PostViewerToolbar({
 function Title({ title, heading }: { title: string; heading: Heading | null }) {
   return (
     heading !== null && (
-      <div className={clsx('w-full truncate text-gray-400')}>{title}</div>
+      <div
+        className={clsx(
+          'w-full truncate text-xs md:text-sm lg:text-base text-gray-400 px-2'
+        )}
+      >
+        {title}
+      </div>
     )
   );
 }
@@ -82,14 +88,14 @@ function Content({
   onContentClick: (heading: Heading) => void;
 }) {
   return (
-    <div className='flex flex-1 min-w-0'>
+    <div className='flex flex-1 min-w-0 px-2'>
       <div className='flex flex-col w-full'>
         {headings.map(item => (
           <button
             key={item.id}
             onClick={() => onContentClick(item)}
             className={clsx(
-              'flex w-full text-xl transition-discrete|opacity duration-300 ease-in',
+              'flex w-full text-base md:text-lg lg:text-xl truncate transition-discrete|opacity duration-300 ease-in',
               isExpanded || heading?.id === item.id
                 ? 'h-6 opacity-100'
                 : 'h-0 opacity-0',
@@ -101,7 +107,7 @@ function Content({
               isExpanded && item.level === 3 && 'pl-8'
             )}
           >
-            <span className='truncate'>{item.text}</span>
+            {item.text}
           </button>
         ))}
       </div>
@@ -123,7 +129,7 @@ function ToggleExpandButton({
     >
       <ChevronDown
         className={clsx(
-          'w-6 h-6 text-gray-500 transition-transform duration-300 ease-in-out',
+          'icon text-gray-500 transition-transform duration-300 ease-in-out',
           isExpanded && '-rotate-180'
         )}
       />
