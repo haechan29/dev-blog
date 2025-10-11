@@ -7,4 +7,6 @@ export interface PostViewer {
   isMouseOnControlBar: boolean;
   isMouseMoved: boolean;
   isTouched: boolean;
+  isToolbarTouched: boolean;
+  isControlBarTouched: boolean;
 }

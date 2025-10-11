@@ -10,6 +10,8 @@ const initialState: PostViewer = {
   isMouseOnControlBar: false,
   isMouseMoved: false,
   isTouched: false,
+  isToolbarTouched: false,
+  isControlBarTouched: false,
 };
 
 const postViewerSlice = createSlice({
@@ -43,6 +45,12 @@ const postViewerSlice = createSlice({
     setIsTouched: (state, action: PayloadAction<boolean>) => {
       state.isTouched = action.payload;
     },
+    setIsToolbarTouched: (state, action: PayloadAction<boolean>) => {
+      state.isToolbarTouched = action.payload;
+    },
+    setIsControlBarTouched: (state, action: PayloadAction<boolean>) => {
+      state.isControlBarTouched = action.payload;
+    },
   },
 });
 
@@ -56,4 +64,6 @@ export const {
   setIsMouseOnControlBar,
   setIsMouseMoved,
   setIsTouched,
+  setIsToolbarTouched,
+  setIsControlBarTouched,
 } = postViewerSlice.actions;

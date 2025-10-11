@@ -6,13 +6,13 @@ import clsx from 'clsx';
 import { Timer } from 'lucide-react';
 
 export default function AutoAdvanceSection() {
-  const { isAutoAdvanceEnabled, autoAdvanceInterval, cycleAutoAdvance } =
+  const { isAutoAdvanceEnabled, autoAdvanceInterval, onClick } =
     useAutoAdvanceState();
 
   return (
     <TooltipItem text='자동 넘김'>
       <button
-        onClick={cycleAutoAdvance}
+        onClick={onClick}
         className='relative flex shrink-0 items-center p-2 cursor-pointer'
         aria-label={isAutoAdvanceEnabled ? '자동 넘김 중지' : '자동 넘김 시작'}
       >

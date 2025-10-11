@@ -28,7 +28,9 @@ export function createProps({
       postViewer.isMouseOnControlBar ||
       postViewer.isMouseMoved ||
       postViewer.isToolbarExpanded ||
-      postViewer.isTouched,
+      postViewer.isTouched ||
+      postViewer.isToolbarTouched ||
+      postViewer.isControlBarTouched,
     pageNumber:
       postPosition.pagination !== null
         ? postPosition.pagination.current + 1

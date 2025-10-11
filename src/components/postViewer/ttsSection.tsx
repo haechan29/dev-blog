@@ -17,8 +17,12 @@ export default function TTSSection({ page }: { page: Page | null }) {
 
   const readablePage = useMemo(() => page?.filter(isReadable) ?? [], [page]);
 
-  const { ttsProps, toggleIsEnabled, toggleIsPlaying, increaseElementIndex } =
-    useTTSState();
+  const {
+    ttsProps,
+    onEnableButtonClick,
+    onPlayButtonClick,
+    increaseElementIndex,
+  } = useTTSState();
 
   const onFinishPage = useCallback(() => dispatch(nextPage()), [dispatch]);
 
@@ -39,7 +43,7 @@ export default function TTSSection({ page }: { page: Page | null }) {
     <div className='flex items-center'>
       <TooltipItem text='음성'>
         <button
-          onClick={toggleIsEnabled}
+          onClick={onEnableButtonClick}
           className='relative flex shrink-0 items-center p-2 cursor-pointer'
           aria-label='음성 재생'
         >
@@ -66,7 +70,7 @@ export default function TTSSection({ page }: { page: Page | null }) {
       </TooltipItem>
 
       <button
-        onClick={toggleIsPlaying}
+        onClick={onPlayButtonClick}
         className={clsx(
           'relative cursor-pointer overflow-hidden',
           'transition-opacity|discrete duration-300 ease-in-out',

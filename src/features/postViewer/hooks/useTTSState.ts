@@ -5,7 +5,11 @@ import {
   toProps as toTTSProps,
 } from '@/features/postViewer/domain/model/tts';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
-import { setAdvanceMode } from '@/lib/redux/postViewerSlice';
+import useDebounce from '@/hooks/useDebounce';
+import {
+  setAdvanceMode,
+  setIsControlBarTouched,
+} from '@/lib/redux/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -18,6 +22,7 @@ export default function useTTSState() {
   });
 
   const dispatch = useDispatch<AppDispatch>();
+  const debounce = useDebounce();
   const { pageNumber, isViewerMode, advanceMode } = usePostViewer();
   const ttsProps = useMemo(() => toTTSProps(tts), [tts]);
 
@@ -43,6 +48,20 @@ export default function useTTSState() {
     if (ttsProps.mode !== 'enabled') return;
     setTTS(prev => ({ ...prev, isPlaying: !ttsProps.isPlaying }));
   }, [ttsProps]);
+
+  const onEnableButtonClick = useCallback(() => {
+    toggleIsEnabled();
+
+    dispatch(setIsControlBarTouched(true));
+    debounce(() => dispatch(setIsControlBarTouched(false)), 2000);
+  }, [debounce, dispatch, toggleIsEnabled]);
+
+  const onPlayButtonClick = useCallback(() => {
+    toggleIsPlaying();
+
+    dispatch(setIsControlBarTouched(true));
+    debounce(() => dispatch(setIsControlBarTouched(false)), 2000);
+  }, [debounce, dispatch, toggleIsPlaying]);
 
   const increaseElementIndex = useCallback(
     () =>
@@ -96,8 +115,8 @@ export default function useTTSState() {
 
   return {
     ttsProps,
-    toggleIsEnabled,
-    toggleIsPlaying,
+    onEnableButtonClick,
+    onPlayButtonClick,
     increaseElementIndex,
   } as const;
 }

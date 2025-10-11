@@ -5,15 +5,20 @@ import {
   toProps as toAutoAdvanceProps,
 } from '@/features/postViewer/domain/model/autoAdvance';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
+import useDebounce from '@/hooks/useDebounce';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { nextPage } from '@/lib/redux/postPositionSlice';
-import { setAdvanceMode } from '@/lib/redux/postViewerSlice';
+import {
+  setAdvanceMode,
+  setIsControlBarTouched,
+} from '@/lib/redux/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function useAutoAdvanceState() {
   const dispatch = useDispatch<AppDispatch>();
+  const debounce = useDebounce();
   const { pageNumber, totalPages, advanceMode } = usePostViewer();
 
   const [autoAdvance, setAutoAdvance] = useLocalStorage<AutoAdvance>(
@@ -46,6 +51,13 @@ export default function useAutoAdvanceState() {
       });
     }
   }, [autoAdvanceInterval, setAutoAdvance]);
+
+  const onClick = useCallback(() => {
+    cycleAutoAdvance();
+
+    dispatch(setIsControlBarTouched(true));
+    debounce(() => dispatch(setIsControlBarTouched(false)), 2000);
+  }, [cycleAutoAdvance, debounce, dispatch]);
 
   useEffect(() => {
     if (!isAutoAdvanceEnabled || !autoAdvanceInterval) return;
@@ -80,6 +92,6 @@ export default function useAutoAdvanceState() {
   return {
     isAutoAdvanceEnabled,
     autoAdvanceInterval,
-    cycleAutoAdvance,
+    onClick,
   } as const;
 }

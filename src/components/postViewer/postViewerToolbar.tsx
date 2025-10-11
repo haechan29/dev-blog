@@ -3,13 +3,8 @@
 import Heading from '@/features/post/domain/model/heading';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import useViewerToolbar from '@/features/postViewer/hooks/useViewerToolbar';
-import { canTouch } from '@/lib/browser';
-import { setIsMouseOnToolbar } from '@/lib/redux/postViewerSlice';
-import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { ChevronDown } from 'lucide-react';
-import { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 
 export default function PostViewerToolbar({
   title,
@@ -18,25 +13,18 @@ export default function PostViewerToolbar({
   title: string;
   headings: Heading[];
 }) {
-  const dispatch = useDispatch<AppDispatch>();
   const { areBarsVisible } = usePostViewer();
-  const { isExpanded, currentHeading, toggleIsExpanded, handleContentClick } =
-    useViewerToolbar();
-
-  const handleMouseEnter = useCallback(() => {
-    if (canTouch) return;
-    dispatch(setIsMouseOnToolbar(true));
-  }, [dispatch]);
-
-  const handleMouseLeave = useCallback(() => {
-    if (canTouch) return;
-    dispatch(setIsMouseOnToolbar(false));
-  }, [dispatch]);
+  const {
+    isExpanded,
+    currentHeading,
+    toggleIsExpanded,
+    onContentClick,
+    ...handlers
+  } = useViewerToolbar();
 
   return (
     <div
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      {...handlers}
       className={clsx(
         'absolute top-0 left-0 right-0 z-50 flex flex-col backdrop-blur-md bg-white/80 px-2 md:px-4 lg:px-6 py-3',
         'transition-opacity duration-300 ease-in-out',
@@ -50,7 +38,7 @@ export default function PostViewerToolbar({
           isExpanded={isExpanded}
           heading={currentHeading}
           headings={headings}
-          onContentClick={handleContentClick}
+          onContentClick={onContentClick}
         />
 
         <ToggleExpandButton
@@ -65,11 +53,7 @@ export default function PostViewerToolbar({
 function Title({ title, heading }: { title: string; heading: Heading | null }) {
   return (
     heading !== null && (
-      <div
-        className={clsx(
-          'w-full truncate text-xs md:text-sm lg:text-base text-gray-400 px-2'
-        )}
-      >
+      <div className='w-full truncate text-xs md:text-sm lg:text-base text-gray-400 px-2'>
         {title}
       </div>
     )
