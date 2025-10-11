@@ -344,8 +344,8 @@ body {
 }
 
 :root {
-  --container-padding: 2rem;
-  --container-scale: 1.2;
+  --container-padding: 1rem;
+  --container-scale: 1.1;
 }
 
 @media (width >= theme(--breakpoint-md)) {
@@ -356,12 +356,6 @@ body {
 }
 
 @media (width >= theme(--breakpoint-lg)) {
-  :root {
-    --container-scale: 1.4;
-  }
-}
-
-@media (width >= theme(--breakpoint-xl)) {
   :root {
     --container-padding: 5rem;
     --container-scale: 1.5;
