@@ -27,12 +27,12 @@ export default function usePostParsing() {
   }, [pageNumber, pages]);
 
   const parsePost = useCallback(() => {
-    const postContainer = document.querySelector('.post-content');
-    if (!containerSize || !postContainer) return;
+    const postElement = document.querySelector('.post-content');
+    if (!containerSize || !postElement) return;
     const { width: containerWidth, height: containerHeight } = containerSize;
 
     const { pages, headingPageMapping } = parsePostInner({
-      postContainer,
+      postElement,
       containerWidth,
       containerHeight,
       excludeClassNames: ['hide-fullscreen'],

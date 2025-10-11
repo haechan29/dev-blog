@@ -9,12 +9,12 @@ import { getIntrinsicSize } from '@/lib/dom';
  * - New page created when content exceeds page height
  */
 export function parsePost({
-  postContainer,
+  postElement,
   containerWidth,
   containerHeight,
   excludeClassNames = [],
 }: {
-  postContainer: Element;
+  postElement: Element;
   containerWidth: number;
   containerHeight: number;
   excludeClassNames?: string[];
@@ -45,7 +45,7 @@ export function parsePost({
     });
   }
 
-  Array.from(postContainer.children)
+  Array.from(postElement.children)
     .filter(
       child =>
         !excludeClassNames.every(className =>

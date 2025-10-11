@@ -8,7 +8,7 @@ import { AppDispatch } from '@/lib/redux/store';
 import { MouseEvent, TouchEvent, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
-export const useClickTouchNavigation = () => {
+export default function useClickTouchNavigationHandler() {
   const dispatch = useDispatch<AppDispatch>();
   const debounce = useDebounce();
 
@@ -62,4 +62,4 @@ export const useClickTouchNavigation = () => {
   );
 
   return { onClick, onTouchEnd } as const;
-};
+}

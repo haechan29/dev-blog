@@ -1,26 +1,16 @@
 'use client';
 
 import { Page } from '@/features/postViewer/domain/types/page';
+import useClickTouchNavigationHandler from '@/features/postViewer/hooks/useClickTouchNavigationHandler';
+import useKeyboardWheelNavigation from '@/features/postViewer/hooks/useKeyboardWheelNavigation';
 import { supportsFullscreen } from '@/lib/browser';
 import clsx from 'clsx';
-import {
-  MouseEvent,
-  TouchEvent,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-} from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 
-export default function PostViewerContainer({
-  page,
-  onClick,
-  onTouchEnd,
-}: {
-  page: Page | null;
-  onClick: (event: MouseEvent<HTMLDivElement>) => void;
-  onTouchEnd: (event: TouchEvent<HTMLDivElement>) => void;
-}) {
+export default function PostViewerContainer({ page }: { page: Page | null }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const navigationHandler = useClickTouchNavigationHandler();
+  useKeyboardWheelNavigation();
 
   useLayoutEffect(() => {
     if (containerRef.current === null) return;
@@ -37,11 +27,10 @@ export default function PostViewerContainer({
   }, []);
 
   useEffect(() => {
-    if (typeof document === 'undefined') return;
+    if (typeof document === 'undefined' || !page || !containerRef.current)
+      return;
 
     const container = containerRef.current;
-    if (!page || !container) return;
-
     container.innerHTML = '';
     const fragment = document.createDocumentFragment();
     page.forEach(element => {
@@ -53,8 +42,7 @@ export default function PostViewerContainer({
   return (
     <div
       ref={containerRef}
-      onClick={onClick}
-      onTouchEnd={onTouchEnd}
+      {...navigationHandler}
       className={clsx(
         'prose absolute inset-0 m-auto',
         'w-[calc(var(--fullscreen-width)/var(--container-scale))]',
