@@ -24,27 +24,28 @@ export default function PostViewerToolbar({
 
   return (
     <div
-      {...handlers}
       className={clsx(
-        'absolute top-0 left-0 right-0 z-50 flex flex-col p-2 md:p-4 lg:p-6',
+        'absolute top-0 left-0 right-0 z-50 pb-10 from-black/70 to-transparent bg-gradient-to-b',
         'transition-opacity duration-300 ease-in-out',
         !areBarsVisible && 'opacity-0 pointer-events-none'
       )}
     >
-      <Title title={title} heading={currentHeading} />
+      <div {...handlers} className='flex flex-col p-2 md:p-4 lg:p-6'>
+        <Title title={title} heading={currentHeading} />
 
-      <div className='flex w-full items-start'>
-        <Content
-          isExpanded={isExpanded}
-          heading={currentHeading}
-          headings={headings}
-          onContentClick={onContentClick}
-        />
+        <div className='flex w-full items-start'>
+          <Content
+            isExpanded={isExpanded}
+            heading={currentHeading}
+            headings={headings}
+            onContentClick={onContentClick}
+          />
 
-        <ToggleExpandButton
-          isExpanded={isExpanded}
-          toggleIsExpanded={toggleIsExpanded}
-        />
+          <ToggleExpandButton
+            isExpanded={isExpanded}
+            toggleIsExpanded={toggleIsExpanded}
+          />
+        </div>
       </div>
     </div>
   );
@@ -79,7 +80,7 @@ function Content({
             key={item.id}
             onClick={() => onContentClick(item)}
             className={clsx(
-              'w-full text-base md:text-lg lg:text-xl text-left transition-discrete|opacity duration-300 ease-in',
+              'w-full text-base md:text-lg lg:text-xl text-left text-white transition-discrete|opacity duration-300 ease-in',
               isExpanded || heading?.id === item.id
                 ? 'h-6 opacity-100'
                 : 'h-0 opacity-0',

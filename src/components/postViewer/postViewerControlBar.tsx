@@ -30,24 +30,28 @@ export default function PostViewerControlBar({ page }: { page: Page | null }) {
 
   return (
     <div
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
       className={clsx(
-        'absolute bottom-0 left-0 right-0 z-50 flex flex-col bg-white/80 backdrop-blur-md px-2 md:px-4 lg:px-6',
-        'transition-transform|opacity duration-300 ease-in-out',
-        !areBarsVisible && 'translate-y-full opacity-0 pointer-events-none'
+        'absolute bottom-0 left-0 right-0 z-50 from-black/70 to-transparent bg-gradient-to-t',
+        'transition-opacity duration-300 ease-in-out',
+        !areBarsVisible && 'opacity-0 pointer-events-none'
       )}
     >
-      <ProgressSection />
+      <div
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        className='flex flex-col px-2 md:px-4 lg:px-6'
+      >
+        <ProgressSection />
 
-      <div className='flex w-full mb-3 justify-between items-center'>
-        <div className='flex items-center gap-2'>
-          <PageIndicatorSection />
-          <TTSSection page={page} />
-          <AutoAdvanceSection />
+        <div className='flex w-full mb-3 justify-between items-center'>
+          <div className='flex items-center gap-2'>
+            <PageIndicatorSection />
+            <TTSSection page={page} />
+            <AutoAdvanceSection />
+          </div>
+
+          <ExitFullscreenButton />
         </div>
-
-        <ExitFullscreenButton />
       </div>
     </div>
   );
