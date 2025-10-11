@@ -330,13 +330,13 @@ body {
 
 .tts-reading-active,
 .tts-reading-active * {
-  font-weight: 500 !important; /* medium */
-  transition: color 0.3s ease-in-out, font-weight 0.3s ease-in-out !important;
+  font-weight: 500; /* medium */
+  transition: color 0.3s ease-in-out, font-weight 0.3s ease-in-out;
 }
 .tts-reading-inactive,
 .tts-reading-inactive * {
-  color: oklch(70.7% 0.022 261.325) !important; /* gray-400 */
-  transition: color 0.3s ease-in-out !important;
+  opacity: 0.4;
+  transition: opacity 0.3s ease-in-out;
 }
 
 :root {
