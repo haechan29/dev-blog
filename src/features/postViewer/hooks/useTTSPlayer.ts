@@ -13,7 +13,7 @@ export default function useTTSPlayer({
   onFinishElement: (nextElementIndex: number) => void;
   onFinishPage: () => void;
 }) {
-  const isPaused = useRef(false);
+  const isPaused = useRef<boolean | null>(null);
 
   const startReading = useCallback(
     (elementIndex: number) => {
@@ -46,13 +46,16 @@ export default function useTTSPlayer({
 
       speechSynthesis.cancel();
       speechSynthesis.speak(utterance);
+      isPaused.current = false;
     },
     [onFinishElement, onFinishPage, readablePage]
   );
 
   const pauseReading = useCallback(() => {
     speechSynthesis.pause();
-    isPaused.current = true;
+    if (isPaused.current === false) {
+      isPaused.current = true;
+    }
   }, []);
 
   const stopReading = useCallback(() => {

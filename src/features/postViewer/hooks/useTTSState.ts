@@ -13,7 +13,6 @@ import { useDispatch } from 'react-redux';
 
 export default function useTTSState() {
   const [tts, setTTS] = useState<TTS>({
-    isEnabled: false,
     isPlaying: false,
     elementIndex: 0,
   });
@@ -25,33 +24,9 @@ export default function useTTSState() {
 
   const lastPageNumber = useRef(pageNumber);
 
-  const toggleIsEnabled = useCallback(() => {
-    if (ttsProps.mode === 'enabled') {
-      setTTS({
-        isEnabled: false,
-        isPlaying: false,
-        elementIndex: 0,
-      });
-    } else if (ttsProps.mode === 'disabled') {
-      setTTS({
-        isEnabled: true,
-        isPlaying: true,
-        elementIndex: 0,
-      });
-    }
-  }, [ttsProps.mode]);
-
   const toggleIsPlaying = useCallback(() => {
-    if (ttsProps.mode !== 'enabled') return;
     setTTS(prev => ({ ...prev, isPlaying: !ttsProps.isPlaying }));
   }, [ttsProps]);
-
-  const onEnableButtonClick = useCallback(() => {
-    toggleIsEnabled();
-
-    dispatch(setIsControlBarTouched(true));
-    debounce(() => dispatch(setIsControlBarTouched(false)), 2000);
-  }, [debounce, dispatch, toggleIsEnabled]);
 
   const onPlayButtonClick = useCallback(() => {
     toggleIsPlaying();
@@ -72,7 +47,6 @@ export default function useTTSState() {
   useEffect(() => {
     if (!isViewerMode) {
       setTTS({
-        isEnabled: false,
         isPlaying: false,
         elementIndex: 0,
       });
@@ -83,9 +57,8 @@ export default function useTTSState() {
     if (pageNumber === lastPageNumber.current) return;
     lastPageNumber.current = pageNumber;
 
-    if (ttsProps.mode === 'enabled' && ttsProps.isPlaying) {
+    if (ttsProps.isPlaying) {
       setTTS({
-        isEnabled: true,
         isPlaying: true,
         elementIndex: 0,
       });
@@ -94,7 +67,6 @@ export default function useTTSState() {
 
   return {
     ttsProps,
-    onEnableButtonClick,
     onPlayButtonClick,
     increaseElementIndex,
   } as const;
