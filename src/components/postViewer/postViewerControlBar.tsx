@@ -1,7 +1,6 @@
 'use client';
 
 import ProgressSection from '@/components/postViewer//progressSection';
-import AutoAdvanceSection from '@/components/postViewer/autoAdvanceSection';
 import ExitFullscreenButton from '@/components/postViewer/exitFullscreenButton';
 import PageIndicatorSection from '@/components/postViewer/pageIndicatorSection';
 import TTSSection from '@/components/postViewer/ttsSection';
@@ -47,7 +46,6 @@ export default function PostViewerControlBar({ page }: { page: Page | null }) {
           <div className='flex items-center gap-2'>
             <PageIndicatorSection />
             <TTSSection page={page} />
-            <AutoAdvanceSection />
           </div>
 
           <ExitFullscreenButton />

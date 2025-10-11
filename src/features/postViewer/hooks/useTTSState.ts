@@ -6,10 +6,7 @@ import {
 } from '@/features/postViewer/domain/model/tts';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import useDebounce from '@/hooks/useDebounce';
-import {
-  setAdvanceMode,
-  setIsControlBarTouched,
-} from '@/lib/redux/postViewerSlice';
+import { setIsControlBarTouched } from '@/lib/redux/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -23,7 +20,7 @@ export default function useTTSState() {
 
   const dispatch = useDispatch<AppDispatch>();
   const debounce = useDebounce();
-  const { pageNumber, isViewerMode, advanceMode } = usePostViewer();
+  const { pageNumber, isViewerMode } = usePostViewer();
   const ttsProps = useMemo(() => toTTSProps(tts), [tts]);
 
   const lastPageNumber = useRef(pageNumber);
@@ -94,24 +91,6 @@ export default function useTTSState() {
       });
     }
   }, [pageNumber, ttsProps]);
-
-  useEffect(() => {
-    if (advanceMode !== null && advanceMode !== 'tts') {
-      setTTS({
-        isEnabled: false,
-        isPlaying: false,
-        elementIndex: 0,
-      });
-    }
-  }, [advanceMode, setTTS]);
-
-  useEffect(() => {
-    if (ttsProps.mode === 'enabled') {
-      dispatch(setAdvanceMode('tts'));
-    } else if (ttsProps.mode === 'disabled') {
-      dispatch(setAdvanceMode(null));
-    }
-  }, [dispatch, ttsProps.mode]);
 
   return {
     ttsProps,

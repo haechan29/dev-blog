@@ -10,7 +10,6 @@ export default interface PostViewerProps {
   pageNumber: number | null;
   totalPages: number | null;
   currentHeading: Heading | null;
-  advanceMode: 'tts' | 'auto' | null;
 }
 
 export function createProps({

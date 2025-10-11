@@ -5,7 +5,6 @@ const initialState: PostViewer = {
   isCommentSectionVisible: false,
   isViewerMode: false,
   isToolbarExpanded: false,
-  advanceMode: null,
   isMouseOnToolbar: false,
   isMouseOnControlBar: false,
   isMouseMoved: false,
@@ -26,12 +25,6 @@ const postViewerSlice = createSlice({
     },
     setIsToolbarExpanded: (state, action: PayloadAction<boolean>) => {
       state.isToolbarExpanded = action.payload;
-    },
-    setAdvanceMode: (
-      state,
-      action: PayloadAction<PostViewer['advanceMode']>
-    ) => {
-      state.advanceMode = action.payload;
     },
     setIsMouseOnToolbar: (state, action: PayloadAction<boolean>) => {
       state.isMouseOnToolbar = action.payload;
@@ -59,7 +52,6 @@ export const {
   setIsCommentSectionVisible,
   setIsViewerMode,
   setIsToolbarExpanded,
-  setAdvanceMode,
   setIsMouseOnToolbar,
   setIsMouseOnControlBar,
   setIsMouseMoved,
