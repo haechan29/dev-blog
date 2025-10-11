@@ -26,7 +26,7 @@ export default function PostViewerToolbar({
     <div
       {...handlers}
       className={clsx(
-        'absolute top-0 left-0 right-0 z-50 flex flex-col backdrop-blur-md bg-white/80 px-2 md:px-4 lg:px-6 py-3',
+        'absolute top-0 left-0 right-0 z-50 flex flex-col p-2 md:p-4 lg:p-6',
         'transition-opacity duration-300 ease-in-out',
         !areBarsVisible && 'opacity-0 pointer-events-none'
       )}
@@ -53,7 +53,7 @@ export default function PostViewerToolbar({
 function Title({ title, heading }: { title: string; heading: Heading | null }) {
   return (
     heading !== null && (
-      <div className='w-full truncate text-xs md:text-sm lg:text-base text-gray-400 px-2'>
+      <div className='w-full truncate hidden md:block md:text-sm lg:text-base text-gray-400 px-2'>
         {title}
       </div>
     )
@@ -113,7 +113,7 @@ function ToggleExpandButton({
     >
       <ChevronDown
         className={clsx(
-          'icon text-gray-500 transition-transform duration-300 ease-in-out',
+          'w-6 h-6 text-gray-500 transition-transform duration-300 ease-in-out',
           isExpanded && '-rotate-180'
         )}
       />
