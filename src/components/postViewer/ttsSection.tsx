@@ -44,7 +44,7 @@ export default function TTSSection({ page }: { page: Page | null }) {
       <button
         onClick={onPlayButtonClick}
         className={clsx(
-          'w-10 h-10 p-2 ml-2 relative cursor-pointer',
+          'w-10 h-10 p-2 relative cursor-pointer',
           'transition-opacity|discrete duration-300 ease-in-out'
         )}
         aria-label='음성 재생'

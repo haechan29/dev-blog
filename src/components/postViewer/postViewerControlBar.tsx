@@ -43,9 +43,9 @@ export default function PostViewerControlBar({ page }: { page: Page | null }) {
         <ProgressSection />
 
         <div className='flex w-full mb-3 justify-between items-center'>
-          <div className='flex items-center gap-2'>
-            <PageIndicatorSection />
+          <div className='flex items-center'>
             <TTSSection page={page} />
+            <PageIndicatorSection />
           </div>
 
           <ExitFullscreenButton />

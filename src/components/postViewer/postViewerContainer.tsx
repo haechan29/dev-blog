@@ -32,11 +32,12 @@ export default function PostViewerContainer({ page }: { page: Page | null }) {
 
     const container = containerRef.current;
     container.innerHTML = '';
-    const fragment = document.createDocumentFragment();
+    const wrapper = document.createElement('div');
+    wrapper.className = 'relative w-full h-full';
     page.forEach(element => {
-      fragment.appendChild(element);
+      wrapper.appendChild(element);
     });
-    container.appendChild(fragment);
+    container.appendChild(wrapper);
   }, [page]);
 
   return (

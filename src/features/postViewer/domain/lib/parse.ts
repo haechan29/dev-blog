@@ -159,7 +159,7 @@ function createPagedElement(
 function createCaptionElement(sentence: string) {
   const captionElement = document.createElement('div');
   captionElement.className =
-    'absolute left-0 right-0 bottom-6 flex justify-center';
+    'absolute left-0 right-0 bottom-0 flex justify-center';
 
   const content = document.createElement('div');
   content.className =
