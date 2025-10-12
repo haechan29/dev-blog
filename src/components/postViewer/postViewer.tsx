@@ -4,19 +4,23 @@ import PostViewerContainer from '@/components/postViewer/postViewerContainer';
 import PostViewerControlBar from '@/components/postViewer/postViewerControlBar';
 import PostViewerToolbar from '@/components/postViewer/postViewerToolbar';
 import { PostProps } from '@/features/post/ui/postProps';
-import usePostParsing from '@/features/postViewer/hooks/usePostParsing';
+import { Page } from '@/features/postViewer/domain/types/page';
 import useViewerFullscreen from '@/features/postViewer/hooks/useViewerFullscreen';
 import useViewerHandler from '@/features/postViewer/hooks/useViewerHandler';
 import useViewerTransition from '@/features/postViewer/hooks/useViewerTransition';
 import { useRef } from 'react';
 import { Toaster } from 'react-hot-toast';
 
-export default function PostViewer({ post }: { post: PostProps }) {
+export default function PostViewer({
+  post,
+  page,
+}: {
+  post: PostProps;
+  page: Page | null;
+}) {
   const postViewerRef = useRef<HTMLDivElement | null>(null);
   useViewerFullscreen(postViewerRef);
   useViewerTransition(postViewerRef);
-
-  const { page } = usePostParsing();
   const { onMouseMove } = useViewerHandler();
 
   return (

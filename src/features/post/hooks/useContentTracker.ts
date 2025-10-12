@@ -14,8 +14,8 @@ export default function useContentTracker(
   useEffect(() => {
     if (!postContentRef.current) return;
 
-    const proseElement = postContentRef.current;
-    const proseObserver = new IntersectionObserver(
+    const postContent = postContentRef.current;
+    const postContentObserver = new IntersectionObserver(
       entries => {
         if (isInitialMount.current) {
           isInitialMount.current = false;
@@ -27,7 +27,7 @@ export default function useContentTracker(
         rootMargin: '10% 0px -90% 0px',
       }
     );
-    proseObserver.observe(proseElement);
-    return () => proseObserver.disconnect();
+    postContentObserver.observe(postContent);
+    return () => postContentObserver.disconnect();
   }, [dispatch, postContentRef]);
 }

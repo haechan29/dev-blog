@@ -1,6 +1,6 @@
 import CommentSection from '@/components/comment/commentSection';
 import LikeButtonItem from '@/components/post/likeButtonItem';
-import PostContentSection from '@/components/post/postContentSection';
+import PostContent from '@/components/post/postContent';
 import PostContentWrapper from '@/components/post/postContentWrapper';
 import PostHeaderSection from '@/components/post/postHeaderSection';
 import PostPageClient from '@/components/post/postPageClient';
@@ -21,7 +21,7 @@ export default async function PostPage({
   const postProps = createProps(post);
 
   return (
-    <div>
+    <div className='px-10 xl:px-20 py-14'>
       <PostPageClient post={postProps} />
 
       <EnterFullscreenButton />
@@ -39,7 +39,7 @@ export default async function PostPage({
       )}
 
       <PostContentWrapper post={postProps}>
-        <PostContentSection content={postProps.content} />
+        <PostContent content={postProps.content} />
       </PostContentWrapper>
 
       <LikeButtonItem postId={postProps.slug} />

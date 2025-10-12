@@ -4,9 +4,9 @@ import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSlug from 'rehype-slug';
 import remarkBreaks from 'remark-breaks';
 
-export default function PostContentSection({ content }: { content: string }) {
+export default function PostContent({ content }: { content: string }) {
   return (
-    <div className='prose post-content mb-20'>
+    <>
       <MDXRemote
         source={content}
         components={components}
@@ -17,6 +17,6 @@ export default function PostContentSection({ content }: { content: string }) {
           },
         }}
       />
-    </div>
+    </>
   );
 }

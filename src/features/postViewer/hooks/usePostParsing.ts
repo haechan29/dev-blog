@@ -8,12 +8,13 @@ import {
   setHeadingPageMapping,
   setPagination,
 } from '@/lib/redux/postPositionSlice';
-import {} from '@/lib/redux/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function usePostParsing() {
+export default function usePostParsing(
+  postContentRef: RefObject<HTMLElement | null>
+) {
   const dispatch = useDispatch<AppDispatch>();
 
   const [pages, setPages] = useState<Page[] | null>(null);
@@ -27,12 +28,13 @@ export default function usePostParsing() {
   }, [pageNumber, pages]);
 
   const parsePost = useCallback(() => {
-    const postElement = document.querySelector('.post-content');
-    if (!containerSize || !postElement) return;
+    if (!containerSize || !postContentRef.current) return;
+
+    const postContent = postContentRef.current;
     const { width: containerWidth, height: containerHeight } = containerSize;
 
     const { pages, headingPageMapping } = parsePostInner({
-      postElement,
+      postElement: postContent,
       containerWidth,
       containerHeight,
       excludeClassNames: ['hide-fullscreen'],
@@ -41,7 +43,7 @@ export default function usePostParsing() {
     dispatch(setHeadingPageMapping(headingPageMapping));
     dispatch(setPagination({ current: 0, total: pages.length }));
     setPages(pages);
-  }, [dispatch, containerSize]);
+  }, [containerSize, dispatch, postContentRef]);
 
   useEffect(() => {
     const timer = setTimeout(parsePost, 100);
