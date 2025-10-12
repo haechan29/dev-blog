@@ -5,6 +5,7 @@ export default interface PostToolbar {
   isInPostsPage: boolean;
   isHeaderVisible: boolean;
   isContentVisible: boolean;
+  isSwipedUp: boolean;
   isExpanded: boolean;
   headings: Heading[];
   title?: string;

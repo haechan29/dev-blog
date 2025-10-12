@@ -23,14 +23,25 @@ export default function PostToolbar() {
     usePostToolbarHandler();
 
   return (
-    <div className='block xl:hidden fixed top-0 left-0 right-0 backdrop-blur-md bg-white/80 mb-4'>
-      <div className='flex flex-col w-full min-w-0 py-2'>
-        <Breadcrumb breadcrumb={breadcrumb} />
+    <div className='block xl:hidden mb-4'>
+      <div
+        className={clsx(
+          'fixed top-0 left-0 right-0 backdrop-blur-md bg-white/80',
+          'transition-transform duration-300 ease-in-out',
+          postToolbar.isVisible ? 'translate-y-0' : '-translate-y-full'
+        )}
+      >
+        <div className='flex flex-col w-full min-w-0 py-2'>
+          <Breadcrumb breadcrumb={breadcrumb} />
 
-        <div className='flex w-full min-w-0 items-start'>
-          <SidebarButton onClick={onSidebarButtonClick} />
-          <Content postToolbar={postToolbar} onClick={onContentClick} />
-          <ExpandButton mode={postToolbar.mode} onClick={onExpandButtonClick} />
+          <div className='flex w-full min-w-0 items-start'>
+            <SidebarButton onClick={onSidebarButtonClick} />
+            <Content postToolbar={postToolbar} onClick={onContentClick} />
+            <ExpandButton
+              mode={postToolbar.mode}
+              onClick={onExpandButtonClick}
+            />
+          </div>
         </div>
       </div>
     </div>

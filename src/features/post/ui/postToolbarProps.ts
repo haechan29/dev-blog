@@ -1,23 +1,30 @@
 import Heading from '@/features/post/domain/model/heading';
 import PostToolbar from '@/features/post/domain/model/postToolbar';
 
-export type EmptyToolbarProps = { mode: 'empty' };
+export type EmptyToolbarProps = {
+  isVisible: boolean;
+  mode: 'empty';
+};
 export type MinimalToolbarProps = {
+  isVisible: boolean;
   mode: 'minimal';
   title: string | null;
 };
 export type BasicToolbarProps = {
+  isVisible: boolean;
   mode: 'basic';
   breadcrumb: string[];
   title: string;
 };
 export type CollapsedToolbarProps = {
+  isVisible: boolean;
   mode: 'collapsed';
   breadcrumb: string[];
   title: string;
   headings: Heading[];
 };
 export type ExpandedToolbarProps = {
+  isVisible: boolean;
   mode: 'expanded';
   breadcrumb: string[];
   title: string;
@@ -42,15 +49,18 @@ export function createProps({
   switch (mode) {
     case 'empty':
       return {
+        isVisible: !postToolbar.isSwipedUp,
         mode,
       };
     case 'minimal':
       return {
+        isVisible: !postToolbar.isSwipedUp,
         mode,
         title: postToolbar.tag,
       };
     case 'basic':
       return {
+        isVisible: !postToolbar.isSwipedUp,
         mode,
         breadcrumb: postToolbar.tag ? [postToolbar.tag] : [],
         title: postToolbar.title!,
@@ -63,6 +73,7 @@ export function createProps({
       ].filter(item => item != null);
       const lastItem = items.pop()!;
       return {
+        isVisible: !postToolbar.isSwipedUp,
         mode,
         breadcrumb: items,
         title: lastItem,
@@ -71,6 +82,7 @@ export function createProps({
     }
     case 'expanded':
       return {
+        isVisible: !postToolbar.isSwipedUp,
         mode,
         breadcrumb: postToolbar.tag
           ? [postToolbar.tag, postToolbar.title!]
