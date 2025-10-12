@@ -30,7 +30,8 @@ export default function PostViewerControlBar({ page }: { page: Page | null }) {
   return (
     <div
       className={clsx(
-        'absolute bottom-0 left-0 right-0 z-50 from-black/70 to-transparent bg-gradient-to-t',
+        'absolute bottom-0 left-0 right-0 z-50',
+        'max-md:from-black/70 max-md:to-transparent max-md:bg-gradient-to-t',
         'transition-opacity duration-300 ease-in-out',
         !areBarsVisible && 'opacity-0 pointer-events-none'
       )}

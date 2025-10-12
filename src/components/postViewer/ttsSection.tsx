@@ -51,14 +51,14 @@ export default function TTSSection({ page }: { page: Page | null }) {
       >
         <Play
           className={clsx(
-            'w-6 h-6 absolute inset-0 m-auto stroke-1 text-white transition-opacity duration-300 ease-in-out',
+            'w-6 h-6 absolute inset-0 m-auto stroke-1 text-white md:text-gray-900 transition-opacity duration-300 ease-in-out',
             ttsProps.isPlaying && 'opacity-0 pointer-events-none'
           )}
         />
 
         <Pause
           className={clsx(
-            'w-6 h-6 absolute inset-0 m-auto stroke-1 text-white transition-opacity duration-300 ease-in-out',
+            'w-6 h-6 absolute inset-0 m-auto stroke-1 text-white md:text-gray-900 transition-opacity duration-300 ease-in-out',
             !ttsProps.isPlaying && 'opacity-0 pointer-events-none'
           )}
         />
