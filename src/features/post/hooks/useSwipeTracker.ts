@@ -2,10 +2,12 @@
 
 import { setIsSwipedUp } from '@/lib/redux/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
-import { useCallback, useEffect, useRef } from 'react';
+import { RefObject, useCallback, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function useSwipeTracker() {
+export default function useSwipeTracker(
+  postContentRef: RefObject<HTMLElement | null>
+) {
   const dispatch = useDispatch<AppDispatch>();
   const startYRef = useRef<number | null>(null);
 
@@ -27,14 +29,15 @@ export default function useSwipeTracker() {
   );
 
   useEffect(() => {
-    const proseElement = document.querySelector<HTMLElement>('.post-content');
-    if (!proseElement) return;
+    if (!postContentRef.current) return;
 
-    proseElement.addEventListener('touchstart', onTouchStart);
-    proseElement.addEventListener('touchend', onTouchEnd);
+    const postContent = postContentRef.current;
+    postContent.addEventListener('touchstart', onTouchStart);
+    postContent.addEventListener('touchend', onTouchEnd);
+
     return () => {
-      proseElement.removeEventListener('touchstart', onTouchStart);
-      proseElement.removeEventListener('touchend', onTouchEnd);
+      postContent.removeEventListener('touchstart', onTouchStart);
+      postContent.removeEventListener('touchend', onTouchEnd);
     };
-  }, [onTouchEnd, onTouchStart]);
+  }, [onTouchEnd, onTouchStart, postContentRef]);
 }

@@ -1,6 +1,7 @@
 import CommentSection from '@/components/comment/commentSection';
 import LikeButtonItem from '@/components/post/likeButtonItem';
 import PostContentSection from '@/components/post/postContentSection';
+import PostContentWrapper from '@/components/post/postContentWrapper';
 import PostHeaderSection from '@/components/post/postHeaderSection';
 import PostPageClient from '@/components/post/postPageClient';
 import TableOfContentsItem from '@/components/post/tableOfContentsItem';
@@ -37,7 +38,9 @@ export default async function PostPage({
         </section>
       )}
 
-      <PostContentSection content={postProps.content} />
+      <PostContentWrapper post={postProps}>
+        <PostContentSection content={postProps.content} />
+      </PostContentWrapper>
 
       <LikeButtonItem postId={postProps.slug} />
 
