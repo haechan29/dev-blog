@@ -92,9 +92,11 @@ function Content({
                 ? 'text-gray-900 font-bold'
                 : 'text-gray-400',
               isExpanded && 'my-1 md:my-2',
-              isExpanded && item.level === 2 && 'pl-4',
-              isExpanded && item.level === 3 && 'pl-8'
+              'pl-[var(--padding-left)]'
             )}
+            style={{
+              '--padding-left': isExpanded ? `${item.level - 1}rem` : '0px',
+            }}
           >
             {item.text}
           </button>

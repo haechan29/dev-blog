@@ -114,8 +114,15 @@ function Content({
                   postToolbar.title === heading.text
                     ? 'text-gray-900 font-semibold'
                     : 'text-gray-400',
-                  postToolbar.mode === 'expanded' && 'my-1'
+                  postToolbar.mode === 'expanded' && 'my-1 md:my-2',
+                  'pl-[var(--padding-left)]'
                 )}
+                style={{
+                  '--padding-left':
+                    postToolbar.mode === 'expanded'
+                      ? `${heading.level - 1}rem`
+                      : '0px',
+                }}
               >
                 {heading.text}
               </button>
