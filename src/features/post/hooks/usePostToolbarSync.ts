@@ -19,11 +19,7 @@ export default function usePostToolbarSync(post?: PostProps) {
   const tag = searchParams.get('tag');
 
   const title = useMemo(() => post?.title ?? null, [post?.title]);
-
-  const filteredHeadings = useMemo(
-    () => post?.headings.filter(heading => heading.level === 1) ?? null,
-    [post?.headings]
-  );
+  const headings = useMemo(() => post?.headings ?? null, [post?.headings]);
 
   useEffect(() => {
     if (!post) {
@@ -35,11 +31,11 @@ export default function usePostToolbarSync(post?: PostProps) {
   }, [dispatch, post]);
 
   useEffect(() => {
-    if (title !== null && filteredHeadings !== null) {
+    if (title !== null && headings !== null) {
       dispatch(setTitle(title));
-      dispatch(setHeadings(filteredHeadings));
+      dispatch(setHeadings(headings));
     }
-  }, [dispatch, filteredHeadings, title]);
+  }, [dispatch, headings, title]);
 
   useEffect(() => {
     dispatch(setTag(tag));
