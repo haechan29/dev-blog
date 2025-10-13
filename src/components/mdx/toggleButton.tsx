@@ -3,11 +3,7 @@
 import clsx from 'clsx';
 import { ReactNode, useState } from 'react';
 
-export default function ToggleButtonItem({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default function ToggleButton({ children }: { children: ReactNode }) {
   const [isClicked, setIsClicked] = useState(false);
 
   return (

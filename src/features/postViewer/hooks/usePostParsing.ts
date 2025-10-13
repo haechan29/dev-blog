@@ -3,44 +3,47 @@
 import { parsePost as parsePostInner } from '@/features/postViewer/domain/lib/parse';
 import { Page } from '@/features/postViewer/domain/types/page';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
+import useViewerContainerSize from '@/features/postViewer/hooks/useViewerContainerSize';
 import {
   setHeadingPageMapping,
-  setTotalPage,
+  setPagination,
 } from '@/lib/redux/postPositionSlice';
-import {} from '@/lib/redux/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
-import { Size } from '@/types/size';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function usePostParsing(postViewerSize: Size | null) {
+export default function usePostParsing(
+  postContentRef: RefObject<HTMLElement | null>
+) {
   const dispatch = useDispatch<AppDispatch>();
 
   const [pages, setPages] = useState<Page[] | null>(null);
 
   const { pageNumber } = usePostViewer();
+  const containerSize = useViewerContainerSize();
 
   const page = useMemo(() => {
-    if (!pages || !pageNumber) return null;
+    if (!pages || pageNumber === null) return null;
     return pages[pageNumber - 1];
   }, [pageNumber, pages]);
 
   const parsePost = useCallback(() => {
-    const postContainer = document.querySelector('.post-content');
-    if (!postViewerSize || !postContainer) return;
-    const { width: containerWidth, height: containerHeight } = postViewerSize;
+    if (!containerSize || !postContentRef.current) return;
+
+    const postContent = postContentRef.current;
+    const { width: containerWidth, height: containerHeight } = containerSize;
 
     const { pages, headingPageMapping } = parsePostInner({
-      postContainer,
+      postElement: postContent,
       containerWidth,
       containerHeight,
       excludeClassNames: ['hide-fullscreen'],
     });
 
-    dispatch(setTotalPage(pages.length));
     dispatch(setHeadingPageMapping(headingPageMapping));
+    dispatch(setPagination({ current: 0, total: pages.length }));
     setPages(pages);
-  }, [dispatch, postViewerSize]);
+  }, [containerSize, dispatch, postContentRef]);
 
   useEffect(() => {
     const timer = setTimeout(parsePost, 100);

@@ -1,4 +1,4 @@
-import PostPreviewItem from '@/components/post/postPreviewItem';
+import PostPreview from '@/components/post/postPreview';
 import PostsPageClient from '@/components/post/postsPageClient';
 import { fetchAllPosts } from '@/features/post/domain/service/postService';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
@@ -38,7 +38,7 @@ export default async function PostsPage({
       <HydrationBoundary state={dehydrate(queryClient)}>
         <div className='px-10 xl:px-20 py-8 flex flex-col'>
           {postProps.map(post => (
-            <PostPreviewItem key={post.slug} tag={tag} post={post} />
+            <PostPreview key={post.slug} tag={tag} post={post} />
           ))}
         </div>
       </HydrationBoundary>

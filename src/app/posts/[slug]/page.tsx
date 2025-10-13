@@ -1,11 +1,11 @@
 import CommentSection from '@/components/comment/commentSection';
 import LikeButtonItem from '@/components/post/likeButtonItem';
-import PostContentSection from '@/components/post/postContentSection';
-import PostHeaderSection from '@/components/post/postHeaderSection';
+import PostContent from '@/components/post/postContent';
+import PostContentWrapper from '@/components/post/postContentWrapper';
+import PostHeader from '@/components/post/postHeader';
 import PostPageClient from '@/components/post/postPageClient';
 import TableOfContentsItem from '@/components/post/tableOfContentsItem';
 import EnterFullscreenButton from '@/components/postViewer/enterFullscreenButton';
-import PostViewer from '@/components/postViewer/postViewer';
 import { fetchPostBySlug } from '@/features/post/domain/service/postService';
 import { createProps } from '@/features/post/ui/postProps';
 import { Suspense } from 'react';
@@ -22,12 +22,11 @@ export default async function PostPage({
 
   return (
     <div className='px-10 xl:px-20 py-14'>
-      <PostViewer post={postProps} />
       <PostPageClient post={postProps} />
 
       <EnterFullscreenButton />
 
-      <PostHeaderSection post={postProps} />
+      <PostHeader post={postProps} />
       <div className='w-full h-[1px] bg-gray-200 mb-10' />
 
       {postProps.headings.length > 0 && (
@@ -39,7 +38,9 @@ export default async function PostPage({
         </section>
       )}
 
-      <PostContentSection content={postProps.content} />
+      <PostContentWrapper post={postProps}>
+        <PostContent content={postProps.content} />
+      </PostContentWrapper>
 
       <LikeButtonItem postId={postProps.slug} />
 

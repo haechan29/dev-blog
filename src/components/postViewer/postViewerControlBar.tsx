@@ -1,41 +1,56 @@
 'use client';
 
 import ProgressSection from '@/components/postViewer//progressSection';
-import AutoAdvanceSection from '@/components/postViewer/autoAdvanceSection';
 import ExitFullscreenButton from '@/components/postViewer/exitFullscreenButton';
 import PageIndicatorSection from '@/components/postViewer/pageIndicatorSection';
 import TTSSection from '@/components/postViewer/ttsSection';
 import { Page } from '@/features/postViewer/domain/types/page';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
+import { canTouch } from '@/lib/browser';
 import { setIsMouseOnControlBar } from '@/lib/redux/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
+import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function PostViewerControlBar({ page }: { page: Page | null }) {
   const dispatch = useDispatch<AppDispatch>();
   const { areBarsVisible } = usePostViewer();
 
+  const handleMouseEnter = useCallback(() => {
+    if (canTouch) return;
+    dispatch(setIsMouseOnControlBar(true));
+  }, [dispatch]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (canTouch) return;
+    dispatch(setIsMouseOnControlBar(false));
+  }, [dispatch]);
+
   return (
     <div
-      onMouseEnter={() => dispatch(setIsMouseOnControlBar(true))}
-      onMouseLeave={() => dispatch(setIsMouseOnControlBar(false))}
       className={clsx(
-        'fixed bottom-0 left-0 right-0 z-50 flex flex-col bg-white/80 backdrop-blur-md px-10',
-        'transition-transform|opacity duration-300 ease-in-out',
-        !areBarsVisible && 'translate-y-full opacity-0'
+        'absolute bottom-0 left-0 right-0 z-50',
+        'max-md:from-black/50 max-md:to-transparent max-md:bg-gradient-to-t',
+        'transition-opacity duration-300 ease-in-out',
+        !areBarsVisible && 'opacity-0 pointer-events-none'
       )}
     >
-      <ProgressSection />
+      <div
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        className='flex flex-col px-2 md:px-4 lg:px-6'
+      >
+        <ProgressSection />
 
-      <div className='flex w-full mb-3 justify-between items-center'>
-        <div className='flex items-center gap-2'>
-          <PageIndicatorSection />
-          <TTSSection page={page} />
-          <AutoAdvanceSection />
+        <div className='flex w-full mb-3 justify-between items-center'>
+          <div className='flex items-center'>
+            <TTSSection page={page} />
+            <PageIndicatorSection />
+          </div>
+
+          <ExitFullscreenButton />
         </div>
-
-        <ExitFullscreenButton />
       </div>
     </div>
   );

@@ -1,7 +1,6 @@
 'use client';
 
-import useIsMobile from '@/hooks/useIsMobile';
-import { useMemo, useState } from 'react';
+import clsx from 'clsx';
 
 interface TooltipProps {
   text: string;
@@ -14,14 +13,6 @@ export default function TooltipItem({
   children,
   position = 'top',
 }: TooltipProps) {
-  const isMobile = useIsMobile();
-  const [isHovered, setIsHovered] = useState(false);
-
-  const isVisible = useMemo(
-    () => !isMobile && isHovered,
-    [isMobile, isHovered]
-  );
-
   const positionClasses = {
     top: 'bottom-full left-1/2 transform -translate-x-1/2 mb-2',
     bottom: 'top-full left-1/2 transform -translate-x-1/2 mt-2',
@@ -39,20 +30,19 @@ export default function TooltipItem({
   };
 
   return (
-    <div
-      className='relative inline-block'
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className='relative inline-block group'>
       {children}
-      {isVisible && (
-        <div className={`absolute z-50 ${positionClasses[position]}`}>
-          <div className='bg-gray-800 text-white text-sm px-3 py-2 rounded-lg shadow-lg whitespace-nowrap'>
-            {text}
-          </div>
-          <div className={`absolute ${arrowClasses[position]}`}></div>
+      <div
+        className={clsx(
+          'absolute z-50 hidden group-hover:block',
+          positionClasses[position]
+        )}
+      >
+        <div className='bg-gray-800 text-white text-sm px-3 py-2 rounded-lg shadow-lg whitespace-nowrap'>
+          {text}
         </div>
-      )}
+        <div className={`absolute ${arrowClasses[position]}`}></div>
+      </div>
     </div>
   );
 }

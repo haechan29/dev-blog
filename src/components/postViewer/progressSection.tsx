@@ -13,7 +13,7 @@ export default function ProgressSection() {
 
   return (
     progress !== null && (
-      <div className='mb-3'>
+      <div className='mx-2 mb-3'>
         <div className='relative w-full h-0.5 bg-gray-200'>
           <div
             className='relative h-0.5 bg-blue-500'

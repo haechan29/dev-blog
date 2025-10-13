@@ -14,7 +14,7 @@ export default function ExitFullscreenButton() {
         className='flex shrink-0 p-2 cursor-pointer'
         aria-label='전체화면 끄기'
       >
-        <Minimize className='w-6 h-6 hover:animate-pop hover:[--scale:0.8]' />
+        <Minimize className='w-6 h-6 text-white md:text-gray-900 stroke-1 hover:animate-pop hover:[--scale:0.8]' />
       </button>
     </TooltipItem>
   );

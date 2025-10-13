@@ -2,12 +2,11 @@
 
 import Heading from '@/features/post/domain/model/heading';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
+import useScrollToContent from '@/features/postViewer/hooks/useScrollToContent';
 import useViewerToolbar from '@/features/postViewer/hooks/useViewerToolbar';
-import { setIsMouseOnToolbar } from '@/lib/redux/postViewerSlice';
-import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { ChevronDown } from 'lucide-react';
-import { useDispatch } from 'react-redux';
+import { RefObject, useRef } from 'react';
 
 export default function PostViewerToolbar({
   title,
@@ -16,35 +15,47 @@ export default function PostViewerToolbar({
   title: string;
   headings: Heading[];
 }) {
-  const dispatch = useDispatch<AppDispatch>();
   const { areBarsVisible } = usePostViewer();
-  const { isExpanded, currentHeading, toggleIsExpanded, handleContentClick } =
-    useViewerToolbar();
+  const {
+    isExpanded,
+    currentHeading,
+    toggleIsExpanded,
+    onContentClick,
+    ...handlers
+  } = useViewerToolbar();
+
+  const contentsRef = useRef<Map<string, HTMLDivElement>>(new Map());
+  useScrollToContent(contentsRef);
 
   return (
     <div
-      onMouseEnter={() => dispatch(setIsMouseOnToolbar(true))}
-      onMouseLeave={() => dispatch(setIsMouseOnToolbar(false))}
       className={clsx(
-        'fixed top-0 left-0 right-0 z-50 flex flex-col backdrop-blur-md bg-white/80 px-10 py-3',
-        'transition-opacity duration-300 ease-in-out',
-        !areBarsVisible && 'opacity-0'
+        'absolute top-0 left-0 right-0 z-50',
+        'max-md:pb-[var(--gradient-padding-bottom)] max-md:from-black/50 max-md:to-transparent max-md:bg-gradient-to-b',
+        'transition-opacity|discrete duration-300 ease-in-out',
+        !areBarsVisible && 'opacity-0 pointer-events-none'
       )}
+      style={{
+        '--gradient-padding-bottom': isExpanded ? '5rem' : '2.5rem',
+      }}
     >
-      <Title title={title} heading={currentHeading} />
+      <div {...handlers} className='flex flex-col p-2 md:p-4 lg:p-6'>
+        <Title title={title} heading={currentHeading} />
 
-      <div className='flex w-full items-start'>
-        <Content
-          isExpanded={isExpanded}
-          heading={currentHeading}
-          headings={headings}
-          onContentClick={handleContentClick}
-        />
+        <div className='flex w-full items-start'>
+          <Content
+            contentsRef={contentsRef}
+            isExpanded={isExpanded}
+            heading={currentHeading}
+            headings={headings}
+            onContentClick={onContentClick}
+          />
 
-        <ToggleExpandButton
-          isExpanded={isExpanded}
-          toggleIsExpanded={toggleIsExpanded}
-        />
+          <ToggleExpandButton
+            isExpanded={isExpanded}
+            toggleIsExpanded={toggleIsExpanded}
+          />
+        </div>
       </div>
     </div>
   );
@@ -53,43 +64,54 @@ export default function PostViewerToolbar({
 function Title({ title, heading }: { title: string; heading: Heading | null }) {
   return (
     heading !== null && (
-      <div className={clsx('w-full truncate text-gray-400')}>{title}</div>
+      <div className='w-full truncate hidden md:block md:text-sm lg:text-base text-gray-400 px-2'>
+        {title}
+      </div>
     )
   );
 }
 
 function Content({
+  contentsRef,
   isExpanded,
   heading,
   headings,
   onContentClick,
 }: {
+  contentsRef: RefObject<Map<string, HTMLElement>>;
   isExpanded: boolean;
   heading: Heading | null;
   headings: Heading[];
   onContentClick: (heading: Heading) => void;
 }) {
   return (
-    <div className='flex flex-1 min-w-0'>
+    <div className='flex flex-1 min-w-0 px-2 max-h-40 md:max-h-60 lg:max-h-80 overflow-y-auto scrollbar-hide'>
       <div className='flex flex-col w-full'>
         {headings.map(item => (
           <button
             key={item.id}
+            ref={content => {
+              const contents = contentsRef.current;
+              if (content) contents.set(item.id, content);
+              else contents.delete(item.id);
+            }}
             onClick={() => onContentClick(item)}
             className={clsx(
-              'flex w-full text-xl transition-discrete|opacity duration-300 ease-in',
+              'w-full text-base md:text-lg lg:text-xl text-left text-white md:text-gray-900 transition-discrete|opacity duration-300 ease-in',
               isExpanded || heading?.id === item.id
                 ? 'h-6 opacity-100'
                 : 'h-0 opacity-0',
               heading?.id === item.id
                 ? 'text-gray-900 font-bold'
                 : 'text-gray-400',
-              isExpanded && 'my-2',
-              isExpanded && item.level === 2 && 'pl-4',
-              isExpanded && item.level === 3 && 'pl-8'
+              isExpanded && 'my-1 md:my-2',
+              'pl-[var(--padding-left)]'
             )}
+            style={{
+              '--padding-left': isExpanded ? `${item.level - 1}rem` : '0px',
+            }}
           >
-            <span className='truncate'>{item.text}</span>
+            {item.text}
           </button>
         ))}
       </div>
@@ -107,11 +129,11 @@ function ToggleExpandButton({
   return (
     <button
       onClick={toggleIsExpanded}
-      className='flex shrink-0 px-2 items-center justify-center'
+      className='flex shrink-0 px-2 items-center justify-center cursor-pointer'
     >
       <ChevronDown
         className={clsx(
-          'w-6 h-6 text-gray-500 transition-transform duration-300 ease-in-out',
+          'w-6 h-6 text-white md:text-gray-500 stroke-1 transition-transform duration-300 ease-in-out',
           isExpanded && '-rotate-180'
         )}
       />

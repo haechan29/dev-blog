@@ -1,11 +1,4 @@
-export type DisabledTTSProps = {
-  mode: 'disabled';
-};
-
-export type EnabledTTSProps = {
-  mode: 'enabled';
+export type TTSProps = {
   isPlaying: boolean;
   elementIndex: number;
 };
-
-export type TTSProps = DisabledTTSProps | EnabledTTSProps;

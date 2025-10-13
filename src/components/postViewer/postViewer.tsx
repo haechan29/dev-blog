@@ -1,61 +1,40 @@
 'use client';
 
-import PostViewerContent from '@/components/postViewer/postViewerContent';
+import PostViewerContainer from '@/components/postViewer/postViewerContainer';
 import PostViewerControlBar from '@/components/postViewer/postViewerControlBar';
 import PostViewerToolbar from '@/components/postViewer/postViewerToolbar';
 import { PostProps } from '@/features/post/ui/postProps';
-import { useFullscreen } from '@/features/postViewer/hooks/useFullscreen';
-import { useFullscreenScale } from '@/features/postViewer/hooks/useFullscreenScale';
-import usePostParsing from '@/features/postViewer/hooks/usePostParsing';
+import { Page } from '@/features/postViewer/domain/types/page';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
-import usePostViewerSize from '@/features/postViewer/hooks/usePostViewerSize';
-import { useViewerNavigation } from '@/features/postViewer/hooks/useViewerNavigation';
-import useDebounce from '@/hooks/useDebounce';
-import useThrottle from '@/hooks/useThrottle';
-import { setIsMouseMoved } from '@/lib/redux/postViewerSlice';
-import { AppDispatch } from '@/lib/redux/store';
-import clsx from 'clsx';
+import useViewerFullscreen from '@/features/postViewer/hooks/useViewerFullscreen';
+import useViewerHandler from '@/features/postViewer/hooks/useViewerHandler';
+import useScrollLock from '@/hooks/useScrollLock';
 import { useRef } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { useDispatch } from 'react-redux';
 
-export default function PostViewer({ post }: { post: PostProps }) {
-  const dispatch = useDispatch<AppDispatch>();
-
+export default function PostViewer({
+  post,
+  page,
+}: {
+  post: PostProps;
+  page: Page | null;
+}) {
   const { isViewerMode } = usePostViewer();
   const postViewerRef = useRef<HTMLDivElement | null>(null);
-  const postViewerContentRef = useRef<HTMLDivElement | null>(null);
-  const throttle = useThrottle();
-  const debounce = useDebounce();
-
-  const postViewerSize = usePostViewerSize(postViewerContentRef);
-  const { page } = usePostParsing(postViewerSize);
-
-  useFullscreenScale();
-  useFullscreen(postViewerRef);
-  useViewerNavigation(postViewerContentRef);
+  const handlers = useViewerHandler();
+  useViewerFullscreen(postViewerRef);
+  useScrollLock(isViewerMode);
 
   return (
     <div
       ref={postViewerRef}
-      onMouseMove={() => {
-        throttle(() => {
-          dispatch(setIsMouseMoved(true));
-          debounce(() => dispatch(setIsMouseMoved(false)), 2000);
-        }, 100);
-      }}
-      className={clsx(
-        'w-screen h-screen bg-white flex flex-col',
-        !isViewerMode && 'hidden'
-      )}
+      {...handlers}
+      className='w-screen h-dvh fixed inset-0 z-40 bg-white opacity-0 pointer-events-none'
     >
       <Toaster toasterId='post-viewer' />
 
       <PostViewerToolbar {...post} />
-      <PostViewerContent
-        page={page}
-        postViewerContentRef={postViewerContentRef}
-      />
+      <PostViewerContainer page={page} />
       <PostViewerControlBar page={page} />
     </div>
   );

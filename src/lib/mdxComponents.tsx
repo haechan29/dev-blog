@@ -1,7 +1,7 @@
 import Caption from '@/components/mdx/caption';
 import HideFullscreen from '@/components/mdx/hideFullscreen';
 import Paged from '@/components/mdx/paged';
-import PostSummarySection from '@/components/post/postSummarySection';
+import Summary from '@/components/mdx/summary';
 import { ReactNode } from 'react';
 
 const ExternalLink = ({ children, ...props }: { children: ReactNode }) => {
@@ -13,7 +13,7 @@ const ExternalLink = ({ children, ...props }: { children: ReactNode }) => {
 };
 
 export const components = {
-  PostSummarySection,
+  Summary,
   HideFullscreen,
   Paged,
   Caption,

@@ -1,22 +1,17 @@
 import { PostViewer } from '@/features/postViewer/domain/model/postViewer';
-import { Padding } from '@/types/padding';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: PostViewer = {
   isCommentSectionVisible: false,
   isViewerMode: false,
   isToolbarExpanded: false,
-  advanceMode: null,
-  fullscreenScale: 1.5,
-  paddingInRem: {
-    top: 5,
-    right: 5,
-    bottom: 5,
-    left: 5,
-  },
   isMouseOnToolbar: false,
   isMouseOnControlBar: false,
   isMouseMoved: false,
+  isTouched: false,
+  isToolbarTouched: false,
+  isControlBarTouched: false,
+  isRotationFinished: false,
 };
 
 const postViewerSlice = createSlice({
@@ -32,18 +27,6 @@ const postViewerSlice = createSlice({
     setIsToolbarExpanded: (state, action: PayloadAction<boolean>) => {
       state.isToolbarExpanded = action.payload;
     },
-    setAdvanceMode: (
-      state,
-      action: PayloadAction<PostViewer['advanceMode']>
-    ) => {
-      state.advanceMode = action.payload;
-    },
-    setFullscreenScale: (state, action: PayloadAction<number>) => {
-      state.fullscreenScale = action.payload;
-    },
-    setPaddingInRem: (state, action: PayloadAction<Padding>) => {
-      state.paddingInRem = action.payload;
-    },
     setIsMouseOnToolbar: (state, action: PayloadAction<boolean>) => {
       state.isMouseOnToolbar = action.payload;
     },
@@ -53,6 +36,18 @@ const postViewerSlice = createSlice({
     setIsMouseMoved: (state, action: PayloadAction<boolean>) => {
       state.isMouseMoved = action.payload;
     },
+    setIsTouched: (state, action: PayloadAction<boolean>) => {
+      state.isTouched = action.payload;
+    },
+    setIsToolbarTouched: (state, action: PayloadAction<boolean>) => {
+      state.isToolbarTouched = action.payload;
+    },
+    setIsControlBarTouched: (state, action: PayloadAction<boolean>) => {
+      state.isControlBarTouched = action.payload;
+    },
+    setIsRotationFinished: (state, action: PayloadAction<boolean>) => {
+      state.isRotationFinished = action.payload;
+    },
   },
 });
 
@@ -61,10 +56,11 @@ export const {
   setIsCommentSectionVisible,
   setIsViewerMode,
   setIsToolbarExpanded,
-  setAdvanceMode,
-  setFullscreenScale,
-  setPaddingInRem,
   setIsMouseOnToolbar,
   setIsMouseOnControlBar,
   setIsMouseMoved,
+  setIsTouched,
+  setIsToolbarTouched,
+  setIsControlBarTouched,
+  setIsRotationFinished,
 } = postViewerSlice.actions;
