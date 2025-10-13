@@ -3,7 +3,10 @@
 import useDebounce from '@/hooks/useDebounce';
 import useThrottle from '@/hooks/useThrottle';
 import { canTouch } from '@/lib/browser';
-import { setIsMouseMoved } from '@/lib/redux/postViewerSlice';
+import {
+  setIsMouseMoved,
+  setIsRotationFinished,
+} from '@/lib/redux/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { TransitionEvent, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
@@ -26,8 +29,8 @@ export default function useViewerHandler() {
   const onTransitionEnd = useCallback(
     (event: TransitionEvent<HTMLElement>) => {
       if (event.propertyName === 'rotate') {
-        dispatch(setIsMouseMoved(true));
-        debounce(() => dispatch(setIsMouseMoved(false)), 2000);
+        dispatch(setIsRotationFinished(true));
+        debounce(() => dispatch(setIsRotationFinished(false)), 2000);
       }
     },
     [debounce, dispatch]

@@ -11,6 +11,7 @@ const initialState: PostViewer = {
   isTouched: false,
   isToolbarTouched: false,
   isControlBarTouched: false,
+  isRotationFinished: false,
 };
 
 const postViewerSlice = createSlice({
@@ -44,6 +45,9 @@ const postViewerSlice = createSlice({
     setIsControlBarTouched: (state, action: PayloadAction<boolean>) => {
       state.isControlBarTouched = action.payload;
     },
+    setIsRotationFinished: (state, action: PayloadAction<boolean>) => {
+      state.isRotationFinished = action.payload;
+    },
   },
 });
 
@@ -58,4 +62,5 @@ export const {
   setIsTouched,
   setIsToolbarTouched,
   setIsControlBarTouched,
+  setIsRotationFinished,
 } = postViewerSlice.actions;

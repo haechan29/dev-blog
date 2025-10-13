@@ -29,7 +29,8 @@ export function createProps({
       postViewer.isToolbarExpanded ||
       postViewer.isTouched ||
       postViewer.isToolbarTouched ||
-      postViewer.isControlBarTouched,
+      postViewer.isControlBarTouched ||
+      postViewer.isRotationFinished,
     pageNumber:
       postPosition.pagination !== null
         ? postPosition.pagination.current + 1

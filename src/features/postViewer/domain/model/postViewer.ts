@@ -8,4 +8,5 @@ export interface PostViewer {
   isTouched: boolean;
   isToolbarTouched: boolean;
   isControlBarTouched: boolean;
+  isRotationFinished: boolean;
 }
