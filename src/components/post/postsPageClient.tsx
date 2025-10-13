@@ -1,9 +1,9 @@
 'use client';
 
-import usePostToolbarSync from '@/features/post/hooks/usePostToolbarSync';
+import usePostsToolbarSync from '@/features/post/hooks/usePostsToolbarSync';
 
 export default function PostsPageClient() {
-  usePostToolbarSync();
+  usePostsToolbarSync();
 
   return null;
 }
