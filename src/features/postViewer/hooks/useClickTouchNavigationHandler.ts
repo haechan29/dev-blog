@@ -2,6 +2,7 @@
 
 import useDebounce from '@/hooks/useDebounce';
 import { canTouch, supportsFullscreen } from '@/lib/browser';
+import { createRipple } from '@/lib/dom';
 import { nextPage, previousPage } from '@/lib/redux/postPositionSlice';
 import { setIsTouched } from '@/lib/redux/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
@@ -22,12 +23,18 @@ export default function useClickTouchNavigationHandler() {
       clientY: number;
       currentTarget: HTMLDivElement;
     }) => {
-      const { width: clientWidth, height: clientHeight } =
-        currentTarget.getBoundingClientRect();
+      if (typeof document === 'undefined' || !currentTarget.parentElement)
+        return;
 
+      const rippleContainer = supportsFullscreen
+        ? currentTarget.parentElement
+        : document.body;
+      createRipple(clientX, clientY, rippleContainer);
+
+      const { width, height } = currentTarget.getBoundingClientRect();
       const [isLeftSideClicked, isRightSideClicked] = supportsFullscreen
-        ? [clientX < clientWidth / 2, clientX > clientWidth / 2]
-        : [clientY < clientHeight / 2, clientY > clientHeight / 2];
+        ? [clientX < width / 2, clientX > width / 2]
+        : [clientY < height / 2, clientY > height / 2];
 
       if (isLeftSideClicked) {
         dispatch(previousPage());

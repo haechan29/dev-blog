@@ -314,12 +314,26 @@ body {
   }
 }
 
+@keyframes ripple {
+  from {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
 @utility animate-shake {
   animation: shake 0.3s ease-in-out;
 }
 
 @utility animate-pop {
   animation: pop 0.3s ease-in-out;
+}
+@utility animate-ripple {
+  animation: ripple 0.3s ease-out;
 }
 
 @custom-variant can-hover {
