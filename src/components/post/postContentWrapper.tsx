@@ -2,7 +2,7 @@
 
 import PostViewer from '@/components/postViewer/postViewer';
 import useContentTracker from '@/features/post/hooks/useContentTracker';
-import useHeadingTracker from '@/features/post/hooks/useHeadingTracker';
+import useHeadingSync from '@/features/post/hooks/useHeadingSync';
 import useScrollTracker from '@/features/post/hooks/useScrollTracker';
 import { PostProps } from '@/features/post/ui/postProps';
 import usePostParsing from '@/features/postViewer/hooks/usePostParsing';
@@ -17,9 +17,10 @@ export default function PostContentWrapper({
 }) {
   const postContentRef = useRef<HTMLDivElement | null>(null);
   const { page } = usePostParsing(postContentRef);
-  useHeadingTracker({ postContentRef, ...post });
+
   useContentTracker(postContentRef);
   useScrollTracker();
+  useHeadingSync(postContentRef, post);
 
   return (
     <>

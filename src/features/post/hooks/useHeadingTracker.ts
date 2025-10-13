@@ -2,10 +2,7 @@
 
 import Heading from '@/features/post/domain/model/heading';
 import useThrottle from '@/hooks/useThrottle';
-import { setCurrentHeading } from '@/lib/redux/postPositionSlice';
-import { AppDispatch } from '@/lib/redux/store';
 import { RefObject, useCallback, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
 
 export default function useHeadingTracker({
   postContentRef,
@@ -14,9 +11,8 @@ export default function useHeadingTracker({
   postContentRef: RefObject<HTMLElement | null>;
   headings: Heading[];
 }) {
-  const dispatch = useDispatch<AppDispatch>();
   const throttle = useThrottle();
-
+  const [heading, setHeading] = useState<Heading | null>(null);
   const [positionMap, setPositionMap] = useState<Map<Heading, number> | null>(
     null
   );
@@ -63,16 +59,16 @@ export default function useHeadingTracker({
     return null;
   }, [positionMap]);
 
-  const updateHeadings = useCallback(() => {
-    throttle(() => {
-      const currentHeading = getCurrentHeading();
-      dispatch(setCurrentHeading(currentHeading));
-    }, 100);
-  }, [dispatch, getCurrentHeading, throttle]);
-
   useEffect(() => {
-    updateHeadings();
-    document.addEventListener('scroll', updateHeadings);
-    return () => document.removeEventListener('scroll', updateHeadings);
-  }, [updateHeadings]);
+    const updateHeading = () =>
+      throttle(() => {
+        const currentHeading = getCurrentHeading();
+        setHeading(currentHeading);
+      }, 100);
+
+    document.addEventListener('scroll', updateHeading);
+    return () => document.removeEventListener('scroll', updateHeading);
+  }, [getCurrentHeading, throttle]);
+
+  return { heading } as const;
 }
