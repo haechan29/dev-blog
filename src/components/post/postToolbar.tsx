@@ -4,9 +4,10 @@ import Heading from '@/features/post/domain/model/heading';
 import usePostToolbar from '@/features/post/hooks/usePostToolbar';
 import usePostToolbarHandler from '@/features/post/hooks/usePostToolbarHandler';
 import { PostToolbarProps } from '@/features/post/ui/postToolbarProps';
+import useScrollToContent from '@/features/postViewer/hooks/useScrollToContent';
 import clsx from 'clsx';
 import { ChevronDown, ChevronRight, Menu } from 'lucide-react';
-import { useMemo } from 'react';
+import { RefObject, useMemo, useRef } from 'react';
 
 export default function PostToolbar() {
   const postToolbar = usePostToolbar();
@@ -22,6 +23,9 @@ export default function PostToolbar() {
   const { onSidebarButtonClick, onContentClick, onExpandButtonClick } =
     usePostToolbarHandler();
 
+  const contentsRef = useRef<Map<string, HTMLDivElement>>(new Map());
+  useScrollToContent(contentsRef);
+
   return (
     <div className='block xl:hidden mb-4'>
       <div
@@ -36,7 +40,11 @@ export default function PostToolbar() {
 
           <div className='flex w-full min-w-0 items-start'>
             <SidebarButton onClick={onSidebarButtonClick} />
-            <Content postToolbar={postToolbar} onClick={onContentClick} />
+            <Content
+              contentsRef={contentsRef}
+              postToolbar={postToolbar}
+              onClick={onContentClick}
+            />
             <ExpandButton
               mode={postToolbar.mode}
               onClick={onExpandButtonClick}
@@ -80,9 +88,11 @@ function SidebarButton({ onClick }: { onClick: () => void }) {
 }
 
 function Content({
+  contentsRef,
   postToolbar,
   onClick,
 }: {
+  contentsRef: RefObject<Map<string, HTMLElement>>;
   postToolbar: PostToolbarProps;
   onClick: (heading: Heading) => void;
 }) {
@@ -104,6 +114,11 @@ function Content({
             {postToolbar.headings.map(heading => (
               <button
                 key={heading.id}
+                ref={content => {
+                  const contents = contentsRef.current;
+                  if (content) contents.set(heading.id, content);
+                  else contents.delete(heading.id);
+                }}
                 onClick={() => onClick(heading)}
                 className={clsx(
                   'truncate text-left transition-discrete|opacity duration-300 ease-in',

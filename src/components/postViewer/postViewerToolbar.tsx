@@ -2,9 +2,11 @@
 
 import Heading from '@/features/post/domain/model/heading';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
+import useScrollToContent from '@/features/postViewer/hooks/useScrollToContent';
 import useViewerToolbar from '@/features/postViewer/hooks/useViewerToolbar';
 import clsx from 'clsx';
 import { ChevronDown } from 'lucide-react';
+import { RefObject, useRef } from 'react';
 
 export default function PostViewerToolbar({
   title,
@@ -21,6 +23,9 @@ export default function PostViewerToolbar({
     onContentClick,
     ...handlers
   } = useViewerToolbar();
+
+  const contentsRef = useRef<Map<string, HTMLDivElement>>(new Map());
+  useScrollToContent(contentsRef);
 
   return (
     <div
@@ -39,6 +44,7 @@ export default function PostViewerToolbar({
 
         <div className='flex w-full items-start'>
           <Content
+            contentsRef={contentsRef}
             isExpanded={isExpanded}
             heading={currentHeading}
             headings={headings}
@@ -66,11 +72,13 @@ function Title({ title, heading }: { title: string; heading: Heading | null }) {
 }
 
 function Content({
+  contentsRef,
   isExpanded,
   heading,
   headings,
   onContentClick,
 }: {
+  contentsRef: RefObject<Map<string, HTMLElement>>;
   isExpanded: boolean;
   heading: Heading | null;
   headings: Heading[];
@@ -82,6 +90,11 @@ function Content({
         {headings.map(item => (
           <button
             key={item.id}
+            ref={content => {
+              const contents = contentsRef.current;
+              if (content) contents.set(item.id, content);
+              else contents.delete(item.id);
+            }}
             onClick={() => onContentClick(item)}
             className={clsx(
               'w-full text-base md:text-lg lg:text-xl text-left text-white md:text-gray-900 transition-discrete|opacity duration-300 ease-in',
