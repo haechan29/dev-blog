@@ -26,7 +26,7 @@ export default function PostViewerToolbar({
     <div
       className={clsx(
         'absolute top-0 left-0 right-0 z-50',
-        'max-md:pb-[var(--gradient-padding-bottom)] max-md:from-black/70 max-md:to-transparent max-md:bg-gradient-to-b',
+        'max-md:pb-[var(--gradient-padding-bottom)] max-md:from-black/50 max-md:to-transparent max-md:bg-gradient-to-b',
         'transition-opacity|discrete duration-300 ease-in-out',
         !areBarsVisible && 'opacity-0 pointer-events-none'
       )}

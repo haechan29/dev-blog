@@ -1,8 +1,7 @@
 'use client';
 
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
-import useDebounce from '@/hooks/useDebounce';
-import { setIsMouseMoved, setIsViewerMode } from '@/lib/redux/postViewerSlice';
+import { setIsViewerMode } from '@/lib/redux/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { Maximize } from 'lucide-react';
@@ -13,14 +12,10 @@ export default function EnterFullscreenButton() {
   const dispatch = useDispatch<AppDispatch>();
   const postViewer = usePostViewer();
 
-  const debounce = useDebounce();
-
-  const handleClick = useCallback(() => {
-    dispatch(setIsMouseMoved(true));
-    debounce(() => dispatch(setIsMouseMoved(false)), 2000);
-
-    dispatch(setIsViewerMode(true));
-  }, [debounce, dispatch]);
+  const handleClick = useCallback(
+    () => dispatch(setIsViewerMode(true)),
+    [dispatch]
+  );
 
   return (
     <button

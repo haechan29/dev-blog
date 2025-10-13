@@ -1,10 +1,16 @@
 'use client';
 
 import { supportsFullscreen } from '@/lib/browser';
-import { RefObject, useCallback, useRef } from 'react';
+import { RefObject, useCallback, useLayoutEffect, useRef } from 'react';
 
 const CLASS_LIST_VISIBILITY = ['opacity-0', 'pointer-events-none'];
 const CLASS_LIST_FULLSCREEN = ['rotate-90', 'origin-top-left'];
+const CLASS_LIST_TRANSITION = [
+  'transition-transform|opacity',
+  'duration-300',
+  'ease-in-out',
+  'translate-x-[100dvw]',
+];
 
 export default function useFullscreen(
   elementRef: RefObject<HTMLElement | null>
@@ -63,6 +69,16 @@ export default function useFullscreen(
       element.classList.remove(...CLASS_LIST_FULLSCREEN);
     }
   }, [elementRef, shrinkToElementSize]);
+
+  useLayoutEffect(() => {
+    const element = elementRef.current;
+    if (!element) return;
+
+    if (!supportsFullscreen) {
+      element.classList.add(...CLASS_LIST_TRANSITION);
+      return () => element.classList.remove(...CLASS_LIST_TRANSITION);
+    }
+  }, [elementRef]);
 
   return { requestFullscreen, exitFullscreen } as const;
 }
