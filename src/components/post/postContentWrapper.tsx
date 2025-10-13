@@ -2,7 +2,8 @@
 
 import PostViewer from '@/components/postViewer/postViewer';
 import useContentTracker from '@/features/post/hooks/useContentTracker';
-import useSwipeTracker from '@/features/post/hooks/useSwipeTracker';
+import useHeadingTracker from '@/features/post/hooks/useHeadingTracker';
+import useScrollTracker from '@/features/post/hooks/useScrollTracker';
 import { PostProps } from '@/features/post/ui/postProps';
 import usePostParsing from '@/features/postViewer/hooks/usePostParsing';
 import { ReactNode, useRef } from 'react';
@@ -16,8 +17,9 @@ export default function PostContentWrapper({
 }) {
   const postContentRef = useRef<HTMLDivElement | null>(null);
   const { page } = usePostParsing(postContentRef);
+  useHeadingTracker({ postContentRef, ...post });
   useContentTracker(postContentRef);
-  useSwipeTracker(postContentRef);
+  useScrollTracker();
 
   return (
     <>

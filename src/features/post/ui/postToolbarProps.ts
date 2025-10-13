@@ -49,18 +49,18 @@ export function createProps({
   switch (mode) {
     case 'empty':
       return {
-        isVisible: !postToolbar.isSwipedUp,
+        isVisible: !postToolbar.isScrollingDown,
         mode,
       };
     case 'minimal':
       return {
-        isVisible: !postToolbar.isSwipedUp,
+        isVisible: !postToolbar.isScrollingDown,
         mode,
         title: postToolbar.tag,
       };
     case 'basic':
       return {
-        isVisible: !postToolbar.isSwipedUp,
+        isVisible: !postToolbar.isScrollingDown,
         mode,
         breadcrumb: postToolbar.tag ? [postToolbar.tag] : [],
         title: postToolbar.title!,
@@ -73,7 +73,7 @@ export function createProps({
       ].filter(item => item != null);
       const lastItem = items.pop()!;
       return {
-        isVisible: !postToolbar.isSwipedUp,
+        isVisible: !postToolbar.isScrollingDown,
         mode,
         breadcrumb: items,
         title: lastItem,
@@ -82,7 +82,7 @@ export function createProps({
     }
     case 'expanded':
       return {
-        isVisible: !postToolbar.isSwipedUp,
+        isVisible: !postToolbar.isScrollingDown,
         mode,
         breadcrumb: postToolbar.tag
           ? [postToolbar.tag, postToolbar.title!]

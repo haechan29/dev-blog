@@ -7,7 +7,7 @@ const initialState: PostToolbar = {
   isInPostsPage: false,
   isHeaderVisible: false,
   isContentVisible: false,
-  isSwipedUp: false,
+  isScrollingDown: false,
   isExpanded: false,
   headings: [],
 };
@@ -28,8 +28,8 @@ const postToolbarSlice = createSlice({
     setIsContentVisible: (state, action: PayloadAction<boolean>) => {
       state.isContentVisible = action.payload;
     },
-    setIsSwipedUp: (state, action: PayloadAction<boolean>) => {
-      state.isSwipedUp = action.payload;
+    setIsScrollingDown: (state, action: PayloadAction<boolean>) => {
+      state.isScrollingDown = action.payload;
     },
     setIsExpanded: (state, action: PayloadAction<boolean>) => {
       state.isExpanded = action.payload;
@@ -48,7 +48,7 @@ export const {
   setIsInPostsPage,
   setIsHeaderVisible,
   setIsContentVisible,
-  setIsSwipedUp,
+  setIsScrollingDown,
   setIsExpanded,
   setTag,
   setTitle,
