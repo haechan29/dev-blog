@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Heart } from 'lucide-react';
 import Link from 'next/link';
+import { useMemo } from 'react';
 
 export default function PostPreview({
   tag,
@@ -14,11 +15,6 @@ export default function PostPreview({
   tag: string | null;
   post: PostProps;
 }) {
-  const { data: stat } = useQuery({
-    queryKey: ['posts', post.id, 'stats'],
-    queryFn: () => fetchPostStat(post.id).then(stat => stat.toProps()),
-  });
-
   return (
     <div className='w-full py-8 border-b border-b-gray-200 text-gray-900 group'>
       <Link
@@ -30,7 +26,7 @@ export default function PostPreview({
       </Link>
 
       <Tags {...post} />
-      <Info {...post} {...stat} />
+      <Info {...post} />
     </div>
   );
 }
@@ -80,15 +76,15 @@ function Tags({ tags }: { tags: string[] }) {
   );
 }
 
-function Info({
-  createdAt,
-  likeCount = 0,
-  viewCount = 0,
-}: {
-  createdAt: string;
-  likeCount?: number;
-  viewCount?: number;
-}) {
+function Info({ id: postId, createdAt }: { id: string; createdAt: string }) {
+  const { data: stat } = useQuery({
+    queryKey: ['posts', postId, 'stats'],
+    queryFn: () => fetchPostStat(postId).then(stat => stat.toProps()),
+  });
+
+  const likeCount = useMemo(() => stat?.likeCount ?? 0, [stat?.likeCount]);
+  const viewCount = useMemo(() => stat?.viewCount ?? 0, [stat?.viewCount]);
+
   return (
     <div
       className={clsx(

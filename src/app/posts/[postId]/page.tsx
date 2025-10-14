@@ -16,7 +16,7 @@ export default async function PostPage({
   params: Promise<{ postId: string }>;
 }) {
   const { postId } = await params;
-  const post = await fetchPost(postId).then(post => createProps(post));
+  const post = await fetchPost(postId).then(createProps);
 
   return (
     <div className='px-10 xl:px-20 py-14'>
@@ -40,9 +40,9 @@ export default async function PostPage({
         <PostContent content={post.content} />
       </PostContentWrapper>
 
-      <LikeButtonItem postId={post.id} />
-
       <Suspense>
+        <LikeButtonItem postId={post.id} />
+
         <Comments {...post} />
       </Suspense>
     </div>
