@@ -3,8 +3,8 @@
 import { incrementViewCount } from '@/features/postStat/domain/service/postStatService';
 import { useCallback, useEffect } from 'react';
 
-export default function useViewTracker({ slug }: { slug: string }) {
-  const key = `post-view-${slug}`;
+export default function useViewTracker({ postId }: { postId: string }) {
+  const key = `post-view-${postId}`;
 
   const getLastViewTime = useCallback(() => {
     const item = localStorage.getItem(key);
@@ -25,8 +25,8 @@ export default function useViewTracker({ slug }: { slug: string }) {
     const lastViewTime = getLastViewTime();
 
     if (lastViewTime === undefined || now - lastViewTime >= 1000 * 60 * 60) {
-      incrementViewCount(slug);
+      incrementViewCount(postId);
       setLastViewTime();
     }
-  }, [getLastViewTime, setLastViewTime, slug]);
+  }, [getLastViewTime, setLastViewTime, postId]);
 }

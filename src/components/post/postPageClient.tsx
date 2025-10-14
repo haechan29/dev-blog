@@ -6,7 +6,7 @@ import { PostProps } from '@/features/post/ui/postProps';
 
 export default function PostPageClient({ post }: { post: PostProps }) {
   usePostToolbarSync(post);
-  useViewTracker(post);
+  useViewTracker({ ...post });
 
   return null;
 }

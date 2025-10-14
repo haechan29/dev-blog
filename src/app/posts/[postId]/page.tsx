@@ -6,7 +6,7 @@ import PostHeader from '@/components/post/postHeader';
 import PostPageClient from '@/components/post/postPageClient';
 import TableOfContentsItem from '@/components/post/tableOfContentsItem';
 import EnterFullscreenButton from '@/components/postViewer/enterFullscreenButton';
-import { fetchPostBySlug } from '@/features/post/domain/service/postService';
+import { fetchPost } from '@/features/post/domain/service/postService';
 import { createProps } from '@/features/post/ui/postProps';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -14,10 +14,10 @@ import { ErrorBoundary } from 'react-error-boundary';
 export default async function PostPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ postId: string }>;
 }) {
-  const { slug } = await params;
-  const post = await fetchPostBySlug(slug);
+  const { postId } = await params;
+  const post = await fetchPost(postId);
   const postProps = createProps(post);
 
   return (
@@ -42,11 +42,11 @@ export default async function PostPage({
         <PostContent content={postProps.content} />
       </PostContentWrapper>
 
-      <LikeButtonItem postId={postProps.slug} />
+      <LikeButtonItem postId={postProps.postId} />
 
       <ErrorBoundary fallback={<div></div>}>
         <Suspense fallback={<div></div>}>
-          <CommentSection slug={slug} />
+          <CommentSection {...post} />
         </Suspense>
       </ErrorBoundary>
     </div>

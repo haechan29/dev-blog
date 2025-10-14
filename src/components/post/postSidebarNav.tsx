@@ -1,6 +1,5 @@
 'use client';
 
-import Post from '@/features/post/domain/model/post';
 import { PostProps } from '@/features/post/ui/postProps';
 import { setIsVisible } from '@/lib/redux/postSidebarSlice';
 import { AppDispatch } from '@/lib/redux/store';
@@ -32,23 +31,23 @@ function NavCategory({ tag, count }: { tag: string; count: number }) {
   const currentTag = searchParams.get('tag') ?? null;
 
   const params = useParams();
-  const currentSlug = params.slug as string | undefined;
+  const currentPostId = params.postId as string | undefined;
 
   const isTagSelected = useMemo(() => currentTag === tag, [currentTag, tag]);
 
   const categoryUrl = useMemo(() => {
     let categoryUrl = '/posts';
-    if (currentSlug) categoryUrl += `/${currentSlug}`;
-    if (currentSlug || !isTagSelected) categoryUrl += `?tag=${tag}`;
+    if (currentPostId) categoryUrl += `/${currentPostId}`;
+    if (currentPostId || !isTagSelected) categoryUrl += `?tag=${tag}`;
     return categoryUrl;
-  }, [currentSlug, isTagSelected, tag]);
+  }, [currentPostId, isTagSelected, tag]);
 
   return (
     <Link
       href={categoryUrl}
       className={clsx(
         'flex items-center w-full py-3 px-9 gap-2 hover:text-blue-500',
-        !currentSlug && isTagSelected
+        !currentPostId && isTagSelected
           ? 'bg-blue-50 font-semibold text-blue-500'
           : 'text-gray-900'
       )}
@@ -68,7 +67,7 @@ function NavPostList({ tag, posts }: { tag: string; posts: PostProps[] }) {
   const currentTag = searchParams.get('tag') ?? null;
 
   const params = useParams();
-  const currentSlug = params.slug as string | undefined;
+  const currentPostId = params.postId as string | undefined;
 
   const postsOfTag = useMemo(() => {
     return currentTag
@@ -82,16 +81,16 @@ function NavPostList({ tag, posts }: { tag: string; posts: PostProps[] }) {
     isTagSelected &&
     postsOfTag.map(post => {
       const postUrl = getPostUrl(currentTag, post);
-      const isSlugSelected = post.slug === currentSlug;
+      const isCurrentPost = post.postId === currentPostId;
 
       return (
         <Link
-          key={`${tag}-${post.slug} `}
+          key={`${tag}-${post.postId} `}
           href={postUrl}
           onClick={() => dispatch(setIsVisible(false))}
           className={clsx(
             'flex w-full py-3 pl-12 pr-9 hover:text-blue-500',
-            isSlugSelected
+            isCurrentPost
               ? 'bg-blue-50 font-semibold text-blue-500'
               : 'text-gray-900'
           )}
@@ -113,8 +112,8 @@ function getTagCounts(posts: PostProps[]) {
   return [...tagMap.entries()];
 }
 
-function getPostUrl(tag: string | null, post: Post) {
-  let postUrl = `/posts/${post.slug}`;
+function getPostUrl(tag: string | null, post: PostProps) {
+  let postUrl = `/posts/${post.postId}`;
   if (tag) postUrl += `?tag=${tag}`;
   return postUrl;
 }

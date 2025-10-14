@@ -15,14 +15,14 @@ export default function PostPreview({
   post: PostProps;
 }) {
   const { data: stat } = useQuery({
-    queryKey: ['posts', post.slug, 'stats'],
-    queryFn: () => fetchPostStat(post.slug).then(stat => stat.toProps()),
+    queryKey: ['posts', post.postId, 'stats'],
+    queryFn: () => fetchPostStat(post.postId).then(stat => stat.toProps()),
   });
 
   return (
     <div className='w-full py-8 border-b border-b-gray-200 text-gray-900 group'>
       <Link
-        href={`/posts/${post.slug}${tag ? `?tag=${tag}` : ''}`}
+        href={`/posts/${post.postId}${tag ? `?tag=${tag}` : ''}`}
         className='text-gray-900'
       >
         <Title {...post} />
@@ -81,11 +81,11 @@ function Tags({ tags }: { tags: string[] }) {
 }
 
 function Info({
-  date,
+  createdAt,
   likeCount = 0,
   viewCount = 0,
 }: {
-  date: string;
+  createdAt: string;
   likeCount?: number;
   viewCount?: number;
 }) {
@@ -96,7 +96,7 @@ function Info({
         'group-hover:opacity-0 transition-opacity duration-300 ease-in-out'
       )}
     >
-      <div>{date}</div>
+      <div>{createdAt}</div>
       <div className='flex items-center gap-1'>
         <Heart className='w-3 h-3 fill-gray-500' />
         <span>{likeCount}</span>

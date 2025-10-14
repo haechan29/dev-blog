@@ -4,9 +4,9 @@ import Heading from '@/features/post/domain/model/heading';
 import Post from '@/features/post/domain/model/post';
 
 export type PostProps = {
-  slug: string;
+  postId: string;
   title: string;
-  date: string;
+  createdAt: string;
   tags: string[];
   content: string;
   headings: Heading[];
@@ -15,10 +15,10 @@ export type PostProps = {
 
 export function createProps(post: Post): PostProps {
   return {
-    slug: post.slug,
+    postId: post.postId,
     title: post.title,
-    date: formatDate(post.date),
-    tags: post.tags ?? [],
+    createdAt: formatDate(post.createdAt),
+    tags: post.tags,
     content: post.content,
     headings: post.headings,
     plainText: extractPlainText(post.content),

@@ -10,8 +10,8 @@ import { useRef } from 'react';
 
 export default function PostHeader({ post }: { post: PostProps }) {
   const { data: stat } = useQuery({
-    queryKey: ['posts', post.slug, 'stats'],
-    queryFn: () => fetchPostStat(post.slug).then(stat => stat.toProps()),
+    queryKey: ['posts', post.postId, 'stats'],
+    queryFn: () => fetchPostStat(post.postId).then(stat => stat.toProps()),
   });
 
   const headerRef = useRef(null);
@@ -47,17 +47,17 @@ function Tags({ tags }: { tags: string[] }) {
 }
 
 function Info({
-  date,
+  createdAt,
   likeCount = 0,
   viewCount = 0,
 }: {
-  date: string;
+  createdAt: string;
   likeCount?: number;
   viewCount?: number;
 }) {
   return (
     <div className='flex gap-4 items-center text-xs text-gray-500'>
-      <div>{date}</div>
+      <div>{createdAt}</div>
       <div className='flex items-center gap-1'>
         <Heart className='w-3 h-3 fill-gray-500' />
         <span>{likeCount}</span>

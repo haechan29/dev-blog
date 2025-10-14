@@ -25,8 +25,8 @@ export default async function PostsPage({
 
   const prefetchStat = (post: PostProps) =>
     queryClient.prefetchQuery({
-      queryKey: ['posts', post.slug, 'stats'],
-      queryFn: () => fetchPostStat(post.slug).then(stat => stat.toProps()),
+      queryKey: ['posts', post.postId, 'stats'],
+      queryFn: () => fetchPostStat(post.postId).then(stat => stat.toProps()),
     });
 
   await Promise.allSettled(postProps.map(prefetchStat));
@@ -38,7 +38,7 @@ export default async function PostsPage({
       <HydrationBoundary state={dehydrate(queryClient)}>
         <div className='px-10 xl:px-20 py-8 flex flex-col'>
           {postProps.map(post => (
-            <PostPreview key={post.slug} tag={tag} post={post} />
+            <PostPreview key={post.postId} tag={tag} post={post} />
           ))}
         </div>
       </HydrationBoundary>

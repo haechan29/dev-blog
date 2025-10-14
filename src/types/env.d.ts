@@ -23,3 +23,12 @@ export type PostStats = {
   created_at: string;
   updated_at: string;
 };
+
+export type Post = {
+  id: string;
+  postId: string;
+  title: string;
+  tags: string[];
+  created_at: string;
+  content: string;
+};

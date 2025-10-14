@@ -8,13 +8,13 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { MessageCircle } from 'lucide-react';
 import { useRef } from 'react';
 
-export default function CommentSectionClient({ slug }: { slug: string }) {
+export default function CommentSectionClient({ postId }: { postId: string }) {
   const commentSectionRef = useRef<HTMLDivElement | null>(null);
 
   const { data: comments } = useSuspenseQuery({
-    queryKey: ['posts', slug, 'comments'],
+    queryKey: ['posts', postId, 'comments'],
     queryFn: async () => {
-      const comments = await getComments(slug);
+      const comments = await getComments(postId);
       return comments.map(comment => comment.toProps());
     },
   });
@@ -26,7 +26,7 @@ export default function CommentSectionClient({ slug }: { slug: string }) {
       <div className='text-xl font-bold text-gray-900 mb-8'>
         댓글 {comments.length}개
       </div>
-      <CommentFormItem postId={slug} />
+      <CommentFormItem postId={postId} />
       <div className='space-y-6'>
         {comments.length === 0 ? (
           <div className='text-center py-12'>

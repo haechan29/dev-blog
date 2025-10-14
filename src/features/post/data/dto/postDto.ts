@@ -1,7 +1,8 @@
 export type PostDto = {
-  slug: string;
+  id: string;
+  postId: string;
   title: string;
-  date: string;
+  createdAt: string;
+  tags: string[];
   content: string;
-  tags?: string[];
-}
+};
