@@ -42,7 +42,7 @@ export default async function PostPage({
         <PostContent content={postProps.content} />
       </PostContentWrapper>
 
-      <LikeButtonItem postId={postProps.postId} />
+      <LikeButtonItem postId={postProps.id} />
 
       <ErrorBoundary fallback={<div></div>}>
         <Suspense fallback={<div></div>}>

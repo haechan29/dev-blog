@@ -6,7 +6,6 @@ export default class Post {
 
   constructor(
     public readonly id: string,
-    public readonly postId: string,
     public readonly title: string,
     public readonly createdAt: string,
     public readonly content: string,

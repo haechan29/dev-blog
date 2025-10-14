@@ -11,7 +11,7 @@ export async function GET(
     const { data, error } = await supabase
       .from('posts')
       .select('*')
-      .eq('post_id', postId)
+      .eq('id', postId)
       .maybeSingle();
 
     if (error) {

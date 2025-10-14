@@ -15,14 +15,14 @@ export default function PostPreview({
   post: PostProps;
 }) {
   const { data: stat } = useQuery({
-    queryKey: ['posts', post.postId, 'stats'],
-    queryFn: () => fetchPostStat(post.postId).then(stat => stat.toProps()),
+    queryKey: ['posts', post.id, 'stats'],
+    queryFn: () => fetchPostStat(post.id).then(stat => stat.toProps()),
   });
 
   return (
     <div className='w-full py-8 border-b border-b-gray-200 text-gray-900 group'>
       <Link
-        href={`/posts/${post.postId}${tag ? `?tag=${tag}` : ''}`}
+        href={`/posts/${post.id}${tag ? `?tag=${tag}` : ''}`}
         className='text-gray-900'
       >
         <Title {...post} />

@@ -10,8 +10,8 @@ import { useRef } from 'react';
 
 export default function PostHeader({ post }: { post: PostProps }) {
   const { data: stat } = useQuery({
-    queryKey: ['posts', post.postId, 'stats'],
-    queryFn: () => fetchPostStat(post.postId).then(stat => stat.toProps()),
+    queryKey: ['posts', post.id, 'stats'],
+    queryFn: () => fetchPostStat(post.id).then(stat => stat.toProps()),
   });
 
   const headerRef = useRef(null);

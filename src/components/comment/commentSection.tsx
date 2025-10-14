@@ -6,20 +6,20 @@ import {
   QueryClient,
 } from '@tanstack/react-query';
 
-export default async function CommentSection({ postId }: { postId: string }) {
+export default async function CommentSection({ id }: { id: string }) {
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({
-    queryKey: ['posts', postId, 'comments'],
+    queryKey: ['posts', id, 'comments'],
     queryFn: async () => {
-      const comments = await getComments(postId);
+      const comments = await getComments(id);
       return comments.map(comment => comment.toProps());
     },
   });
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <CommentSectionClient postId={postId} />
+      <CommentSectionClient postId={id} />
     </HydrationBoundary>
   );
 }

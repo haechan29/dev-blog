@@ -1,6 +1,6 @@
 import PostSidebar from '@/components/post/postSidebar';
 import PostToolbar from '@/components/post/postToolbar';
-import { fetchAllPosts } from '@/features/post/domain/service/postService';
+import { fetchPosts } from '@/features/post/domain/service/postService';
 import { createProps } from '@/features/post/ui/postProps';
 import { ReactNode, Suspense } from 'react';
 
@@ -9,7 +9,7 @@ export default async function PostsLayout({
 }: {
   children: ReactNode;
 }) {
-  const posts = await fetchAllPosts();
+  const posts = await fetchPosts();
   const postProps = posts.map(createProps);
 
   return (

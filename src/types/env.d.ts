@@ -24,7 +24,6 @@ export type PostStats = {
 
 export type Post = {
   id: string;
-  postId: string;
   title: string;
   tags: string[];
   created_at: string;

@@ -81,11 +81,11 @@ function NavPostList({ tag, posts }: { tag: string; posts: PostProps[] }) {
     isTagSelected &&
     postsOfTag.map(post => {
       const postUrl = getPostUrl(currentTag, post);
-      const isCurrentPost = post.postId === currentPostId;
+      const isCurrentPost = post.id === currentPostId;
 
       return (
         <Link
-          key={`${tag}-${post.postId} `}
+          key={`${tag}-${post.id} `}
           href={postUrl}
           onClick={() => dispatch(setIsVisible(false))}
           className={clsx(
@@ -113,7 +113,7 @@ function getTagCounts(posts: PostProps[]) {
 }
 
 function getPostUrl(tag: string | null, post: PostProps) {
-  let postUrl = `/posts/${post.postId}`;
+  let postUrl = `/posts/${post.id}`;
   if (tag) postUrl += `?tag=${tag}`;
   return postUrl;
 }
