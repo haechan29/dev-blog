@@ -20,8 +20,7 @@ export function createProps({
   postPosition: PostPosition;
 }): PostViewerProps {
   return {
-    isButtonVisible:
-      !postViewer.isCommentSectionVisible && !postViewer.isViewerMode,
+    isButtonVisible: !postViewer.areCommentsVisible && !postViewer.isViewerMode,
     areBarsVisible:
       postViewer.isMouseOnToolbar ||
       postViewer.isMouseOnControlBar ||

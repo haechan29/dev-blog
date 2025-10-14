@@ -1,0 +1,31 @@
+import CommentsClient from '@/components/comment/commentsClient';
+import { getComments } from '@/features/comment/domain/service/commentService';
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from '@tanstack/react-query';
+import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+
+export default async function Comments({ id: postId }: { id: string }) {
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery({
+    queryKey: ['posts', postId, 'comments'],
+    queryFn: async () => {
+      const comments = await getComments(postId);
+      return comments.map(comment => comment.toProps());
+    },
+  });
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <ErrorBoundary fallback={<div></div>}>
+        <Suspense>
+          <CommentsClient postId={postId} />
+        </Suspense>
+      </ErrorBoundary>
+    </HydrationBoundary>
+  );
+}

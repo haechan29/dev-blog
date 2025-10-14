@@ -1,4 +1,4 @@
-import CommentSection from '@/components/comment/commentSection';
+import Comments from '@/components/comment/comments';
 import LikeButtonItem from '@/components/post/likeButtonItem';
 import PostContent from '@/components/post/postContent';
 import PostContentWrapper from '@/components/post/postContentWrapper';
@@ -9,7 +9,6 @@ import EnterFullscreenButton from '@/components/postViewer/enterFullscreenButton
 import { fetchPost } from '@/features/post/domain/service/postService';
 import { createProps } from '@/features/post/ui/postProps';
 import { Suspense } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
 
 export default async function PostPage({
   params,
@@ -17,38 +16,35 @@ export default async function PostPage({
   params: Promise<{ postId: string }>;
 }) {
   const { postId } = await params;
-  const post = await fetchPost(postId);
-  const postProps = createProps(post);
+  const post = await fetchPost(postId).then(post => createProps(post));
 
   return (
     <div className='px-10 xl:px-20 py-14'>
-      <PostPageClient post={postProps} />
+      <PostPageClient post={post} />
 
       <EnterFullscreenButton />
 
-      <PostHeader post={postProps} />
+      <PostHeader post={post} />
       <div className='w-full h-[1px] bg-gray-200 mb-10' />
 
-      {postProps.headings.length > 0 && (
+      {post.headings.length > 0 && (
         <section className='mb-10 xl:mb-0'>
           <div className='block xl:hidden text-xl xl:text-2xl font-bold text-gray-900 mt-4 mb-2 leading-tight'>
             목차
           </div>
-          <TableOfContentsItem headings={postProps.headings} />
+          <TableOfContentsItem headings={post.headings} />
         </section>
       )}
 
-      <PostContentWrapper post={postProps}>
-        <PostContent content={postProps.content} />
+      <PostContentWrapper post={post}>
+        <PostContent content={post.content} />
       </PostContentWrapper>
 
-      <LikeButtonItem postId={postProps.id} />
+      <LikeButtonItem postId={post.id} />
 
-      <ErrorBoundary fallback={<div></div>}>
-        <Suspense fallback={<div></div>}>
-          <CommentSection {...post} />
-        </Suspense>
-      </ErrorBoundary>
+      <Suspense>
+        <Comments {...post} />
+      </Suspense>
     </div>
   );
 }

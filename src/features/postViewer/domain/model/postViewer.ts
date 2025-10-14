@@ -1,5 +1,5 @@
 export interface PostViewer {
-  isCommentSectionVisible: boolean;
+  areCommentsVisible: boolean;
   isViewerMode: boolean;
   isToolbarExpanded: boolean;
   isMouseOnToolbar: boolean;

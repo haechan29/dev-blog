@@ -1,10 +1,9 @@
 'use client';
 
-import * as CommentService from '@/features/comment/domain/service/commentService';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import useComments from '@/features/comment/hooks/useComments';
 import clsx from 'clsx';
 import { Loader2, Send } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
 
 export default function CommentFormItem({ postId }: { postId: string }) {
@@ -15,27 +14,27 @@ export default function CommentFormItem({ postId }: { postId: string }) {
   const [isPasswordValid, setIsPasswordValid] = useState(true);
   const [isContentValid, setIsContentValid] = useState(true);
 
-  const queryClient = useQueryClient();
-
-  const createComment = useMutation({
-    mutationFn: (params: {
+  const { createCommentMutation } = useComments({ postId });
+  const createComment = useCallback(
+    (params: {
       postId: string;
       authorName: string;
       content: string;
       password: string;
-    }) => CommentService.createComment(params),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['posts', postId, 'comments'],
+    }) => {
+      createCommentMutation.mutate(params, {
+        onSuccess: () => {
+          setAuthorName('익명');
+          setContent('');
+          setPassword('');
+        },
+        onError: () => {
+          toast.error('댓글 등록 실패');
+        },
       });
-      setAuthorName('익명');
-      setContent('');
-      setPassword('');
     },
-    onError: () => {
-      toast.error('댓글 등록 실패');
-    },
-  });
+    [createCommentMutation]
+  );
 
   const handleSubmit = () => {
     if (!authorName.trim()) {
@@ -59,12 +58,7 @@ export default function CommentFormItem({ postId }: { postId: string }) {
       return;
     }
 
-    createComment.mutate({
-      postId: postId,
-      authorName: authorName.trim(),
-      content: content.trim(),
-      password: password.trim(),
-    });
+    createComment({ postId, authorName, content, password });
   };
 
   return (
@@ -124,10 +118,10 @@ export default function CommentFormItem({ postId }: { postId: string }) {
           onClick={handleSubmit}
           className={clsx(
             'h-10 flex justify-center items-center px-4 text-white rounded-lg hover:bg-blue-500 cursor-pointer',
-            createComment.isPending ? 'bg-blue-500' : 'bg-blue-600'
+            createCommentMutation.isPending ? 'bg-blue-500' : 'bg-blue-600'
           )}
         >
-          {createComment.isPending ? (
+          {createCommentMutation.isPending ? (
             <Loader2 size={18} strokeWidth={3} className='animate-spin' />
           ) : (
             <>

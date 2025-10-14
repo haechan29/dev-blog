@@ -2,29 +2,20 @@
 
 import CommentFormItem from '@/components/comment/commentFormItem';
 import CommentItem from '@/components/comment/commentItem';
-import CommentSectionDetector from '@/components/comment/commentSectionDetector';
-import { getComments } from '@/features/comment/domain/service/commentService';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import useComments from '@/features/comment/hooks/useComments';
+import useCommentsTracker from '@/features/comment/hooks/useCommentsTracker';
 import { MessageCircle } from 'lucide-react';
 import { useRef } from 'react';
 
-export default function CommentSectionClient({ postId }: { postId: string }) {
-  const commentSectionRef = useRef<HTMLDivElement | null>(null);
-
-  const { data: comments } = useSuspenseQuery({
-    queryKey: ['posts', postId, 'comments'],
-    queryFn: async () => {
-      const comments = await getComments(postId);
-      return comments.map(comment => comment.toProps());
-    },
-  });
+export default function CommentsClient({ postId }: { postId: string }) {
+  const { comments } = useComments({ postId });
+  const commentsRef = useRef<HTMLDivElement | null>(null);
+  useCommentsTracker({ commentsRef });
 
   return (
-    <div ref={commentSectionRef}>
-      <CommentSectionDetector commentSectionRef={commentSectionRef} />
-
+    <div ref={commentsRef}>
       <div className='text-xl font-bold text-gray-900 mb-8'>
-        댓글 {comments.length}개
+        {`댓글 ${comments.length}개`}
       </div>
       <CommentFormItem postId={postId} />
       <div className='space-y-6'>
