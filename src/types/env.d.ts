@@ -20,8 +20,6 @@ export type PostStats = {
   post_id: string;
   like_count: number;
   view_count: number;
-  created_at: string;
-  updated_at: string;
 };
 
 export type Post = {
