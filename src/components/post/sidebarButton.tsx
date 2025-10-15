@@ -13,7 +13,7 @@ export default function SidebarButton() {
   return (
     <button
       onClick={onClick}
-      className='flex shrink-0 p-2 items-center justify-center'
+      className='shrink-0 px-2 items-center justify-center'
     >
       <Menu className='w-6 h-6 text-gray-500' />
     </button>

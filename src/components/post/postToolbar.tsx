@@ -27,30 +27,23 @@ export default function PostToolbar() {
   useScrollToContent(contentsRef);
 
   return (
-    <div className='block xl:hidden mb-4'>
-      <div
-        className={clsx(
-          'fixed top-0 left-0 right-0 backdrop-blur-md bg-white/80',
-          'transition-transform duration-300 ease-in-out',
-          postToolbar.isVisible ? 'translate-y-0' : '-translate-y-full'
-        )}
-      >
-        <div className='flex flex-col w-full min-w-0 p-2'>
-          <Breadcrumb breadcrumb={breadcrumb} />
+    <div
+      className={clsx(
+        'sticky top-0 z-40 w-full flex flex-col p-2 md:p-4 lg:p-6 bg-white/80 backdrop-blur-md',
+        'transition-transform duration-300 ease-in-out',
+        postToolbar.isVisible ? 'translate-y-0' : '-translate-y-full'
+      )}
+    >
+      <Breadcrumb breadcrumb={breadcrumb} />
 
-          <div className='flex w-full min-w-0 items-start'>
-            <SidebarButton />
-            <Content
-              contentsRef={contentsRef}
-              postToolbar={postToolbar}
-              onClick={onContentClick}
-            />
-            <ExpandButton
-              mode={postToolbar.mode}
-              onClick={onExpandButtonClick}
-            />
-          </div>
-        </div>
+      <div className='flex w-full items-start'>
+        <SidebarButton />
+        <Content
+          contentsRef={contentsRef}
+          postToolbar={postToolbar}
+          onClick={onContentClick}
+        />
+        <ExpandButton mode={postToolbar.mode} onClick={onExpandButtonClick} />
       </div>
     </div>
   );
@@ -147,7 +140,7 @@ function ExpandButton({
   return (
     <button
       onClick={onClick}
-      className='flex shrink-0 px-2 items-center justify-center'
+      className='shrink-0 px-2 items-center justify-center'
     >
       <ChevronDown
         className={clsx(

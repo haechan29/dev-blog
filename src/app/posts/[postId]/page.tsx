@@ -5,6 +5,7 @@ import PostContentWrapper from '@/components/post/postContentWrapper';
 import PostHeader from '@/components/post/postHeader';
 import PostHeaderWrapper from '@/components/post/postHeaderWrapper';
 import PostPageClient from '@/components/post/postPageClient';
+import PostToolbar from '@/components/post/postToolbar';
 import TableOfContentsItem from '@/components/post/tableOfContentsItem';
 import EnterFullscreenButton from '@/components/postViewer/enterFullscreenButton';
 import { fetchPost } from '@/features/post/domain/service/postService';
@@ -20,34 +21,37 @@ export default async function PostPage({
   const post = await fetchPost(postId).then(createProps);
 
   return (
-    <div className='px-10 xl:px-20 py-14'>
-      <PostPageClient post={post} />
+    <>
+      <PostToolbar />
+      <div className='px-10 xl:px-20 py-14'>
+        <PostPageClient post={post} />
 
-      <EnterFullscreenButton />
+        <EnterFullscreenButton />
 
-      <PostHeaderWrapper>
-        <PostHeader post={post} />
-      </PostHeaderWrapper>
-      <div className='w-full h-[1px] bg-gray-200 mb-10' />
+        <PostHeaderWrapper>
+          <PostHeader post={post} />
+        </PostHeaderWrapper>
+        <div className='w-full h-[1px] bg-gray-200 mb-10' />
 
-      {post.headings.length > 0 && (
-        <section className='mb-10 xl:mb-0'>
-          <div className='block xl:hidden text-xl xl:text-2xl font-bold text-gray-900 mt-4 mb-2 leading-tight'>
-            목차
-          </div>
-          <TableOfContentsItem headings={post.headings} />
-        </section>
-      )}
+        {post.headings.length > 0 && (
+          <section className='mb-10 xl:mb-0'>
+            <div className='block xl:hidden text-xl xl:text-2xl font-bold text-gray-900 mt-4 mb-2 leading-tight'>
+              목차
+            </div>
+            <TableOfContentsItem headings={post.headings} />
+          </section>
+        )}
 
-      <PostContentWrapper post={post}>
-        <PostContent content={post.content} />
-      </PostContentWrapper>
+        <PostContentWrapper post={post}>
+          <PostContent content={post.content} />
+        </PostContentWrapper>
 
-      <Suspense>
-        <LikeButtonItem postId={post.id} />
+        <Suspense>
+          <LikeButtonItem postId={post.id} />
 
-        <Comments {...post} />
-      </Suspense>
-    </div>
+          <Comments {...post} />
+        </Suspense>
+      </div>
+    </>
   );
 }
