@@ -1,5 +1,4 @@
 import PostPreview from '@/components/post/postPreview';
-import PostsPageClient from '@/components/post/postsPageClient';
 import PostsToolbar from '@/components/post/postsToolbar';
 import { fetchPosts } from '@/features/post/domain/service/postService';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
@@ -14,9 +13,7 @@ export default async function PostsPage({
 
   return (
     <div>
-      <PostsPageClient />
       <PostsToolbar />
-
       <div className='px-10 xl:px-20'>
         <PostPreviews posts={posts} tag={tag} />
       </div>

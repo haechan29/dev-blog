@@ -4,7 +4,6 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: PostToolbar = {
   tag: null,
-  isInPostsPage: false,
   isHeaderVisible: false,
   isContentVisible: false,
   isScrollingDown: false,
@@ -18,9 +17,6 @@ const postToolbarSlice = createSlice({
   reducers: {
     setTag: (state, action: PayloadAction<string | null>) => {
       state.tag = action.payload;
-    },
-    setIsInPostsPage: (state, action: PayloadAction<boolean>) => {
-      state.isInPostsPage = action.payload;
     },
     setIsHeaderVisible: (state, action: PayloadAction<boolean>) => {
       state.isHeaderVisible = action.payload;
@@ -45,7 +41,6 @@ const postToolbarSlice = createSlice({
 
 export default postToolbarSlice.reducer;
 export const {
-  setIsInPostsPage,
   setIsHeaderVisible,
   setIsContentVisible,
   setIsScrollingDown,

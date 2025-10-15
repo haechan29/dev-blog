@@ -5,11 +5,6 @@ export type EmptyToolbarProps = {
   isVisible: boolean;
   mode: 'empty';
 };
-export type MinimalToolbarProps = {
-  isVisible: boolean;
-  mode: 'minimal';
-  title: string | null;
-};
 export type BasicToolbarProps = {
   isVisible: boolean;
   mode: 'basic';
@@ -33,7 +28,6 @@ export type ExpandedToolbarProps = {
 
 export type PostToolbarProps =
   | EmptyToolbarProps
-  | MinimalToolbarProps
   | BasicToolbarProps
   | CollapsedToolbarProps
   | ExpandedToolbarProps;
@@ -51,12 +45,6 @@ export function createProps({
       return {
         isVisible: !postToolbar.isScrollingDown,
         mode,
-      };
-    case 'minimal':
-      return {
-        isVisible: !postToolbar.isScrollingDown,
-        mode,
-        title: postToolbar.tag,
       };
     case 'basic':
       return {
@@ -94,8 +82,7 @@ export function createProps({
 }
 
 function getMode(postToolbar: PostToolbar): PostToolbarProps['mode'] {
-  if (postToolbar.isInPostsPage) return 'minimal';
-  else if (postToolbar.isHeaderVisible) return 'empty';
+  if (postToolbar.isHeaderVisible) return 'empty';
   else if (postToolbar.isContentVisible && postToolbar.isExpanded)
     return 'expanded';
   else if (postToolbar.isContentVisible && !postToolbar.isExpanded)

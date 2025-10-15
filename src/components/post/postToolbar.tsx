@@ -93,8 +93,7 @@ function Content({
           postToolbar.mode === 'empty' ? 'opacity-0' : 'opacity-100'
         )}
       >
-        {((postToolbar.mode === 'minimal' && postToolbar.title !== null) ||
-          postToolbar.mode === 'basic') && (
+        {postToolbar.mode === 'basic' && (
           <div className='font-semibold h-6 truncate'>{postToolbar.title}</div>
         )}
         {(postToolbar.mode === 'collapsed' ||
