@@ -29,7 +29,8 @@ export default function PostToolbar() {
   return (
     <div
       className={clsx(
-        'sticky top-0 z-40 w-full flex flex-col p-2 md:p-4 lg:p-6 bg-white/80 backdrop-blur-md',
+        'sticky top-0 z-40 w-full flex flex-col p-2 bg-white/80 backdrop-blur-md',
+        'xl:ml-[var(--sidebar-width)]',
         'transition-transform duration-300 ease-in-out',
         postToolbar.isVisible ? 'translate-y-0' : '-translate-y-full'
       )}

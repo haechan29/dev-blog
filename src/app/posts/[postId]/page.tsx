@@ -10,6 +10,7 @@ import TableOfContentsItem from '@/components/post/tableOfContentsItem';
 import EnterFullscreenButton from '@/components/postViewer/enterFullscreenButton';
 import { fetchPost } from '@/features/post/domain/service/postService';
 import { createProps } from '@/features/post/ui/postProps';
+import clsx from 'clsx';
 import { Suspense } from 'react';
 
 export default async function PostPage({
@@ -22,8 +23,16 @@ export default async function PostPage({
 
   return (
     <>
-      <PostToolbar />
-      <div className='px-10 xl:px-20 py-14'>
+      <div className='block xl:hidden'>
+        <PostToolbar />
+      </div>
+      <div
+        className={clsx(
+          'px-10 xl:px-20 py-14',
+          'xl:ml-[var(--sidebar-width)]',
+          'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
+        )}
+      >
         <PostPageClient post={post} />
 
         <EnterFullscreenButton />

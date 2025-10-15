@@ -3,6 +3,7 @@
 import SidebarButton from '@/components/post/sidebarButton';
 import clsx from 'clsx';
 import { Search } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 
 export default function PostsToolbar() {
@@ -10,7 +11,7 @@ export default function PostsToolbar() {
     <div
       className={clsx(
         'sticky top-0 z-40 w-full flex items-center',
-        'p-2 md:p-4 lg:p-6 gap-4 bg-white/80 backdrop-blur-md'
+        'p-2 gap-4 bg-white/80 backdrop-blur-md'
       )}
     >
       <div className='xl:hidden'>
@@ -18,13 +19,22 @@ export default function PostsToolbar() {
       </div>
 
       <div className='flex-1 min-w-0'>
-        <div className='hidden md:block w-full'>
+        <div
+          className={clsx(
+            'hidden md:block w-full',
+            'xl:pl-[var(--sidebar-width)]',
+            'xl:pr-[calc(var(--toc-width)+var(--toc-margin))]'
+          )}
+        >
           <SearchBar />
         </div>
       </div>
 
-      <div className='flex md:hidden'>
-        <SearchButton />
+      <div className='flex items-center'>
+        <CreatePostButton />
+        <div className='block md:hidden'>
+          <SearchButton />
+        </div>
       </div>
     </div>
   );
@@ -44,6 +54,20 @@ function SearchBar() {
       />
       <SearchButton />
     </div>
+  );
+}
+
+function CreatePostButton() {
+  return (
+    <Link
+      href={`/write`}
+      className={clsx(
+        'text-sm font-semibold py-2 px-4 mr-2 rounded-full',
+        'bg-gray-200 hover:bg-gray-300'
+      )}
+    >
+      글 쓰기
+    </Link>
   );
 }
 

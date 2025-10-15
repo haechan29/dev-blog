@@ -2,6 +2,7 @@ import PostPreview from '@/components/post/postPreview';
 import PostsToolbar from '@/components/post/postsToolbar';
 import { fetchPosts } from '@/features/post/domain/service/postService';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
+import clsx from 'clsx';
 
 export default async function PostsPage({
   searchParams,
@@ -12,12 +13,18 @@ export default async function PostsPage({
   const posts = await getPosts(tag);
 
   return (
-    <div>
+    <>
       <PostsToolbar />
-      <div className='px-10 xl:px-20'>
+      <div
+        className={clsx(
+          'px-10 xl:px-20',
+          'xl:ml-[var(--sidebar-width)]',
+          'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
+        )}
+      >
         <PostPreviews posts={posts} tag={tag} />
       </div>
-    </div>
+    </>
   );
 }
 
