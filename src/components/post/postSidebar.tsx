@@ -26,15 +26,15 @@ export default function PostSidebar({ posts }: { posts: PostProps[] }) {
     <div
       {...swipeHandlers}
       className={clsx(
-        'fixed z-50 left-0 top-0 bottom-0 w-72 transition-transform duration-300 ease-in-out',
+        'fixed z-50 left-0 top-0 bottom-0 w-72 h-dvh flex flex-col',
+        'bg-[#fafbfc] border-r border-r-gray-50',
+        'transition-transform duration-300 ease-in-out',
         !isVisible && '-translate-x-full'
       )}
     >
-      <div className='flex flex-col w-full min-w-0 h-dvh bg-[#fafbfc] border-r border-r-gray-50'>
-        <PostSidebarHeader />
-        <PostSidebarNav posts={posts} />
-        <PostSidebarFooter />
-      </div>
+      <PostSidebarHeader />
+      <PostSidebarNav posts={posts} />
+      <PostSidebarFooter />
     </div>
   );
 }

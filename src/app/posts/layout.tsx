@@ -1,7 +1,7 @@
 import PostSidebar from '@/components/post/postSidebar';
-import PostToolbar from '@/components/post/postToolbar';
 import { fetchPosts } from '@/features/post/domain/service/postService';
 import { createProps } from '@/features/post/ui/postProps';
+import clsx from 'clsx';
 import { ReactNode, Suspense } from 'react';
 
 export default async function PostsLayout({
@@ -13,12 +13,18 @@ export default async function PostsLayout({
   const postProps = posts.map(createProps);
 
   return (
-    <div className='min-h-screen bg-white'>
-      <PostToolbar />
+    <>
       <Suspense>
         <PostSidebar posts={postProps} />
       </Suspense>
-      <div className='xl:mx-72'>{children}</div>
-    </div>
+      <div
+        className={clsx(
+          'xl:ml-[var(--sidebar-width)]',
+          'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
+        )}
+      >
+        {children}
+      </div>
+    </>
   );
 }

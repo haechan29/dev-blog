@@ -1,4 +1,5 @@
 import Providers from '@/providers';
+import clsx from 'clsx';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
@@ -27,7 +28,11 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-y-scroll`}
+        className={clsx(
+          geistSans.variable,
+          geistMono.variable,
+          'min-h-dvh bg-white antialiased overflow-y-scroll'
+        )}
       >
         <Providers>{children}</Providers>
         <Toaster />

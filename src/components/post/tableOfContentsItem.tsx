@@ -33,8 +33,8 @@ export default function TableOfContentsItem({
   return (
     <div
       className={clsx(
-        'p-4 border border-gray-200',
-        'w-full xl:fixed xl:right-8 xl:top-1/2 xl:transform xl:-translate-y-1/2 xl:w-64'
+        'w-full  xl:w-[var(--toc-width)] p-4 xl:m-[var(--toc-margin)] border border-gray-200',
+        'xl:fixed xl:right-0 xl:top-1/2 xl:transform xl:-translate-y-1/2'
       )}
     >
       <ul className='space-y-2'>

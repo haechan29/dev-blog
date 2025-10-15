@@ -5,8 +5,9 @@ import { useState } from 'react';
 
 export default function PostsToolbar() {
   const [searchKeyword, setSearchKeyword] = useState('');
+
   return (
-    <div className='flex pl-6 pr-4 mb-4 border border-gray-200 rounded-full'>
+    <div className='w-full flex pl-6 pr-4 mb-4 border border-gray-200 rounded-full'>
       <input
         type='text'
         value={searchKeyword}
