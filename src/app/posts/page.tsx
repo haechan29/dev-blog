@@ -13,11 +13,13 @@ export default async function PostsPage({
   const posts = await getPosts(tag);
 
   return (
-    <div className='px-10 xl:px-20 py-8'>
+    <div>
       <PostsPageClient />
-
       <PostsToolbar />
-      <PostPreviews posts={posts} tag={tag} />
+
+      <div className='px-10 xl:px-20'>
+        <PostPreviews posts={posts} tag={tag} />
+      </div>
     </div>
   );
 }

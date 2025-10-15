@@ -1,23 +1,50 @@
 'use client';
 
+import SidebarButton from '@/components/post/sidebarButton';
 import { Search } from 'lucide-react';
 import { useState } from 'react';
 
 export default function PostsToolbar() {
-  const [searchKeyword, setSearchKeyword] = useState('');
+  return (
+    <div className='w-full flex items-center p-2 md:p-4 lg:p-6 gap-4'>
+      <div className='xl:hidden'>
+        <SidebarButton />
+      </div>
+
+      <div className='flex-1 min-w-0'>
+        <div className='hidden md:block w-full'>
+          <SearchBar />
+        </div>
+      </div>
+
+      <div className='block md:hidden'>
+        <SearchButton />
+      </div>
+    </div>
+  );
+}
+
+function SearchBar() {
+  const [query, setQuery] = useState('');
 
   return (
-    <div className='w-full flex pl-6 pr-4 mb-4 border border-gray-200 rounded-full'>
+    <div className='flex w-full max-w-3/4 mx-auto pl-6 pr-4 border border-gray-200 rounded-full'>
       <input
         type='text'
-        value={searchKeyword}
-        onChange={e => setSearchKeyword(e.target.value)}
+        value={query}
+        onChange={e => setQuery(e.target.value)}
         placeholder='검색'
-        className='flex-1 text-gray-900 outline-none'
+        className='flex-1 min-w-0 text-gray-900 outline-none'
       />
-      <button className='p-2 cursor-pointer' onClick={() => {}}>
-        <Search className='w-6 h-6 ' />
-      </button>
+      <SearchButton />
     </div>
+  );
+}
+
+function SearchButton() {
+  return (
+    <button className='shrink-0 p-2 cursor-pointer' onClick={() => {}}>
+      <Search className='w-6 h-6 ' />
+    </button>
   );
 }

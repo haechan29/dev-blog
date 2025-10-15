@@ -1,12 +1,13 @@
 'use client';
 
+import SidebarButton from '@/components/post/sidebarButton';
 import Heading from '@/features/post/domain/model/heading';
 import usePostToolbar from '@/features/post/hooks/usePostToolbar';
 import usePostToolbarHandler from '@/features/post/hooks/usePostToolbarHandler';
 import { PostToolbarProps } from '@/features/post/ui/postToolbarProps';
 import useScrollToContent from '@/features/postViewer/hooks/useScrollToContent';
 import clsx from 'clsx';
-import { ChevronDown, ChevronRight, Menu } from 'lucide-react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import { RefObject, useMemo, useRef } from 'react';
 
 export default function PostToolbar() {
@@ -20,8 +21,7 @@ export default function PostToolbar() {
       : [];
   }, [postToolbar]);
 
-  const { onSidebarButtonClick, onContentClick, onExpandButtonClick } =
-    usePostToolbarHandler();
+  const { onContentClick, onExpandButtonClick } = usePostToolbarHandler();
 
   const contentsRef = useRef<Map<string, HTMLDivElement>>(new Map());
   useScrollToContent(contentsRef);
@@ -35,11 +35,11 @@ export default function PostToolbar() {
           postToolbar.isVisible ? 'translate-y-0' : '-translate-y-full'
         )}
       >
-        <div className='flex flex-col w-full min-w-0 py-2'>
+        <div className='flex flex-col w-full min-w-0 p-2'>
           <Breadcrumb breadcrumb={breadcrumb} />
 
           <div className='flex w-full min-w-0 items-start'>
-            <SidebarButton onClick={onSidebarButtonClick} />
+            <SidebarButton />
             <Content
               contentsRef={contentsRef}
               postToolbar={postToolbar}
@@ -73,17 +73,6 @@ function Breadcrumb({ breadcrumb }: { breadcrumb: string[] }) {
         );
       })}
     </div>
-  );
-}
-
-function SidebarButton({ onClick }: { onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className='flex shrink-0 px-2 items-center justify-center'
-    >
-      <Menu className='w-6 h-6 text-gray-500' />
-    </button>
   );
 }
 

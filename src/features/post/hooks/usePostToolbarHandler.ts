@@ -3,7 +3,6 @@
 import Heading from '@/features/post/domain/model/heading';
 import usePostToolbar from '@/features/post/hooks/usePostToolbar';
 import { setCurrentHeading } from '@/lib/redux/postPositionSlice';
-import { setIsVisible } from '@/lib/redux/postSidebarSlice';
 import { setIsExpanded } from '@/lib/redux/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { scrollToElement } from '@/lib/scroll';
@@ -13,11 +12,6 @@ import { useDispatch } from 'react-redux';
 export default function usePostToolbarHandler() {
   const dispatch = useDispatch<AppDispatch>();
   const postToolbar = usePostToolbar();
-
-  const onSidebarButtonClick = useCallback(
-    () => dispatch(setIsVisible(true)),
-    [dispatch]
-  );
 
   const onContentClick = useCallback(
     (heading: Heading) => {
@@ -50,7 +44,6 @@ export default function usePostToolbarHandler() {
   );
 
   return {
-    onSidebarButtonClick,
     onContentClick,
     onExpandButtonClick,
   } as const;
