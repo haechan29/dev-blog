@@ -10,8 +10,6 @@ export default class PostStat {
 
   toProps(): PostStatItemProps {
     return {
-      id: this.id,
-      postId: this.postId,
       likeCount: this.likeCount,
       viewCount: this.viewCount,
     };

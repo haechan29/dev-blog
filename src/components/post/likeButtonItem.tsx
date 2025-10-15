@@ -1,10 +1,7 @@
 'use client';
 
-import * as PostStatService from '@/features/postStat/domain/service/postStatService';
-import { fetchPostStat } from '@/features/postStat/domain/service/postStatService';
-import { PostStatItemProps } from '@/features/postStat/ui/postStatItemProps';
+import usePostStat from '@/features/postStat/hooks/usePostStat';
 import useThrottle from '@/hooks/useThrottle';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Heart } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
@@ -13,46 +10,7 @@ export default function LikeButtonItem({ postId }: { postId: string }) {
   const [heartFilled, setHeartFilled] = useState(false);
   const throttle = useThrottle();
 
-  const queryClient = useQueryClient();
-
-  const { data: stat } = useQuery({
-    queryKey: ['posts', postId, 'stats'],
-    queryFn: () => fetchPostStat(postId).then(stat => stat.toProps()),
-  });
-
-  const incrementLikeCount = useMutation({
-    mutationFn: () => PostStatService.incrementLikeCount(postId),
-    onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ['posts', postId, 'stats'] });
-      const previousStat = queryClient.getQueryData(['posts', postId, 'stats']);
-
-      queryClient.setQueryData(
-        ['posts', postId, 'stats'],
-        (prev: PostStatItemProps | undefined) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            likeCount: prev.likeCount + 1,
-          };
-        }
-      );
-
-      return { previousStat };
-    },
-    onError: (_error, _variables, context) => {
-      if (context?.previousStat) {
-        queryClient.setQueryData(
-          ['posts', postId, 'stats'],
-          context.previousStat
-        );
-      }
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['posts', postId, 'stats'],
-      });
-    },
-  });
+  const { stat, incrementLikeCount } = usePostStat({ postId });
 
   const handleClick = useCallback(() => {
     throttle(() => {
@@ -87,10 +45,7 @@ export default function LikeButtonItem({ postId }: { postId: string }) {
           )}
         />
 
-        <RollingCounter
-          heartFilled={heartFilled}
-          count={stat?.likeCount ?? 0}
-        />
+        <RollingCounter heartFilled={heartFilled} count={stat.likeCount} />
       </button>
     </div>
   );
@@ -103,7 +58,7 @@ function RollingCounter({
   heartFilled: boolean;
   count: number;
 }) {
-  const [prevCount, setPrevCount] = useState(count);
+  const [prevCount, setPrevCount] = useState(0);
   const isRolling = useMemo(() => count !== prevCount, [count, prevCount]);
 
   return (
