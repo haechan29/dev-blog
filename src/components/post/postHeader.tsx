@@ -1,28 +1,14 @@
-'use client';
-
-import useHeaderTracker from '@/features/post/hooks/useHeaderTracker';
+import PostInfo from '@/components/post/postInfo';
 import { PostProps } from '@/features/post/ui/postProps';
-import { fetchPostStat } from '@/features/postStat/domain/service/postStatService';
-import { useQuery } from '@tanstack/react-query';
-import { Heart } from 'lucide-react';
 import Link from 'next/link';
-import { useRef } from 'react';
 
 export default function PostHeader({ post }: { post: PostProps }) {
-  const { data: stat } = useQuery({
-    queryKey: ['posts', post.id, 'stats'],
-    queryFn: () => fetchPostStat(post.id).then(stat => stat.toProps()),
-  });
-
-  const headerRef = useRef(null);
-  useHeaderTracker(headerRef);
-
   return (
-    <div ref={headerRef} className='mb-10'>
+    <>
       <Title {...post} />
       <Tags {...post} />
-      <Info {...post} {...stat} />
-    </div>
+      <PostInfo {...post} />
+    </>
   );
 }
 
@@ -42,27 +28,6 @@ function Tags({ tags }: { tags: string[] }) {
           {tag}
         </Link>
       ))}
-    </div>
-  );
-}
-
-function Info({
-  createdAt,
-  likeCount = 0,
-  viewCount = 0,
-}: {
-  createdAt: string;
-  likeCount?: number;
-  viewCount?: number;
-}) {
-  return (
-    <div className='flex gap-4 items-center text-xs text-gray-500'>
-      <div>{createdAt}</div>
-      <div className='flex items-center gap-1'>
-        <Heart className='w-3 h-3 fill-gray-500' />
-        <span>{likeCount}</span>
-      </div>
-      <div>{`조회 ${viewCount}`}</div>
     </div>
   );
 }

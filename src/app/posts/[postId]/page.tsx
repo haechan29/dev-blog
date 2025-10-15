@@ -3,6 +3,7 @@ import LikeButtonItem from '@/components/post/likeButtonItem';
 import PostContent from '@/components/post/postContent';
 import PostContentWrapper from '@/components/post/postContentWrapper';
 import PostHeader from '@/components/post/postHeader';
+import PostHeaderWrapper from '@/components/post/postHeaderWrapper';
 import PostPageClient from '@/components/post/postPageClient';
 import TableOfContentsItem from '@/components/post/tableOfContentsItem';
 import EnterFullscreenButton from '@/components/postViewer/enterFullscreenButton';
@@ -24,7 +25,9 @@ export default async function PostPage({
 
       <EnterFullscreenButton />
 
-      <PostHeader post={post} />
+      <PostHeaderWrapper>
+        <PostHeader post={post} />
+      </PostHeaderWrapper>
       <div className='w-full h-[1px] bg-gray-200 mb-10' />
 
       {post.headings.length > 0 && (

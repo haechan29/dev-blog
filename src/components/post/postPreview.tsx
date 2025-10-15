@@ -1,12 +1,7 @@
-'use client';
-
+import PostInfo from '@/components/post/postInfo';
 import { PostProps } from '@/features/post/ui/postProps';
-import { fetchPostStat } from '@/features/postStat/domain/service/postStatService';
-import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { Heart } from 'lucide-react';
 import Link from 'next/link';
-import { useMemo } from 'react';
 
 export default function PostPreview({
   tag,
@@ -26,7 +21,7 @@ export default function PostPreview({
       </Link>
 
       <Tags {...post} />
-      <Info {...post} />
+      <PostInfo {...post} />
     </div>
   );
 }
@@ -72,32 +67,6 @@ function Tags({ tags }: { tags: string[] }) {
           {tag}
         </Link>
       ))}
-    </div>
-  );
-}
-
-function Info({ id: postId, createdAt }: { id: string; createdAt: string }) {
-  const { data: stat } = useQuery({
-    queryKey: ['posts', postId, 'stats'],
-    queryFn: () => fetchPostStat(postId).then(stat => stat.toProps()),
-  });
-
-  const likeCount = useMemo(() => stat?.likeCount ?? 0, [stat?.likeCount]);
-  const viewCount = useMemo(() => stat?.viewCount ?? 0, [stat?.viewCount]);
-
-  return (
-    <div
-      className={clsx(
-        'flex gap-4 items-center text-xs text-gray-500',
-        'group-hover:opacity-0 transition-opacity duration-300 ease-in-out'
-      )}
-    >
-      <div>{createdAt}</div>
-      <div className='flex items-center gap-1'>
-        <Heart className='w-3 h-3 fill-gray-500' />
-        <span>{likeCount}</span>
-      </div>
-      <div>{`조회 ${viewCount}`}</div>
     </div>
   );
 }
