@@ -7,9 +7,14 @@ import { useState } from 'react';
 
 type Mode = 'edit' | 'preview';
 
-export default function WritePostEditorWithPreview() {
+export default function WritePostEditorWithPreview({
+  content,
+  setContent,
+}: {
+  content: string;
+  setContent: (content: string) => void;
+}) {
   const [mode, setMode] = useState<Mode>('edit');
-  const [content, setContent] = useState('');
 
   return (
     <div className='w-full mt-4 p-4'>
