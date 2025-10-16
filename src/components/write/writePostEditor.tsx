@@ -1,17 +1,18 @@
 'use client';
 
+import { WritePostProps } from '@/features/write/ui/writePostProps';
 import clsx from 'clsx';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 
 export default function WritePostEditor({
   content,
   setContent,
+  invalidField,
 }: {
   content: string;
   setContent: (content: string) => void;
+  invalidField: WritePostProps['invalidField'];
 }) {
-  const [isContentValid, setIsContentValid] = useState(true);
-
   const insertMarkdown = useCallback(
     (before: string, after: string = '') => {
       setContent(content + before + after);
@@ -20,18 +21,12 @@ export default function WritePostEditor({
   );
 
   return (
-    <div
-      className={clsx(
-        'w-full min-h-screen flex flex-col',
-        'border border-gray-200 rounded-lg bg-white'
-      )}
-    >
+    <div className='w-full min-h-screen flex flex-col'>
       <EditorToolbar insertMarkdown={insertMarkdown} />
       <EditorContent
         content={content}
         setContent={setContent}
-        isContentValid={isContentValid}
-        setIsContentValid={setIsContentValid}
+        invalidField={invalidField}
       />
     </div>
   );
@@ -43,7 +38,7 @@ function EditorToolbar({
   insertMarkdown: (before: string, after?: string) => void;
 }) {
   return (
-    <div className='flex gap-2 p-3 border-b border-gray-200'>
+    <div className='flex border-t border-x border-gray-200 rounded-t-lg gap-2 p-3'>
       <HeadingButton level={1} insertMarkdown={insertMarkdown} />
       <HeadingButton level={2} insertMarkdown={insertMarkdown} />
       <HeadingButton level={3} insertMarkdown={insertMarkdown} />
@@ -59,25 +54,24 @@ function EditorToolbar({
 function EditorContent({
   content,
   setContent,
-  isContentValid,
-  setIsContentValid,
+  invalidField,
 }: {
   content: string;
   setContent: (value: string) => void;
-  isContentValid: boolean;
-  setIsContentValid: (value: boolean) => void;
+  invalidField: WritePostProps['invalidField'];
 }) {
+  const isInvalid = useMemo(() => invalidField === 'content', [invalidField]);
+
   return (
     <textarea
       value={content}
-      onChange={e => {
-        setIsContentValid(true);
-        setContent(e.target.value);
-      }}
+      onChange={e => setContent(e.target.value)}
       placeholder='본문을 입력하세요...'
       className={clsx(
-        'flex-1 p-4 resize-none outline-none',
-        isContentValid ? '' : 'border-red-400',
+        'flex-1 p-4 resize-none outline-none border rounded-b-lg',
+        isInvalid
+          ? 'border-red-400 animate-shake'
+          : 'border-gray-200 hover:border-blue-500 focus:border-blue-500',
         content ? 'bg-white' : 'bg-gray-50'
       )}
     />

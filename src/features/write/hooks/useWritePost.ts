@@ -24,25 +24,61 @@ export default function useWritePost() {
     [writePost]
   );
 
-  const setTitle = useCallback((title: string) => {
-    setWritePost(prev => ({ ...prev, title, isTitleValid: true }));
+  const resetValidity = useCallback(() => {
+    setWritePost(prev => ({
+      ...prev,
+      isTitleValid: true,
+      isTagsValid: true,
+      isPasswordValid: true,
+      isContentValid: true,
+    }));
   }, []);
 
-  const setTags = useCallback((tagsString: string) => {
-    const tagsArray = tagsString
-      .split('#')
-      .map(tag => tag.trim())
-      .filter(Boolean);
-    setWritePost(prev => ({ ...prev, tags: tagsArray, isTagsValid: true }));
-  }, []);
+  const setTitle = useCallback(
+    (title: string) => {
+      setWritePost(prev => ({ ...prev, title }));
+      resetValidity();
+    },
+    [resetValidity]
+  );
 
-  const setPassword = useCallback((password: string) => {
-    setWritePost(prev => ({ ...prev, password, isPasswordValid: true }));
-  }, []);
+  const setTags = useCallback(
+    (tagsString: string) => {
+      const tagsArray = tagsString
+        .split('#')
+        .map(tag => tag.trim())
+        .filter(Boolean);
+      setWritePost(prev => ({ ...prev, tags: tagsArray }));
+      resetValidity();
+    },
+    [resetValidity]
+  );
 
-  const setContent = useCallback((content: string) => {
-    setWritePost(prev => ({ ...prev, content, isContentValid: true }));
-  }, []);
+  const setPassword = useCallback(
+    (password: string) => {
+      setWritePost(prev => ({ ...prev, password }));
+      resetValidity();
+    },
+    [resetValidity]
+  );
+
+  const setContent = useCallback(
+    (content: string) => {
+      setWritePost(prev => ({ ...prev, content }));
+      resetValidity();
+    },
+    [resetValidity]
+  );
+
+  const createPost = useCallback(async () => {
+    const validation = validate(writePost);
+    const isValid = Object.values(validation).every(v => v);
+    if (!isValid) {
+      setWritePost(prev => ({ ...prev, ...validation }));
+      return;
+    }
+    console.log('게시글이 생성되었습니다');
+  }, [writePost]);
 
   return {
     ...props,
@@ -50,5 +86,15 @@ export default function useWritePost() {
     setTags,
     setPassword,
     setContent,
+    createPost,
+  };
+}
+
+function validate({ title, password, content }: WritePost) {
+  return {
+    isTitleValid: title.trim().length > 0,
+    isTagsValid: true,
+    isPasswordValid: password.trim().length > 0,
+    isContentValid: content.trim().length > 0,
   };
 }

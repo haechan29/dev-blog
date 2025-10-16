@@ -2,6 +2,7 @@
 
 import WritePostEditor from '@/components/write/writePostEditor';
 import WritePostPreview from '@/components/write/writePostPreview';
+import { WritePostProps } from '@/features/write/ui/writePostProps';
 import clsx from 'clsx';
 import { useState } from 'react';
 
@@ -10,9 +11,11 @@ type Mode = 'edit' | 'preview';
 export default function WritePostEditorWithPreview({
   content,
   setContent,
+  invalidField,
 }: {
   content: string;
   setContent: (content: string) => void;
+  invalidField: WritePostProps['invalidField'];
 }) {
   const [mode, setMode] = useState<Mode>('edit');
 
@@ -29,7 +32,11 @@ export default function WritePostEditorWithPreview({
             mode === 'edit' ? 'block' : 'hidden lg:block'
           )}
         >
-          <WritePostEditor content={content} setContent={setContent} />
+          <WritePostEditor
+            content={content}
+            setContent={setContent}
+            invalidField={invalidField}
+          />
         </div>
 
         <div

@@ -12,7 +12,7 @@ export default function WritePage() {
 
   return (
     <div>
-      <WritePostToolbar />
+      <WritePostToolbar {...writePost} />
       <WritePostTitle {...writePost} />
       <WritePostTag {...writePost} />
       <WritePostPassword {...writePost} />

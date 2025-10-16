@@ -5,16 +5,16 @@ import { ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 
-export default function WritePostToolbar() {
+export default function WritePostToolbar({
+  createPost,
+}: {
+  createPost: () => void;
+}) {
   const router = useRouter();
 
   const handleBack = useCallback(() => {
     router.back();
   }, [router]);
-
-  const handlePublish = useCallback(() => {
-    // 발행 로직
-  }, []);
 
   return (
     <div
@@ -24,7 +24,7 @@ export default function WritePostToolbar() {
       )}
     >
       <BackButton onClick={handleBack} />
-      <PublishButton onClick={handlePublish} />
+      <PublishButton onClick={createPost} />
     </div>
   );
 }
