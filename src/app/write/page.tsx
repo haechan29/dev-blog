@@ -9,6 +9,8 @@ export default function WritePage() {
       <WritePostTitle />
       <WritePostTag />
       <WritePostPassword />
+
+      <WritePostEditorWithPreview />
     </div>
   );
 }
