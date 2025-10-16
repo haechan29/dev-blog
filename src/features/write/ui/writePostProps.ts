@@ -1,4 +1,8 @@
 import { WritePost } from '@/features/write/domain/model/writePost';
+import {
+  WritePostStepsProps,
+  createProps as createStepProps,
+} from '@/features/write/ui/writePostStepProps';
 
 export type WritePostProps = {
   title: string;
@@ -6,7 +10,8 @@ export type WritePostProps = {
   password: string;
   content: string;
   invalidField: 'title' | 'tags' | 'password' | 'content' | null;
-};
+  publishResult?: WritePost['publishResult'];
+} & WritePostStepsProps;
 
 export function createProps(writePost: WritePost): WritePostProps {
   return {
@@ -15,6 +20,7 @@ export function createProps(writePost: WritePost): WritePostProps {
     password: writePost.password,
     content: writePost.content,
     invalidField: getInvalidField(writePost),
+    ...createStepProps(writePost.currentStepId),
   };
 }
 

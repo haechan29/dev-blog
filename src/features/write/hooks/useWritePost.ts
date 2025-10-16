@@ -17,6 +17,7 @@ export default function useWritePost() {
     isTagsValid: true,
     isPasswordValid: true,
     isContentValid: true,
+    currentStepId: 'write',
   });
 
   const props: WritePostProps = useMemo(

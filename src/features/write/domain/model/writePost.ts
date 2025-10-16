@@ -7,4 +7,6 @@ export interface WritePost {
   isTagsValid: boolean;
   isPasswordValid: boolean;
   isContentValid: boolean;
+  currentStepId: 'write' | 'upload';
+  publishResult?: 'success' | 'error';
 }
