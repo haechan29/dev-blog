@@ -1,9 +1,11 @@
-export type WritePostStep = {
-  id: 'write' | 'upload';
+export interface WritePostStep {
+  id: string;
   toolbarText: string;
   actionButtonText: string;
   action: string;
-};
+}
+
+export type WritePostSteps = Record<'write' | 'upload', WritePostStep>;
 
 export const WRITE_STEP: WritePostStep = {
   id: 'write',
@@ -19,7 +21,7 @@ export const UPLOAD_STEP: WritePostStep = {
   action: 'publish',
 };
 
-export const WRITE_POST_STEPS = new Map<WritePostStep['id'], WritePostStep>([
-  ['write', WRITE_STEP],
-  ['upload', UPLOAD_STEP],
-]);
+export const WRITE_POST_STEPS: WritePostSteps = {
+  write: WRITE_STEP,
+  upload: UPLOAD_STEP,
+};

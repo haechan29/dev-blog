@@ -60,7 +60,7 @@ function SearchBar() {
 function CreatePostButton() {
   return (
     <Link
-      href={`/write`}
+      href={`/write?step=write`}
       className={clsx(
         'text-sm font-semibold py-2 px-4 mr-2 rounded-full',
         'bg-gray-200 hover:bg-gray-300'

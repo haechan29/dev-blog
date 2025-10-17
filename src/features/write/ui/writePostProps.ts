@@ -11,14 +11,14 @@ export type WritePostProps = {
 } & WritePostToolbarProps;
 
 export function createProps(writePost: WritePost): WritePostProps {
-  const currentStep = writePost.totalSteps.get(writePost.currentStep)!;
+  const currentStep = writePost.totalSteps[writePost.currentStepId]!;
   return {
     title: writePost.title,
     tags: writePost.tags.map(tag => `#${tag}`).join(' '),
     password: writePost.password,
     content: writePost.content,
     invalidField: getInvalidField(writePost),
-    toolbarTexts: [...writePost.totalSteps.values()].map(step => ({
+    toolbarTexts: Object.values(writePost.totalSteps).map(step => ({
       isCurrentStep: step.id === currentStep.id,
       content: step.toolbarText,
     })),

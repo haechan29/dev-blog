@@ -1,14 +1,21 @@
 'use client';
 
 import { WritePost } from '@/features/write/domain/model/writePost';
-import { WRITE_POST_STEPS } from '@/features/write/domain/model/writePostStep';
+import {
+  WRITE_POST_STEPS,
+  WritePostSteps,
+} from '@/features/write/domain/model/writePostStep';
 import {
   createProps,
   WritePostProps,
 } from '@/features/write/ui/writePostProps';
 import { useCallback, useMemo, useState } from 'react';
 
-export default function useWritePost() {
+export default function useWritePost({
+  currentStepId,
+}: {
+  currentStepId: keyof WritePostSteps;
+}) {
   const [writePost, setWritePost] = useState<WritePost>({
     title: '',
     tags: [],
@@ -18,7 +25,7 @@ export default function useWritePost() {
     isTagsValid: true,
     isPasswordValid: true,
     isContentValid: true,
-    currentStep: 'write',
+    currentStepId,
     totalSteps: WRITE_POST_STEPS,
   });
 
@@ -77,7 +84,7 @@ export default function useWritePost() {
     const validation = validateContent(writePost);
     const isValid = Object.values(validation).every(v => v);
     if (isValid) {
-      setWritePost(prev => ({ ...prev, currentStep: 'upload' }));
+      setWritePost(prev => ({ ...prev, currentStepId: 'upload' }));
     } else {
       setWritePost(prev => ({ ...prev, ...validation }));
     }
