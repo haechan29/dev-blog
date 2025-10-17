@@ -1,3 +1,5 @@
+import { WritePostStep } from '@/features/write/domain/model/writePostStep';
+
 export interface WritePost {
   title: string;
   tags: string[];
@@ -7,6 +9,7 @@ export interface WritePost {
   isTagsValid: boolean;
   isPasswordValid: boolean;
   isContentValid: boolean;
-  currentStepId: 'write' | 'upload';
+  currentStep: WritePostStep['id'];
+  totalSteps: Map<WritePostStep['id'], WritePostStep>;
   publishResult?: 'success' | 'error';
 }

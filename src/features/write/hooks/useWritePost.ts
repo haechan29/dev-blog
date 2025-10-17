@@ -1,6 +1,7 @@
 'use client';
 
 import { WritePost } from '@/features/write/domain/model/writePost';
+import { WRITE_POST_STEPS } from '@/features/write/domain/model/writePostStep';
 import {
   createProps,
   WritePostProps,
@@ -17,7 +18,8 @@ export default function useWritePost() {
     isTagsValid: true,
     isPasswordValid: true,
     isContentValid: true,
-    currentStepId: 'write',
+    currentStep: 'write',
+    totalSteps: WRITE_POST_STEPS,
   });
 
   const props: WritePostProps = useMemo(
@@ -71,15 +73,39 @@ export default function useWritePost() {
     [resetValidity]
   );
 
-  const createPost = useCallback(async () => {
-    const validation = validate(writePost);
+  const handleNext = useCallback(() => {
+    const validation = validateContent(writePost);
     const isValid = Object.values(validation).every(v => v);
-    if (!isValid) {
+    if (isValid) {
+      setWritePost(prev => ({ ...prev, currentStep: 'upload' }));
+    } else {
       setWritePost(prev => ({ ...prev, ...validation }));
-      return;
     }
-    console.log('게시글이 생성되었습니다');
   }, [writePost]);
+
+  const handlePublish = useCallback(() => {
+    const validation = validateMeta(writePost);
+    const isValid = Object.values(validation).every(v => v);
+    if (isValid) {
+      console.log('게시글이 생성되었습니다');
+    } else {
+      setWritePost(prev => ({ ...prev, ...validation }));
+    }
+  }, [writePost]);
+
+  const onAction = useCallback(
+    (action: string) => {
+      switch (action) {
+        case 'next':
+          handleNext();
+          break;
+        case 'publish':
+          handlePublish();
+          break;
+      }
+    },
+    [handleNext, handlePublish]
+  );
 
   return {
     ...props,
@@ -87,15 +113,20 @@ export default function useWritePost() {
     setTags,
     setPassword,
     setContent,
-    createPost,
+    onAction,
   };
 }
 
-function validate({ title, password, content }: WritePost) {
+function validateContent(writePost: WritePost) {
   return {
-    isTitleValid: title.trim().length > 0,
+    isContentValid: writePost.content.trim().length > 0,
+  };
+}
+
+function validateMeta(writePost: WritePost) {
+  return {
+    isTitleValid: writePost.title.trim().length > 0,
     isTagsValid: true,
-    isPasswordValid: password.trim().length > 0,
-    isContentValid: content.trim().length > 0,
+    isPasswordValid: writePost.password.trim().length > 0,
   };
 }

@@ -1,8 +1,5 @@
 import { WritePost } from '@/features/write/domain/model/writePost';
-import {
-  WritePostStepsProps,
-  createProps as createStepProps,
-} from '@/features/write/ui/writePostStepProps';
+import { WritePostToolbarProps } from '@/features/write/ui/writePostToolbarProps';
 
 export type WritePostProps = {
   title: string;
@@ -11,16 +8,21 @@ export type WritePostProps = {
   content: string;
   invalidField: 'title' | 'tags' | 'password' | 'content' | null;
   publishResult?: WritePost['publishResult'];
-} & WritePostStepsProps;
+} & WritePostToolbarProps;
 
 export function createProps(writePost: WritePost): WritePostProps {
+  const currentStep = writePost.totalSteps.get(writePost.currentStep)!;
   return {
     title: writePost.title,
     tags: writePost.tags.map(tag => `#${tag}`).join(' '),
     password: writePost.password,
     content: writePost.content,
     invalidField: getInvalidField(writePost),
-    ...createStepProps(writePost.currentStepId),
+    toolbarTexts: [...writePost.totalSteps.values()].map(step => ({
+      isCurrentStep: step.id === currentStep.id,
+      content: step.toolbarText,
+    })),
+    ...currentStep,
   };
 }
 
