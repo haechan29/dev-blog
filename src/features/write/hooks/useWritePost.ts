@@ -9,13 +9,18 @@ import {
   createProps,
   WritePostProps,
 } from '@/features/write/ui/writePostProps';
-import { useCallback, useMemo, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export default function useWritePost({
   currentStepId,
 }: {
   currentStepId: keyof WritePostSteps;
 }) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
   const [writePost, setWritePost] = useState<WritePost>({
     title: '',
     tags: [],
@@ -84,11 +89,13 @@ export default function useWritePost({
     const validation = validateContent(writePost);
     const isValid = Object.values(validation).every(v => v);
     if (isValid) {
-      setWritePost(prev => ({ ...prev, currentStepId: 'upload' }));
+      const params = new URLSearchParams(searchParams);
+      params.set('step', 'upload');
+      router.push(`${pathname}?${params.toString()}`);
     } else {
       setWritePost(prev => ({ ...prev, ...validation }));
     }
-  }, [writePost]);
+  }, [pathname, router, searchParams, writePost]);
 
   const handlePublish = useCallback(() => {
     const validation = validateMeta(writePost);
@@ -113,6 +120,10 @@ export default function useWritePost({
     },
     [handleNext, handlePublish]
   );
+
+  useEffect(() => {
+    setWritePost(prev => ({ ...prev, currentStepId }));
+  }, [currentStepId]);
 
   return {
     ...props,
