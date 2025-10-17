@@ -1,8 +1,7 @@
 'use client';
 
 import QueryParamsValidator from '@/components/queryParamsValidator';
-import WritePostEditorWithPreview from '@/components/write/writePostEditorWithPreview';
-import WritePostMeta from '@/components/write/writePostMeta';
+import WritePostContent from '@/components/write/writePostContent';
 import WritePostToolbar from '@/components/write/writePostToolbar';
 import {
   WRITE_POST_STEPS,
@@ -29,12 +28,9 @@ function WritePageWithValidation() {
   const writePost = useWritePost({ currentStepId: step });
 
   return (
-    <>
+    <div className='w-full overflow-x-hidden'>
       <WritePostToolbar {...writePost} />
-      <div className='mx-10 xl:mx-20'>
-        <WritePostMeta {...writePost} />
-        <WritePostEditorWithPreview {...writePost} />
-      </div>
-    </>
+      <WritePostContent {...writePost} />
+    </div>
   );
 }

@@ -1,4 +1,5 @@
 import { WritePost } from '@/features/write/domain/model/writePost';
+import { WritePostSteps } from '@/features/write/domain/model/writePostStep';
 import { WritePostToolbarProps } from '@/features/write/ui/writePostToolbarProps';
 
 export type WritePostProps = {
@@ -7,6 +8,7 @@ export type WritePostProps = {
   password: string;
   content: string;
   invalidField: 'title' | 'tags' | 'password' | 'content' | null;
+  currentStepId: keyof WritePostSteps;
   publishResult?: WritePost['publishResult'];
 } & WritePostToolbarProps;
 
@@ -18,6 +20,7 @@ export function createProps(writePost: WritePost): WritePostProps {
     password: writePost.password,
     content: writePost.content,
     invalidField: getInvalidField(writePost),
+    currentStepId: writePost.currentStepId,
     toolbarTexts: Object.values(writePost.totalSteps).map(step => ({
       isCurrentStep: step.id === currentStep.id,
       content: step.toolbarText,
