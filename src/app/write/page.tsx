@@ -2,9 +2,7 @@
 
 import QueryParamsValidator from '@/components/queryParamsValidator';
 import WritePostEditorWithPreview from '@/components/write/writePostEditorWithPreview';
-import WritePostPassword from '@/components/write/writePostPassword';
-import WritePostTag from '@/components/write/writePostTag';
-import WritePostTitle from '@/components/write/writePostTitle';
+import WritePostMeta from '@/components/write/writePostMeta';
 import WritePostToolbar from '@/components/write/writePostToolbar';
 import {
   WRITE_POST_STEPS,
@@ -31,12 +29,12 @@ function WritePageWithValidation() {
   const writePost = useWritePost({ currentStepId: step });
 
   return (
-    <div>
+    <>
       <WritePostToolbar {...writePost} />
-      <WritePostTitle {...writePost} />
-      <WritePostTag {...writePost} />
-      <WritePostPassword {...writePost} />
-      <WritePostEditorWithPreview {...writePost} />
-    </div>
+      <div className='mx-10 xl:mx-20'>
+        <WritePostMeta {...writePost} />
+        <WritePostEditorWithPreview {...writePost} />
+      </div>
+    </>
   );
 }

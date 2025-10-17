@@ -20,7 +20,7 @@ export default function WritePostEditorWithPreview({
   const [mode, setMode] = useState<Mode>('edit');
 
   return (
-    <div className='w-full mt-4 p-4'>
+    <div className='w-full'>
       <div className='lg:hidden mb-4'>
         <ModeToggle mode={mode} setMode={setMode} />
       </div>
