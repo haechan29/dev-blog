@@ -125,6 +125,16 @@ export default function useWritePost({
     setWritePost(prev => ({ ...prev, currentStepId }));
   }, [currentStepId]);
 
+  useEffect(() => {
+    if (writePost.currentStepId !== 'write') {
+      const validation = validateContent(writePost);
+      const isValid = Object.values(validation).every(v => v);
+      if (!isValid) {
+        router.push('/write?step=write');
+      }
+    }
+  }, [pathname, router, searchParams, writePost]);
+
   return {
     ...props,
     setTitle,
