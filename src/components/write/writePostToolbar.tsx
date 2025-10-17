@@ -1,30 +1,46 @@
 'use client';
 
 import clsx from 'clsx';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useCallback } from 'react';
+import { Fragment, useCallback } from 'react';
 
 export default function WritePostToolbar({
-  createPost,
+  toolbarTexts,
+  actionButtonText,
+  action,
+  onAction,
 }: {
-  createPost: () => void;
+  toolbarTexts: {
+    isCurrentStep: boolean;
+    content: string;
+  }[];
+  actionButtonText: string;
+  action: string;
+  onAction: (action: string) => void;
 }) {
   const router = useRouter();
-
-  const handleBack = useCallback(() => {
-    router.back();
-  }, [router]);
+  const onBackButtonClick = useCallback(() => router.back(), [router]);
+  const onActionButtonClick = useCallback(
+    () => onAction(action),
+    [action, onAction]
+  );
 
   return (
     <div
       className={clsx(
-        'sticky top-0 z-40 w-full flex items-center justify-between',
+        'sticky top-0 z-40 w-full flex items-center gap-4',
         'p-2 md:p-4 bg-white/80 backdrop-blur-md'
       )}
     >
-      <BackButton onClick={handleBack} />
-      <PublishButton onClick={createPost} />
+      <BackButton onClick={onBackButtonClick} />
+      <div className='flex-1 min-w-0'>
+        <Texts toolbarTexts={toolbarTexts} />
+      </div>
+      <ActionButton
+        actionButtonText={actionButtonText}
+        onClick={onActionButtonClick}
+      />
     </div>
   );
 }
@@ -34,17 +50,51 @@ function BackButton({ onClick }: { onClick: () => void }) {
     <button
       onClick={onClick}
       className={clsx(
-        'flex items-center gap-2 py-2 px-4 rounded-lg',
-        'text-gray-700 hover:bg-gray-100 font-semibold'
+        'py-2 px-4 rounded-lg font-semibold',
+        'text-gray-700 bg-gray-200 hover:bg-gray-100'
       )}
     >
-      <ChevronLeft className='w-5 h-5' />
-      <span className='hidden sm:inline'>나가기</span>
+      나가기
     </button>
   );
 }
 
-function PublishButton({ onClick }: { onClick: () => void }) {
+function Texts({
+  toolbarTexts,
+}: {
+  toolbarTexts: {
+    isCurrentStep: boolean;
+    content: string;
+  }[];
+}) {
+  return (
+    <div className='w-full flex items-center gap-2'>
+      {toolbarTexts.map(({ isCurrentStep, content }, index) => {
+        const isLast = toolbarTexts.length - 1 === index;
+
+        return (
+          <Fragment key={`${content}-${index}`}>
+            <div
+              className={clsx(
+                'truncate',
+                isCurrentStep ? 'text-gray-900' : 'text-gray-400'
+              )}
+            >{`${index + 1}. ${content}`}</div>
+            {!isLast && <ChevronRight className='w-4 h-4 text-gray-400' />}
+          </Fragment>
+        );
+      })}
+    </div>
+  );
+}
+
+function ActionButton({
+  actionButtonText,
+  onClick,
+}: {
+  actionButtonText: string;
+  onClick: () => void;
+}) {
   return (
     <button
       onClick={onClick}
@@ -53,7 +103,7 @@ function PublishButton({ onClick }: { onClick: () => void }) {
         'bg-blue-600 text-white hover:bg-blue-500'
       )}
     >
-      발행
+      {actionButtonText}
     </button>
   );
 }
