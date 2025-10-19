@@ -2,13 +2,23 @@
 
 import { WritePost } from '@/features/write/domain/model/writePost';
 import {
+  validate,
+  WritePostForm,
+} from '@/features/write/domain/model/writePostForm';
+import {
   WRITE_POST_STEPS,
   WritePostSteps,
 } from '@/features/write/domain/model/writePostStep';
+import useWritePostForm from '@/features/write/hooks/useWritePostForm';
+import useWritePostValidity from '@/features/write/hooks/useWritePostValidity';
 import {
   createProps,
   WritePostProps,
 } from '@/features/write/ui/writePostProps';
+import {
+  createProps as createToolbarProps,
+  WritePostToolbarProps,
+} from '@/features/write/ui/writePostToolbarProps';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -22,139 +32,93 @@ export default function useWritePost({
   const router = useRouter();
 
   const [writePost, setWritePost] = useState<WritePost>({
+    currentStepId,
+    totalSteps: WRITE_POST_STEPS,
+    shouldValidate: false,
+  });
+
+  const [writePostForm, setWritePostForm] = useState<WritePostForm>({
     title: '',
     tags: [],
     password: '',
     content: '',
-    isTitleValid: true,
-    isTagsValid: true,
-    isPasswordValid: true,
-    isContentValid: true,
-    currentStepId,
-    totalSteps: WRITE_POST_STEPS,
   });
 
-  const props: WritePostProps = useMemo(
+  const writePostProps: WritePostProps = useMemo(
     () => createProps(writePost),
     [writePost]
   );
 
-  const resetValidity = useCallback(() => {
-    setWritePost(prev => ({
-      ...prev,
-      isTitleValid: true,
-      isTagsValid: true,
-      isPasswordValid: true,
-      isContentValid: true,
-    }));
+  const writePostToolbarProps: WritePostToolbarProps = useMemo(
+    () => createToolbarProps(writePost),
+    [writePost]
+  );
+
+  const { writePostFormProps, setTitle, setTags, setPassword, setContent } =
+    useWritePostForm({
+      writePostForm,
+      setWritePostForm,
+    });
+
+  const { writePostValidity, validateFields } = useWritePostValidity({
+    writePost,
+    writePostForm,
+  });
+
+  const setShouldValidate = useCallback((shouldValidate: boolean) => {
+    setWritePost(prev => ({ ...prev, shouldValidate }));
   }, []);
 
-  const setTitle = useCallback(
-    (title: string) => {
-      setWritePost(prev => ({ ...prev, title }));
-      resetValidity();
-    },
-    [resetValidity]
-  );
-
-  const setTags = useCallback(
-    (tagsString: string) => {
-      const tagsArray = tagsString
-        .split('#')
-        .map(tag => tag.trim())
-        .filter(Boolean);
-      setWritePost(prev => ({ ...prev, tags: tagsArray }));
-      resetValidity();
-    },
-    [resetValidity]
-  );
-
-  const setPassword = useCallback(
-    (password: string) => {
-      setWritePost(prev => ({ ...prev, password }));
-      resetValidity();
-    },
-    [resetValidity]
-  );
-
-  const setContent = useCallback(
-    (content: string) => {
-      setWritePost(prev => ({ ...prev, content }));
-      resetValidity();
-    },
-    [resetValidity]
-  );
-
-  const handleNext = useCallback(() => {
-    const validation = validateContent(writePost);
-    const isValid = Object.values(validation).every(v => v);
-    if (isValid) {
-      const params = new URLSearchParams(searchParams);
-      params.set('step', 'upload');
-      router.push(`${pathname}?${params.toString()}`);
-    } else {
-      setWritePost(prev => ({ ...prev, ...validation }));
+  const handleAction = useCallback(() => {
+    const currentStep = writePost.totalSteps[writePost.currentStepId];
+    switch (currentStep.action) {
+      case 'next':
+        const params = new URLSearchParams(searchParams);
+        params.set('step', 'upload');
+        router.push(`${pathname}?${params.toString()}`);
+        break;
+      case 'publish':
+        console.log('게시글이 생성되었습니다');
+        break;
     }
-  }, [pathname, router, searchParams, writePost]);
+  }, [
+    pathname,
+    router,
+    searchParams,
+    writePost.currentStepId,
+    writePost.totalSteps,
+  ]);
 
-  const handlePublish = useCallback(() => {
-    const validation = validateMeta(writePost);
-    const isValid = Object.values(validation).every(v => v);
-    if (isValid) {
-      console.log('게시글이 생성되었습니다');
-    } else {
-      setWritePost(prev => ({ ...prev, ...validation }));
-    }
-  }, [writePost]);
-
-  const onAction = useCallback(
-    (action: string) => {
-      switch (action) {
-        case 'next':
-          handleNext();
-          break;
-        case 'publish':
-          handlePublish();
-          break;
-      }
-    },
-    [handleNext, handlePublish]
-  );
+  const onAction = useCallback(() => {
+    const isValid = validateFields();
+    if (!isValid) return;
+    handleAction();
+  }, [handleAction, validateFields]);
 
   useEffect(() => {
-    setWritePost(prev => ({ ...prev, currentStepId }));
+    setWritePost(prev => ({ ...prev, currentStepId, shouldValidate: false }));
   }, [currentStepId]);
 
   useEffect(() => {
-    if (writePost.currentStepId !== 'write') {
-      const validation = validateContent(writePost);
-      const isValid = Object.values(validation).every(v => v);
+    for (const step of Object.values(writePost.totalSteps)) {
+      if (writePost.currentStepId === step.id) return;
+      const isValid = validate(writePostForm, ...step.fields);
       if (!isValid) {
-        router.push('/write?step=write');
+        router.push(`/write?step=${step.id}`);
       }
     }
-  }, [pathname, router, searchParams, writePost]);
+  }, [router, writePost.currentStepId, writePost.totalSteps, writePostForm]);
 
   return {
-    ...props,
+    writePost: writePostProps,
+    writePostToolbar: writePostToolbarProps,
+    writePostForm: writePostFormProps,
+    writePostValidity,
     setTitle,
     setTags,
     setPassword,
     setContent,
+    setShouldValidate,
     onAction,
-  };
-}
-
-function validateContent(writePost: WritePost) {
-  return {
-    isContentValid: writePost.content.trim().length > 0,
-  };
-}
-
-function validateMeta(writePost: WritePost) {
-  return {
-    isTitleValid: writePost.title.trim().length > 0,
-    isTagsValid: true,
-    isPasswordValid: writePost.password.trim().length > 0,
   };
 }

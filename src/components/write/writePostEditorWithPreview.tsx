@@ -2,20 +2,23 @@
 
 import WritePostEditor from '@/components/write/writePostEditor';
 import WritePostPreview from '@/components/write/writePostPreview';
-import { WritePostProps } from '@/features/write/ui/writePostProps';
+import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
+import { WritePostValidityProps } from '@/features/write/ui/writePostValidityProps';
 import clsx from 'clsx';
 import { useState } from 'react';
 
 type Mode = 'edit' | 'preview';
 
 export default function WritePostEditorWithPreview({
-  content,
+  writePostForm: { content },
+  writePostValidity: { isContentValid },
   setContent,
-  invalidField,
+  setShouldValidate,
 }: {
-  content: string;
+  writePostForm: WritePostFormProps;
+  writePostValidity: WritePostValidityProps;
   setContent: (content: string) => void;
-  invalidField: WritePostProps['invalidField'];
+  setShouldValidate: (shouldValidate: boolean) => void;
 }) {
   const [mode, setMode] = useState<Mode>('edit');
 
@@ -34,8 +37,9 @@ export default function WritePostEditorWithPreview({
         >
           <WritePostEditor
             content={content}
+            isContentValid={isContentValid}
             setContent={setContent}
-            invalidField={invalidField}
+            setShouldValidate={setShouldValidate}
           />
         </div>
 

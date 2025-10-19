@@ -1,17 +1,18 @@
 'use client';
 
-import { WritePostProps } from '@/features/write/ui/writePostProps';
 import clsx from 'clsx';
-import { useCallback, useMemo } from 'react';
+import { ChangeEvent, useCallback } from 'react';
 
 export default function WritePostEditor({
   content,
+  isContentValid,
   setContent,
-  invalidField,
+  setShouldValidate,
 }: {
   content: string;
+  isContentValid: boolean;
   setContent: (content: string) => void;
-  invalidField: WritePostProps['invalidField'];
+  setShouldValidate: (shouldValidate: boolean) => void;
 }) {
   const insertMarkdown = useCallback(
     (before: string, after: string = '') => {
@@ -20,13 +21,21 @@ export default function WritePostEditor({
     [content, setContent]
   );
 
+  const onChange = useCallback(
+    (e: ChangeEvent<HTMLTextAreaElement>) => {
+      setShouldValidate(false);
+      setContent(e.target.value);
+    },
+    [setContent, setShouldValidate]
+  );
+
   return (
     <div className='w-full min-h-screen flex flex-col'>
       <EditorToolbar insertMarkdown={insertMarkdown} />
       <EditorContent
         content={content}
-        setContent={setContent}
-        invalidField={invalidField}
+        isContentValid={isContentValid}
+        onChange={onChange}
       />
     </div>
   );
@@ -53,25 +62,23 @@ function EditorToolbar({
 
 function EditorContent({
   content,
-  setContent,
-  invalidField,
+  isContentValid,
+  onChange,
 }: {
   content: string;
-  setContent: (value: string) => void;
-  invalidField: WritePostProps['invalidField'];
+  isContentValid: boolean;
+  onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
 }) {
-  const isInvalid = useMemo(() => invalidField === 'content', [invalidField]);
-
   return (
     <textarea
       value={content}
-      onChange={e => setContent(e.target.value)}
+      onChange={onChange}
       placeholder='본문을 입력하세요...'
       className={clsx(
         'flex-1 p-4 resize-none outline-none border rounded-b-lg',
-        isInvalid
-          ? 'border-red-400 animate-shake'
-          : 'border-gray-200 hover:border-blue-500 focus:border-blue-500',
+        isContentValid
+          ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
+          : 'border-red-400 animate-shake',
         content ? 'bg-white' : 'bg-gray-50'
       )}
     />

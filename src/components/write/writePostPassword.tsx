@@ -1,26 +1,37 @@
 'use client';
 
-import { WritePostProps } from '@/features/write/ui/writePostProps';
+import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
+import { WritePostValidityProps } from '@/features/write/ui/writePostValidityProps';
 import clsx from 'clsx';
-import { useMemo } from 'react';
+import { ChangeEvent, useCallback, useMemo } from 'react';
 
 export default function WritePostPassword({
-  password,
+  writePostForm: { password },
+  writePostValidity: { invalidMeta },
   setPassword,
-  invalidField,
+  setShouldValidate,
 }: {
-  password: string;
+  writePostForm: WritePostFormProps;
+  writePostValidity: WritePostValidityProps;
   setPassword: (password: string) => void;
-  invalidField: WritePostProps['invalidField'];
+  setShouldValidate: (shouldValidate: boolean) => void;
 }) {
-  const isInvalid = useMemo(() => invalidField === 'password', [invalidField]);
+  const isInvalid = useMemo(() => invalidMeta === 'password', [invalidMeta]);
+
+  const onChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      setShouldValidate(false);
+      setPassword(e.target.value);
+    },
+    [setPassword, setShouldValidate]
+  );
 
   return (
     <div className='mb-4'>
       <input
         type='password'
         value={password}
-        onChange={e => setPassword(e.target.value)}
+        onChange={onChange}
         placeholder='비밀번호'
         className={clsx(
           'w-full p-3 outline-none border rounded-lg',

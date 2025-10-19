@@ -1,27 +1,23 @@
 'use client';
 
+import { WritePostToolbarProps } from '@/features/write/ui/writePostToolbarProps';
 import clsx from 'clsx';
 import { ChevronRight } from 'lucide-react';
 import { Fragment, useCallback } from 'react';
 
 export default function WritePostToolbar({
-  toolbarTexts,
-  actionButtonText,
-  action,
+  writePostToolbar: { toolbarTexts, actionButtonText },
+  setShouldValidate,
   onAction,
 }: {
-  toolbarTexts: {
-    isCurrentStep: boolean;
-    content: string;
-  }[];
-  actionButtonText: string;
-  action: string;
-  onAction: (action: string) => void;
+  writePostToolbar: WritePostToolbarProps;
+  setShouldValidate: (shouldValidate: boolean) => void;
+  onAction: () => void;
 }) {
-  const onActionButtonClick = useCallback(
-    () => onAction(action),
-    [action, onAction]
-  );
+  const onActionButtonClick = useCallback(() => {
+    setShouldValidate(true);
+    onAction();
+  }, [onAction, setShouldValidate]);
 
   return (
     <div

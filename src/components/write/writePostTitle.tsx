@@ -1,26 +1,37 @@
 'use client';
 
-import { WritePostProps } from '@/features/write/ui/writePostProps';
+import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
+import { WritePostValidityProps } from '@/features/write/ui/writePostValidityProps';
 import clsx from 'clsx';
-import { useMemo } from 'react';
+import { ChangeEvent, useCallback, useMemo } from 'react';
 
 export default function WritePostTitle({
-  title,
+  writePostForm: { title },
+  writePostValidity: { invalidMeta },
   setTitle,
-  invalidField,
+  setShouldValidate,
 }: {
-  title: string;
+  writePostForm: WritePostFormProps;
+  writePostValidity: WritePostValidityProps;
   setTitle: (title: string) => void;
-  invalidField: WritePostProps['invalidField'];
+  setShouldValidate: (shouldValidate: boolean) => void;
 }) {
-  const isInvalid = useMemo(() => invalidField === 'title', [invalidField]);
+  const isInvalid = useMemo(() => invalidMeta === 'title', [invalidMeta]);
+
+  const onChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      setShouldValidate(false);
+      setTitle(e.target.value);
+    },
+    [setShouldValidate, setTitle]
+  );
 
   return (
     <div className='mb-4'>
       <input
         type='text'
         value={title}
-        onChange={e => setTitle(e.target.value)}
+        onChange={onChange}
         placeholder='제목을 입력하세요'
         className={clsx(
           'w-full p-4 text-2xl font-bold outline-none border rounded-lg',
