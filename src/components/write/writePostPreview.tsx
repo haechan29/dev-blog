@@ -1,6 +1,7 @@
 'use client';
 
-import { mdxComponents } from '@/lib/mdxComponents';
+import { mdxComponents } from '@/lib/md/mdComponents';
+import { mdxOptions } from '@/lib/md/mdConfig';
 import type { MDXRemoteSerializeResult } from 'next-mdx-remote';
 import { MDXRemote } from 'next-mdx-remote';
 import { serialize } from 'next-mdx-remote/serialize';
@@ -15,16 +16,11 @@ export default function WritePostPreview({ content }: { content: string }) {
 
   useEffect(() => {
     const parseMdx = async () => {
-      if (!content.trim()) {
-        setMdxSource(null);
-        return;
-      }
-
       setError(null);
       try {
-        const source = await serialize(content);
+        const source = await serialize(content, { mdxOptions });
         setMdxSource(source);
-      } catch (err) {
+      } catch (error) {
         setError('MDX 파싱 에러');
         setMdxSource(null);
       }

@@ -1,8 +1,6 @@
-import { mdxComponents } from '@/lib/mdxComponents';
+import { mdxComponents } from '@/lib/md/mdComponents';
+import { mdxOptions } from '@/lib/md/mdConfig';
 import { MDXRemote } from 'next-mdx-remote/rsc';
-import rehypePrettyCode from 'rehype-pretty-code';
-import rehypeSlug from 'rehype-slug';
-import remarkBreaks from 'remark-breaks';
 
 export default function PostContent({ content }: { content: string }) {
   return (
@@ -11,10 +9,7 @@ export default function PostContent({ content }: { content: string }) {
         source={content}
         components={mdxComponents}
         options={{
-          mdxOptions: {
-            rehypePlugins: [rehypePrettyCode, rehypeSlug],
-            remarkPlugins: [remarkBreaks],
-          },
+          mdxOptions,
         }}
       />
     </>
