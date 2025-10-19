@@ -12,7 +12,7 @@ const ExternalLink = ({ children, ...props }: { children: ReactNode }) => {
   );
 };
 
-export const components = {
+export const mdxComponents = {
   Summary,
   HideFullscreen,
   Paged,

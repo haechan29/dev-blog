@@ -1,4 +1,4 @@
-import { components } from '@/lib/mdxComponents';
+import { mdxComponents } from '@/lib/mdxComponents';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSlug from 'rehype-slug';
@@ -9,7 +9,7 @@ export default function PostContent({ content }: { content: string }) {
     <>
       <MDXRemote
         source={content}
-        components={components}
+        components={mdxComponents}
         options={{
           mdxOptions: {
             rehypePlugins: [rehypePrettyCode, rehypeSlug],
