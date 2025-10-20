@@ -3,12 +3,11 @@
 import WritePostContentEditor from '@/components/write/writePostContentEditor';
 import WritePostContentPreview from '@/components/write/writePostContentPreview';
 import WritePostContentToolbar from '@/components/write/writePostContentToolbar';
+import useParseHtml from '@/features/write/hooks/useParseHtml';
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
 import { WritePostValidityProps } from '@/features/write/ui/writePostValidityProps';
-import useDebounce from '@/hooks/useDebounce';
-import { processMd } from '@/lib/md';
 import clsx from 'clsx';
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 
 type Mode = 'edit' | 'preview';
 
@@ -24,25 +23,7 @@ export default function WritePostContent({
   setShouldValidate: (shouldValidate: boolean) => void;
 }) {
   const [mode, setMode] = useState<Mode>('edit');
-  const [htmlSource, setHtmlSource] = useState<string | null>(null);
-  const [isError, setIsError] = useState(false);
-  const debounce = useDebounce();
-
-  const parseMd = useCallback(async () => {
-    setIsError(false);
-    try {
-      const result = await processMd(content);
-      setHtmlSource(result);
-    } catch (error) {
-      setIsError(true);
-    }
-  }, [content]);
-
-  useEffect(() => {
-    debounce(() => {
-      parseMd();
-    }, 300);
-  }, [debounce, parseMd]);
+  const { htmlSource, isError } = useParseHtml({ content });
 
   return (
     <div className='w-full gap-4 mb-10'>
