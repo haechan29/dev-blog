@@ -1,7 +1,7 @@
 'use client';
 
 import QueryParamsValidator from '@/components/queryParamsValidator';
-import WritePostContent from '@/components/write/writePostContent';
+import WritePostForm from '@/components/write/writePostForm';
 import WritePostToolbar from '@/components/write/writePostToolbar';
 import {
   WRITE_POST_STEPS,
@@ -30,7 +30,7 @@ function WritePageWithValidation() {
   return (
     <div className='w-full overflow-x-hidden'>
       <WritePostToolbar {...writePost} />
-      <WritePostContent {...writePost} />
+      <WritePostForm {...writePost} />
     </div>
   );
 }

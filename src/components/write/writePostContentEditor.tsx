@@ -3,7 +3,7 @@
 import clsx from 'clsx';
 import { ChangeEvent, useCallback } from 'react';
 
-export default function WritePostEditorContent({
+export default function WritePostContentEditor({
   content,
   isContentValid,
   isError,
@@ -30,7 +30,7 @@ export default function WritePostEditorContent({
       onChange={onChange}
       placeholder='본문을 입력하세요'
       className={clsx(
-        'w-full p-4 resize-none outline-none border rounded-b-lg lg:rounded-bl-lg',
+        'w-full p-4 resize-none outline-none border rounded-br-lg lg:rounded-br-none rounded-bl-lg',
         isContentValid && !isError
           ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
           : 'border-red-400 animate-shake',

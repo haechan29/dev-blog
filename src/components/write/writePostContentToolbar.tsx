@@ -2,7 +2,7 @@
 
 import { useCallback } from 'react';
 
-export default function WritePostEditorToolbar({
+export default function WritePostContentToolbar({
   content,
   setContent,
 }: {
