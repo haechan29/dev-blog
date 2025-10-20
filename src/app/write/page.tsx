@@ -28,9 +28,11 @@ function WritePageWithValidation() {
   const writePost = useWritePost({ currentStepId: step });
 
   return (
-    <div className='w-full overflow-x-hidden'>
+    <div className='w-screen h-dvh flex flex-col'>
       <WritePostToolbar {...writePost} />
-      <WritePostForm {...writePost} />
+      <div className='flex-1 min-h-0'>
+        <WritePostForm {...writePost} />
+      </div>
     </div>
   );
 }

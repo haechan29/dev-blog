@@ -31,7 +31,7 @@ export default function RootLayout({
         className={clsx(
           geistSans.variable,
           geistMono.variable,
-          'min-h-dvh bg-white antialiased overflow-y-scroll'
+          'min-h-dvh bg-white antialiased overflow-y-auto'
         )}
       >
         <Providers>{children}</Providers>

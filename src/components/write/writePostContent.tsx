@@ -31,14 +31,14 @@ export default function WritePostContent({
   });
 
   return (
-    <div className='w-full gap-4 mb-10'>
+    <div className='w-full h-full flex flex-col'>
       <WritePostContentToolbar
         writePostEditors={writePostEditors}
         mode={mode}
         onAction={onAction}
         setMode={setMode}
       />
-      <div className='w-full flex prose min-h-screen'>
+      <div className='flex flex-1 min-h-0 prose'>
         <div
           className={clsx(
             'flex-1 min-w-0',

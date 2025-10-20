@@ -18,17 +18,20 @@ export default function WritePostForm(writePost: {
   setShouldValidate: (shouldValidate: boolean) => void;
 }) {
   return (
-    <div
-      className={clsx(
-        'w-[200vw] flex transition-transform duration-300 ease-in-out',
-        writePost.writePost.currentStepId === 'upload' && '-translate-x-[100vw]'
-      )}
-    >
-      <div className='w-[100vw] px-10 xl:px-20'>
-        <WritePostContent {...writePost} />
-      </div>
-      <div className='w-[100vw] px-10 xl:px-20'>
-        <WritePostMeta {...writePost} />
+    <div className='w-[100vw] h-full overflow-x-hidden'>
+      <div
+        className={clsx(
+          'w-[200vw] h-full flex transition-transform duration-300 ease-in-out',
+          writePost.writePost.currentStepId === 'upload' &&
+            '-translate-x-[100vw]'
+        )}
+      >
+        <div className='w-[100vw] h-full px-4 lg:px-8 pb-4 lg:pb-8'>
+          <WritePostContent {...writePost} />
+        </div>
+        <div className='w-[100vw] h-full px-4 lg:px-8 pb-4 lg:pb-8'>
+          <WritePostMeta {...writePost} />
+        </div>
       </div>
     </div>
   );
