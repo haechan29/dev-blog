@@ -1,3 +1,4 @@
+import type { Element } from 'hast';
 import type {
   ContainerDirective,
   LeafDirective,
@@ -23,7 +24,7 @@ const elements: Record<string, HtmlElement> = {
   hidefullscreen: { name: 'div', properties: { className: 'hide-fullscreen' } },
 };
 
-export function createDirectiveHandler() {
+export function handleDirective() {
   return (tree: Node) => {
     visit(tree, node => {
       if (!isDirectiveNode(node) || !elements[node.name]) return;
@@ -32,6 +33,20 @@ export function createDirectiveHandler() {
         hName: name,
         hProperties: properties,
       };
+    });
+  };
+}
+
+export function handleLink() {
+  return (tree: Node) => {
+    visit(tree, 'element', (node: Element) => {
+      if (node.tagName === 'a' && node.properties?.href) {
+        const href = node.properties.href as string;
+        if (href.startsWith('http') || href.startsWith('//')) {
+          node.properties.rel = 'noopener noreferrer';
+          node.properties.target = '_blank';
+        }
+      }
     });
   };
 }
