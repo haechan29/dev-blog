@@ -23,6 +23,9 @@ importers:
       '@tanstack/react-query-devtools':
         specifier: ^5.85.6
         version: 5.85.6(@tanstack/react-query@5.85.6(react@19.1.1))(react@19.1.1)
+      '@types/hast':
+        specifier: ^3.0.4
+        version: 3.0.4
       '@types/unist':
         specifier: ^3.0.3
         version: 3.0.3

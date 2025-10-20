@@ -1,32 +1,26 @@
 'use client';
 
-import { mdxComponents } from '@/lib/md/mdComponents';
-import { mdxOptions } from '@/lib/md/mdConfig';
-import type { MDXRemoteSerializeResult } from 'next-mdx-remote';
-import { MDXRemote } from 'next-mdx-remote';
-import { serialize } from 'next-mdx-remote/serialize';
+import { processMd } from '@/lib/md';
 import { useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
 export default function WritePostPreview({ content }: { content: string }) {
-  const [mdxSource, setMdxSource] = useState<MDXRemoteSerializeResult | null>(
-    null
-  );
+  const [htmlSource, setHtmlSource] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const parseMdx = async () => {
+    const parseMd = async () => {
       setError(null);
       try {
-        const source = await serialize(content, { mdxOptions });
-        setMdxSource(source);
+        const result = await processMd(content);
+        setHtmlSource(result);
       } catch (error) {
-        setError('MDX 파싱 에러');
-        setMdxSource(null);
+        setError('마크다운 파싱 에러');
+        setHtmlSource(null);
       }
     };
 
-    parseMdx();
+    parseMd();
   }, [content]);
 
   return (
@@ -35,11 +29,12 @@ export default function WritePostPreview({ content }: { content: string }) {
         미리보기
       </div>
       <div className='p-4'>
-        {mdxSource ? (
+        {htmlSource ? (
           <ErrorBoundary fallback={<div></div>}>
-            <div className='prose'>
-              <MDXRemote {...mdxSource} components={mdxComponents} />
-            </div>
+            <div
+              className='prose'
+              dangerouslySetInnerHTML={{ __html: htmlSource }}
+            />
           </ErrorBoundary>
         ) : (
           <p className='text-gray-400'>본문을 입력하면 미리보기가 표시됩니다</p>
