@@ -1,7 +1,5 @@
 'use client';
 
-import { useCallback } from 'react';
-
 const buttonStyles = {
   default:
     'shrink-0 px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 cursor-pointer',
@@ -12,10 +10,12 @@ const buttonStyles = {
     'shrink-0 px-3 py-1 text-sm line-through border border-gray-300 rounded hover:bg-gray-50 cursor-pointer',
 };
 
-type ToolbarButton = {
+export type ToolbarButton = {
   id: string;
   label: string;
-  action: string;
+  actionType: 'insert' | 'toggle';
+  markdownBefore: string;
+  markdownAfter?: string;
   buttonStyle: keyof typeof buttonStyles;
 };
 
@@ -23,70 +23,80 @@ const toolbarButtons: ToolbarButton[] = [
   {
     id: 'heading1',
     label: '제목1',
-    action: 'insertHeading1',
+    actionType: 'insert',
+    markdownBefore: '# ',
     buttonStyle: 'default',
   },
   {
     id: 'heading2',
     label: '제목2',
-    action: 'insertHeading2',
+    actionType: 'insert',
+    markdownBefore: '## ',
     buttonStyle: 'default',
   },
   {
     id: 'heading3',
     label: '제목3',
-    action: 'insertHeading3',
+    actionType: 'insert',
+    markdownBefore: '### ',
     buttonStyle: 'default',
   },
   {
     id: 'bold',
     label: 'B',
-    action: 'toggleBold',
+    actionType: 'toggle',
+    markdownBefore: '**',
+    markdownAfter: '**',
     buttonStyle: 'bold',
   },
   {
     id: 'italic',
     label: 'I',
-    action: 'toggleItalic',
+    actionType: 'toggle',
+    markdownBefore: '*',
+    markdownAfter: '*',
     buttonStyle: 'italic',
   },
   {
     id: 'strikethrough',
     label: '취소선',
-    action: 'toggleStrikethrough',
+    actionType: 'toggle',
+    markdownBefore: '~~',
+    markdownAfter: '~~',
     buttonStyle: 'strikethrough',
   },
   {
     id: 'link',
     label: '링크',
-    action: 'insertLink',
+    actionType: 'insert',
+    markdownBefore: '[',
+    markdownAfter: ']()',
     buttonStyle: 'default',
   },
   {
     id: 'bgm',
     label: 'BGM',
-    action: 'insertBgm',
+    actionType: 'insert',
+    markdownBefore: '<iframe src="youtube.com/embed/" />',
     buttonStyle: 'default',
   },
 ];
 
 export default function WritePostContentToolbar({
-  content,
-  setContent,
+  onAction,
 }: {
-  content: string;
-  setContent: (content: string) => void;
+  onAction: ({
+    actionType,
+    markdownBefore,
+    markdownAfter,
+  }: ToolbarButton) => void;
 }) {
-  const onAction = useCallback((action: string) => {
-    console.log(action);
-  }, []);
-
   return (
     <div className='w-full flex overflow-x-auto scrollbar-hide border-t border-x border-gray-200 rounded-t-lg gap-4 p-3'>
       {toolbarButtons.map(button => (
         <button
           key={button.id}
-          onClick={() => onAction(button.action)}
+          onClick={() => onAction(button)}
           className={buttonStyles[button.buttonStyle]}
         >
           {button.label}

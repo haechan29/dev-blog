@@ -1,15 +1,17 @@
 'use client';
 
 import clsx from 'clsx';
-import { ChangeEvent, useCallback } from 'react';
+import { ChangeEvent, RefObject, useCallback } from 'react';
 
 export default function WritePostContentEditor({
+  contentEditorRef,
   content,
   isContentValid,
   isError,
   setContent,
   setShouldValidate,
 }: {
+  contentEditorRef: RefObject<HTMLTextAreaElement | null>;
   content: string;
   isContentValid: boolean;
   isError: boolean;
@@ -26,6 +28,7 @@ export default function WritePostContentEditor({
 
   return (
     <textarea
+      ref={contentEditorRef}
       value={content}
       onChange={onChange}
       placeholder='본문을 입력하세요'

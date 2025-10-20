@@ -2,14 +2,23 @@
 
 import WritePostContentEditor from '@/components/write/writePostContentEditor';
 import WritePostContentPreview from '@/components/write/writePostContentPreview';
-import WritePostContentToolbar from '@/components/write/writePostContentToolbar';
+import WritePostContentToolbar, {
+  ToolbarButton,
+} from '@/components/write/writePostContentToolbar';
 import useParseHtml from '@/features/write/hooks/useParseHtml';
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
 import { WritePostValidityProps } from '@/features/write/ui/writePostValidityProps';
 import clsx from 'clsx';
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 type Mode = 'edit' | 'preview';
+type TextParts = {
+  textBefore: string;
+  selectedText: string;
+  textAfter: string;
+  markdownBefore: string;
+  markdownAfter?: string;
+};
 
 export default function WritePostContent({
   writePostForm: { content },
@@ -24,6 +33,92 @@ export default function WritePostContent({
 }) {
   const [mode, setMode] = useState<Mode>('edit');
   const { htmlSource, isError } = useParseHtml({ content });
+  const contentEditorRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const insertMarkdown = useCallback(
+    ({
+      textBefore,
+      selectedText,
+      textAfter,
+      markdownBefore,
+      markdownAfter = '',
+    }: TextParts) => {
+      const newText = markdownBefore + selectedText + markdownAfter;
+      const newCursorPosition = selectedText
+        ? textBefore.length + newText.length
+        : textBefore.length + markdownBefore.length;
+      return { newText: textBefore + newText + textAfter, newCursorPosition };
+    },
+    []
+  );
+
+  const removeMarkdown = useCallback(
+    ({
+      textBefore,
+      selectedText,
+      textAfter,
+      markdownBefore,
+      markdownAfter = '',
+    }: TextParts) => {
+      const newText = selectedText
+        ? textBefore +
+          selectedText.slice(markdownBefore.length, -markdownAfter.length) +
+          textAfter
+        : textBefore.slice(0, -markdownBefore.length) +
+          textAfter.slice(markdownAfter.length);
+      console.log(newText);
+      const newCursorPosition = selectedText
+        ? newText.length - textAfter.length
+        : textBefore.length - markdownBefore.length;
+      return { newText, newCursorPosition } as const;
+    },
+    []
+  );
+
+  const onAction = useCallback(
+    ({ actionType, markdownBefore, markdownAfter = '' }: ToolbarButton) => {
+      if (!contentEditorRef.current) return;
+      const contentEditor = contentEditorRef.current;
+
+      const [start, end] = [
+        contentEditor.selectionStart,
+        contentEditor.selectionEnd,
+      ];
+      const [textBefore, selectedText, textAfter] = [
+        content.substring(0, start),
+        content.substring(start, end),
+        content.substring(end),
+      ];
+      const isWrapped = selectedText
+        ? selectedText.startsWith(markdownBefore) &&
+          selectedText.endsWith(markdownAfter)
+        : textBefore.endsWith(markdownBefore) &&
+          textAfter.startsWith(markdownAfter);
+
+      const shouldInsert = actionType === 'insert' || !isWrapped;
+      const { newText, newCursorPosition } = shouldInsert
+        ? insertMarkdown({
+            textBefore,
+            selectedText,
+            textAfter,
+            markdownBefore,
+            markdownAfter,
+          })
+        : removeMarkdown({
+            textBefore,
+            selectedText,
+            textAfter,
+            markdownBefore,
+            markdownAfter,
+          });
+      setContent(newText);
+      setTimeout(() => {
+        contentEditor.focus();
+        contentEditor.setSelectionRange(newCursorPosition, newCursorPosition);
+      }, 0);
+    },
+    [content, insertMarkdown, removeMarkdown, setContent]
+  );
 
   return (
     <div className='w-full gap-4 mb-10'>
@@ -32,7 +127,7 @@ export default function WritePostContent({
       </div>
 
       <div className='w-full'>
-        <WritePostContentToolbar content={content} setContent={setContent} />
+        <WritePostContentToolbar onAction={onAction} />
         <div className='w-full flex prose min-h-screen'>
           <div
             className={clsx(
@@ -41,6 +136,7 @@ export default function WritePostContent({
             )}
           >
             <WritePostContentEditor
+              contentEditorRef={contentEditorRef}
               content={content}
               isContentValid={isContentValid}
               isError={isError}
