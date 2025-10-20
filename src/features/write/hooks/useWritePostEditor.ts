@@ -87,7 +87,9 @@ export default function useWritePostEditor({
         content.substring(end),
       ];
       const isWrapped = selectedText
-        ? selectedText.startsWith(markdownBefore) &&
+        ? selectedText.length >=
+            markdownBefore.length + (markdownAfter?.length ?? 0) &&
+          selectedText.startsWith(markdownBefore) &&
           selectedText.endsWith(markdownAfter)
         : textBefore.endsWith(markdownBefore) &&
           textAfter.startsWith(markdownAfter);

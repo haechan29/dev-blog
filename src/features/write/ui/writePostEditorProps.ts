@@ -2,12 +2,12 @@ import { WritePostEditor } from '@/features/write/domain/model/writePostEditor';
 
 export const buttonStyles = {
   default:
-    'shrink-0 px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 cursor-pointer',
-  bold: 'shrink-0 px-3 py-1 text-sm font-bold border border-gray-300 rounded hover:bg-gray-50 cursor-pointer',
+    'shrink-0 px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100 cursor-pointer',
+  bold: 'shrink-0 px-3 py-1 text-sm font-bold border border-gray-300 rounded hover:bg-gray-100 cursor-pointer',
   italic:
-    'shrink-0 px-3 py-1 text-sm italic border border-gray-300 rounded hover:bg-gray-50 cursor-pointer',
+    'shrink-0 px-3 py-1 text-sm italic border border-gray-300 rounded hover:bg-gray-100 cursor-pointer',
   strikethrough:
-    'shrink-0 px-3 py-1 text-sm line-through border border-gray-300 rounded hover:bg-gray-50 cursor-pointer',
+    'shrink-0 px-3 py-1 text-sm line-through border border-gray-300 rounded hover:bg-gray-100 cursor-pointer',
 };
 
 export type WritePostEditorProps = {

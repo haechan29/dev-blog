@@ -10,7 +10,7 @@ import { WritePostValidityProps } from '@/features/write/ui/writePostValidityPro
 import clsx from 'clsx';
 import { useState } from 'react';
 
-type Mode = 'edit' | 'preview';
+export type Mode = 'edit' | 'preview';
 
 export default function WritePostContent({
   writePostForm: { content },
@@ -32,77 +32,38 @@ export default function WritePostContent({
 
   return (
     <div className='w-full gap-4 mb-10'>
-      <div className='lg:hidden'>
-        <ModeToggle mode={mode} setMode={setMode} />
-      </div>
+      <WritePostContentToolbar
+        writePostEditors={writePostEditors}
+        mode={mode}
+        onAction={onAction}
+        setMode={setMode}
+      />
+      <div className='w-full flex prose min-h-screen'>
+        <div
+          className={clsx(
+            'flex-1 min-w-0',
+            mode === 'edit' ? 'flex' : 'hidden lg:flex'
+          )}
+        >
+          <WritePostContentEditor
+            contentEditorRef={contentEditorRef}
+            content={content}
+            isContentValid={isContentValid}
+            isError={isError}
+            setContent={setContent}
+            setShouldValidate={setShouldValidate}
+          />
+        </div>
 
-      <div className='w-full'>
-        <WritePostContentToolbar
-          writePostEditors={writePostEditors}
-          onAction={onAction}
-        />
-        <div className='w-full flex prose min-h-screen'>
-          <div
-            className={clsx(
-              'flex-1 min-w-0',
-              mode === 'edit' ? 'flex' : 'hidden lg:flex'
-            )}
-          >
-            <WritePostContentEditor
-              contentEditorRef={contentEditorRef}
-              content={content}
-              isContentValid={isContentValid}
-              isError={isError}
-              setContent={setContent}
-              setShouldValidate={setShouldValidate}
-            />
-          </div>
-
-          <div
-            className={clsx(
-              'flex flex-1 min-w-0',
-              mode === 'preview' ? 'flex' : 'hidden lg:flex'
-            )}
-          >
-            <WritePostContentPreview htmlSource={htmlSource} />
-          </div>
+        <div
+          className={clsx(
+            'flex flex-1 min-w-0',
+            mode === 'preview' ? 'flex' : 'hidden lg:flex'
+          )}
+        >
+          <WritePostContentPreview htmlSource={htmlSource} />
         </div>
       </div>
-    </div>
-  );
-}
-
-function ModeToggle({
-  mode,
-  setMode,
-}: {
-  mode: Mode;
-  setMode: (mode: Mode) => void;
-}) {
-  return (
-    <div className='flex gap-2 mb-4'>
-      <button
-        onClick={() => setMode('edit')}
-        className={clsx(
-          'flex-1 py-2 px-4 rounded-lg font-semibold',
-          mode === 'edit'
-            ? 'bg-blue-600 text-white'
-            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-        )}
-      >
-        Edit
-      </button>
-      <button
-        onClick={() => setMode('preview')}
-        className={clsx(
-          'flex-1 py-2 px-4 rounded-lg font-semibold',
-          mode === 'preview'
-            ? 'bg-blue-600 text-white'
-            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-        )}
-      >
-        Preview
-      </button>
     </div>
   );
 }
