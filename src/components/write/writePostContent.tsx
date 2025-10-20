@@ -50,7 +50,7 @@ export default function WritePostContent({
         <ModeToggle mode={mode} setMode={setMode} />
       </div>
 
-      <div>
+      <div className='w-full'>
         <WritePostContentToolbar content={content} setContent={setContent} />
         <div className='w-full flex prose min-h-screen'>
           <div
