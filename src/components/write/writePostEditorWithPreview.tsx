@@ -1,11 +1,14 @@
 'use client';
 
-import WritePostEditor from '@/components/write/writePostEditor';
+import WritePostEditorContent from '@/components/write/writePostEditorContent';
+import WritePostEditorToolbar from '@/components/write/writePostEditorToolbar';
 import WritePostPreview from '@/components/write/writePostPreview';
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
 import { WritePostValidityProps } from '@/features/write/ui/writePostValidityProps';
+import useDebounce from '@/hooks/useDebounce';
+import { processMd } from '@/lib/md';
 import clsx from 'clsx';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 type Mode = 'edit' | 'preview';
 
@@ -21,35 +24,58 @@ export default function WritePostEditorWithPreview({
   setShouldValidate: (shouldValidate: boolean) => void;
 }) {
   const [mode, setMode] = useState<Mode>('edit');
+  const [htmlSource, setHtmlSource] = useState<string | null>(null);
+  const [isError, setIsError] = useState(false);
+  const debounce = useDebounce();
+
+  const parseMd = useCallback(async () => {
+    setIsError(false);
+    try {
+      const result = await processMd(content);
+      setHtmlSource(result);
+    } catch (error) {
+      setIsError(true);
+    }
+  }, [content]);
+
+  useEffect(() => {
+    debounce(() => {
+      parseMd();
+    }, 300);
+  }, [debounce, parseMd]);
 
   return (
-    <div className='w-full'>
-      <div className='lg:hidden mb-4'>
+    <div className='w-full gap-4 mb-10'>
+      <div className='lg:hidden'>
         <ModeToggle mode={mode} setMode={setMode} />
       </div>
 
-      <div className='w-full flex gap-4'>
-        <div
-          className={clsx(
-            'flex-1',
-            mode === 'edit' ? 'block' : 'hidden lg:block'
-          )}
-        >
-          <WritePostEditor
-            content={content}
-            isContentValid={isContentValid}
-            setContent={setContent}
-            setShouldValidate={setShouldValidate}
-          />
-        </div>
+      <div>
+        <WritePostEditorToolbar content={content} setContent={setContent} />
+        <div className='w-full flex prose min-h-screen'>
+          <div
+            className={clsx(
+              'flex-1 min-w-0',
+              mode === 'edit' ? 'flex' : 'hidden lg:flex'
+            )}
+          >
+            <WritePostEditorContent
+              content={content}
+              isContentValid={isContentValid}
+              isError={isError}
+              setContent={setContent}
+              setShouldValidate={setShouldValidate}
+            />
+          </div>
 
-        <div
-          className={clsx(
-            'flex-1',
-            mode === 'preview' ? 'block' : 'hidden lg:block'
-          )}
-        >
-          <WritePostPreview content={content} />
+          <div
+            className={clsx(
+              'flex flex-1 min-w-0',
+              mode === 'preview' ? 'flex' : 'hidden lg:flex'
+            )}
+          >
+            <WritePostPreview htmlSource={htmlSource} />
+          </div>
         </div>
       </div>
     </div>

@@ -1,18 +1,13 @@
 'use client';
 
-import clsx from 'clsx';
-import { ChangeEvent, useCallback } from 'react';
+import { useCallback } from 'react';
 
-export default function WritePostEditor({
+export default function WritePostEditorToolbar({
   content,
-  isContentValid,
   setContent,
-  setShouldValidate,
 }: {
   content: string;
-  isContentValid: boolean;
   setContent: (content: string) => void;
-  setShouldValidate: (shouldValidate: boolean) => void;
 }) {
   const insertMarkdown = useCallback(
     (before: string, after: string = '') => {
@@ -21,31 +16,6 @@ export default function WritePostEditor({
     [content, setContent]
   );
 
-  const onChange = useCallback(
-    (e: ChangeEvent<HTMLTextAreaElement>) => {
-      setShouldValidate(false);
-      setContent(e.target.value);
-    },
-    [setContent, setShouldValidate]
-  );
-
-  return (
-    <div className='w-full min-h-screen flex flex-col'>
-      <EditorToolbar insertMarkdown={insertMarkdown} />
-      <EditorContent
-        content={content}
-        isContentValid={isContentValid}
-        onChange={onChange}
-      />
-    </div>
-  );
-}
-
-function EditorToolbar({
-  insertMarkdown,
-}: {
-  insertMarkdown: (before: string, after?: string) => void;
-}) {
   return (
     <div className='flex border-t border-x border-gray-200 rounded-t-lg gap-2 p-3'>
       <HeadingButton level={1} insertMarkdown={insertMarkdown} />
@@ -57,31 +27,6 @@ function EditorToolbar({
       <LinkButton insertMarkdown={insertMarkdown} />
       <BgmButton insertMarkdown={insertMarkdown} />
     </div>
-  );
-}
-
-function EditorContent({
-  content,
-  isContentValid,
-  onChange,
-}: {
-  content: string;
-  isContentValid: boolean;
-  onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
-}) {
-  return (
-    <textarea
-      value={content}
-      onChange={onChange}
-      placeholder='본문을 입력하세요...'
-      className={clsx(
-        'flex-1 p-4 resize-none outline-none border rounded-b-lg',
-        isContentValid
-          ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
-          : 'border-red-400 animate-shake',
-        content ? 'bg-white' : 'bg-gray-50'
-      )}
-    />
   );
 }
 
