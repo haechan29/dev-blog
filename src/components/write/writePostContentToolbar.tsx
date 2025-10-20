@@ -69,8 +69,16 @@ const toolbarButtons: ToolbarButton[] = [
     id: 'link',
     label: '링크',
     actionType: 'insert',
-    markdownBefore: '[',
-    markdownAfter: ']()',
+    markdownBefore: '[링크',
+    markdownAfter: '](url)',
+    buttonStyle: 'default',
+  },
+  {
+    id: 'table',
+    label: '테이블',
+    actionType: 'insert',
+    markdownBefore: '| 헤더1',
+    markdownAfter: ' | 헤더2 |\n|-------|-------|\n| 내용1 | 내용2 |',
     buttonStyle: 'default',
   },
   {
