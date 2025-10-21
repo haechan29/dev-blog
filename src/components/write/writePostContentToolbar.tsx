@@ -4,16 +4,17 @@ import {
   buttonStyles,
   WritePostContentButtonProps,
 } from '@/features/write/ui/writePostContentButtonProps';
-import { WritePostContentToolbarProps } from '@/features/write/ui/writePostContentToolbarProps';
 import clsx from 'clsx';
 import { useCallback } from 'react';
 
 export default function WritePostContentToolbar({
-  contentToolbar,
+  shouldAttachToolbarToBottom,
+  toolbarTranslateY,
   contentButtons,
   onAction,
 }: {
-  contentToolbar: WritePostContentToolbarProps;
+  shouldAttachToolbarToBottom: boolean;
+  toolbarTranslateY: number;
   contentButtons: WritePostContentButtonProps[];
   onAction: (editor: WritePostContentButtonProps) => void;
 }) {
@@ -31,12 +32,12 @@ export default function WritePostContentToolbar({
         'border-gray-200',
         'transition-transform duration-300 ease-in-out',
         '-translate-y-[var(--toolbar-translate-y)]',
-        contentToolbar.shouldAttachToBottom
+        shouldAttachToolbarToBottom
           ? 'fixed bottom-0 bg-white/80 backdrop-blur-md'
           : 'rounded-t-lg border-t border-x'
       )}
       style={{
-        '--toolbar-translate-y': `${contentToolbar.toolbarTranslateY}px`,
+        '--toolbar-translate-y': `${toolbarTranslateY}px`,
       }}
     >
       {contentButtons.map(button => (

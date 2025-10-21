@@ -1,7 +1,7 @@
 import { WritePostContentToolbar } from '@/features/write/domain/model/writePostContentToolbar';
 
 export type WritePostContentToolbarProps = {
-  shouldAttachToBottom: boolean;
+  shouldAttachToolbarToBottom: boolean;
   toolbarTranslateY: number;
 };
 
@@ -9,7 +9,7 @@ export function createProps(
   contentToolbar: WritePostContentToolbar
 ): WritePostContentToolbarProps {
   return {
-    shouldAttachToBottom: contentToolbar.canTouch,
+    shouldAttachToolbarToBottom: contentToolbar.canTouch,
     toolbarTranslateY:
       contentToolbar.isEditorFocused && contentToolbar.canTouch
         ? contentToolbar.keyboardHeight

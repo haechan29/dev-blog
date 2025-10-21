@@ -1,21 +1,11 @@
 'use client';
 
-import { WritePostContent } from '@/features/write/domain/model/writePostContent';
 import { writePostContentButtons } from '@/features/write/domain/model/writePostContentButton';
-import { WritePostContentToolbar } from '@/features/write/domain/model/writePostContentToolbar';
-import { WritePostContentButtonProps } from '@/features/write/ui/writePostContentButtonProps';
-import { createProps } from '@/features/write/ui/writePostContentProps';
-import useKeyboardHeight from '@/hooks/useKeyboardHeight';
-import { canTouch } from '@/lib/browser';
 import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import toast from 'react-hot-toast';
+  createProps,
+  WritePostContentButtonProps,
+} from '@/features/write/ui/writePostContentButtonProps';
+import { RefObject, useCallback, useMemo, useState } from 'react';
 
 type MarkdownParams = {
   textBefore: string;
@@ -25,36 +15,20 @@ type MarkdownParams = {
   markdownAfter?: string;
 };
 
-export default function useWritePostContent({
+export default function useWritePostContentButton({
   content,
+  contentEditorRef,
   setContent,
 }: {
   content: string;
+  contentEditorRef: RefObject<HTMLTextAreaElement | null>;
   setContent: (content: string) => void;
 }) {
-  const [contentToolbar, setContentToolbar] = useState<WritePostContentToolbar>(
-    {
-      isEditorFocused: false,
-      canTouch: false,
-      keyboardHeight: 0,
-    }
+  const [contentButtons] = useState(writePostContentButtons);
+  const contentButtonProps = useMemo(
+    () => contentButtons.map(createProps),
+    [contentButtons]
   );
-
-  const writePostContent = useMemo<WritePostContent>(
-    () => ({
-      contentToolbar,
-      contentButtons: writePostContentButtons,
-    }),
-    [contentToolbar]
-  );
-  const { keyboardHeight } = useKeyboardHeight();
-
-  const writePostContentProps = useMemo(
-    () => createProps(writePostContent),
-    [writePostContent]
-  );
-
-  const contentEditorRef = useRef<HTMLTextAreaElement | null>(null);
 
   const insertMarkdown = useCallback(
     ({
@@ -143,32 +117,11 @@ export default function useWritePostContent({
         contentEditor.setSelectionRange(newCursorPosition, newCursorPosition);
       }, 0);
     },
-    [content, insertMarkdown, removeMarkdown, setContent]
+    [content, contentEditorRef, insertMarkdown, removeMarkdown, setContent]
   );
 
-  const setIsEditorFocused = useCallback((isEditorFocused: boolean) => {
-    toast.success(`${isEditorFocused}`);
-    setContentToolbar(prev => ({ ...prev, isEditorFocused }));
-  }, []);
-
-  useLayoutEffect(() => {
-    setContentToolbar(prev => ({
-      ...prev,
-      canTouch: canTouch,
-    }));
-  }, []);
-
-  useEffect(() => {
-    setContentToolbar(prev => ({
-      ...prev,
-      keyboardHeight: keyboardHeight ?? 0,
-    }));
-  }, [keyboardHeight]);
-
   return {
-    writePostContent: writePostContentProps,
-    contentEditorRef,
+    contentButtons: contentButtonProps,
     onAction,
-    setIsEditorFocused,
   } as const;
 }
