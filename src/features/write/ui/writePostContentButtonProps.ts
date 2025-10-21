@@ -1,4 +1,4 @@
-import { WritePostEditor } from '@/features/write/domain/model/writePostEditor';
+import { WritePostContentButton } from '@/features/write/domain/model/writePostContentButton';
 
 export const buttonStyles = {
   default:
@@ -10,7 +10,7 @@ export const buttonStyles = {
     'shrink-0 px-3 py-1 text-sm line-through border border-gray-300 rounded hover:bg-gray-100 cursor-pointer',
 };
 
-export type WritePostEditorProps = {
+export type WritePostContentButtonProps = {
   label: string;
   actionType: 'insert' | 'toggle';
   buttonStyle: keyof typeof buttonStyles;
@@ -18,9 +18,9 @@ export type WritePostEditorProps = {
   markdownAfter?: string;
 };
 
-const writePostEditorProps: Record<
-  WritePostEditor['id'],
-  WritePostEditorProps
+const writePostContentButtonProps: Record<
+  WritePostContentButton['id'],
+  WritePostContentButtonProps
 > = {
   heading1: {
     label: '제목1',
@@ -78,7 +78,7 @@ const writePostEditorProps: Record<
 };
 
 export function createProps(
-  writePostEditor: WritePostEditor
-): WritePostEditorProps {
-  return writePostEditorProps[writePostEditor.id];
+  writePostContentButton: WritePostContentButton
+): WritePostContentButtonProps {
+  return writePostContentButtonProps[writePostContentButton.id];
 }

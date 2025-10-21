@@ -1,8 +1,8 @@
-export interface WritePostEditor {
+export interface WritePostContentButton {
   id: string;
 }
 
-export const writePostEditors: WritePostEditor[] = [
+export const writePostContentButtons: WritePostContentButton[] = [
   { id: 'heading1' },
   { id: 'heading2' },
   { id: 'heading3' },
