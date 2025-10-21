@@ -14,7 +14,7 @@ export default function WritePostContentToolbar({
   onAction,
 }: {
   shouldAttachToolbarToBottom: boolean;
-  toolbarTranslateY: number;
+  toolbarTranslateY: string;
   contentButtons: WritePostContentButtonProps[];
   onAction: (editor: WritePostContentButtonProps) => void;
 }) {
@@ -31,13 +31,13 @@ export default function WritePostContentToolbar({
         'w-full flex p-3 gap-4 overflow-x-auto scrollbar-hide',
         'border-gray-200',
         'transition-transform duration-300 ease-in-out',
-        '-translate-y-[var(--toolbar-translate-y)]',
+        'translate-y-[var(--toolbar-translate-y)]',
         shouldAttachToolbarToBottom
-          ? 'fixed bottom-0 bg-white/80 backdrop-blur-md'
+          ? 'fixed inset-x-0 top-[100%] bg-white/80 backdrop-blur-md'
           : 'rounded-t-lg border-t border-x'
       )}
       style={{
-        '--toolbar-translate-y': `${toolbarTranslateY}px`,
+        '--toolbar-translate-y': toolbarTranslateY,
       }}
     >
       {contentButtons.map(button => (
