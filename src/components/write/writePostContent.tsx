@@ -48,7 +48,9 @@ export default function WritePostContent({
         </div>
       </div>
 
-      <WritePostContentPreview htmlSource={htmlSource} />
+      <div className='max-md:pb-4'>
+        <WritePostContentPreview htmlSource={htmlSource} />
+      </div>
     </div>
   );
 }

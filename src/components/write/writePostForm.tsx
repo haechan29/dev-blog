@@ -26,10 +26,10 @@ export default function WritePostForm(writePost: {
             '-translate-x-[100vw]'
         )}
       >
-        <div className='w-[100vw] h-full px-4 lg:px-8 pb-4 lg:pb-8'>
+        <div className='w-[100vw] h-full px-4 lg:px-8 lg:pb-8'>
           <WritePostContent {...writePost} />
         </div>
-        <div className='w-[100vw] h-full px-4 lg:px-8 pb-4 lg:pb-8'>
+        <div className='w-[100vw] h-full px-4 lg:px-8 lg:pb-8'>
           <WritePostMeta {...writePost} />
         </div>
       </div>
