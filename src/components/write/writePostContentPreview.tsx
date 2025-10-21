@@ -1,5 +1,6 @@
 'use client';
 
+import clsx from 'clsx';
 import { ErrorBoundary } from 'react-error-boundary';
 
 export default function WritePostContentPreview({
@@ -8,7 +9,12 @@ export default function WritePostContentPreview({
   htmlSource: string | null;
 }) {
   return (
-    <div className='w-full h-full overflow-y-auto border-l lg:border-l-0 border-r border-y border-gray-200 rounded-bl-lg lg:rounded-bl-none rounded-br-lg p-4'>
+    <div
+      className={clsx(
+        'w-full h-full overflow-y-auto p-4',
+        'border border-gray-200 rounded-lg'
+      )}
+    >
       {htmlSource ? (
         <ErrorBoundary fallback={<div>에러가 발생했습니다</div>}>
           <div dangerouslySetInnerHTML={{ __html: htmlSource }} />
