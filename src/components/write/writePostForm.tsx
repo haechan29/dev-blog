@@ -29,7 +29,7 @@ export default function WritePostForm(writePost: {
         <div className='w-[100vw] h-full px-4 lg:px-8 lg:pb-8'>
           <WritePostContent {...writePost} />
         </div>
-        <div className='w-[100vw] h-full px-4 lg:px-8 lg:pb-8'>
+        <div className='w-[100vw] h-full md:px-40 lg:56 xl:px-72'>
           <WritePostMeta {...writePost} />
         </div>
       </div>

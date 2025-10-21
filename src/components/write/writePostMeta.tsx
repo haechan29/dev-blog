@@ -15,10 +15,10 @@ export default function WritePostMeta(writePost: {
   setShouldValidate: (shouldValidate: boolean) => void;
 }) {
   return (
-    <>
+    <div className='flex flex-col gap-4'>
       <WritePostTitle {...writePost} />
       <WritePostTag {...writePost} />
       <WritePostPassword {...writePost} />
-    </>
+    </div>
   );
 }

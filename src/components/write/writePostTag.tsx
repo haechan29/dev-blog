@@ -27,20 +27,18 @@ export default function WritePostTag({
   );
 
   return (
-    <div className='mb-4'>
-      <input
-        type='text'
-        value={tags}
-        onChange={onChange}
-        placeholder='#태그를 입력하세요'
-        className={clsx(
-          'w-full p-3 outline-none border rounded-lg',
-          isInvalid
-            ? 'border-red-400 animate-shake'
-            : 'border-gray-200 hover:border-blue-500 focus:border-blue-500',
-          tags.length > 0 ? 'bg-white' : 'bg-gray-50'
-        )}
-      />
-    </div>
+    <input
+      type='text'
+      value={tags}
+      onChange={onChange}
+      placeholder='#태그'
+      className={clsx(
+        'w-full p-3 text-sm outline-none border rounded-lg',
+        isInvalid
+          ? 'border-red-400 animate-shake'
+          : 'border-gray-200 hover:border-blue-500 focus:border-blue-500',
+        tags.length > 0 || 'bg-gray-50'
+      )}
+    />
   );
 }

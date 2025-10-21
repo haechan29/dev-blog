@@ -27,20 +27,18 @@ export default function WritePostTitle({
   );
 
   return (
-    <div className='mb-4'>
-      <input
-        type='text'
-        value={title}
-        onChange={onChange}
-        placeholder='제목을 입력하세요'
-        className={clsx(
-          'w-full p-4 text-2xl font-bold outline-none border rounded-lg',
-          isInvalid
-            ? 'border-red-400 animate-shake'
-            : 'border-gray-200 hover:border-blue-500 focus:border-blue-500',
-          title ? 'bg-white' : 'bg-gray-50'
-        )}
-      />
-    </div>
+    <input
+      type='text'
+      value={title}
+      onChange={onChange}
+      placeholder='제목을 입력하세요'
+      className={clsx(
+        'w-full p-4 text-xl font-semibold outline-none border rounded-lg',
+        isInvalid
+          ? 'border-red-400 animate-shake'
+          : 'border-gray-200 hover:border-blue-500 focus:border-blue-500',
+        title || 'bg-gray-50'
+      )}
+    />
   );
 }

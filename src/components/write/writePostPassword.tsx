@@ -27,20 +27,18 @@ export default function WritePostPassword({
   );
 
   return (
-    <div className='mb-4'>
-      <input
-        type='password'
-        value={password}
-        onChange={onChange}
-        placeholder='비밀번호'
-        className={clsx(
-          'w-full p-3 outline-none border rounded-lg',
-          isInvalid
-            ? 'border-red-400 animate-shake'
-            : 'border-gray-200 hover:border-blue-500 focus:border-blue-500',
-          password ? 'bg-white' : 'bg-gray-50'
-        )}
-      />
-    </div>
+    <input
+      type='password'
+      value={password}
+      onChange={onChange}
+      placeholder='비밀번호'
+      className={clsx(
+        'w-full p-3 text-sm outline-none border rounded-lg',
+        isInvalid
+          ? 'border-red-400 animate-shake'
+          : 'border-gray-200 hover:border-blue-500 focus:border-blue-500',
+        password || 'bg-gray-50'
+      )}
+    />
   );
 }
