@@ -12,7 +12,7 @@ export function createProps(
     shouldAttachToolbarToBottom: contentToolbar.canTouch,
     toolbarTranslateY:
       contentToolbar.isEditorFocused && contentToolbar.canTouch
-        ? `calc(${-contentToolbar.keyboardHeight}px - 100%`
+        ? `calc(${-contentToolbar.keyboardHeight}px - 100%)`
         : '0px',
   };
 }
