@@ -71,7 +71,7 @@ export default function useWritePostContentButton({
 
   const onAction = useCallback(
     ({
-      actionType,
+      action,
       markdownBefore,
       markdownAfter = '',
     }: WritePostContentButtonProps) => {
@@ -95,7 +95,7 @@ export default function useWritePostContentButton({
         : textBefore.endsWith(markdownBefore) &&
           textAfter.startsWith(markdownAfter);
 
-      const shouldInsert = actionType === 'insert' || !isWrapped;
+      const shouldInsert = action === 'insert' || !isWrapped;
       const { newText, newCursorPosition } = shouldInsert
         ? insertMarkdown({
             textBefore,

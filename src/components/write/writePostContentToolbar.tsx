@@ -1,10 +1,11 @@
 'use client';
 
 import {
-  buttonStyles,
+  ButtonContent,
   WritePostContentButtonProps,
 } from '@/features/write/ui/writePostContentButtonProps';
 import clsx from 'clsx';
+import { Grid2x2, Link } from 'lucide-react';
 import { useCallback } from 'react';
 
 export default function WritePostContentToolbar({
@@ -28,8 +29,7 @@ export default function WritePostContentToolbar({
       onMouseDown={e => e.preventDefault()} // prevent keyboard from closing
       onTouchStart={e => e.preventDefault()} // prevent keyboard from closing
       className={clsx(
-        'w-full flex p-3 gap-4 overflow-x-auto scrollbar-hide',
-        'border-gray-200',
+        'w-full flex px-2 py-1 gap-1 overflow-x-auto scrollbar-hide border-gray-200',
         'transition-transform duration-300 ease-in-out',
         'translate-y-[var(--toolbar-translate-y)]',
         shouldAttachToolbarToBottom
@@ -42,13 +42,27 @@ export default function WritePostContentToolbar({
     >
       {contentButtons.map(button => (
         <button
-          key={button.label}
+          key={`${button.content.type}-${button.content.value}`}
           onClick={() => onToolbarButtonClick(button)}
-          className={buttonStyles[button.buttonStyle]}
+          className='min-w-10 h-10 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer'
         >
-          {button.label}
+          <ContentButton buttonContent={button.content} />
         </button>
       ))}
     </div>
   );
+}
+
+function ContentButton({
+  buttonContent: { type, style, value },
+}: {
+  buttonContent: ButtonContent;
+}) {
+  return type === 'text' ? (
+    <div className={style}>{value}</div>
+  ) : type === 'link' ? (
+    <Link className={style} />
+  ) : type === 'table' ? (
+    <Grid2x2 className={style} />
+  ) : null;
 }

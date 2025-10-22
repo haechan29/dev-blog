@@ -1,19 +1,55 @@
 import { WritePostContentButton } from '@/features/write/domain/model/writePostContentButton';
 
-export const buttonStyles = {
-  default:
-    'shrink-0 px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100 cursor-pointer',
-  bold: 'shrink-0 px-3 py-1 text-sm font-bold border border-gray-300 rounded hover:bg-gray-100 cursor-pointer',
-  italic:
-    'shrink-0 px-3 py-1 text-sm italic border border-gray-300 rounded hover:bg-gray-100 cursor-pointer',
-  strikethrough:
-    'shrink-0 px-3 py-1 text-sm line-through border border-gray-300 rounded hover:bg-gray-100 cursor-pointer',
+export type ButtonContent = {
+  type: 'text' | 'link' | 'table';
+  style: string;
+  value?: string;
+};
+
+const buttonContents: Record<WritePostContentButton['id'], ButtonContent> = {
+  heading1: {
+    type: 'text',
+    style: 'text-sm font-semibold',
+    value: 'H1',
+  },
+  heading2: {
+    type: 'text',
+    style: 'text-xs font-semibold',
+    value: 'H2',
+  },
+  heading3: {
+    type: 'text',
+    style: 'text-xs',
+    value: 'H3',
+  },
+  bold: {
+    type: 'text',
+    style: 'font-bold',
+    value: 'B',
+  },
+  italic: {
+    type: 'text',
+    style: 'italic',
+    value: 'I',
+  },
+  strikethrough: {
+    type: 'text',
+    style: 'line-through',
+    value: 'T',
+  },
+  link: {
+    type: 'link',
+    style: 'w-[18] h-[18]',
+  },
+  table: {
+    type: 'table',
+    style: 'w-5 h-5',
+  },
 };
 
 export type WritePostContentButtonProps = {
-  label: string;
-  actionType: 'insert' | 'toggle';
-  buttonStyle: keyof typeof buttonStyles;
+  action: 'insert' | 'toggle';
+  content: ButtonContent;
   markdownBefore: string;
   markdownAfter?: string;
 };
@@ -23,55 +59,47 @@ const writePostContentButtonProps: Record<
   WritePostContentButtonProps
 > = {
   heading1: {
-    label: '제목1',
-    actionType: 'insert',
-    buttonStyle: 'default',
+    action: 'insert',
+    content: buttonContents['heading1'],
     markdownBefore: '# ',
   },
   heading2: {
-    label: '제목2',
-    actionType: 'insert',
-    buttonStyle: 'default',
+    action: 'insert',
+    content: buttonContents['heading2'],
     markdownBefore: '## ',
   },
   heading3: {
-    label: '제목3',
-    actionType: 'insert',
-    buttonStyle: 'default',
+    action: 'insert',
+    content: buttonContents['heading3'],
     markdownBefore: '### ',
   },
   bold: {
-    label: 'B',
-    actionType: 'toggle',
-    buttonStyle: 'bold',
+    action: 'toggle',
+    content: buttonContents['bold'],
     markdownBefore: '**',
     markdownAfter: '**',
   },
   italic: {
-    label: 'I',
-    actionType: 'toggle',
-    buttonStyle: 'italic',
+    action: 'toggle',
+    content: buttonContents['italic'],
     markdownBefore: '*',
     markdownAfter: '*',
   },
   strikethrough: {
-    label: '취소선',
-    actionType: 'toggle',
-    buttonStyle: 'strikethrough',
+    action: 'toggle',
+    content: buttonContents['strikethrough'],
     markdownBefore: '~~',
     markdownAfter: '~~',
   },
   link: {
-    label: '링크',
-    actionType: 'insert',
-    buttonStyle: 'default',
+    action: 'insert',
+    content: buttonContents['link'],
     markdownBefore: '[링크',
     markdownAfter: '](url)',
   },
   table: {
-    label: '테이블',
-    actionType: 'insert',
-    buttonStyle: 'default',
+    action: 'insert',
+    content: buttonContents['table'],
     markdownBefore: '| 헤더1',
     markdownAfter: ' | 헤더2 |\n|-------|-------|\n| 내용1 | 내용2 |',
   },
