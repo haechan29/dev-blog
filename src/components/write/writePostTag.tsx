@@ -1,5 +1,6 @@
 'use client';
 
+import useWritePostTag from '@/features/write/hooks/useWritePostTag';
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
 import { WritePostValidityProps } from '@/features/write/ui/writePostValidityProps';
 import clsx from 'clsx';
@@ -16,49 +17,25 @@ export default function WritePostTag({
   setTags: (tags: string[]) => void;
   setShouldValidate: (shouldValidate: boolean) => void;
 }) {
-  const [tag, setTag] = useState('#');
   const [isFocused, setIsFocused] = useState(false);
   const isInvalid = useMemo(() => invalidMeta === 'tags', [invalidMeta]);
-  const isTagEmpty = useMemo(() => tag === '#', [tag]);
-
-  const insertTag = useCallback(
-    (tag: string) => {
-      setTags([...tags, ...getTags(tag)]);
-      setTag('#');
-    },
-    [setTags, tags]
-  );
-
-  const deleteTag = useCallback(() => {
-    if (tags.length === 0) return;
-    setTag(tags.pop()!);
-    setTags(tags);
-  }, [setTags, tags]);
+  const { tag, isTagEmpty, setTag } = useWritePostTag({
+    tags,
+    setTags,
+  });
 
   const onFocus = useCallback(() => setIsFocused(true), []);
   const onBlur = useCallback(() => {
-    insertTag(tag);
+    setTag(tag);
     setIsFocused(false);
-  }, [insertTag, tag]);
+  }, [setTag, tag]);
 
   const onChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      const currentValue = e.target.value;
-      if (currentValue && !currentValue.startsWith('#')) return;
-
-      const shouldInsertTag = currentValue.includes(' ');
-      const shouldDeleteTag = currentValue === '';
-
-      if (shouldInsertTag) {
-        insertTag(currentValue);
-      } else if (shouldDeleteTag) {
-        deleteTag();
-      } else {
-        setTag(currentValue);
-      }
+      setTag(e.target.value);
       setShouldValidate(false);
     },
-    [deleteTag, insertTag, setShouldValidate]
+    [setShouldValidate, setTag]
   );
 
   return (
@@ -101,11 +78,4 @@ export default function WritePostTag({
       </div>
     </div>
   );
-}
-
-function getTags(tag: string): string[] {
-  return tag
-    .split(/\s+/)
-    .filter(tag => tag.trim())
-    .map(tag => (tag.startsWith('#') ? tag : `#${tag}`));
 }
