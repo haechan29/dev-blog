@@ -13,7 +13,7 @@ export default function WritePostForm(writePost: {
   writePostValidity: WritePostValidityProps;
   setContent: (content: string) => void;
   setTitle: (title: string) => void;
-  setTags: (tags: string) => void;
+  setTags: (tags: string[]) => void;
   setPassword: (password: string) => void;
   setShouldValidate: (shouldValidate: boolean) => void;
 }) {

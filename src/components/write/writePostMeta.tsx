@@ -10,7 +10,7 @@ export default function WritePostMeta(writePost: {
   writePostForm: WritePostFormProps;
   writePostValidity: WritePostValidityProps;
   setTitle: (title: string) => void;
-  setTags: (tags: string) => void;
+  setTags: (tags: string[]) => void;
   setPassword: (password: string) => void;
   setShouldValidate: (shouldValidate: boolean) => void;
 }) {

@@ -10,5 +10,6 @@ export type WritePostFormProps = {
 export function createProps(form: WritePostForm): WritePostFormProps {
   return {
     ...form,
+    tags: form.tags.map(tag => `#${tag}`),
   };
 }

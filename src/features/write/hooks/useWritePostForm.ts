@@ -21,12 +21,12 @@ export default function useWritePostForm({
   );
 
   const setTags = useCallback(
-    (tagsString: string) => {
-      const tagsArray = tagsString
-        .split('#')
-        .map(tag => tag.trim())
-        .filter(Boolean);
-      setWritePostForm({ ...writePostForm, tags: tagsArray });
+    (tags: string[]) => {
+      const tagsArray = tags
+        .filter(tag => tag.startsWith('#'))
+        .map(tag => tag.slice(1))
+        .filter(tag => tag.trim());
+      setWritePostForm({ ...writePostForm, tags: [...new Set(tagsArray)] });
     },
     [setWritePostForm, writePostForm]
   );
