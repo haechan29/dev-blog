@@ -56,9 +56,9 @@ export default function WritePostPassword({
         className='flex shrink-0 p-2 mr-1 justify-center items-center'
       >
         {isPasswordVisible ? (
-          <EyeOff className='w-5 h-5' />
+          <EyeOff className='w-5 h-5 text-gray-700' />
         ) : (
-          <Eye className='w-5 h-5' />
+          <Eye className='w-5 h-5 text-gray-700' />
         )}
       </button>
     </div>
