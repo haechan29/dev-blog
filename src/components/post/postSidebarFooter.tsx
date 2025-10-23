@@ -1,6 +1,6 @@
 'use client';
 
-import TooltipItem from '@/components/tooltipItem';
+import Tooltip from '@/components/tooltip';
 import { setIsVisible } from '@/lib/redux/postSidebarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { ChevronLeft, FileUser, Mail } from 'lucide-react';
@@ -36,7 +36,7 @@ export default function PostSidebarFooter() {
       <div className='flex flex-1 min-w-0 justify-center'>
         <div className='flex min-w-0 gap-x-4'>
           {githubUrl && (
-            <TooltipItem text='Github'>
+            <Tooltip text='Github'>
               <a
                 href={githubUrl}
                 onClick={() => dispatch(setIsVisible(false))}
@@ -55,11 +55,11 @@ export default function PostSidebarFooter() {
                   <div className='text-xs can-hover:hidden'>Github</div>
                 </div>
               </a>
-            </TooltipItem>
+            </Tooltip>
           )}
 
           {mail && (
-            <TooltipItem text={mail}>
+            <Tooltip text={mail}>
               <button
                 onClick={handleMailIconClick}
                 className='w-10 h-10 flex justify-center items-center cursor-pointer rounded-full hover:bg-blue-300 transition-colors duration-300 ease-in-out'
@@ -69,10 +69,10 @@ export default function PostSidebarFooter() {
                   <div className='text-xs can-hover:hidden'>Mail</div>
                 </div>
               </button>
-            </TooltipItem>
+            </Tooltip>
           )}
 
-          <TooltipItem text='포트폴리오'>
+          <Tooltip text='포트폴리오'>
             <Link
               href='/portfolio'
               onClick={() => dispatch(setIsVisible(false))}
@@ -83,7 +83,7 @@ export default function PostSidebarFooter() {
                 <div className='text-xs can-hover:hidden'>Portfolio</div>
               </div>
             </Link>
-          </TooltipItem>
+          </Tooltip>
         </div>
       </div>
     </div>

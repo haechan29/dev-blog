@@ -1,6 +1,6 @@
 'use client';
 
-import TooltipItem from '@/components/tooltipItem';
+import Tooltip from '@/components/tooltip';
 import { isReadable } from '@/features/postViewer/domain/lib/tts';
 import { Page } from '@/features/postViewer/domain/types/page';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
@@ -40,7 +40,7 @@ export default function TTSSection({ page }: { page: Page | null }) {
   }, [isViewerMode, stopReading]);
 
   return (
-    <TooltipItem text='음성 재생'>
+    <Tooltip text='음성 재생'>
       <button
         onClick={onPlayButtonClick}
         className={clsx(
@@ -63,6 +63,6 @@ export default function TTSSection({ page }: { page: Page | null }) {
           )}
         />
       </button>
-    </TooltipItem>
+    </Tooltip>
   );
 }
