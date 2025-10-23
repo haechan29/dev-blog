@@ -17,7 +17,10 @@ export default function WritePostContentPreview({
     >
       {htmlSource ? (
         <ErrorBoundary fallback={<div>에러가 발생했습니다</div>}>
-          <div dangerouslySetInnerHTML={{ __html: htmlSource }} />
+          <div
+            className='prose'
+            dangerouslySetInnerHTML={{ __html: htmlSource }}
+          />
         </ErrorBoundary>
       ) : (
         <p className='text-gray-400'>본문을 입력하면 미리보기가 표시됩니다</p>

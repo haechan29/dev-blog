@@ -11,17 +11,17 @@ import remarkRehype from 'remark-rehype';
 import { unified } from 'unified';
 
 const processor = unified()
-  .use(remarkParse)
-  .use(remarkGfm)
-  .use(remarkBreaks)
-  .use(remarkDirective)
-  .use(handleDirective)
-  .use(remarkRehype)
-  .use(rehypeSanitize)
-  .use(handleLink)
-  .use(rehypePrettyCode)
-  .use(rehypeSlug)
-  .use(rehypeStringify);
+  .use(remarkParse) // parse markdown text into AST
+  .use(remarkGfm) // support GitHub flavored markdown (tables, strikethrough, etc)
+  .use(remarkBreaks) // convert line breaks to br tags
+  .use(remarkDirective) // support custom directives like :::page
+  .use(handleDirective) // process custom directives
+  .use(remarkRehype) // convert markdown AST to HTML AST
+  .use(rehypeSanitize) // remove unsafe HTML tags and attributes
+  .use(handleLink) // process links
+  .use(rehypePrettyCode) // add syntax highlighting to code blocks
+  .use(rehypeSlug) // add id attributes to headings
+  .use(rehypeStringify); // convert HTML AST to HTML string
 
 export async function processMd(source: string) {
   const result = await processor.process(source);
