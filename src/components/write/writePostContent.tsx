@@ -31,8 +31,8 @@ export default function WritePostContent({
   });
 
   return (
-    <div className='h-full grid grid-rows-[50%_100%] lg:grid-rows-none lg:grid-cols-2 gap-4'>
-      <div className='h-full flex flex-col'>
+    <div className='h-full grid max-lg:grid-rows-[50%_100%] lg:grid-cols-2 gap-4'>
+      <div className='h-full flex flex-col max-lg:min-w-0 lg:min-h-0'>
         <WritePostContentToolbar {...contentToolbar} {...contentButton} />
         <div className='flex-1 min-h-0'>
           <WritePostContentEditor
@@ -48,7 +48,7 @@ export default function WritePostContent({
         </div>
       </div>
 
-      <div className='max-md:pb-4'>
+      <div className='max-md:pb-4 max-lg:min-w-0 lg:min-h-0'>
         <WritePostContentPreview htmlSource={htmlSource} />
       </div>
     </div>
