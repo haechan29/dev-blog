@@ -1,5 +1,6 @@
 'use client';
 
+import Tooltip from '@/components/tooltip';
 import {
   ButtonContent,
   WritePostContentButtonProps,
@@ -41,13 +42,14 @@ export default function WritePostContentToolbar({
       }}
     >
       {contentButtons.map(button => (
-        <button
-          key={`${button.content.type}-${button.content.value}`}
-          onClick={() => onToolbarButtonClick(button)}
-          className='min-w-10 h-10 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer'
-        >
-          <ContentButton buttonContent={button.content} />
-        </button>
+        <Tooltip key={button.label} text={button.label} direction='top'>
+          <button
+            onClick={() => onToolbarButtonClick(button)}
+            className='min-w-10 h-10 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer'
+          >
+            <ContentButton buttonContent={button.content} />
+          </button>
+        </Tooltip>
       ))}
     </div>
   );
