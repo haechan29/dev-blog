@@ -1,5 +1,6 @@
 'use client';
 
+import { MAX_TAG_LENGTH } from '@/components/write/writePostTag';
 import { WritePostForm } from '@/features/write/domain/model/writePostForm';
 import { createProps } from '@/features/write/ui/writePostFormProps';
 import { useCallback, useMemo } from 'react';
@@ -24,7 +25,7 @@ export default function useWritePostForm({
     (tags: string[]) => {
       const tagsArray = tags
         .filter(tag => tag.startsWith('#'))
-        .map(tag => tag.slice(1))
+        .map(tag => tag.slice(1, MAX_TAG_LENGTH))
         .filter(tag => tag.trim());
       setWritePostForm({ ...writePostForm, tags: [...new Set(tagsArray)] });
     },
