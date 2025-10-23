@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 export default function useWritePostTag({
   tags,
@@ -9,13 +9,8 @@ export default function useWritePostTag({
   tags: string[];
   setTags: (tags: string[]) => void;
 }) {
-  const [tag, setTagInner] = useState('#');
+  const [tag, setTag] = useState('#');
   const isTagEmpty = useMemo(() => tag === '#', [tag]);
-
-  const setTag = useCallback((tag: string) => {
-    if (!tag || !tag.startsWith('#')) return;
-    setTagInner(tag);
-  }, []);
 
   const insertTag = useCallback(
     (tag: string) => {
@@ -31,21 +26,28 @@ export default function useWritePostTag({
     setTags(tags);
   }, [setTag, setTags, tags]);
 
-  useEffect(() => {
-    const shouldInsertTag = tag.includes(' ');
-    const shouldDeleteTag = tag === '';
+  const updateTag = useCallback(
+    (tag: string) => {
+      const shouldInsertTag = tag.includes(' ');
+      const shouldDeleteTag = tag === '';
 
-    if (shouldInsertTag) {
-      insertTag(tag);
-    } else if (shouldDeleteTag) {
-      deleteTag();
-    }
-  }, [deleteTag, insertTag, tag]);
+      if (shouldInsertTag) {
+        insertTag(tag);
+      } else if (shouldDeleteTag) {
+        deleteTag();
+      } else {
+        setTag(tag);
+      }
+    },
+    [deleteTag, insertTag]
+  );
 
   return {
     tag,
     isTagEmpty,
     setTag,
+    insertTag,
+    updateTag,
   } as const;
 }
 

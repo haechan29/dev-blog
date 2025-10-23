@@ -19,23 +19,23 @@ export default function WritePostTag({
 }) {
   const [isFocused, setIsFocused] = useState(false);
   const isInvalid = useMemo(() => invalidMeta === 'tags', [invalidMeta]);
-  const { tag, isTagEmpty, setTag } = useWritePostTag({
+  const { tag, isTagEmpty, insertTag, updateTag } = useWritePostTag({
     tags,
     setTags,
   });
 
   const onFocus = useCallback(() => setIsFocused(true), []);
   const onBlur = useCallback(() => {
-    setTag(tag);
+    insertTag(tag);
     setIsFocused(false);
-  }, [setTag, tag]);
+  }, [insertTag, tag]);
 
   const onChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      setTag(e.target.value);
+      updateTag(e.target.value);
       setShouldValidate(false);
     },
-    [setShouldValidate, setTag]
+    [setShouldValidate, updateTag]
   );
 
   return (
