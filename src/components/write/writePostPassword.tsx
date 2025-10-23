@@ -6,6 +6,8 @@ import clsx from 'clsx';
 import { Eye, EyeOff } from 'lucide-react';
 import { ChangeEvent, useCallback, useMemo, useState } from 'react';
 
+const MAX_PASSWORD_LENGTH = 20;
+
 export default function WritePostPassword({
   writePostForm: { password },
   writePostValidity: { invalidMeta },
@@ -21,6 +23,11 @@ export default function WritePostPassword({
   const [isFocused, setIsFocused] = useState(false);
   const isInvalid = useMemo(() => invalidMeta === 'password', [invalidMeta]);
 
+  const isPasswordTooLong = useMemo(
+    () => password.length > MAX_PASSWORD_LENGTH,
+    [password.length]
+  );
+
   const onChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       setShouldValidate(false);
@@ -32,13 +39,13 @@ export default function WritePostPassword({
   return (
     <div
       className={clsx(
-        'flex border rounded-lg hover:border-blue-500',
+        'flex border rounded-lg gap-2',
         !isPasswordVisible && !password && 'bg-gray-50',
-        isInvalid
+        isInvalid || isPasswordTooLong
           ? 'border-red-400 animate-shake'
           : isFocused
           ? 'border-blue-500'
-          : 'border-gray-200'
+          : 'border-gray-200 hover:border-blue-500'
       )}
     >
       <input
@@ -50,6 +57,18 @@ export default function WritePostPassword({
         placeholder='비밀번호'
         className='flex-1 min-w-0 p-3 text-sm outline-none'
       />
+
+      <div
+        className={clsx(
+          'flex text-sm gap-0.5 items-center',
+          password.length < MAX_PASSWORD_LENGTH * 0.95 && 'hidden',
+          isPasswordTooLong && 'text-red-500'
+        )}
+      >
+        <div>{password.length}</div>
+        <div>/</div>
+        <div>{MAX_PASSWORD_LENGTH}</div>
+      </div>
 
       <button
         onClick={() => setIsPasswordVisible(prev => !prev)}
