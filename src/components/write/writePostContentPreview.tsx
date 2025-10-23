@@ -9,22 +9,26 @@ export default function WritePostContentPreview({
   htmlSource: string | null;
 }) {
   return (
-    <div
-      className={clsx(
-        'w-full h-full overflow-y-auto p-4',
-        'border border-gray-200 rounded-lg'
-      )}
-    >
-      {htmlSource ? (
-        <ErrorBoundary fallback={<div>에러가 발생했습니다</div>}>
-          <div
-            className='prose'
-            dangerouslySetInnerHTML={{ __html: htmlSource }}
-          />
-        </ErrorBoundary>
-      ) : (
-        <p className='text-gray-400'>본문을 입력하면 미리보기가 표시됩니다</p>
-      )}
+    <div className='flex flex-col h-full'>
+      <div
+        className={clsx(
+          'flex px-4 h-12 items-center text-sm border-gray-200 rounded-t-lg border-t border-x max-lg:hidden'
+        )}
+      >
+        미리보기
+      </div>
+      <div className='flex-1 min-h-0 border-gray-200 border max-lg:rounded-lg lg:rounded-b-lg overflow-y-auto p-4'>
+        {htmlSource ? (
+          <ErrorBoundary fallback={<div>에러가 발생했습니다</div>}>
+            <div
+              className='prose'
+              dangerouslySetInnerHTML={{ __html: htmlSource }}
+            />
+          </ErrorBoundary>
+        ) : (
+          <p className='text-gray-500'>본문을 입력하면 미리보기가 표시됩니다</p>
+        )}
+      </div>
     </div>
   );
 }
