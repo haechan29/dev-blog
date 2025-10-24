@@ -8,11 +8,11 @@ import useWritePostContentButton from '@/features/write/hooks/useWritePostConten
 import useWritePostContentToolbar from '@/features/write/hooks/useWritePostContentToolbar';
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
 import { WritePostValidityProps } from '@/features/write/ui/writePostValidityProps';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 
 export default function WritePostContent({
   writePostForm: { content },
-  writePostValidity: { isContentValid },
+  writePostValidity: { invalidField },
   setContent,
   setShouldValidate,
 }: {
@@ -29,6 +29,7 @@ export default function WritePostContent({
     contentEditorRef,
     setContent,
   });
+  const isInvalid = useMemo(() => invalidField === 'content', [invalidField]);
 
   return (
     <div className='h-full grid max-lg:grid-rows-[50%_100%] lg:grid-cols-2 gap-4'>
@@ -38,7 +39,7 @@ export default function WritePostContent({
           <WritePostContentEditor
             contentEditorRef={contentEditorRef}
             content={content}
-            isContentValid={isContentValid}
+            isInvalid={isInvalid}
             isError={isError}
             {...contentToolbar}
             setContent={setContent}

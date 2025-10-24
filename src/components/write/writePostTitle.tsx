@@ -9,7 +9,7 @@ const MAX_TITLE_LENGTH = 50;
 
 export default function WritePostTitle({
   writePostForm: { title },
-  writePostValidity: { invalidMeta },
+  writePostValidity: { invalidField },
   setTitle,
   setShouldValidate,
 }: {
@@ -19,7 +19,7 @@ export default function WritePostTitle({
   setShouldValidate: (shouldValidate: boolean) => void;
 }) {
   const [isFocused, setIsFocused] = useState(false);
-  const isInvalid = useMemo(() => invalidMeta === 'title', [invalidMeta]);
+  const isInvalid = useMemo(() => invalidField === 'title', [invalidField]);
   const titleRef = useRef<HTMLInputElement | null>(null);
 
   const isTitleTooLong = useMemo(

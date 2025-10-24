@@ -10,7 +10,7 @@ const MAX_PASSWORD_LENGTH = 20;
 
 export default function WritePostPassword({
   writePostForm: { password },
-  writePostValidity: { invalidMeta },
+  writePostValidity: { invalidField },
   setPassword,
   setShouldValidate,
 }: {
@@ -21,7 +21,7 @@ export default function WritePostPassword({
 }) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  const isInvalid = useMemo(() => invalidMeta === 'password', [invalidMeta]);
+  const isInvalid = useMemo(() => invalidField === 'password', [invalidField]);
 
   const isPasswordTooLong = useMemo(
     () => password.length > MAX_PASSWORD_LENGTH,

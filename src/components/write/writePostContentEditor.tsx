@@ -8,7 +8,7 @@ const MAX_CONTENT_LENGTH = 50_000;
 export default function WritePostContentEditor({
   contentEditorRef,
   content,
-  isContentValid,
+  isInvalid,
   isError,
   shouldAttachToolbarToBottom,
   setContent,
@@ -17,7 +17,7 @@ export default function WritePostContentEditor({
 }: {
   contentEditorRef: RefObject<HTMLTextAreaElement | null>;
   content: string;
-  isContentValid: boolean;
+  isInvalid: boolean;
   isError: boolean;
   shouldAttachToolbarToBottom: boolean;
   setContent: (content: string) => void;
@@ -48,7 +48,7 @@ export default function WritePostContentEditor({
         className={clsx(
           'flex-1 min-h-0 p-4 resize-none outline-none border',
           shouldAttachToolbarToBottom ? 'rounded-lg' : 'rounded-b-lg',
-          isContentValid && !isError && !isContentTooLong
+          !isInvalid && !isError && !isContentTooLong
             ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
             : 'border-red-400 animate-shake',
           !content && 'bg-gray-50'

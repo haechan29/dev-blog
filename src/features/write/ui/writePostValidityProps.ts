@@ -5,28 +5,17 @@ import {
 } from '@/features/write/domain/model/writePostForm';
 
 export interface WritePostValidityProps {
-  isContentValid: boolean;
-  invalidMeta: 'title' | 'tags' | 'password' | null;
+  invalidField: keyof WritePostForm | null;
 }
 
 export function createProps(
   writePost: WritePost,
   writePostForm: WritePostForm
 ): WritePostValidityProps {
+  const currentStep = writePost.totalSteps[writePost.currentStepId];
+  const invalidField =
+    currentStep.fields.find(field => !validate(writePostForm, field)) ?? null;
   return {
-    isContentValid:
-      !writePost.shouldValidate || validate(writePostForm, 'content'),
-    invalidMeta: getInvalidField(writePost, writePostForm),
+    invalidField: writePost.shouldValidate ? invalidField : null,
   };
-}
-
-function getInvalidField(
-  writePost: WritePost,
-  writePostForm: WritePostForm
-): WritePostValidityProps['invalidMeta'] {
-  if (!writePost.shouldValidate) return null;
-  else if (!validate(writePostForm, 'title')) return 'title';
-  else if (!validate(writePostForm, 'tags')) return 'tags';
-  else if (!validate(writePostForm, 'password')) return 'password';
-  return null;
 }

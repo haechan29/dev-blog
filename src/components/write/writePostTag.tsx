@@ -11,7 +11,7 @@ const MAX_TAGS_LENGTH = 10;
 
 export default function WritePostTag({
   writePostForm: { tags },
-  writePostValidity: { invalidMeta },
+  writePostValidity: { invalidField },
   setTags,
   setShouldValidate,
 }: {
@@ -22,7 +22,7 @@ export default function WritePostTag({
 }) {
   const [isFocused, setIsFocused] = useState(false);
   const tagRef = useRef<HTMLInputElement | null>(null);
-  const isInvalid = useMemo(() => invalidMeta === 'tags', [invalidMeta]);
+  const isInvalid = useMemo(() => invalidField === 'tags', [invalidField]);
   const { tag, isTagEmpty, insertTag, updateTag } = useWritePostTag({
     tags,
     setTags,
