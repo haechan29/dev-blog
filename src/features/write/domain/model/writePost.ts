@@ -1,8 +1,7 @@
-import { WritePostSteps } from '@/features/write/domain/model/writePostStep';
+import { writePostSteps } from '@/features/write/constants/writePostStep';
 
 export interface WritePost {
-  currentStepId: keyof WritePostSteps;
-  totalSteps: WritePostSteps;
+  currentStepId: keyof typeof writePostSteps;
   shouldValidate: boolean;
   publishResult?: 'success' | 'error';
 }

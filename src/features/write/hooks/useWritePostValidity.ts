@@ -1,5 +1,6 @@
 'use client';
 
+import { writePostSteps } from '@/features/write/constants/writePostStep';
 import { WritePost } from '@/features/write/domain/model/writePost';
 import {
   validate,
@@ -24,9 +25,9 @@ export default function useWritePostValidity({
   );
 
   const validateFields = useCallback(() => {
-    const currentStep = writePost.totalSteps[writePost.currentStepId];
+    const currentStep = writePostSteps[writePost.currentStepId];
     return validate(writePostForm, ...currentStep.fields);
-  }, [writePost.currentStepId, writePost.totalSteps, writePostForm]);
+  }, [writePost.currentStepId, writePostForm]);
 
   return { writePostValidity: writePostValidityProps, validateFields } as const;
 }

@@ -1,3 +1,4 @@
+import { writePostSteps } from '@/features/write/constants/writePostStep';
 import { WritePost } from '@/features/write/domain/model/writePost';
 
 export type WritePostToolbarProps = {
@@ -9,9 +10,9 @@ export type WritePostToolbarProps = {
 };
 
 export function createProps(writePost: WritePost): WritePostToolbarProps {
-  const currentStep = writePost.totalSteps[writePost.currentStepId]!;
+  const currentStep = writePostSteps[writePost.currentStepId]!;
   return {
-    toolbarTexts: Object.values(writePost.totalSteps).map(step => ({
+    toolbarTexts: Object.values(writePostSteps).map(step => ({
       isCurrentStep: step.id === currentStep.id,
       content: step.toolbarText,
     })),

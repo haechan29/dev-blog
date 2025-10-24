@@ -1,8 +1,8 @@
+import { writePostSteps } from '@/features/write/constants/writePostStep';
 import { WritePost } from '@/features/write/domain/model/writePost';
-import { WritePostSteps } from '@/features/write/domain/model/writePostStep';
 
 export type WritePostProps = {
-  currentStepId: keyof WritePostSteps;
+  currentStepId: keyof typeof writePostSteps;
   publishResult?: WritePost['publishResult'];
 };
 

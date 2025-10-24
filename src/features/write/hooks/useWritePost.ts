@@ -1,14 +1,11 @@
 'use client';
 
+import { writePostSteps } from '@/features/write/constants/writePostStep';
 import { WritePost } from '@/features/write/domain/model/writePost';
 import {
   validate,
   WritePostForm,
 } from '@/features/write/domain/model/writePostForm';
-import {
-  WRITE_POST_STEPS,
-  WritePostSteps,
-} from '@/features/write/domain/model/writePostStep';
 import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import useWritePostValidity from '@/features/write/hooks/useWritePostValidity';
 import {
@@ -25,7 +22,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 export default function useWritePost({
   currentStepId,
 }: {
-  currentStepId: keyof WritePostSteps;
+  currentStepId: keyof typeof writePostSteps;
 }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -33,7 +30,6 @@ export default function useWritePost({
 
   const [writePost, setWritePost] = useState<WritePost>({
     currentStepId,
-    totalSteps: WRITE_POST_STEPS,
     shouldValidate: false,
   });
 
@@ -70,7 +66,7 @@ export default function useWritePost({
   }, []);
 
   const handleAction = useCallback(() => {
-    const currentStep = writePost.totalSteps[writePost.currentStepId];
+    const currentStep = writePostSteps[writePost.currentStepId];
     switch (currentStep.action) {
       case 'next':
         const params = new URLSearchParams(searchParams);
@@ -81,13 +77,7 @@ export default function useWritePost({
         console.log('게시글이 생성되었습니다');
         break;
     }
-  }, [
-    pathname,
-    router,
-    searchParams,
-    writePost.currentStepId,
-    writePost.totalSteps,
-  ]);
+  }, [pathname, router, searchParams, writePost.currentStepId]);
 
   const onAction = useCallback(() => {
     const isValid = validateFields();
@@ -100,14 +90,14 @@ export default function useWritePost({
   }, [currentStepId]);
 
   useEffect(() => {
-    for (const step of Object.values(writePost.totalSteps)) {
+    for (const step of Object.values(writePostSteps)) {
       if (writePost.currentStepId === step.id) return;
       const isValid = validate(writePostForm, ...step.fields);
       if (!isValid) {
         router.push(`/write?step=${step.id}`);
       }
     }
-  }, [router, writePost.currentStepId, writePost.totalSteps, writePostForm]);
+  }, [router, writePost.currentStepId, writePostForm]);
 
   return {
     writePost: writePostProps,

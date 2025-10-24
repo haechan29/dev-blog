@@ -1,3 +1,4 @@
+import { writePostSteps } from '@/features/write/constants/writePostStep';
 import { WritePost } from '@/features/write/domain/model/writePost';
 import {
   validate,
@@ -12,7 +13,7 @@ export function createProps(
   writePost: WritePost,
   writePostForm: WritePostForm
 ): WritePostValidityProps {
-  const currentStep = writePost.totalSteps[writePost.currentStepId];
+  const currentStep = writePostSteps[writePost.currentStepId];
   const invalidField =
     currentStep.fields.find(field => !validate(writePostForm, field)) ?? null;
   return {

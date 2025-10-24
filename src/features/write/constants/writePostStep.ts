@@ -1,6 +1,6 @@
 import { WritePostForm } from '@/features/write/domain/model/writePostForm';
 
-export interface WritePostStep {
+interface WritePostStep {
   id: string;
   toolbarText: string;
   actionButtonText: string;
@@ -8,9 +8,7 @@ export interface WritePostStep {
   fields: (keyof WritePostForm)[];
 }
 
-export type WritePostSteps = Record<'write' | 'upload', WritePostStep>;
-
-export const WRITE_STEP: WritePostStep = {
+export const writeStep: WritePostStep = {
   id: 'write',
   toolbarText: '글 쓰기',
   actionButtonText: '다음',
@@ -18,7 +16,7 @@ export const WRITE_STEP: WritePostStep = {
   fields: ['content'],
 };
 
-export const UPLOAD_STEP: WritePostStep = {
+export const uploadStep: WritePostStep = {
   id: 'upload',
   toolbarText: '업로드하기',
   actionButtonText: '완료',
@@ -26,7 +24,7 @@ export const UPLOAD_STEP: WritePostStep = {
   fields: ['title', 'tags', 'password'],
 };
 
-export const WRITE_POST_STEPS: WritePostSteps = {
-  write: WRITE_STEP,
-  upload: UPLOAD_STEP,
+export const writePostSteps = {
+  write: writeStep,
+  upload: uploadStep,
 };
