@@ -1,3 +1,4 @@
+import { TAG_DELIMETER } from '@/features/write/constants/writePostForm';
 import { WritePostForm } from '@/features/write/domain/model/writePostForm';
 
 export type WritePostFormProps = {
@@ -10,6 +11,6 @@ export type WritePostFormProps = {
 export function createProps(form: WritePostForm): WritePostFormProps {
   return {
     ...form,
-    tags: form.tags.map(tag => `#${tag}`),
+    tags: form.tags.map(tag => `${TAG_DELIMETER}${tag}`),
   };
 }

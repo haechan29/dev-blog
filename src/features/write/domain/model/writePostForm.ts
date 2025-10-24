@@ -1,3 +1,5 @@
+import { maxLengths } from '@/features/write/constants/writePostForm';
+
 export interface WritePostForm {
   title: string;
   tags: string[];
@@ -5,16 +7,28 @@ export interface WritePostForm {
   content: string;
 }
 
-const validator = {
-  title: (form: WritePostForm) => form.title.trim().length > 0,
-  tags: (form: WritePostForm) => true,
-  password: (form: WritePostForm) => form.password.trim().length > 0,
-  content: (form: WritePostForm) => form.content.trim().length > 0,
-};
-
 export function validate(
   form: WritePostForm,
   ...fields: (keyof WritePostForm)[]
 ) {
-  return fields.every(field => validator[field](form));
+  return fields.every(field => {
+    switch (field) {
+      case 'title': {
+        const title = form[field];
+        return title.length > 0 && title.length <= maxLengths['title'];
+      }
+      case 'tags': {
+        const tags = form[field];
+        return tags.length <= maxLengths['tags'];
+      }
+      case 'password': {
+        const password = form[field];
+        return password.length > 0 && password.length <= maxLengths['password'];
+      }
+      case 'content': {
+        const content = form[field];
+        return content.length > 0 && content.length <= maxLengths['content'];
+      }
+    }
+  });
 }
