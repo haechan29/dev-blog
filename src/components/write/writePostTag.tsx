@@ -34,6 +34,7 @@ export default function WritePostTag({
     [tags.length]
   );
 
+  const onClick = useCallback(() => tagRef.current?.focus(), []);
   const onFocus = useCallback(() => setIsFocused(true), []);
   const onBlur = useCallback(() => {
     insertTag(tag);
@@ -60,7 +61,7 @@ export default function WritePostTag({
         isTagEmpty && 'text-gray-400',
         tags.length === 0 && isTagEmpty && 'bg-gray-50'
       )}
-      onClick={() => tagRef.current?.focus()}
+      onClick={onClick}
     >
       <div className='flex flex-1 min-w-0 overflow-x-auto scrollbar-hide gap-2 items-center'>
         {tags.map((tag, index) => (
@@ -81,9 +82,14 @@ export default function WritePostTag({
             !isFocused && tags.length > 0 && 'opacity-0'
           )}
         >
-          <div className={clsx('inline-block', isTagEmpty && 'text-gray-400')}>
-            {isTagEmpty ? '#태그' : tag}
-          </div>
+          {isTagEmpty ? (
+            <span className='text-gray-400'>#태그</span>
+          ) : (
+            <>
+              <span>{tag.slice(0, MAX_TAG_LENGTH)}</span>
+              <span className='text-red-500'>{tag.slice(MAX_TAG_LENGTH)}</span>
+            </>
+          )}
           <input
             ref={tagRef}
             type='text'
@@ -93,22 +99,6 @@ export default function WritePostTag({
             onChange={onChange}
             className='absolute z-50 inset-0 outline-none text-transparent caret-gray-900'
           />
-
-          {/* {isTagEmpty && (
-          <div className='flex w-0 overflow-x-visible absolute z-50 left-0 inset-y-0 py-3 items-center text-gray-400'>
-            <div className='shrink-0 invisible'>#</div>
-            <div className='shrink-0'>태그</div>
-          </div>
-        )}
-
-        {isTagTooLong && (
-          <div className='flex w-0 overflow-x-visible absolute z-50 left-0 inset-y-0 py-3 items-center text-red-500'>
-            <div className='shrink-0 invisible'>
-              {tag.slice(0, MAX_TAG_LENGTH)}
-            </div>
-            <div className='shrink-0'>{tag.slice(MAX_TAG_LENGTH)}</div>
-          </div>
-        )} */}
         </div>
       </div>
 
@@ -117,7 +107,8 @@ export default function WritePostTag({
           className={clsx(
             'flex text-sm gap-0.5 items-center',
             isTagTooLong && 'text-red-500',
-            (!isFocused || tag.length < MAX_TAG_LENGTH * 0.95) && 'hidden'
+            (tags.length === 0 || tag.length < MAX_TAG_LENGTH * 0.95) &&
+              'hidden'
           )}
         >
           <div>{tag.length - 1}</div>
@@ -129,7 +120,8 @@ export default function WritePostTag({
           className={clsx(
             'flex text-sm gap-0.5 items-center',
             areTagsTooMany ? 'text-red-500' : 'text-blue-500',
-            (tags.length === 0 || !isTagEmpty) && 'hidden'
+            (tags.length === 0 || tag.length >= MAX_TAG_LENGTH * 0.95) &&
+              'hidden'
           )}
         >
           <div>{tags.length}</div>
