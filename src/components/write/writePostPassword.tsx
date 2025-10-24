@@ -28,6 +28,8 @@ export default function WritePostPassword({
     [password.length]
   );
 
+  const onFocus = useCallback(() => setIsFocused(true), []);
+  const onBlur = useCallback(() => setIsFocused(false), []);
   const onChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       setShouldValidate(false);
@@ -39,7 +41,7 @@ export default function WritePostPassword({
   return (
     <div
       className={clsx(
-        'flex border rounded-lg gap-2',
+        'flex border rounded-lg gap-3 p-3',
         !isPasswordVisible && !password && 'bg-gray-50',
         isInvalid || isPasswordTooLong
           ? 'border-red-400 animate-shake'
@@ -50,12 +52,12 @@ export default function WritePostPassword({
     >
       <input
         type={isPasswordVisible ? 'text' : 'password'}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
+        onFocus={onFocus}
+        onBlur={onBlur}
         value={password}
         onChange={onChange}
         placeholder='비밀번호'
-        className='flex-1 min-w-0 p-3 text-sm outline-none'
+        className='flex-1 min-w-0 text-sm outline-none'
       />
 
       <div
@@ -72,7 +74,7 @@ export default function WritePostPassword({
 
       <button
         onClick={() => setIsPasswordVisible(prev => !prev)}
-        className='flex shrink-0 p-2 mr-1 justify-center items-center'
+        className='flex shrink-0 p-2 -m-2 justify-center items-center'
       >
         {isPasswordVisible ? (
           <EyeOff className='w-5 h-5 text-gray-700' />

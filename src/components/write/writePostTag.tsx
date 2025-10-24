@@ -52,7 +52,7 @@ export default function WritePostTag({
   return (
     <div
       className={clsx(
-        'w-full flex border rounded-lg gap-2 items-center px-3',
+        'w-full flex border rounded-lg items-center gap-3 p-3',
         isInvalid || areTagsTooMany || isTagTooLong
           ? 'border-red-400 animate-shake'
           : isFocused
@@ -78,7 +78,7 @@ export default function WritePostTag({
 
         <div
           className={clsx(
-            'w-fit shrink-0 relative text-sm my-3',
+            'w-fit shrink-0 relative text-sm',
             !isFocused && tags.length > 0 && 'opacity-0'
           )}
         >
