@@ -1,11 +1,10 @@
 'use client';
 
+import { maxLengths } from '@/features/write/constants/writePostForm';
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
 import { WritePostValidityProps } from '@/features/write/ui/writePostValidityProps';
 import clsx from 'clsx';
 import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
-
-const MAX_TITLE_LENGTH = 50;
 
 export default function WritePostTitle({
   writePostForm: { title },
@@ -18,14 +17,14 @@ export default function WritePostTitle({
   setTitle: (title: string) => void;
   setShouldValidate: (shouldValidate: boolean) => void;
 }) {
+  const maxLength = maxLengths['title'];
   const [isFocused, setIsFocused] = useState(false);
   const isInvalid = useMemo(() => invalidField === 'title', [invalidField]);
-  const titleRef = useRef<HTMLInputElement | null>(null);
-
   const isTitleTooLong = useMemo(
-    () => title.length > MAX_TITLE_LENGTH,
-    [title.length]
+    () => title.length > maxLength,
+    [maxLength, title.length]
   );
+  const titleRef = useRef<HTMLInputElement | null>(null);
 
   const onClick = useCallback(() => titleRef.current?.focus(), []);
   const onFocus = useCallback(() => setIsFocused(true), []);
@@ -57,10 +56,8 @@ export default function WritePostTitle({
             <span className='text-gray-400'>제목을 입력하세요</span>
           ) : (
             <>
-              <span>{title.slice(0, MAX_TITLE_LENGTH)}</span>
-              <span className='text-red-500'>
-                {title.slice(MAX_TITLE_LENGTH)}
-              </span>
+              <span>{title.slice(0, maxLength)}</span>
+              <span className='text-red-500'>{title.slice(maxLength)}</span>
             </>
           )}
           <input
@@ -78,13 +75,13 @@ export default function WritePostTitle({
       <div
         className={clsx(
           'flex text-sm gap-0.5 items-center',
-          title.length < MAX_TITLE_LENGTH * 0.95 && 'hidden',
+          title.length < maxLength * 0.95 && 'hidden',
           isTitleTooLong && 'text-red-500'
         )}
       >
         <div>{title.length}</div>
         <div>/</div>
-        <div>{MAX_TITLE_LENGTH}</div>
+        <div>{maxLength}</div>
       </div>
     </div>
   );

@@ -1,7 +1,9 @@
 'use client';
 
-import { MAX_TAG_LENGTH } from '@/components/write/writePostTag';
-import { TAG_DELIMETER } from '@/features/write/constants/writePostForm';
+import {
+  maxLengths,
+  TAG_DELIMETER,
+} from '@/features/write/constants/writePostForm';
 import { WritePostForm } from '@/features/write/domain/model/writePostForm';
 import { createProps } from '@/features/write/ui/writePostFormProps';
 import { useCallback, useMemo } from 'react';
@@ -13,7 +15,10 @@ export default function useWritePostForm({
   writePostForm: WritePostForm;
   setWritePostForm: (form: WritePostForm) => void;
 }) {
-  const props = useMemo(() => createProps(writePostForm), [writePostForm]);
+  const writePostFormProps = useMemo(
+    () => createProps(writePostForm),
+    [writePostForm]
+  );
 
   const setTitle = useCallback(
     (title: string) => {
@@ -26,7 +31,7 @@ export default function useWritePostForm({
     (tagsArray: string[]) => {
       const tags = tagsArray
         .filter(tag => tag.startsWith(TAG_DELIMETER))
-        .map(tag => tag.slice(1, MAX_TAG_LENGTH))
+        .map(tag => tag.slice(1, maxLengths['tag']))
         .filter(tag => tag.trim());
       setWritePostForm({ ...writePostForm, tags: [...new Set(tags)] });
     },
@@ -48,7 +53,7 @@ export default function useWritePostForm({
   );
 
   return {
-    writePostFormProps: props,
+    writePostFormProps,
     setTitle,
     setTags,
     setPassword,

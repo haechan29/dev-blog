@@ -1,13 +1,11 @@
 'use client';
 
+import { maxLengths } from '@/features/write/constants/writePostForm';
 import useWritePostTag from '@/features/write/hooks/useWritePostTag';
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
 import { WritePostValidityProps } from '@/features/write/ui/writePostValidityProps';
 import clsx from 'clsx';
 import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
-
-export const MAX_TAG_LENGTH = 31;
-const MAX_TAGS_LENGTH = 10;
 
 export default function WritePostTag({
   writePostForm: { tags },
@@ -23,15 +21,19 @@ export default function WritePostTag({
   const [isFocused, setIsFocused] = useState(false);
   const tagRef = useRef<HTMLInputElement | null>(null);
   const isInvalid = useMemo(() => invalidField === 'tags', [invalidField]);
+  const maxTagLength = useMemo(() => maxLengths['tag'], []);
+  const maxTagsLength = useMemo(() => maxLengths['tags'], []);
   const { tag, isTagEmpty, insertTag, updateTag } = useWritePostTag({
     tags,
     setTags,
   });
-
-  const isTagTooLong = useMemo(() => tag.length > MAX_TAG_LENGTH, [tag.length]);
+  const isTagTooLong = useMemo(
+    () => tag.length > maxTagLength,
+    [maxTagLength, tag.length]
+  );
   const areTagsTooMany = useMemo(
-    () => tags.length > MAX_TAGS_LENGTH,
-    [tags.length]
+    () => tags.length > maxTagsLength,
+    [maxTagsLength, tags.length]
   );
 
   const onClick = useCallback(() => tagRef.current?.focus(), []);
@@ -69,7 +71,7 @@ export default function WritePostTag({
             key={tag}
             className={clsx(
               'shrink-0 text-sm',
-              index < MAX_TAGS_LENGTH ? 'text-blue-500' : 'text-red-500'
+              index < maxTagsLength ? 'text-blue-500' : 'text-red-500'
             )}
           >
             {tag}
@@ -86,8 +88,8 @@ export default function WritePostTag({
             <span className='text-gray-400'>#태그</span>
           ) : (
             <>
-              <span>{tag.slice(0, MAX_TAG_LENGTH)}</span>
-              <span className='text-red-500'>{tag.slice(MAX_TAG_LENGTH)}</span>
+              <span>{tag.slice(0, maxTagLength)}</span>
+              <span className='text-red-500'>{tag.slice(maxTagLength)}</span>
             </>
           )}
           <input
@@ -107,26 +109,24 @@ export default function WritePostTag({
           className={clsx(
             'flex text-sm gap-0.5 items-center',
             isTagTooLong && 'text-red-500',
-            (tags.length === 0 || tag.length < MAX_TAG_LENGTH * 0.95) &&
-              'hidden'
+            tag.length < maxTagLength * 0.95 && 'hidden'
           )}
         >
           <div>{tag.length - 1}</div>
           <div>/</div>
-          <div>{MAX_TAG_LENGTH - 1}</div>
+          <div>{maxTagLength - 1}</div>
         </div>
 
         <div
           className={clsx(
             'flex text-sm gap-0.5 items-center',
             areTagsTooMany ? 'text-red-500' : 'text-blue-500',
-            (tags.length === 0 || tag.length >= MAX_TAG_LENGTH * 0.95) &&
-              'hidden'
+            (tags.length === 0 || tag.length >= maxTagLength * 0.95) && 'hidden'
           )}
         >
           <div>{tags.length}</div>
           <div>/</div>
-          <div>{MAX_TAGS_LENGTH}</div>
+          <div>{maxTagsLength}</div>
         </div>
       </div>
     </div>

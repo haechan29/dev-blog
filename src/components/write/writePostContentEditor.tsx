@@ -1,9 +1,8 @@
 'use client';
 
+import { maxLengths } from '@/features/write/constants/writePostForm';
 import clsx from 'clsx';
 import { ChangeEvent, RefObject, useCallback, useMemo } from 'react';
-
-const MAX_CONTENT_LENGTH = 50_000;
 
 export default function WritePostContentEditor({
   contentEditorRef,
@@ -24,9 +23,10 @@ export default function WritePostContentEditor({
   setShouldValidate: (shouldValidate: boolean) => void;
   setIsEditorFocused: (isEditorFocused: boolean) => void;
 }) {
+  const maxLength = useMemo(() => maxLengths['content'], []);
   const isContentTooLong = useMemo(
-    () => content.length > MAX_CONTENT_LENGTH,
-    [content.length]
+    () => content.length > maxLength,
+    [content.length, maxLength]
   );
   const onChange = useCallback(
     (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -57,13 +57,13 @@ export default function WritePostContentEditor({
       <div
         className={clsx(
           'flex justify-end items-center gap-1 text-sm p-2',
-          content.length < MAX_CONTENT_LENGTH * 0.95 && 'hidden',
+          content.length < maxLength * 0.95 && 'hidden',
           isContentTooLong && 'text-red-500'
         )}
       >
         <div>{content.length.toLocaleString()}</div>
         <div>/</div>
-        <div>{MAX_CONTENT_LENGTH.toLocaleString()}</div>
+        <div>{maxLength.toLocaleString()}</div>
       </div>
     </div>
   );

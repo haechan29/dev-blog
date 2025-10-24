@@ -1,12 +1,11 @@
 'use client';
 
+import { maxLengths } from '@/features/write/constants/writePostForm';
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
 import { WritePostValidityProps } from '@/features/write/ui/writePostValidityProps';
 import clsx from 'clsx';
 import { Eye, EyeOff } from 'lucide-react';
 import { ChangeEvent, useCallback, useMemo, useState } from 'react';
-
-const MAX_PASSWORD_LENGTH = 20;
 
 export default function WritePostPassword({
   writePostForm: { password },
@@ -22,10 +21,10 @@ export default function WritePostPassword({
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const isInvalid = useMemo(() => invalidField === 'password', [invalidField]);
-
+  const maxLength = useMemo(() => maxLengths['password'], []);
   const isPasswordTooLong = useMemo(
-    () => password.length > MAX_PASSWORD_LENGTH,
-    [password.length]
+    () => password.length > maxLength,
+    [maxLength, password.length]
   );
 
   const onFocus = useCallback(() => setIsFocused(true), []);
@@ -63,13 +62,13 @@ export default function WritePostPassword({
       <div
         className={clsx(
           'flex text-sm gap-0.5 items-center',
-          password.length < MAX_PASSWORD_LENGTH * 0.95 && 'hidden',
+          password.length < maxLength * 0.95 && 'hidden',
           isPasswordTooLong && 'text-red-500'
         )}
       >
         <div>{password.length}</div>
         <div>/</div>
-        <div>{MAX_PASSWORD_LENGTH}</div>
+        <div>{maxLength}</div>
       </div>
 
       <button
