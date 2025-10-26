@@ -1,5 +1,5 @@
 import { writePostSteps } from '@/features/write/constants/writePostStep';
-import { WritePost } from '@/features/write/domain/model/writePost';
+import { WritePostToolbar } from '@/features/write/domain/model/writePostToolbar';
 
 export type WritePostToolbarProps = {
   toolbarTexts: {
@@ -9,8 +9,10 @@ export type WritePostToolbarProps = {
   actionButtonText: string;
 };
 
-export function createProps(writePost: WritePost): WritePostToolbarProps {
-  const currentStep = writePostSteps[writePost.currentStepId]!;
+export function createProps(
+  writePostToolbar: WritePostToolbar
+): WritePostToolbarProps {
+  const currentStep = writePostSteps[writePostToolbar.currentStepId];
   return {
     toolbarTexts: Object.values(writePostSteps).map(step => ({
       isCurrentStep: step.id === currentStep.id,

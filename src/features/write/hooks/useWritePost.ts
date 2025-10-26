@@ -6,10 +6,6 @@ import {
   createProps,
   WritePostProps,
 } from '@/features/write/ui/writePostProps';
-import {
-  createProps as createToolbarProps,
-  WritePostToolbarProps,
-} from '@/features/write/ui/writePostToolbarProps';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -28,11 +24,6 @@ export default function useWritePost({
 
   const writePostProps: WritePostProps = useMemo(
     () => createProps(writePost),
-    [writePost]
-  );
-
-  const writePostToolbarProps: WritePostToolbarProps = useMemo(
-    () => createToolbarProps(writePost),
     [writePost]
   );
 
@@ -73,7 +64,6 @@ export default function useWritePost({
 
   return {
     writePost: writePostProps,
-    writePostToolbar: writePostToolbarProps,
     onAction,
   };
 }

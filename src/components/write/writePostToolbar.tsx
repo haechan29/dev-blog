@@ -1,19 +1,27 @@
 'use client';
 
-import { WritePostToolbarProps } from '@/features/write/ui/writePostToolbarProps';
+import { writePostSteps } from '@/features/write/constants/writePostStep';
+import {
+  createProps,
+  WritePostToolbarProps,
+} from '@/features/write/ui/writePostToolbarProps';
 import clsx from 'clsx';
 import { ChevronRight } from 'lucide-react';
-import { Fragment, useCallback } from 'react';
+import { Fragment, useCallback, useMemo } from 'react';
 
 export default function WritePostToolbar({
-  writePostToolbar: { toolbarTexts, actionButtonText },
+  currentStepId,
   setShouldValidate,
   onAction,
 }: {
-  writePostToolbar: WritePostToolbarProps;
+  currentStepId: keyof typeof writePostSteps;
   setShouldValidate: (shouldValidate: boolean) => void;
   onAction: () => void;
 }) {
+  const { toolbarTexts, actionButtonText }: WritePostToolbarProps = useMemo(
+    () => createProps({ currentStepId }),
+    [currentStepId]
+  );
   const onActionButtonClick = useCallback(() => {
     setShouldValidate(true);
     onAction();

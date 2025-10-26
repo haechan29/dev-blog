@@ -3,7 +3,7 @@
 import { writePostSteps } from '@/features/write/constants/writePostStep';
 import { WritePostForm } from '@/features/write/domain/model/writePostForm';
 import { createProps } from '@/features/write/ui/writePostFormProps';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export default function useWritePostForm({
   currentStepId,
@@ -76,6 +76,11 @@ export default function useWritePostForm({
       content: { ...prev.content, value: content },
     }));
   }, []);
+
+  useEffect(
+    () => setWritePostForm(prev => ({ ...prev, currentStepId })),
+    [currentStepId]
+  );
 
   return {
     writePostForm: writePostFormProps,

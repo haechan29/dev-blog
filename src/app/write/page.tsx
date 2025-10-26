@@ -28,7 +28,11 @@ function WritePageWithValidation() {
 
   return (
     <div className='w-screen h-dvh flex flex-col'>
-      <WritePostToolbar {...writePost} {...writePostForm} />
+      <WritePostToolbar
+        currentStepId={step}
+        {...writePost}
+        {...writePostForm}
+      />
       <div className='flex-1 min-h-0'>
         <WritePostForm {...writePostForm} />
       </div>
