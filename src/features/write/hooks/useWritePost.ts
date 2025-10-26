@@ -34,10 +34,28 @@ export default function useWritePost({
   });
 
   const [writePostForm, setWritePostForm] = useState<WritePostForm>({
-    title: '',
-    tags: [],
-    password: '',
-    content: '',
+    title: {
+      value: '',
+      isEmptyAllowed: false,
+      maxLength: 50,
+    },
+    tags: {
+      value: [],
+      isEmptyAllowed: true,
+      maxTagLength: 31,
+      maxTagsLength: 10,
+      delimeter: '#',
+    },
+    password: {
+      value: '',
+      isEmptyAllowed: false,
+      maxLength: 20,
+    },
+    content: {
+      value: '',
+      isEmptyAllowed: false,
+      maxLength: 50_000,
+    },
   });
 
   const writePostProps: WritePostProps = useMemo(

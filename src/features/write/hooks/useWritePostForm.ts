@@ -1,9 +1,5 @@
 'use client';
 
-import {
-  maxLengths,
-  TAG_DELIMETER,
-} from '@/features/write/constants/writePostForm';
 import { WritePostForm } from '@/features/write/domain/model/writePostForm';
 import { createProps } from '@/features/write/ui/writePostFormProps';
 import { useCallback, useMemo } from 'react';
@@ -21,33 +17,52 @@ export default function useWritePostForm({
   );
 
   const setTitle = useCallback(
-    (title: string) => {
-      setWritePostForm({ ...writePostForm, title });
+    (newValue: string) => {
+      const title = writePostForm.title;
+      if (title.value === newValue) return;
+      setWritePostForm({
+        ...writePostForm,
+        title: { ...title, value: newValue },
+      });
     },
     [setWritePostForm, writePostForm]
   );
 
   const setTags = useCallback(
-    (tagsArray: string[]) => {
-      const tags = tagsArray
-        .filter(tag => tag.startsWith(TAG_DELIMETER))
-        .map(tag => tag.slice(1, maxLengths['tag']))
+    (newValue: string[]) => {
+      const tags = writePostForm.tags;
+      const filtered = newValue
+        .filter(tag => tag.startsWith(tags.delimeter))
+        .map(tag => tag.slice(1, tags.maxTagLength))
         .filter(tag => tag.trim());
-      setWritePostForm({ ...writePostForm, tags: [...new Set(tags)] });
+      setWritePostForm({
+        ...writePostForm,
+        tags: { ...tags, value: [...new Set(filtered)] },
+      });
     },
     [setWritePostForm, writePostForm]
   );
 
   const setPassword = useCallback(
-    (password: string) => {
-      setWritePostForm({ ...writePostForm, password });
+    (newValue: string) => {
+      const password = writePostForm.password;
+      if (password.value === newValue) return;
+      setWritePostForm({
+        ...writePostForm,
+        password: { ...password, value: newValue },
+      });
     },
     [setWritePostForm, writePostForm]
   );
 
   const setContent = useCallback(
-    (content: string) => {
-      setWritePostForm({ ...writePostForm, content });
+    (newValue: string) => {
+      const content = writePostForm.content;
+      if (content.value === newValue) return;
+      setWritePostForm({
+        ...writePostForm,
+        content: { ...content, value: newValue },
+      });
     },
     [setWritePostForm, writePostForm]
   );

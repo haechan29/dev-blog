@@ -11,7 +11,9 @@ import { WritePostValidityProps } from '@/features/write/ui/writePostValidityPro
 import { useMemo, useRef } from 'react';
 
 export default function WritePostContent({
-  writePostForm: { content },
+  writePostForm: {
+    content: { value: content, maxLength, isValid },
+  },
   writePostValidity: { invalidField },
   setContent,
   setShouldValidate,
@@ -39,6 +41,7 @@ export default function WritePostContent({
           <WritePostContentEditor
             contentEditorRef={contentEditorRef}
             content={content}
+            maxLength={maxLength}
             isInvalid={isInvalid}
             isError={isError}
             {...contentToolbar}

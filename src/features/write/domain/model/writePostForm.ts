@@ -1,10 +1,26 @@
-import { maxLengths } from '@/features/write/constants/writePostForm';
-
 export interface WritePostForm {
-  title: string;
-  tags: string[];
-  password: string;
-  content: string;
+  title: {
+    value: string;
+    isEmptyAllowed: boolean;
+    maxLength: number;
+  };
+  tags: {
+    value: string[];
+    isEmptyAllowed: boolean;
+    maxTagLength: number;
+    maxTagsLength: number;
+    delimeter: string;
+  };
+  password: {
+    value: string;
+    isEmptyAllowed: boolean;
+    maxLength: number;
+  };
+  content: {
+    value: string;
+    isEmptyAllowed: boolean;
+    maxLength: number;
+  };
 }
 
 export function validate(
@@ -14,20 +30,28 @@ export function validate(
   return fields.every(field => {
     switch (field) {
       case 'title': {
-        const title = form[field];
-        return title.length > 0 && title.length <= maxLengths['title'];
+        const { value, isEmptyAllowed, maxLength } = form[field];
+        return (
+          (isEmptyAllowed || value.length > 0) && value.length <= maxLength
+        );
       }
       case 'tags': {
-        const tags = form[field];
-        return tags.length <= maxLengths['tags'];
+        const { value, isEmptyAllowed, maxTagsLength } = form[field];
+        return (
+          (isEmptyAllowed || value.length > 0) && value.length <= maxTagsLength
+        );
       }
       case 'password': {
-        const password = form[field];
-        return password.length > 0 && password.length <= maxLengths['password'];
+        const { value, isEmptyAllowed, maxLength } = form[field];
+        return (
+          (isEmptyAllowed || value.length > 0) && value.length <= maxLength
+        );
       }
       case 'content': {
-        const content = form[field];
-        return content.length > 0 && content.length <= maxLengths['content'];
+        const { value, isEmptyAllowed, maxLength } = form[field];
+        return (
+          (isEmptyAllowed || value.length > 0) && value.length <= maxLength
+        );
       }
     }
   });

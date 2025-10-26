@@ -1,6 +1,5 @@
 'use client';
 
-import { maxLengths } from '@/features/write/constants/writePostForm';
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
 import { WritePostValidityProps } from '@/features/write/ui/writePostValidityProps';
 import clsx from 'clsx';
@@ -8,7 +7,9 @@ import { Eye, EyeOff } from 'lucide-react';
 import { ChangeEvent, useCallback, useMemo, useState } from 'react';
 
 export default function WritePostPassword({
-  writePostForm: { password },
+  writePostForm: {
+    password: { value: password, maxLength, isValid },
+  },
   writePostValidity: { invalidField },
   setPassword,
   setShouldValidate,
@@ -21,7 +22,6 @@ export default function WritePostPassword({
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const isInvalid = useMemo(() => invalidField === 'password', [invalidField]);
-  const maxLength = useMemo(() => maxLengths['password'], []);
   const isPasswordTooLong = useMemo(
     () => password.length > maxLength,
     [maxLength, password.length]

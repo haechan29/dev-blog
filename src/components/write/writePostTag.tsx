@@ -1,6 +1,5 @@
 'use client';
 
-import { maxLengths } from '@/features/write/constants/writePostForm';
 import useWritePostTag from '@/features/write/hooks/useWritePostTag';
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
 import { WritePostValidityProps } from '@/features/write/ui/writePostValidityProps';
@@ -8,7 +7,9 @@ import clsx from 'clsx';
 import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
 
 export default function WritePostTag({
-  writePostForm: { tags },
+  writePostForm: {
+    tags: { value: tags, maxTagLength, maxTagsLength, isValid },
+  },
   writePostValidity: { invalidField },
   setTags,
   setShouldValidate,
@@ -21,8 +22,6 @@ export default function WritePostTag({
   const [isFocused, setIsFocused] = useState(false);
   const tagRef = useRef<HTMLInputElement | null>(null);
   const isInvalid = useMemo(() => invalidField === 'tags', [invalidField]);
-  const maxTagLength = useMemo(() => maxLengths['tag'], []);
-  const maxTagsLength = useMemo(() => maxLengths['tags'], []);
   const { tag, isTagEmpty, insertTag, updateTag } = useWritePostTag({
     tags,
     setTags,

@@ -1,12 +1,12 @@
 'use client';
 
-import { maxLengths } from '@/features/write/constants/writePostForm';
 import clsx from 'clsx';
 import { ChangeEvent, RefObject, useCallback, useMemo } from 'react';
 
 export default function WritePostContentEditor({
   contentEditorRef,
   content,
+  maxLength,
   isInvalid,
   isError,
   shouldAttachToolbarToBottom,
@@ -16,6 +16,7 @@ export default function WritePostContentEditor({
 }: {
   contentEditorRef: RefObject<HTMLTextAreaElement | null>;
   content: string;
+  maxLength: number;
   isInvalid: boolean;
   isError: boolean;
   shouldAttachToolbarToBottom: boolean;
@@ -23,7 +24,6 @@ export default function WritePostContentEditor({
   setShouldValidate: (shouldValidate: boolean) => void;
   setIsEditorFocused: (isEditorFocused: boolean) => void;
 }) {
-  const maxLength = useMemo(() => maxLengths['content'], []);
   const isContentTooLong = useMemo(
     () => content.length > maxLength,
     [content.length, maxLength]
