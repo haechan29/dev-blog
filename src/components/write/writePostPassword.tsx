@@ -6,15 +6,13 @@ import { Eye, EyeOff } from 'lucide-react';
 import { ChangeEvent, useCallback, useMemo, useState } from 'react';
 
 export default function WritePostPassword({
-  writePostForm: {
-    password: { value: password, maxLength, isValid },
-  },
+  password: { value: password, maxLength, isValid },
   setPassword,
-  setShouldValidate,
+  resetInvalidField,
 }: {
-  writePostForm: WritePostFormProps;
+  password: WritePostFormProps['password'];
   setPassword: (password: string) => void;
-  setShouldValidate: (shouldValidate: boolean) => void;
+  resetInvalidField: () => void;
 }) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -27,10 +25,10 @@ export default function WritePostPassword({
   const onBlur = useCallback(() => setIsFocused(false), []);
   const onChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      setShouldValidate(false);
+      resetInvalidField();
       setPassword(e.target.value);
     },
-    [setPassword, setShouldValidate]
+    [resetInvalidField, setPassword]
   );
 
   return (

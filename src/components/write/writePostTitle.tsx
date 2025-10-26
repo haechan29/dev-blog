@@ -5,15 +5,13 @@ import clsx from 'clsx';
 import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
 
 export default function WritePostTitle({
-  writePostForm: {
-    title: { value: title, isValid, maxLength },
-  },
+  title: { value: title, isValid, maxLength },
   setTitle,
-  setShouldValidate,
+  resetInvalidField,
 }: {
-  writePostForm: WritePostFormProps;
+  title: WritePostFormProps['title'];
   setTitle: (title: string) => void;
-  setShouldValidate: (shouldValidate: boolean) => void;
+  resetInvalidField: () => void;
 }) {
   const [isFocused, setIsFocused] = useState(false);
   const isTitleTooLong = useMemo(
@@ -27,10 +25,10 @@ export default function WritePostTitle({
   const onBlur = useCallback(() => setIsFocused(false), []);
   const onChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      setShouldValidate(false);
+      resetInvalidField();
       setTitle(e.target.value);
     },
-    [setShouldValidate, setTitle]
+    [resetInvalidField, setTitle]
   );
 
   return (

@@ -10,16 +10,16 @@ import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
 import { useRef } from 'react';
 
 export default function WritePostContent({
-  writePostForm: { content },
+  content,
   setContent,
-  setShouldValidate,
+  resetInvalidField,
 }: {
-  writePostForm: WritePostFormProps;
+  content: WritePostFormProps['content'];
   setContent: (content: string) => void;
-  setShouldValidate: (shouldValidate: boolean) => void;
+  resetInvalidField: () => void;
 }) {
   const contentEditorRef = useRef<HTMLTextAreaElement | null>(null);
-  const { htmlSource, isError } = useParseHtml({ ...content });
+  const { htmlSource, isError } = useParseHtml(content);
   const { contentToolbar, setIsEditorFocused } = useWritePostContentToolbar();
   const contentButton = useWritePostContentButton({
     ...content,
@@ -38,7 +38,7 @@ export default function WritePostContent({
             {...content}
             {...contentToolbar}
             setContent={setContent}
-            setShouldValidate={setShouldValidate}
+            resetInvalidField={resetInvalidField}
             setIsEditorFocused={setIsEditorFocused}
           />
         </div>

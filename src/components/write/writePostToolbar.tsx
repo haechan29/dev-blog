@@ -1,31 +1,33 @@
 'use client';
 
-import { writePostSteps } from '@/features/write/constants/writePostStep';
-import {
-  createProps,
-  WritePostToolbarProps,
-} from '@/features/write/ui/writePostToolbarProps';
+import useWritePostToolbar from '@/features/write/hooks/useWritePostToolbar';
+import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
 import clsx from 'clsx';
 import { ChevronRight } from 'lucide-react';
-import { Fragment, useCallback, useMemo } from 'react';
+import { Fragment, useCallback } from 'react';
 
 export default function WritePostToolbar({
-  currentStepId,
-  setShouldValidate,
-  onAction,
+  writePostForm: { currentStepId },
+  getInvalidField,
+  setInvalidField,
 }: {
-  currentStepId: keyof typeof writePostSteps;
-  setShouldValidate: (shouldValidate: boolean) => void;
-  onAction: () => void;
+  writePostForm: WritePostFormProps;
+  getInvalidField: () => string | null;
+  setInvalidField: (invalidField: string) => void;
 }) {
-  const { toolbarTexts, actionButtonText }: WritePostToolbarProps = useMemo(
-    () => createProps({ currentStepId }),
-    [currentStepId]
-  );
+  const {
+    writePostToolbar: { toolbarTexts, actionButtonText },
+    onAction,
+  } = useWritePostToolbar({ currentStepId });
+
   const onActionButtonClick = useCallback(() => {
-    setShouldValidate(true);
-    onAction();
-  }, [onAction, setShouldValidate]);
+    const invalidField = getInvalidField();
+    if (invalidField) {
+      setInvalidField(invalidField);
+    } else {
+      onAction();
+    }
+  }, [getInvalidField, onAction, setInvalidField]);
 
   return (
     <div

@@ -1,6 +1,5 @@
 import { writePostSteps } from '@/features/write/constants/writePostStep';
 
-export interface WritePost {
+export interface WritePostToolbar {
   currentStepId: keyof typeof writePostSteps;
-  publishResult?: 'success' | 'error';
 }

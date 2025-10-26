@@ -2,7 +2,7 @@ import { writePostSteps } from '@/features/write/constants/writePostStep';
 
 export interface WritePostForm {
   currentStepId: keyof typeof writePostSteps;
-  shouldValidate: boolean;
+  invalidField: string | null;
   title: {
     value: string;
     isEmptyAllowed: boolean;
@@ -27,40 +27,35 @@ export interface WritePostForm {
   };
 }
 
-export function validate(
-  form: WritePostForm,
-  ...fields: (keyof WritePostForm)[]
-) {
-  return (
-    !form.shouldValidate ||
-    fields.every(field => {
-      switch (field) {
-        case 'title': {
-          const { value, isEmptyAllowed, maxLength } = form[field];
-          return (
-            (isEmptyAllowed || value.length > 0) && value.length <= maxLength
-          );
-        }
-        case 'tags': {
-          const { value, isEmptyAllowed, maxTagsLength } = form[field];
-          return (
-            (isEmptyAllowed || value.length > 0) &&
-            value.length <= maxTagsLength
-          );
-        }
-        case 'password': {
-          const { value, isEmptyAllowed, maxLength } = form[field];
-          return (
-            (isEmptyAllowed || value.length > 0) && value.length <= maxLength
-          );
-        }
-        case 'content': {
-          const { value, isEmptyAllowed, maxLength } = form[field];
-          return (
-            (isEmptyAllowed || value.length > 0) && value.length <= maxLength
-          );
-        }
+export function validate(form: WritePostForm, ...fields: string[]) {
+  return fields.every(field => {
+    switch (field) {
+      case 'title': {
+        const { value, isEmptyAllowed, maxLength } = form[field];
+        return (
+          (isEmptyAllowed || value.length > 0) && value.length <= maxLength
+        );
       }
-    })
-  );
+      case 'tags': {
+        const { value, isEmptyAllowed, maxTagsLength } = form[field];
+        return (
+          (isEmptyAllowed || value.length > 0) && value.length <= maxTagsLength
+        );
+      }
+      case 'password': {
+        const { value, isEmptyAllowed, maxLength } = form[field];
+        return (
+          (isEmptyAllowed || value.length > 0) && value.length <= maxLength
+        );
+      }
+      case 'content': {
+        const { value, isEmptyAllowed, maxLength } = form[field];
+        return (
+          (isEmptyAllowed || value.length > 0) && value.length <= maxLength
+        );
+      }
+      default:
+        return false;
+    }
+  });
 }

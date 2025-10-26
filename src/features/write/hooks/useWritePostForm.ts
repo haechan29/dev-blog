@@ -1,8 +1,12 @@
 'use client';
 
 import { writePostSteps } from '@/features/write/constants/writePostStep';
-import { WritePostForm } from '@/features/write/domain/model/writePostForm';
+import {
+  validate,
+  WritePostForm,
+} from '@/features/write/domain/model/writePostForm';
 import { createProps } from '@/features/write/ui/writePostFormProps';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export default function useWritePostForm({
@@ -10,9 +14,10 @@ export default function useWritePostForm({
 }: {
   currentStepId: keyof typeof writePostSteps;
 }) {
+  const router = useRouter();
   const [writePostForm, setWritePostForm] = useState<WritePostForm>({
     currentStepId,
-    shouldValidate: false,
+    invalidField: null,
     title: {
       value: '',
       isEmptyAllowed: false,
@@ -42,11 +47,19 @@ export default function useWritePostForm({
     [writePostForm]
   );
 
-  const setShouldValidate = useCallback((shouldValidate: boolean) => {
-    setWritePostForm(prev => ({
-      ...prev,
-      shouldValidate,
-    }));
+  const getInvalidField = useCallback(() => {
+    const currentStep = writePostSteps[writePostForm.currentStepId];
+    return (
+      currentStep.fields.find(field => !validate(writePostForm, field)) ?? null
+    );
+  }, [writePostForm]);
+
+  const setInvalidField = useCallback((invalidField: string) => {
+    setWritePostForm(prev => ({ ...prev, invalidField }));
+  }, []);
+
+  const resetInvalidField = useCallback(() => {
+    setWritePostForm(prev => ({ ...prev, invalidField: null }));
   }, []);
 
   const setTitle = useCallback((title: string) => {
@@ -82,9 +95,21 @@ export default function useWritePostForm({
     [currentStepId]
   );
 
+  useEffect(() => {
+    for (const step of Object.values(writePostSteps)) {
+      if (writePostForm.currentStepId === step.id) return;
+      const isValid = validate(writePostForm, ...step.fields);
+      if (!isValid) {
+        router.push(`/write?step=${step.id}`);
+      }
+    }
+  }, [router, writePostForm]);
+
   return {
     writePostForm: writePostFormProps,
-    setShouldValidate,
+    getInvalidField,
+    setInvalidField,
+    resetInvalidField,
     setTitle,
     setTags,
     setPassword,

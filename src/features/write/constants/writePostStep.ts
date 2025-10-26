@@ -1,11 +1,9 @@
-import { WritePostForm } from '@/features/write/domain/model/writePostForm';
-
 interface WritePostStep {
   id: string;
   toolbarText: string;
   actionButtonText: string;
   action: string;
-  fields: (keyof WritePostForm)[];
+  fields: string[];
 }
 
 export const writeStep: WritePostStep = {

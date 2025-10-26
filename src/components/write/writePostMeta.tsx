@@ -5,18 +5,20 @@ import WritePostTag from '@/components/write/writePostTag';
 import WritePostTitle from '@/components/write/writePostTitle';
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
 
-export default function WritePostMeta(writePost: {
-  writePostForm: WritePostFormProps;
+export default function WritePostMeta(writePostForm: {
+  title: WritePostFormProps['title'];
+  tags: WritePostFormProps['tags'];
+  password: WritePostFormProps['password'];
   setTitle: (title: string) => void;
   setTags: (tags: string[]) => void;
   setPassword: (password: string) => void;
-  setShouldValidate: (shouldValidate: boolean) => void;
+  resetInvalidField: () => void;
 }) {
   return (
     <div className='flex flex-col gap-4'>
-      <WritePostTitle {...writePost} />
-      <WritePostTag {...writePost} />
-      <WritePostPassword {...writePost} />
+      <WritePostTitle {...writePostForm} />
+      <WritePostTag {...writePostForm} />
+      <WritePostPassword {...writePostForm} />
     </div>
   );
 }

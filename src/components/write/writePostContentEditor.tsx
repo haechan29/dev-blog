@@ -11,7 +11,7 @@ export default function WritePostContentEditor({
   isValid,
   shouldAttachToolbarToBottom,
   setContent,
-  setShouldValidate,
+  resetInvalidField,
   setIsEditorFocused,
 }: {
   contentEditorRef: RefObject<HTMLTextAreaElement | null>;
@@ -21,7 +21,7 @@ export default function WritePostContentEditor({
   isValid: boolean;
   shouldAttachToolbarToBottom: boolean;
   setContent: (content: string) => void;
-  setShouldValidate: (shouldValidate: boolean) => void;
+  resetInvalidField: () => void;
   setIsEditorFocused: (isEditorFocused: boolean) => void;
 }) {
   const isContentTooLong = useMemo(
@@ -30,10 +30,10 @@ export default function WritePostContentEditor({
   );
   const onChange = useCallback(
     (e: ChangeEvent<HTMLTextAreaElement>) => {
-      setShouldValidate(false);
+      resetInvalidField();
       setContent(e.target.value);
     },
-    [setContent, setShouldValidate]
+    [resetInvalidField, setContent]
   );
 
   return (

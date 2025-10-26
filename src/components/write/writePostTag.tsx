@@ -6,15 +6,13 @@ import clsx from 'clsx';
 import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
 
 export default function WritePostTag({
-  writePostForm: {
-    tags: { value: tags, maxTagLength, maxTagsLength, isValid },
-  },
+  tags: { value: tags, maxTagLength, maxTagsLength, isValid },
   setTags,
-  setShouldValidate,
+  resetInvalidField,
 }: {
-  writePostForm: WritePostFormProps;
+  tags: WritePostFormProps['tags'];
   setTags: (tags: string[]) => void;
-  setShouldValidate: (shouldValidate: boolean) => void;
+  resetInvalidField: () => void;
 }) {
   const [isFocused, setIsFocused] = useState(false);
   const tagRef = useRef<HTMLInputElement | null>(null);
@@ -41,9 +39,9 @@ export default function WritePostTag({
   const onChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       updateTag(e.target.value);
-      setShouldValidate(false);
+      resetInvalidField();
     },
-    [setShouldValidate, updateTag]
+    [resetInvalidField, updateTag]
   );
 
   return (
