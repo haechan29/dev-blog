@@ -7,6 +7,7 @@ import useParseHtml from '@/features/write/hooks/useParseHtml';
 import useWritePostContentButton from '@/features/write/hooks/useWritePostContentButton';
 import useWritePostContentToolbar from '@/features/write/hooks/useWritePostContentToolbar';
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
+import { SetState } from '@/types/react';
 import { useRef } from 'react';
 
 export default function WritePostContent({
@@ -15,7 +16,7 @@ export default function WritePostContent({
   resetInvalidField,
 }: {
   content: WritePostFormProps['content'];
-  setContent: (content: string) => void;
+  setContent: SetState<string>;
   resetInvalidField: () => void;
 }) {
   const contentEditorRef = useRef<HTMLTextAreaElement | null>(null);

@@ -1,8 +1,16 @@
 'use client';
 
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
+import { SetState } from '@/types/react';
 import clsx from 'clsx';
-import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
+import {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 export default function WritePostTitle({
   title: { value: title, isValid, maxLength },
@@ -10,7 +18,7 @@ export default function WritePostTitle({
   resetInvalidField,
 }: {
   title: WritePostFormProps['title'];
-  setTitle: (title: string) => void;
+  setTitle: SetState<string>;
   resetInvalidField: () => void;
 }) {
   const [isFocused, setIsFocused] = useState(false);
@@ -30,6 +38,12 @@ export default function WritePostTitle({
     },
     [resetInvalidField, setTitle]
   );
+
+  useEffect(() => {
+    if (!isFocused) {
+      setTitle(prev => prev.slice(0, maxLength));
+    }
+  }, [isFocused, maxLength, setTitle]);
 
   return (
     <div
@@ -69,7 +83,7 @@ export default function WritePostTitle({
       <div
         className={clsx(
           'flex text-sm gap-0.5 items-center',
-          title.length < maxLength * 0.95 && 'hidden',
+          (!isFocused || title.length < maxLength * 0.95) && 'hidden',
           isTitleTooLong && 'text-red-500'
         )}
       >

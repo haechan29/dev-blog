@@ -2,8 +2,16 @@
 
 import useWritePostTag from '@/features/write/hooks/useWritePostTag';
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
+import { SetState } from '@/types/react';
 import clsx from 'clsx';
-import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
+import {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 export default function WritePostTag({
   tags: { value: tags, maxTagLength, maxTagsLength, isValid },
@@ -11,7 +19,7 @@ export default function WritePostTag({
   resetInvalidField,
 }: {
   tags: WritePostFormProps['tags'];
-  setTags: (tags: string[]) => void;
+  setTags: SetState<string[]>;
   resetInvalidField: () => void;
 }) {
   const [isFocused, setIsFocused] = useState(false);
@@ -43,6 +51,12 @@ export default function WritePostTag({
     },
     [resetInvalidField, updateTag]
   );
+
+  useEffect(() => {
+    if (!isFocused) {
+      setTags(prev => prev.slice(0, maxTagsLength));
+    }
+  }, [isFocused, maxTagsLength, setTags]);
 
   return (
     <div
@@ -114,7 +128,10 @@ export default function WritePostTag({
           className={clsx(
             'flex text-sm gap-0.5 items-center',
             areTagsTooMany ? 'text-red-500' : 'text-blue-500',
-            (tags.length === 0 || tag.length >= maxTagLength * 0.95) && 'hidden'
+            (tags.length === 0 ||
+              !isFocused ||
+              tag.length >= maxTagLength * 0.95) &&
+              'hidden'
           )}
         >
           <div>{tags.length}</div>

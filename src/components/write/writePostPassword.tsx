@@ -1,9 +1,10 @@
 'use client';
 
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
+import { SetState } from '@/types/react';
 import clsx from 'clsx';
 import { Eye, EyeOff } from 'lucide-react';
-import { ChangeEvent, useCallback, useMemo, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
 export default function WritePostPassword({
   password: { value: password, maxLength, isValid },
@@ -11,7 +12,7 @@ export default function WritePostPassword({
   resetInvalidField,
 }: {
   password: WritePostFormProps['password'];
-  setPassword: (password: string) => void;
+  setPassword: SetState<string>;
   resetInvalidField: () => void;
 }) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -30,6 +31,12 @@ export default function WritePostPassword({
     },
     [resetInvalidField, setPassword]
   );
+
+  useEffect(() => {
+    if (!isFocused) {
+      setPassword(prev => prev.slice(0, maxLength));
+    }
+  }, [isFocused, maxLength, setPassword]);
 
   return (
     <div
@@ -56,7 +63,7 @@ export default function WritePostPassword({
       <div
         className={clsx(
           'flex text-sm gap-0.5 items-center',
-          password.length < maxLength * 0.95 && 'hidden',
+          (!isFocused || password.length < maxLength * 0.95) && 'hidden',
           isPasswordTooLong && 'text-red-500'
         )}
       >

@@ -2,20 +2,13 @@
 
 import WritePostContent from '@/components/write/writePostContent';
 import WritePostMeta from '@/components/write/writePostMeta';
-import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
+import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import clsx from 'clsx';
 
 export default function WritePostForm({
   writePostForm: { currentStepId, content, ...meta },
   ...writePostForm
-}: {
-  writePostForm: WritePostFormProps;
-  resetInvalidField: () => void;
-  setTitle: (title: string) => void;
-  setTags: (tags: string[]) => void;
-  setPassword: (password: string) => void;
-  setContent: (content: string) => void;
-}) {
+}: ReturnType<typeof useWritePostForm>) {
   return (
     <div className='w-[100vw] h-full overflow-x-hidden'>
       <div
