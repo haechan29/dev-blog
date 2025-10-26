@@ -1,19 +1,22 @@
 'use client';
 
+import { WritePost } from '@/features/write/domain/model/writePost';
 import { WritePostForm } from '@/features/write/domain/model/writePostForm';
 import { createProps } from '@/features/write/ui/writePostFormProps';
 import { useCallback, useMemo } from 'react';
 
 export default function useWritePostForm({
+  writePost,
   writePostForm,
   setWritePostForm,
 }: {
+  writePost: WritePost;
   writePostForm: WritePostForm;
   setWritePostForm: (form: WritePostForm) => void;
 }) {
   const writePostFormProps = useMemo(
-    () => createProps(writePostForm),
-    [writePostForm]
+    () => createProps(writePost, writePostForm),
+    [writePost, writePostForm]
   );
 
   const setTitle = useCallback(

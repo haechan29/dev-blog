@@ -16,11 +16,11 @@ type MarkdownParams = {
 };
 
 export default function useWritePostContentButton({
-  content,
+  value: content,
   contentEditorRef,
   setContent,
 }: {
-  content: string;
+  value: string;
   contentEditorRef: RefObject<HTMLTextAreaElement | null>;
   setContent: (content: string) => void;
 }) {

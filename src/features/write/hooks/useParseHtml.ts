@@ -4,7 +4,7 @@ import useDebounce from '@/hooks/useDebounce';
 import { processMd } from '@/lib/md';
 import { useCallback, useEffect, useState } from 'react';
 
-export default function useParseHtml({ content }: { content: string }) {
+export default function useParseHtml({ value: content }: { value: string }) {
   const [htmlSource, setHtmlSource] = useState<string | null>(null);
   const [isError, setIsError] = useState(false);
   const debounce = useDebounce();

@@ -19,7 +19,6 @@ export default function WritePostTitle({
   setShouldValidate: (shouldValidate: boolean) => void;
 }) {
   const [isFocused, setIsFocused] = useState(false);
-  const isInvalid = useMemo(() => invalidField === 'title', [invalidField]);
   const isTitleTooLong = useMemo(
     () => title.length > maxLength,
     [maxLength, title.length]
@@ -42,7 +41,7 @@ export default function WritePostTitle({
       className={clsx(
         'flex border rounded-lg gap-3 px-3 py-4',
         !title && 'bg-gray-50',
-        isInvalid || isTitleTooLong
+        !isValid || isTitleTooLong
           ? 'border-red-400 animate-shake'
           : isFocused
           ? 'border-blue-500'

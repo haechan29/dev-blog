@@ -10,7 +10,6 @@ export default function WritePostTag({
   writePostForm: {
     tags: { value: tags, maxTagLength, maxTagsLength, isValid },
   },
-  writePostValidity: { invalidField },
   setTags,
   setShouldValidate,
 }: {
@@ -21,7 +20,6 @@ export default function WritePostTag({
 }) {
   const [isFocused, setIsFocused] = useState(false);
   const tagRef = useRef<HTMLInputElement | null>(null);
-  const isInvalid = useMemo(() => invalidField === 'tags', [invalidField]);
   const { tag, isTagEmpty, insertTag, updateTag } = useWritePostTag({
     tags,
     setTags,
@@ -54,7 +52,7 @@ export default function WritePostTag({
     <div
       className={clsx(
         'w-full flex border rounded-lg items-center gap-3 p-3',
-        isInvalid || areTagsTooMany || isTagTooLong
+        !isValid || areTagsTooMany || isTagTooLong
           ? 'border-red-400 animate-shake'
           : isFocused
           ? 'border-blue-500'

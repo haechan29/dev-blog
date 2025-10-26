@@ -8,12 +8,10 @@ import useWritePostContentButton from '@/features/write/hooks/useWritePostConten
 import useWritePostContentToolbar from '@/features/write/hooks/useWritePostContentToolbar';
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
 import { WritePostValidityProps } from '@/features/write/ui/writePostValidityProps';
-import { useMemo, useRef } from 'react';
+import { useRef } from 'react';
 
 export default function WritePostContent({
-  writePostForm: {
-    content: { value: content, maxLength, isValid },
-  },
+  writePostForm: { content },
   writePostValidity: { invalidField },
   setContent,
   setShouldValidate,
@@ -24,14 +22,13 @@ export default function WritePostContent({
   setShouldValidate: (shouldValidate: boolean) => void;
 }) {
   const contentEditorRef = useRef<HTMLTextAreaElement | null>(null);
-  const { htmlSource, isError } = useParseHtml({ content });
+  const { htmlSource, isError } = useParseHtml({ ...content });
   const { contentToolbar, setIsEditorFocused } = useWritePostContentToolbar();
   const contentButton = useWritePostContentButton({
-    content,
+    ...content,
     contentEditorRef,
     setContent,
   });
-  const isInvalid = useMemo(() => invalidField === 'content', [invalidField]);
 
   return (
     <div className='h-full grid max-lg:grid-rows-[50%_100%] lg:grid-cols-2 gap-4'>
@@ -40,10 +37,8 @@ export default function WritePostContent({
         <div className='flex-1 min-h-0'>
           <WritePostContentEditor
             contentEditorRef={contentEditorRef}
-            content={content}
-            maxLength={maxLength}
-            isInvalid={isInvalid}
             isError={isError}
+            {...content}
             {...contentToolbar}
             setContent={setContent}
             setShouldValidate={setShouldValidate}

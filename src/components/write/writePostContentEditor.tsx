@@ -5,20 +5,20 @@ import { ChangeEvent, RefObject, useCallback, useMemo } from 'react';
 
 export default function WritePostContentEditor({
   contentEditorRef,
-  content,
-  maxLength,
-  isInvalid,
   isError,
+  value: content,
+  maxLength,
+  isValid,
   shouldAttachToolbarToBottom,
   setContent,
   setShouldValidate,
   setIsEditorFocused,
 }: {
   contentEditorRef: RefObject<HTMLTextAreaElement | null>;
-  content: string;
-  maxLength: number;
-  isInvalid: boolean;
   isError: boolean;
+  value: string;
+  maxLength: number;
+  isValid: boolean;
   shouldAttachToolbarToBottom: boolean;
   setContent: (content: string) => void;
   setShouldValidate: (shouldValidate: boolean) => void;
@@ -48,7 +48,7 @@ export default function WritePostContentEditor({
         className={clsx(
           'flex-1 min-h-0 p-4 resize-none outline-none border',
           shouldAttachToolbarToBottom ? 'rounded-lg' : 'rounded-b-lg',
-          !isInvalid && !isError && !isContentTooLong
+          isValid && !isError && !isContentTooLong
             ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
             : 'border-red-400 animate-shake',
           !content && 'bg-gray-50'

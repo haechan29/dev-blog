@@ -10,7 +10,6 @@ export default function WritePostPassword({
   writePostForm: {
     password: { value: password, maxLength, isValid },
   },
-  writePostValidity: { invalidField },
   setPassword,
   setShouldValidate,
 }: {
@@ -21,7 +20,6 @@ export default function WritePostPassword({
 }) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  const isInvalid = useMemo(() => invalidField === 'password', [invalidField]);
   const isPasswordTooLong = useMemo(
     () => password.length > maxLength,
     [maxLength, password.length]
@@ -42,7 +40,7 @@ export default function WritePostPassword({
       className={clsx(
         'flex border rounded-lg gap-3 p-3',
         !isPasswordVisible && !password && 'bg-gray-50',
-        isInvalid || isPasswordTooLong
+        !isValid || isPasswordTooLong
           ? 'border-red-400 animate-shake'
           : isFocused
           ? 'border-blue-500'

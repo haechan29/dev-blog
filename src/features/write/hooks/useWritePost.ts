@@ -70,6 +70,7 @@ export default function useWritePost({
 
   const { writePostFormProps, setTitle, setTags, setPassword, setContent } =
     useWritePostForm({
+      writePost,
       writePostForm,
       setWritePostForm,
     });

@@ -1,3 +1,5 @@
+import { writePostSteps } from '@/features/write/constants/writePostStep';
+import { WritePost } from '@/features/write/domain/model/writePost';
 import {
   validate,
   WritePostForm,
@@ -27,27 +29,36 @@ export type WritePostFormProps = {
   };
 };
 
-export function createProps(form: WritePostForm): WritePostFormProps {
+export function createProps(
+  writePost: WritePost,
+  form: WritePostForm
+): WritePostFormProps {
+  const { currentStepId, shouldValidate } = writePost;
+  const currentStep = writePostSteps[currentStepId];
+  const invalidField = shouldValidate
+    ? currentStep.fields.find(field => !validate(form, field)) ?? null
+    : null;
+
   return {
     title: {
       value: form.title.value,
-      isValid: validate(form, 'title'),
+      isValid: invalidField !== 'title',
       maxLength: form.title.maxLength,
     },
     tags: {
       value: form.tags.value.map(tag => `${form.tags.delimeter}${tag}`),
-      isValid: validate(form, 'tags'),
+      isValid: invalidField !== 'tags',
       maxTagLength: form.tags.maxTagLength,
       maxTagsLength: form.tags.maxTagsLength,
     },
     password: {
       value: form.password.value,
-      isValid: validate(form, 'password'),
+      isValid: invalidField !== 'password',
       maxLength: form.password.maxLength,
     },
     content: {
       value: form.content.value,
-      isValid: validate(form, 'content'),
+      isValid: invalidField !== 'content',
       maxLength: form.content.maxLength,
     },
   };
