@@ -1,11 +1,11 @@
 import { writePostSteps } from '@/features/write/constants/writePostStep';
-import { WritePost } from '@/features/write/domain/model/writePost';
 import {
   validate,
   WritePostForm,
 } from '@/features/write/domain/model/writePostForm';
 
 export type WritePostFormProps = {
+  currentStepId: keyof typeof writePostSteps;
   title: {
     value: string;
     isValid: boolean;
@@ -29,17 +29,13 @@ export type WritePostFormProps = {
   };
 };
 
-export function createProps(
-  writePost: WritePost,
-  form: WritePostForm
-): WritePostFormProps {
-  const { currentStepId, shouldValidate } = writePost;
-  const currentStep = writePostSteps[currentStepId];
-  const invalidField = shouldValidate
-    ? currentStep.fields.find(field => !validate(form, field)) ?? null
-    : null;
+export function createProps(form: WritePostForm): WritePostFormProps {
+  const currentStep = writePostSteps[form.currentStepId];
+  const invalidField =
+    currentStep.fields.find(field => !validate(form, field)) ?? null;
 
   return {
+    currentStepId: form.currentStepId,
     title: {
       value: form.title.value,
       isValid: invalidField !== 'title',

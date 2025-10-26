@@ -3,11 +3,6 @@
 import { writePostSteps } from '@/features/write/constants/writePostStep';
 import { WritePost } from '@/features/write/domain/model/writePost';
 import {
-  validate,
-  WritePostForm,
-} from '@/features/write/domain/model/writePostForm';
-import useWritePostForm from '@/features/write/hooks/useWritePostForm';
-import {
   createProps,
   WritePostProps,
 } from '@/features/write/ui/writePostProps';
@@ -29,32 +24,6 @@ export default function useWritePost({
 
   const [writePost, setWritePost] = useState<WritePost>({
     currentStepId,
-    shouldValidate: false,
-  });
-
-  const [writePostForm, setWritePostForm] = useState<WritePostForm>({
-    title: {
-      value: '',
-      isEmptyAllowed: false,
-      maxLength: 50,
-    },
-    tags: {
-      value: [],
-      isEmptyAllowed: true,
-      maxTagLength: 31,
-      maxTagsLength: 10,
-      delimeter: '#',
-    },
-    password: {
-      value: '',
-      isEmptyAllowed: false,
-      maxLength: 20,
-    },
-    content: {
-      value: '',
-      isEmptyAllowed: false,
-      maxLength: 50_000,
-    },
   });
 
   const writePostProps: WritePostProps = useMemo(
@@ -66,17 +35,6 @@ export default function useWritePost({
     () => createToolbarProps(writePost),
     [writePost]
   );
-
-  const { writePostFormProps, setTitle, setTags, setPassword, setContent } =
-    useWritePostForm({
-      writePost,
-      writePostForm,
-      setWritePostForm,
-    });
-
-  const setShouldValidate = useCallback((shouldValidate: boolean) => {
-    setWritePost(prev => ({ ...prev, shouldValidate }));
-  }, []);
 
   const handleAction = useCallback(() => {
     const currentStep = writePostSteps[writePost.currentStepId];
@@ -93,35 +51,29 @@ export default function useWritePost({
   }, [pathname, router, searchParams, writePost.currentStepId]);
 
   const onAction = useCallback(() => {
-    const currentStep = writePostSteps[writePost.currentStepId];
-    const isValid = validate(writePostForm, ...currentStep.fields);
-    if (!isValid) return;
+    // const currentStep = writePostSteps[writePost.currentStepId];
+    // const isValid = validate(writePostForm, ...currentStep.fields);
+    // if (!isValid) return;
     handleAction();
-  }, [handleAction, writePost.currentStepId, writePostForm]);
+  }, [handleAction]);
 
   useEffect(() => {
     setWritePost(prev => ({ ...prev, currentStepId, shouldValidate: false }));
   }, [currentStepId]);
 
   useEffect(() => {
-    for (const step of Object.values(writePostSteps)) {
-      if (writePost.currentStepId === step.id) return;
-      const isValid = validate(writePostForm, ...step.fields);
-      if (!isValid) {
-        router.push(`/write?step=${step.id}`);
-      }
-    }
-  }, [router, writePost.currentStepId, writePostForm]);
+    // for (const step of Object.values(writePostSteps)) {
+    //   if (writePost.currentStepId === step.id) return;
+    //   const isValid = validate(writePostForm, ...step.fields);
+    //   if (!isValid) {
+    //     router.push(`/write?step=${step.id}`);
+    //   }
+    // }
+  }, []);
 
   return {
     writePost: writePostProps,
     writePostToolbar: writePostToolbarProps,
-    writePostForm: writePostFormProps,
-    setTitle,
-    setTags,
-    setPassword,
-    setContent,
-    setShouldValidate,
     onAction,
   };
 }
