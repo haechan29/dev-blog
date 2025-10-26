@@ -2,7 +2,6 @@
 
 import useWritePostTag from '@/features/write/hooks/useWritePostTag';
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
-import { WritePostValidityProps } from '@/features/write/ui/writePostValidityProps';
 import clsx from 'clsx';
 import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
 
@@ -14,7 +13,6 @@ export default function WritePostTag({
   setShouldValidate,
 }: {
   writePostForm: WritePostFormProps;
-  writePostValidity: WritePostValidityProps;
   setTags: (tags: string[]) => void;
   setShouldValidate: (shouldValidate: boolean) => void;
 }) {

@@ -7,7 +7,6 @@ import {
   WritePostForm,
 } from '@/features/write/domain/model/writePostForm';
 import useWritePostForm from '@/features/write/hooks/useWritePostForm';
-import useWritePostValidity from '@/features/write/hooks/useWritePostValidity';
 import {
   createProps,
   WritePostProps,
@@ -75,11 +74,6 @@ export default function useWritePost({
       setWritePostForm,
     });
 
-  const { writePostValidity, validateFields } = useWritePostValidity({
-    writePost,
-    writePostForm,
-  });
-
   const setShouldValidate = useCallback((shouldValidate: boolean) => {
     setWritePost(prev => ({ ...prev, shouldValidate }));
   }, []);
@@ -99,10 +93,11 @@ export default function useWritePost({
   }, [pathname, router, searchParams, writePost.currentStepId]);
 
   const onAction = useCallback(() => {
-    const isValid = validateFields();
+    const currentStep = writePostSteps[writePost.currentStepId];
+    const isValid = validate(writePostForm, ...currentStep.fields);
     if (!isValid) return;
     handleAction();
-  }, [handleAction, validateFields]);
+  }, [handleAction, writePost.currentStepId, writePostForm]);
 
   useEffect(() => {
     setWritePost(prev => ({ ...prev, currentStepId, shouldValidate: false }));
@@ -122,7 +117,6 @@ export default function useWritePost({
     writePost: writePostProps,
     writePostToolbar: writePostToolbarProps,
     writePostForm: writePostFormProps,
-    writePostValidity,
     setTitle,
     setTags,
     setPassword,

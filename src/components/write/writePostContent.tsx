@@ -7,17 +7,14 @@ import useParseHtml from '@/features/write/hooks/useParseHtml';
 import useWritePostContentButton from '@/features/write/hooks/useWritePostContentButton';
 import useWritePostContentToolbar from '@/features/write/hooks/useWritePostContentToolbar';
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
-import { WritePostValidityProps } from '@/features/write/ui/writePostValidityProps';
 import { useRef } from 'react';
 
 export default function WritePostContent({
   writePostForm: { content },
-  writePostValidity: { invalidField },
   setContent,
   setShouldValidate,
 }: {
   writePostForm: WritePostFormProps;
-  writePostValidity: WritePostValidityProps;
   setContent: (content: string) => void;
   setShouldValidate: (shouldValidate: boolean) => void;
 }) {

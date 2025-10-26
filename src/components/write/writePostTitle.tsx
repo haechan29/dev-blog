@@ -1,7 +1,6 @@
 'use client';
 
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
-import { WritePostValidityProps } from '@/features/write/ui/writePostValidityProps';
 import clsx from 'clsx';
 import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
 
@@ -9,12 +8,10 @@ export default function WritePostTitle({
   writePostForm: {
     title: { value: title, isValid, maxLength },
   },
-  writePostValidity: { invalidField },
   setTitle,
   setShouldValidate,
 }: {
   writePostForm: WritePostFormProps;
-  writePostValidity: WritePostValidityProps;
   setTitle: (title: string) => void;
   setShouldValidate: (shouldValidate: boolean) => void;
 }) {

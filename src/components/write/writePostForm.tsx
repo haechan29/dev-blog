@@ -4,13 +4,11 @@ import WritePostContent from '@/components/write/writePostContent';
 import WritePostMeta from '@/components/write/writePostMeta';
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
 import { WritePostProps } from '@/features/write/ui/writePostProps';
-import { WritePostValidityProps } from '@/features/write/ui/writePostValidityProps';
 import clsx from 'clsx';
 
 export default function WritePostForm(writePost: {
   writePost: WritePostProps;
   writePostForm: WritePostFormProps;
-  writePostValidity: WritePostValidityProps;
   setContent: (content: string) => void;
   setTitle: (title: string) => void;
   setTags: (tags: string[]) => void;

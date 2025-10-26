@@ -1,7 +1,6 @@
 'use client';
 
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
-import { WritePostValidityProps } from '@/features/write/ui/writePostValidityProps';
 import clsx from 'clsx';
 import { Eye, EyeOff } from 'lucide-react';
 import { ChangeEvent, useCallback, useMemo, useState } from 'react';
@@ -14,7 +13,6 @@ export default function WritePostPassword({
   setShouldValidate,
 }: {
   writePostForm: WritePostFormProps;
-  writePostValidity: WritePostValidityProps;
   setPassword: (password: string) => void;
   setShouldValidate: (shouldValidate: boolean) => void;
 }) {
