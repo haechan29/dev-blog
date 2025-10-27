@@ -9,6 +9,7 @@ import {
 } from '@/features/write/ui/writePostToolbarProps';
 import useNavigationWithParams from '@/hooks/useNavigationWithParams';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import toast from 'react-hot-toast';
 
 export default function useWritePostToolbar({
   currentStepId,
@@ -30,13 +31,23 @@ export default function useWritePostToolbar({
   const onAction = useCallback(async () => {
     const currentStep = writePostSteps[writePostToolbar.currentStepId];
     switch (currentStep.action) {
-      case 'next':
+      case 'next': {
         navigate({ setParams: { step: 'upload' } });
         break;
-      case 'publish':
-        const post = await createPost();
-        navigate({ pathname: `/posts/${post.id}` });
+      }
+      case 'publish': {
+        try {
+          const post = await createPost();
+          navigate({ pathname: `/posts/${post.id}` });
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : '게시글 생성에 실패했습니다';
+          toast.error(errorMessage);
+        }
         break;
+      }
     }
   }, [createPost, navigate, writePostToolbar.currentStepId]);
 

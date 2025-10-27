@@ -14,7 +14,7 @@ export default function useParseHtml({ value: content }: { value: string }) {
     try {
       const result = await processMd(content);
       setHtmlSource(result);
-    } catch (error) {
+    } catch {
       setIsError(true);
     }
   }, [content]);
