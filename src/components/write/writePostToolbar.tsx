@@ -1,5 +1,6 @@
 'use client';
 
+import { PostProps } from '@/features/post/ui/postProps';
 import useWritePostToolbar from '@/features/write/hooks/useWritePostToolbar';
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
 import clsx from 'clsx';
@@ -10,15 +11,17 @@ export default function WritePostToolbar({
   writePostForm: { currentStepId },
   getInvalidField,
   setInvalidField,
+  createPost,
 }: {
   writePostForm: WritePostFormProps;
   getInvalidField: () => string | null;
   setInvalidField: (invalidField: string) => void;
+  createPost: () => Promise<PostProps>;
 }) {
   const {
     writePostToolbar: { toolbarTexts, actionButtonText },
     onAction,
-  } = useWritePostToolbar({ currentStepId });
+  } = useWritePostToolbar({ currentStepId, createPost });
 
   const onActionButtonClick = useCallback(() => {
     const invalidField = getInvalidField();

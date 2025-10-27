@@ -1,5 +1,7 @@
 'use client';
 
+import * as PostService from '@/features/post/domain/service/postService';
+import { createProps as createPostProps } from '@/features/post/ui/postProps';
 import { writePostSteps } from '@/features/write/constants/writePostStep';
 import {
   validate,
@@ -106,6 +108,21 @@ export default function useWritePostForm({
     }));
   }, []);
 
+  const createPost = useCallback(async () => {
+    const post = await PostService.createPost({
+      title: writePostForm.title.value,
+      content: writePostForm.content.value,
+      tags: writePostForm.tags.value,
+      password: writePostForm.password.value,
+    });
+    return createPostProps(post);
+  }, [
+    writePostForm.content.value,
+    writePostForm.password.value,
+    writePostForm.tags.value,
+    writePostForm.title.value,
+  ]);
+
   useEffect(
     () => setWritePostForm(prev => ({ ...prev, currentStepId })),
     [currentStepId]
@@ -126,6 +143,7 @@ export default function useWritePostForm({
     getInvalidField,
     setInvalidField,
     resetInvalidField,
+    createPost,
     setTitle,
     setTags,
     setPassword,

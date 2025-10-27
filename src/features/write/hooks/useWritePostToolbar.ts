@@ -1,5 +1,6 @@
 'use client';
 
+import { PostProps } from '@/features/post/ui/postProps';
 import { writePostSteps } from '@/features/write/constants/writePostStep';
 import { WritePostToolbar } from '@/features/write/domain/model/writePostToolbar';
 import {
@@ -11,8 +12,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export default function useWritePostToolbar({
   currentStepId,
+  createPost,
 }: {
   currentStepId: keyof typeof writePostSteps;
+  createPost: () => Promise<PostProps>;
 }) {
   const navigate = useNavigationWithParams();
   const [writePostToolbar, setWritePostToolbar] = useState<WritePostToolbar>({
@@ -24,17 +27,18 @@ export default function useWritePostToolbar({
     [currentStepId]
   );
 
-  const onAction = useCallback(() => {
+  const onAction = useCallback(async () => {
     const currentStep = writePostSteps[writePostToolbar.currentStepId];
     switch (currentStep.action) {
       case 'next':
         navigate({ setParams: { step: 'upload' } });
         break;
       case 'publish':
-        console.log('게시글이 생성되었습니다');
+        const post = await createPost();
+        navigate({ pathname: `/posts/${post.id}` });
         break;
     }
-  }, [navigate, writePostToolbar.currentStepId]);
+  }, [createPost, navigate, writePostToolbar.currentStepId]);
 
   useEffect(
     () => setWritePostToolbar(prev => ({ ...prev, currentStepId })),
