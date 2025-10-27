@@ -1,23 +1,37 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { SetState } from '@/types/react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export default function useWritePostTag({
   tags,
+  isFocused,
+  maxTagLength,
+  maxTagsLength,
+  delimiter,
   setTags,
 }: {
   tags: string[];
-  setTags: (tags: string[]) => void;
+  isFocused: boolean;
+  maxTagLength: number;
+  maxTagsLength: number;
+  delimiter: string;
+  setTags: SetState<string[]>;
 }) {
-  const [tag, setTag] = useState('#');
-  const isTagEmpty = useMemo(() => tag === '#', [tag]);
+  const [tag, setTag] = useState(delimiter);
+  const isTagEmpty = useMemo(() => tag === delimiter, [delimiter, tag]);
 
   const insertTag = useCallback(
     (tag: string) => {
-      setTags([...tags, ...getTags(tag)]);
-      setTag('#');
+      const newTags = tag
+        .split(/\s+/)
+        .map(tag => (tag.startsWith(delimiter) ? tag.slice(1) : tag))
+        .map(tag => tag.slice(0, maxTagLength))
+        .filter(tag => tag.trim());
+      setTags(prev => [...new Set([...prev, ...newTags])]);
+      setTag(delimiter);
     },
-    [setTag, setTags, tags]
+    [delimiter, maxTagLength, setTags]
   );
 
   const deleteTag = useCallback(() => {
@@ -42,6 +56,18 @@ export default function useWritePostTag({
     [deleteTag, insertTag]
   );
 
+  useEffect(() => {
+    if (!tag.startsWith(delimiter)) {
+      setTag(prev => `${delimiter}${prev}`);
+    }
+  }, [delimiter, tag]);
+
+  useEffect(() => {
+    if (!isFocused) {
+      setTags(prev => prev.slice(0, maxTagsLength));
+    }
+  }, [isFocused, maxTagsLength, setTags]);
+
   return {
     tag,
     isTagEmpty,
@@ -49,11 +75,4 @@ export default function useWritePostTag({
     insertTag,
     updateTag,
   } as const;
-}
-
-function getTags(tag: string): string[] {
-  return tag
-    .split(/\s+/)
-    .filter(tag => tag.trim())
-    .map(tag => (tag.startsWith('#') ? tag : `#${tag}`));
 }

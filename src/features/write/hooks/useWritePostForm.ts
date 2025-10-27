@@ -6,8 +6,15 @@ import {
   WritePostForm,
 } from '@/features/write/domain/model/writePostForm';
 import { createProps } from '@/features/write/ui/writePostFormProps';
+import { update } from '@/types/react';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 export default function useWritePostForm({
   currentStepId,
@@ -26,9 +33,9 @@ export default function useWritePostForm({
     tags: {
       value: [],
       isEmptyAllowed: true,
-      maxTagLength: 31,
+      maxTagLength: 30,
       maxTagsLength: 10,
-      delimeter: '#',
+      delimiter: '#',
     },
     password: {
       value: '',
@@ -62,31 +69,40 @@ export default function useWritePostForm({
     setWritePostForm(prev => ({ ...prev, invalidField: null }));
   }, []);
 
-  const setTitle = useCallback((title: string) => {
+  const setTitle = useCallback((action: SetStateAction<string>) => {
     setWritePostForm(prev => ({
       ...prev,
-      title: { ...prev.title, value: title },
+      title: {
+        ...prev.title,
+        value: update(action, prev.title.value),
+      },
     }));
   }, []);
 
-  const setTags = useCallback((tags: string[]) => {
+  const setTags = useCallback((action: SetStateAction<string[]>) => {
     setWritePostForm(prev => ({
       ...prev,
-      tags: { ...prev.tags, value: getTags({ ...prev.tags, tags }) },
+      tags: {
+        ...prev.tags,
+        value: update(action, prev.tags.value),
+      },
     }));
   }, []);
 
-  const setPassword = useCallback((password: string) => {
+  const setPassword = useCallback((action: SetStateAction<string>) => {
     setWritePostForm(prev => ({
       ...prev,
-      password: { ...prev.password, value: password },
+      password: {
+        ...prev.password,
+        value: update(action, prev.password.value),
+      },
     }));
   }, []);
 
-  const setContent = useCallback((content: string) => {
+  const setContent = useCallback((action: SetStateAction<string>) => {
     setWritePostForm(prev => ({
       ...prev,
-      content: { ...prev.content, value: content },
+      content: { ...prev.content, value: update(action, prev.content.value) },
     }));
   }, []);
 
@@ -115,20 +131,4 @@ export default function useWritePostForm({
     setPassword,
     setContent,
   } as const;
-}
-
-function getTags({
-  tags,
-  maxTagLength: maxLength,
-  delimeter,
-}: {
-  tags: string[];
-  maxTagLength: number;
-  delimeter: string;
-}) {
-  const newTags = tags
-    .filter(tag => tag.startsWith(delimeter))
-    .map(tag => tag.slice(1, maxLength))
-    .filter(tag => tag.trim());
-  return [...new Set(newTags)];
 }

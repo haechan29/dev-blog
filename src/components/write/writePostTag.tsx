@@ -4,17 +4,10 @@ import useWritePostTag from '@/features/write/hooks/useWritePostTag';
 import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
 import { SetState } from '@/types/react';
 import clsx from 'clsx';
-import {
-  ChangeEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
 
 export default function WritePostTag({
-  tags: { value: tags, maxTagLength, maxTagsLength, isValid },
+  tags: { value: tags, maxTagLength, maxTagsLength, isValid, delimiter },
   setTags,
   resetInvalidField,
 }: {
@@ -26,6 +19,10 @@ export default function WritePostTag({
   const tagRef = useRef<HTMLInputElement | null>(null);
   const { tag, isTagEmpty, insertTag, updateTag } = useWritePostTag({
     tags,
+    isFocused,
+    maxTagLength,
+    maxTagsLength,
+    delimiter,
     setTags,
   });
   const isTagTooLong = useMemo(
@@ -52,12 +49,6 @@ export default function WritePostTag({
     [resetInvalidField, updateTag]
   );
 
-  useEffect(() => {
-    if (!isFocused) {
-      setTags(prev => prev.slice(0, maxTagsLength));
-    }
-  }, [isFocused, maxTagsLength, setTags]);
-
   return (
     <div
       className={clsx(
@@ -81,7 +72,7 @@ export default function WritePostTag({
               index < maxTagsLength ? 'text-blue-500' : 'text-red-500'
             )}
           >
-            {tag}
+            {`${delimiter}${tag}`}
           </div>
         ))}
 
@@ -92,7 +83,7 @@ export default function WritePostTag({
           )}
         >
           {isTagEmpty ? (
-            <span className='text-gray-400'>#태그</span>
+            <span className='text-gray-400'>{`${delimiter}태그`}</span>
           ) : (
             <>
               <span>{tag.slice(0, maxTagLength)}</span>

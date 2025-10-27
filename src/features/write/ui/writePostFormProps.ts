@@ -13,6 +13,7 @@ export type WritePostFormProps = {
     isValid: boolean;
     maxTagLength: number;
     maxTagsLength: number;
+    delimiter: string;
   };
   password: {
     value: string;
@@ -35,10 +36,11 @@ export function createProps(form: WritePostForm): WritePostFormProps {
       maxLength: form.title.maxLength,
     },
     tags: {
-      value: form.tags.value.map(tag => `${form.tags.delimeter}${tag}`),
+      value: form.tags.value,
       isValid: form.invalidField !== 'tags',
       maxTagLength: form.tags.maxTagLength,
       maxTagsLength: form.tags.maxTagsLength,
+      delimiter: form.tags.delimiter,
     },
     password: {
       value: form.password.value,

@@ -13,7 +13,7 @@ export interface WritePostForm {
     isEmptyAllowed: boolean;
     maxTagLength: number;
     maxTagsLength: number;
-    delimeter: string;
+    delimiter: string;
   };
   password: {
     value: string;
