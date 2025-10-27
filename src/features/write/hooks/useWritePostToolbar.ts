@@ -6,7 +6,7 @@ import {
   createProps,
   WritePostToolbarProps,
 } from '@/features/write/ui/writePostToolbarProps';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import useNavigationWithParams from '@/hooks/useNavigationWithParams';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export default function useWritePostToolbar({
@@ -14,10 +14,7 @@ export default function useWritePostToolbar({
 }: {
   currentStepId: keyof typeof writePostSteps;
 }) {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const router = useRouter();
-
+  const navigate = useNavigationWithParams();
   const [writePostToolbar, setWritePostToolbar] = useState<WritePostToolbar>({
     currentStepId,
   });
@@ -31,15 +28,13 @@ export default function useWritePostToolbar({
     const currentStep = writePostSteps[writePostToolbar.currentStepId];
     switch (currentStep.action) {
       case 'next':
-        const params = new URLSearchParams(searchParams);
-        params.set('step', 'upload');
-        router.push(`${pathname}?${params.toString()}`);
+        navigate({ setParams: { step: 'upload' } });
         break;
       case 'publish':
         console.log('게시글이 생성되었습니다');
         break;
     }
-  }, [pathname, router, searchParams, writePostToolbar.currentStepId]);
+  }, [navigate, writePostToolbar.currentStepId]);
 
   useEffect(
     () => setWritePostToolbar(prev => ({ ...prev, currentStepId })),
