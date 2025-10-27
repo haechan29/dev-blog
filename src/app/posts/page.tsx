@@ -36,9 +36,14 @@ function PostPreviews({
   tag: string | null;
 }) {
   return (
-    <div className='flex flex-col'>
-      {posts.map(post => (
-        <PostPreview key={post.id} tag={tag} post={post} />
+    <div className='flex flex-col mt-8 mb-20'>
+      {posts.map((post, index) => (
+        <div key={post.id} className='mb-8'>
+          <PostPreview tag={tag} post={post} />
+          {index !== posts.length - 1 && (
+            <div className='h-[1px] bg-gray-200' />
+          )}
+        </div>
       ))}
     </div>
   );
