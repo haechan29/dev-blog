@@ -15,10 +15,6 @@ export async function fetchPostStat(
   };
 }
 
-export async function createPostStat(postId: string): Promise<void> {
-  await api.post(`/api/posts/${postId}/stats`);
-}
-
 export async function deletePostStat(postId: string): Promise<void> {
   await api.delete(`/api/posts/${postId}/stats`);
 }

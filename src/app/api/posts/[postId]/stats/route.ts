@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   request: NextRequest,
@@ -29,52 +29,6 @@ export async function GET(
   } catch {
     return NextResponse.json(
       { error: '댓글 게시글 통계 조회 요청이 실패했습니다.' },
-      { status: 500 }
-    );
-  }
-}
-
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ postId: string }> }
-) {
-  try {
-    const { postId } = await params;
-
-    if (!postId) {
-      return NextResponse.json(
-        { error: '게시글 통계를 생성하기 위해 postId가 필요합니다.' },
-        { status: 400 }
-      );
-    }
-
-    const isExisting = await isPostStatExisting(postId);
-
-    if (isExisting) {
-      return NextResponse.json(
-        { error: '이미 존재하는 게시글 통계입니다.' },
-        { status: 409 }
-      );
-    }
-
-    const { error } = await supabase
-      .from('post_stats')
-      .insert({
-        post_id: postId,
-        like_count: 0,
-        comment_count: 0,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json({ data: null }, { status: 201 });
-  } catch {
-    return NextResponse.json(
-      { error: '통계 생성 요청이 실패했습니다.' },
       { status: 500 }
     );
   }
