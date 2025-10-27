@@ -1,8 +1,9 @@
-import { PostDto } from '@/features/post/data/dto/postDto';
+import { PostResponseDto } from '@/features/post/data/dto/postResponseDto';
+import { toData } from '@/features/post/domain/mapper/postMapper';
 import { api } from '@/lib/api';
 import { Post } from '@/types/env';
 
-export async function fetchPosts(): Promise<PostDto[]> {
+export async function fetchPosts(): Promise<PostResponseDto[]> {
   const response = await api.get(`/api/posts`);
   const posts = response.data as Post[];
 
@@ -18,7 +19,7 @@ export async function fetchPosts(): Promise<PostDto[]> {
   });
 }
 
-export async function fetchPost(postId: string): Promise<PostDto> {
+export async function fetchPost(postId: string): Promise<PostResponseDto> {
   const response = await api.get(`/api/posts/${postId}`);
   const post = response.data as Post;
 
@@ -32,13 +33,14 @@ export async function fetchPost(postId: string): Promise<PostDto> {
   };
 }
 
-export async function createPost(requestBody: {
+export async function createPost(params: {
   title: string;
   content: string;
   tags: string[];
   password: string;
-}): Promise<PostDto> {
-  const response = await api.post(`/api/posts`, requestBody);
+}): Promise<PostResponseDto> {
+  const dto = toData(params);
+  const response = await api.post(`/api/posts`, dto);
   const post: Post = response.data;
   return {
     id: post.id,
