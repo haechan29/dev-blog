@@ -10,9 +10,10 @@ export async function fetchPosts(): Promise<PostDto[]> {
     return {
       id: post.id,
       title: post.title,
-      createdAt: post.created_at,
-      content: post.content,
       tags: post.tags,
+      content: post.content,
+      createdAt: post.created_at,
+      updatedAt: post.updated_at,
     };
   });
 }
@@ -24,8 +25,27 @@ export async function fetchPost(postId: string): Promise<PostDto> {
   return {
     id: post.id,
     title: post.title,
-    createdAt: post.created_at,
-    content: post.content,
     tags: post.tags,
+    content: post.content,
+    createdAt: post.created_at,
+    updatedAt: post.updated_at,
+  };
+}
+
+export async function createPost(requestBody: {
+  title: string;
+  content: string;
+  tags: string[];
+  password: string;
+}): Promise<PostDto> {
+  const response = await api.post(`/api/posts`, requestBody);
+  const post: Post = response.data;
+  return {
+    id: post.id,
+    title: post.title,
+    tags: post.tags,
+    content: post.content,
+    createdAt: post.created_at,
+    updatedAt: post.updated_at,
   };
 }

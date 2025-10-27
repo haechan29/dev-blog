@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
         title,
         content,
         password_hash: passwordHash,
-        tags: tags || [],
+        tags,
       })
       .select('id, title, content, tags, created_at, updated_at');
 

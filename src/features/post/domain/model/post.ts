@@ -8,6 +8,7 @@ export default class Post {
     public readonly id: string,
     public readonly title: string,
     public readonly createdAt: string,
+    public readonly updatedAt: string,
     public readonly content: string,
     public readonly tags: string[]
   ) {

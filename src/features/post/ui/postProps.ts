@@ -7,6 +7,7 @@ export type PostProps = {
   id: string;
   title: string;
   createdAt: string;
+  updatedAt: string;
   tags: string[];
   content: string;
   headings: Heading[];
@@ -18,6 +19,7 @@ export function createProps(post: Post): PostProps {
     id: post.id,
     title: post.title,
     createdAt: formatDate(post.createdAt),
+    updatedAt: formatDate(post.updatedAt),
     tags: post.tags,
     content: post.content,
     headings: post.headings,
