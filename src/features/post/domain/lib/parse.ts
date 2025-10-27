@@ -31,18 +31,23 @@ export function extractHeadings(content: string): Heading[] {
 
 export function extractPlainText(content: string): string {
   return content
-    .replace(/^---[\s\S]*?---/m, '') // frontmatter 제거
-    .replace(/```[\s\S]*?```/g, '') // 코드 블록 제거
-    .replace(/`[^`]*`/g, '') // 인라인 코드 제거
-    .replace(/<[^>]+>[\s\S]*?<\/[^>]+>/g, '') // JSX 태그와 내용 제거
-    .replace(/<[^>]*>/g, '') // 단일 태그 제거
-    .replace(/!\[.*?\]\(.*?\)/g, '') // 이미지 제거
-    .replace(/^#{1,6}\s+.*$/gm, '') // 헤딩 라인 전체 제거
-    .replace(/\*\*(.*?)\*\*/g, '$1') // **굵게** 제거
-    .replace(/\*(.*?)\*/g, '$1') // *기울임* 제거
-    .replace(/\[(.*?)\]\(.*?\)/g, '$1') // 링크 제거
-    .replace(/\n+/g, ' ') // 개행 제거
-    .replace(/\s+/g, ' ') // 중복 공백 제거
-    .trim()
-    .substring(0, 500);
+    .replace(/```[\s\S]*?```/g, '') // remove code blocks
+    .replace(/`[^`]*`/g, '') // remove inline code
+    .replace(/^#{1,6}\s+.*$/gm, '') // remove heading markers
+    .replace(/^\s*[-*+]\s+/gm, '') // remove unordered list markers
+    .replace(/^\s*\d+\.\s+/gm, '') // remove ordered list markers
+    .replace(/^\s*>\s*(.*)/gm, '$1') // remove blockquote markers and keep content
+    .replace(/\*\*(.*?)\*\*/g, '$1') // remove bold formatting
+    .replace(/__(.*?)__/g, '$1') // remove bold formatting (underscore)
+    .replace(/\*(.*?)\*/g, '$1') // remove italic formatting
+    .replace(/_(.*?)_/g, '$1') // remove italic formatting (underscore)
+    .replace(/~~(.*?)~~/g, '$1') // remove strikethrough formatting
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1') // remove links and keep text
+    .replace(/!\[.*?\]\(.*?\)/g, '') // remove images completely
+    .replace(/^\s*\|.*\|$/gm, '') // remove table rows
+    .replace(/^\s*[-:|\s]*$/gm, '') // remove table separators
+    .replace(/^\s*---+\s*$/gm, '') // remove horizontal rules
+    .replace(/[ \t]+/g, ' ') // remove multiple spaces and tabs only
+    .replace(/\n+/g, '\n') // reduce multiple newlines to single newline
+    .trim();
 }

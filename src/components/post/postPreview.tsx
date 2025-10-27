@@ -28,12 +28,22 @@ export default function PostPreview({
         <div className='relative mb-4 h-18'>
           <div
             className={clsx(
-              'absolute inset-x-0 top-0 leading-6',
+              'absolute inset-x-0 top-0 whitespace-pre-line',
               'transition-discrete duration-300 group-hover:duration-500 ease-in-out delay-0 group-hover:delay-500',
-              'h-18 line-clamp-3 group-hover:h-30 group-hover:line-clamp-5'
+              'h-18 line-clamp-3 group-hover:h-36 group-hover:line-clamp-[9999]'
             )}
           >
-            {plainText}
+            <div className='group-hover:hidden'>{plainText}</div>
+            <div
+              className={clsx(
+                'text-transparent group-hover:text-gray-900 absolute inset-x-0 top-0',
+                'transition-transform ease-linear group-hover:duration-[var(--translation-duration)] duration-[0] group-hover:delay-1000 delay-0',
+                'group-hover:translate-y-[calc(-100%+9rem)]'
+              )}
+              style={{ '--translation-duration': `${plainText.length / 50}s` }}
+            >
+              {plainText}
+            </div>
           </div>
         </div>
 
