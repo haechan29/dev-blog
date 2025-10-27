@@ -8,6 +8,7 @@ import {
   WritePostToolbarProps,
 } from '@/features/write/ui/writePostToolbarProps';
 import useNavigationWithParams from '@/hooks/useNavigationWithParams';
+import nProgress from 'nprogress';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 
@@ -37,6 +38,7 @@ export default function useWritePostToolbar({
       }
       case 'publish': {
         try {
+          nProgress.start();
           const post = await createPost();
           navigate({ pathname: `/posts/${post.id}` });
         } catch (error) {
@@ -45,6 +47,8 @@ export default function useWritePostToolbar({
               ? error.message
               : '게시글 생성에 실패했습니다';
           toast.error(errorMessage);
+        } finally {
+          nProgress.done();
         }
         break;
       }

@@ -2,6 +2,32 @@
 @import 'tailwind-scrollbar-hide/v4';
 @import 'tw-animate-css';
 
+#nprogress .bar {
+  background: #ff0000 !important;
+  height: 2px;
+  box-shadow: none !important;
+  z-index: 2000;
+}
+
+#nprogress::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #e5e5e5 !important;
+  z-index: 1000 !important;
+}
+
+#nprogress .spinner {
+  display: none !important;
+}
+
+#nprogress .peg {
+  display: none !important;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
