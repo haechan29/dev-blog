@@ -3,6 +3,10 @@ import { PostProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
 import Link from 'next/link';
 
+const SCALE_ANIMATION_DELAY = 0.5;
+const SCROLL_ANIMATION_DELAY = 1;
+const MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION = 200;
+
 export default function PostPreview({
   tag,
   post: { id, title, plainText, tags, createdAt },
@@ -10,8 +14,16 @@ export default function PostPreview({
   tag: string | null;
   post: PostProps;
 }) {
+  const isScrollAnimationEnabled =
+    plainText.length >= MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION;
   return (
-    <div className='relative flex flex-col group mb-8'>
+    <div
+      className='relative flex flex-col group mb-8'
+      style={{
+        '--scale-delay': `${SCALE_ANIMATION_DELAY}s`,
+        '--scroll-delay': `${SCROLL_ANIMATION_DELAY}s`,
+      }}
+    >
       <div
         className={clsx(
           'absolute -inset-x-6 -inset-y-4 -z-50 rounded-xl bg-gray-100/50',
@@ -20,34 +32,49 @@ export default function PostPreview({
           'opacity-0 group-hover:opacity-100'
         )}
       />
+
       <Link
         href={`/posts/${id}${tag ? `?tag=${tag}` : ''}`}
         className='w-full text-gray-900'
       >
         <div className='text-2xl font-semibold mb-4 line-clamp-2'>{title}</div>
-        <div className='relative mb-4 h-18'>
-          <div
-            className={clsx(
-              'absolute inset-x-0 top-0 whitespace-pre-line',
-              'transition-discrete duration-300 group-hover:duration-500 ease-in-out delay-0 group-hover:delay-500',
-              'h-18 line-clamp-3 group-hover:h-36 group-hover:line-clamp-[9999]'
-            )}
-          >
-            <div className='group-hover:hidden'>{plainText}</div>
-            <div
-              className={clsx(
-                'text-transparent group-hover:text-gray-900 absolute inset-x-0 top-0',
-                'transition-transform ease-linear group-hover:duration-[var(--translation-duration)] duration-[0] group-hover:delay-1000 delay-0',
-                'group-hover:translate-y-[calc(-100%+9rem)]'
-              )}
-              style={{ '--translation-duration': `${plainText.length / 50}s` }}
-            >
-              {plainText}
+        <div className='mb-4 whitespace-pre-line'>
+          {isScrollAnimationEnabled ? (
+            <div className='relative h-18'>
+              <div
+                className={clsx(
+                  'absolute inset-x-0 top-0',
+                  'h-18 line-clamp-3 group-hover:h-36 group-hover:line-clamp-[9999]',
+                  'transition-discrete ease-in-out duration-300 group-hover:duration-[var(--scale-delay)]',
+                  'delay-0 group-hover:delay-[var(--scale-delay)]'
+                )}
+              >
+                <div className='group-hover:hidden'>{plainText}</div>
+                <div
+                  className={clsx(
+                    'text-transparent group-hover:text-gray-900 absolute inset-x-0 top-0',
+                    'transition-transform ease-linear duration-[0] group-hover:duration-[var(--scroll-duration)]',
+                    'group-hover:delay-[var(--scroll-delay)] delay-0 group-hover:translate-y-[calc(-100%+9rem)]'
+                  )}
+                  style={{
+                    '--scroll-duration': `${plainText.length / 50}s`,
+                  }}
+                >
+                  {plainText}
+                </div>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div>{plainText}</div>
+          )}
         </div>
 
-        <div className='group-hover:opacity-0 transition-opacity duration-300 ease-in-out delay-0 group-hover:delay-500'>
+        <div
+          className={clsx(
+            isScrollAnimationEnabled &&
+              'transition-opacity duration-300 ease-in-out delay-0 group-hover:delay-[var(--scale-delay)] group-hover:opacity-0'
+          )}
+        >
           <div className='flex flex-wrap gap-2 mb-4'>
             {tags.map(tag => (
               <div
