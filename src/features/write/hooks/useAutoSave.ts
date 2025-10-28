@@ -1,32 +1,51 @@
 'use client';
 
+import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
 import useDebounce from '@/hooks/useDebounce';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 const AUTO_SAVE_DELAY = 3_000; // debounce delay after user stops typing
 const AUTO_SAVE_INTERVAL = 10_000; // periodic save interval from last save
+const LOCAL_STORAGE_KEY = 'draft-content';
 
-export default function useAutoSave({ value: content }: { value: string }) {
+export default function useAutoSave({
+  writePostForm: {
+    content: { value: content },
+  },
+}: {
+  writePostForm: WritePostFormProps;
+}) {
   const debounce = useDebounce();
-  const [_, setContent] = useLocalStorage('draft-content', content);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const saveContent = useCallback(
-    (content: string) => {
-      setContent(content);
+  const saveDraft = useCallback((content: string) => {
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, content);
+    } catch {}
 
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      intervalRef.current = setInterval(
-        () => saveContent(content),
-        AUTO_SAVE_INTERVAL
-      );
-    },
-    [setContent]
-  );
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(
+      () => saveDraft(content),
+      AUTO_SAVE_INTERVAL
+    );
+  }, []);
+
+  const draft = useMemo(() => {
+    try {
+      return localStorage.getItem(LOCAL_STORAGE_KEY);
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const removeDraft = useCallback(() => {
+    try {
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+    } catch {}
+  }, []);
 
   useEffect(() => {
-    debounce(() => saveContent(content), AUTO_SAVE_DELAY);
+    debounce(() => saveDraft(content), AUTO_SAVE_DELAY);
 
     return () => {
       if (intervalRef.current) {
@@ -34,5 +53,7 @@ export default function useAutoSave({ value: content }: { value: string }) {
         intervalRef.current = null;
       }
     };
-  }, [content, debounce, saveContent]);
+  }, [content, debounce, saveDraft]);
+
+  return { draft, removeDraft } as const;
 }
