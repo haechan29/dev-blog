@@ -9,11 +9,12 @@ const MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION = 200;
 
 export default function PostPreview({
   tag,
-  post: { id, title, plainText, tags, createdAt },
+  post,
 }: {
   tag: string | null;
   post: PostProps;
 }) {
+  const { id, title, plainText, tags } = post;
   const isScrollAnimationEnabled =
     plainText.length >= MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION;
   return (
@@ -85,7 +86,7 @@ export default function PostPreview({
               </div>
             ))}
           </div>
-          <PostInfo id={id} createdAt={createdAt} />
+          <PostInfo {...post} />
         </div>
       </Link>
     </div>
