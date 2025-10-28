@@ -21,3 +21,11 @@ export async function createPost(params: {
   const dto = await PostRespository.createPost(params);
   return toDomain(dto);
 }
+
+export async function deletePost(
+  postId: string,
+  commentId: number,
+  password: string
+): Promise<void> {
+  await PostRespository.deletePost(postId, password);
+}

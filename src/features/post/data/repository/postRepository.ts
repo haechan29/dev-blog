@@ -51,3 +51,14 @@ export async function createPost(params: {
     updatedAt: post.updated_at,
   };
 }
+
+export async function deletePost(
+  postId: string,
+  password: string
+): Promise<void> {
+  await api.delete(`/api/posts/${postId}`, {
+    headers: {
+      'X-Post-Password': password,
+    },
+  });
+}
