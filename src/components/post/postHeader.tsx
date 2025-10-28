@@ -1,17 +1,17 @@
 'use client';
 
 import PostInfo from '@/components/post/postInfo';
+import PostSettingsDropdown from '@/components/post/postSettingsDropdown';
 import useHeaderTracker from '@/features/post/hooks/useHeaderTracker';
 import { PostProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
 import { MoreVertical } from 'lucide-react';
-import { useCallback, useRef } from 'react';
+import { useRef } from 'react';
 
 export default function PostHeader({ post }: { post: PostProps }) {
   const { title, tags } = post;
   const headerRef = useRef<HTMLDivElement | null>(null);
   useHeaderTracker(headerRef);
-  const onClick = useCallback(() => console.log('click!'), []);
 
   return (
     <div className='flex flex-col gap-6 mb-10'>
@@ -37,13 +37,12 @@ export default function PostHeader({ post }: { post: PostProps }) {
 
       <div className='flex justify-between items-center'>
         <PostInfo {...post} />
-        <button
-          aria-label='게시물 설정'
-          className='flex justify-center items-center p-2 -m-2'
-          onClick={onClick}
+        <PostSettingsDropdown
+          onEdit={() => console.log('edit')}
+          onDelete={() => console.log('delete')}
         >
-          <MoreVertical className='w-5 h-5 text-gray-400' />
-        </button>
+          <MoreVertical className='w-9 h-9 text-gray-400 p-2 -m-2' />
+        </PostSettingsDropdown>
       </div>
     </div>
   );
