@@ -4,6 +4,7 @@ import QueryParamsValidator from '@/components/queryParamsValidator';
 import WritePostForm from '@/components/write/writePostForm';
 import WritePostToolbar from '@/components/write/writePostToolbar';
 import { writePostSteps } from '@/features/write/constants/writePostStep';
+import useAutoSave from '@/features/write/hooks/useAutoSave';
 import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import { useSearchParams } from 'next/navigation';
 
@@ -23,6 +24,7 @@ function WritePageWithValidation() {
   const searchParams = useSearchParams();
   const step = searchParams.get('step') as keyof typeof writePostSteps;
   const writePostForm = useWritePostForm({ currentStepId: step });
+  useAutoSave(writePostForm.writePostForm.content);
 
   return (
     <div className='w-screen h-dvh flex flex-col'>
