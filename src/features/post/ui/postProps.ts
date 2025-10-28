@@ -5,6 +5,7 @@ import Post from '@/features/post/domain/model/post';
 
 export type PostProps = {
   id: string;
+  authorName: string;
   title: string;
   createdAt: string;
   updatedAt: string;
@@ -12,11 +13,13 @@ export type PostProps = {
   content: string;
   headings: Heading[];
   plainText: string;
+  authorId?: string;
 };
 
 export function createProps(post: Post): PostProps {
   return {
     id: post.id,
+    authorName: post.authorName,
     title: post.title,
     createdAt: formatDate(post.createdAt),
     updatedAt: formatDate(post.updatedAt),
@@ -24,5 +27,6 @@ export function createProps(post: Post): PostProps {
     content: post.content,
     headings: post.headings,
     plainText: extractPlainText(post.content),
+    authorId: post.authorId,
   };
 }

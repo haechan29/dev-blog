@@ -10,11 +10,13 @@ export async function fetchPosts(): Promise<PostResponseDto[]> {
   return posts.map((post: Post) => {
     return {
       id: post.id,
+      authorName: post.author_name,
       title: post.title,
       tags: post.tags,
       content: post.content,
       createdAt: post.created_at,
       updatedAt: post.updated_at,
+      authorId: post.author_id,
     };
   });
 }
@@ -25,11 +27,13 @@ export async function fetchPost(postId: string): Promise<PostResponseDto> {
 
   return {
     id: post.id,
+    authorName: post.author_name,
     title: post.title,
     tags: post.tags,
     content: post.content,
     createdAt: post.created_at,
     updatedAt: post.updated_at,
+    authorId: post.author_id,
   };
 }
 
@@ -44,11 +48,13 @@ export async function createPost(params: {
   const post: Post = response.data;
   return {
     id: post.id,
+    authorName: post.author_name,
     title: post.title,
     tags: post.tags,
     content: post.content,
     createdAt: post.created_at,
     updatedAt: post.updated_at,
+    authorId: post.author_id,
   };
 }
 

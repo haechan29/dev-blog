@@ -6,11 +6,13 @@ export default class Post {
 
   constructor(
     public readonly id: string,
+    public readonly authorName: string,
     public readonly title: string,
     public readonly createdAt: string,
     public readonly updatedAt: string,
     public readonly content: string,
-    public readonly tags: string[]
+    public readonly tags: string[],
+    public readonly authorId?: string
   ) {
     this.headings = extractHeadings(content);
   }
