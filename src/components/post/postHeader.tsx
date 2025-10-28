@@ -41,7 +41,7 @@ export default function PostHeader({ post }: { post: PostProps }) {
           onEdit={() => console.log('edit')}
           onDelete={() => console.log('delete')}
         >
-          <MoreVertical className='w-9 h-9 text-gray-400 p-2 -m-2' />
+          <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2' />
         </PostSettingsDropdown>
       </div>
     </div>

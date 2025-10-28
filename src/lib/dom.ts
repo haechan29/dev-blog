@@ -1,5 +1,4 @@
 import { Size } from '@/types/size';
-import clsx from 'clsx';
 
 /**
  * get element's content size excluding padding, border, and margin
@@ -39,22 +38,46 @@ export function remToPx(rem: number): number {
   return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
 }
 
-export function createRipple(
-  clientX: number,
-  clientY: number,
-  container: HTMLElement = document.body
-) {
-  if (typeof document === 'undefined') return;
+export function createRipple({
+  clientX,
+  clientY,
+  currentTarget: target,
+  rippleColor = 'rgba(0,0,0,0.3)',
+}: {
+  clientX: number;
+  clientY: number;
+  currentTarget: HTMLElement;
+  rippleColor?: string;
+}) {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
 
-  const rippleElement = document.createElement('div');
-  rippleElement.className = clsx(
-    'w-[100px] h-[100px] fixed z-[9999] top-[var(--ripple-top)] left-[var(--ripple-left)] -translate-y-1/2 -translate-x-1/2',
-    'animate-ripple rounded-full bg-gray-300'
-  );
-  rippleElement.style.setProperty('--ripple-top', `${clientY}px`);
-  rippleElement.style.setProperty('--ripple-left', `${clientX}px`);
-  rippleElement.addEventListener('animationend', () => {
-    rippleElement.remove();
+  const { width, height, top, left } = target.getBoundingClientRect();
+  const { borderRadius } = window.getComputedStyle(target);
+  const container = document.createElement('div');
+  container.className = 'fixed z-[1000] overflow-hidden';
+  Object.assign(container.style, {
+    width: `${width}px`,
+    height: `${height}px`,
+    top: `${top}px`,
+    left: `${left}px`,
+    borderRadius,
   });
+
+  const rippleSize = Math.sqrt(width ** 2 + height ** 2) * 2;
+  const rippleElement = document.createElement('div');
+  rippleElement.className =
+    'absolute z-[2000] animate-ripple rounded-full -translate-y-1/2 -translate-x-1/2';
+  Object.assign(rippleElement.style, {
+    width: `${rippleSize}px`,
+    height: `${rippleSize}px`,
+    top: `${clientY - top}px`,
+    left: `${clientX - left}px`,
+    backgroundColor: rippleColor,
+  });
+  rippleElement.addEventListener('animationend', () => {
+    container.remove();
+  });
+
   container.appendChild(rippleElement);
+  document.body.appendChild(container);
 }

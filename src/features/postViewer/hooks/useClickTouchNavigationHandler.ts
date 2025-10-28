@@ -23,13 +23,7 @@ export default function useClickTouchNavigationHandler() {
       clientY: number;
       currentTarget: HTMLDivElement;
     }) => {
-      if (typeof document === 'undefined' || !currentTarget.parentElement)
-        return;
-
-      const rippleContainer = supportsFullscreen
-        ? currentTarget.parentElement
-        : document.body;
-      createRipple(clientX, clientY, rippleContainer);
+      if (typeof document === 'undefined') return;
 
       const { width, height } = currentTarget.getBoundingClientRect();
       const [isLeftSideClicked, isRightSideClicked] = supportsFullscreen
@@ -56,14 +50,22 @@ export default function useClickTouchNavigationHandler() {
 
   const onTouchEnd = useCallback(
     (event: TouchEvent<HTMLDivElement>) => {
-      dispatch(setIsTouched(true));
-      debounce(() => dispatch(setIsTouched(false)), 2000);
+      const touch = event.changedTouches[0];
+      createRipple({
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+        currentTarget: event.currentTarget,
+        rippleColor: 'rgba(0,0,0,0.1)',
+      });
 
       handleNavigation({
-        clientX: event.changedTouches[0].clientX,
-        clientY: event.changedTouches[0].clientY,
+        clientX: touch.clientX,
+        clientY: touch.clientY,
         currentTarget: event.currentTarget,
       });
+
+      dispatch(setIsTouched(true));
+      debounce(() => dispatch(setIsTouched(false)), 2000);
     },
     [debounce, dispatch, handleNavigation]
   );

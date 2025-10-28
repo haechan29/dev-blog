@@ -6,7 +6,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { createRipple } from '@/lib/dom';
 import { Edit2, Trash2 } from 'lucide-react';
+import { TouchEvent, useCallback } from 'react';
 
 export default function PostSettingsDropdown({
   children,
@@ -17,9 +19,20 @@ export default function PostSettingsDropdown({
   onEdit: () => void;
   onDelete: () => void;
 }) {
+  const onTouchStart = useCallback((e: TouchEvent<HTMLButtonElement>) => {
+    const touch = e.touches[0];
+    createRipple({
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+      currentTarget: e.currentTarget,
+    });
+  }, []);
+
   return (
-    <DropdownMenu modal={false}>
-      <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+    <DropdownMenu>
+      <DropdownMenuTrigger onTouchStart={onTouchStart} asChild>
+        {children}
+      </DropdownMenuTrigger>
 
       <DropdownMenuContent align='end'>
         <DropdownMenuItem
