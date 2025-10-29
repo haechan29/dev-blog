@@ -37,10 +37,7 @@ export default function PostHeader({ post }: { post: PostProps }) {
 
       <div className='flex justify-between items-center'>
         <PostInfo {...post} />
-        <PostSettingsDropdown
-          onEdit={() => console.log('edit')}
-          onDelete={() => console.log('delete')}
-        >
+        <PostSettingsDropdown post={post} onEdit={() => console.log('edit')}>
           <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2' />
         </PostSettingsDropdown>
       </div>
