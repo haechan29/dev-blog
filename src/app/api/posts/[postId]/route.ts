@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { Post } from '@/types/env';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -35,6 +36,67 @@ export async function GET(
   }
 }
 
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ postId: string }> }
+) {
+  try {
+    const { postId } = await params;
+    const { title, content, tags, password } = await request.json();
+
+    if (!postId || !password) {
+      return NextResponse.json(
+        { error: '게시글 수정 요청에 필요한 필드가 누락되었습니다.' },
+        { status: 400 }
+      );
+    }
+
+    const { isPostExist, isValidPassword } = await checkPostPassword(
+      postId,
+      password
+    );
+
+    if (!isPostExist) {
+      return NextResponse.json(
+        { error: `게시글을 찾을 수 없습니다.` },
+        { status: 404 }
+      );
+    } else if (!isValidPassword) {
+      return NextResponse.json(
+        { error: '비밀번호가 일치하지 않습니다.' },
+        { status: 401 }
+      );
+    }
+
+    const newPost: Partial<Post> = {
+      updated_at: new Date().toISOString(),
+    };
+    if (title !== undefined) newPost.title = title;
+    if (content !== undefined) newPost.content = content;
+    if (tags !== undefined) newPost.tags = tags;
+
+    const { data, error } = await supabase
+      .from('posts')
+      .update(newPost)
+      .eq('id', postId)
+      .select('id, title, content, tags, created_at, updated_at');
+
+    if (error) {
+      return NextResponse.json(
+        { error: '게시글 수정에 실패했습니다.' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ data: data[0] });
+  } catch {
+    return NextResponse.json(
+      { error: '게시글 수정 요청이 실패했습니다.' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ postId: string }> }
@@ -57,7 +119,7 @@ export async function DELETE(
 
     if (!isPostExist) {
       return NextResponse.json(
-        { error: `게시글을 찾을 수 없습니다. (id: ${postId})` },
+        { error: `게시글을 찾을 수 없습니다.` },
         { status: 404 }
       );
     } else if (!isValidPassword) {

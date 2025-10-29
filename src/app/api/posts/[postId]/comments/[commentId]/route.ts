@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabase';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function PUT(
+export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ commentId: number }> }
 ) {
@@ -23,7 +23,7 @@ export async function PUT(
     );
     if (!isCommentExist) {
       return NextResponse.json(
-        { error: `댓글을 찾을 수 없습니다. (id: ${commentId})` },
+        { error: `댓글을 찾을 수 없습니다.` },
         { status: 404 }
       );
     } else if (!isValidPassword) {
@@ -81,7 +81,7 @@ export async function DELETE(
     );
     if (!isCommentExist) {
       return NextResponse.json(
-        { error: `댓글을 찾을 수 없습니다. (id: ${commentId})` },
+        { error: `댓글을 찾을 수 없습니다.` },
         { status: 404 }
       );
     } else if (!isValidPassword) {

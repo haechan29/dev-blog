@@ -51,7 +51,7 @@ export async function updateComment({
   content: string;
   password: string;
 }): Promise<CommentResponseDto> {
-  const response = await api.put(
+  const response = await api.patch(
     `/api/posts/${postId}/comments/${commentId}`,
     requestBody
   );
