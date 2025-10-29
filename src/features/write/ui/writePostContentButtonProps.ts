@@ -1,7 +1,7 @@
 import { WritePostContentButton } from '@/features/write/domain/model/writePostContentButton';
 
 export type ButtonContent = {
-  type: 'text' | 'link' | 'table';
+  type: 'text' | 'link' | 'table' | 'blockquote' | 'horizontalRule';
   style: string;
   value?: string;
 };
@@ -43,6 +43,24 @@ const buttonContents: Record<WritePostContentButton['id'], ButtonContent> = {
   },
   table: {
     type: 'table',
+    style: 'w-5 h-5',
+  },
+  unorderedList: {
+    type: 'text',
+    style: 'text-xl',
+    value: '•',
+  },
+  orderedList: {
+    type: 'text',
+    style: 'text-sm font-bold',
+    value: '1.',
+  },
+  blockquote: {
+    type: 'blockquote',
+    style: 'w-[14] h-[14] fill-gray-900',
+  },
+  horizontalRule: {
+    type: 'horizontalRule',
     style: 'w-5 h-5',
   },
 };
@@ -111,6 +129,32 @@ const writePostContentButtonProps: Record<
     content: buttonContents['table'],
     markdownBefore: '| 제목1',
     markdownAfter: ' | 제목2 |\n|-------|-------|\n| 내용1 | 내용2 |',
+  },
+  unorderedList: {
+    action: 'insert',
+    label: '순서 없는 목록',
+    content: buttonContents['unorderedList'],
+    markdownBefore: '- 항목 1',
+    markdownAfter: '\n- 항목 2\n- 항목 3',
+  },
+  orderedList: {
+    action: 'insert',
+    label: '순서 있는 목록',
+    content: buttonContents['orderedList'],
+    markdownBefore: '1. 항목 1',
+    markdownAfter: '\n2. 항목 2\n3. 항목 3',
+  },
+  blockquote: {
+    action: 'insert',
+    label: '인용문',
+    content: buttonContents['blockquote'],
+    markdownBefore: '> 내용',
+  },
+  horizontalRule: {
+    action: 'insert',
+    label: '구분선',
+    content: buttonContents['horizontalRule'],
+    markdownBefore: '---\n',
   },
 };
 

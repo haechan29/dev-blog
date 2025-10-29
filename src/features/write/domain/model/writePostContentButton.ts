@@ -9,6 +9,10 @@ export const writePostContentButtons: WritePostContentButton[] = [
   { id: 'bold' },
   { id: 'italic' },
   { id: 'strikethrough' },
+  { id: 'unorderedList' },
+  { id: 'orderedList' },
   { id: 'link' },
+  { id: 'blockquote' },
+  { id: 'horizontalRule' },
   { id: 'table' },
 ];

@@ -6,7 +6,7 @@ import {
   WritePostContentButtonProps,
 } from '@/features/write/ui/writePostContentButtonProps';
 import clsx from 'clsx';
-import { Grid2x2, Link } from 'lucide-react';
+import { Grid2x2, Link, Minus, Quote } from 'lucide-react';
 import { useCallback } from 'react';
 
 export default function WritePostContentToolbar({
@@ -60,11 +60,16 @@ function ContentButton({
 }: {
   buttonContent: ButtonContent;
 }) {
-  return type === 'text' ? (
-    <div className={style}>{value}</div>
-  ) : type === 'link' ? (
-    <Link className={style} />
-  ) : type === 'table' ? (
-    <Grid2x2 className={style} />
-  ) : null;
+  switch (type) {
+    case 'text':
+      return <div className={style}>{value}</div>;
+    case 'link':
+      return <Link className={style} />;
+    case 'table':
+      return <Grid2x2 className={style} />;
+    case 'blockquote':
+      return <Quote className={style} />;
+    case 'horizontalRule':
+      return <Minus className={style} />;
+  }
 }
