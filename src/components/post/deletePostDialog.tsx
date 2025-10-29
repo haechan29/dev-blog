@@ -7,9 +7,12 @@ import {
   DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
+import * as PostService from '@/features/post/domain/service/postService';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 
 export default function DeletePostDialog({
   postId,
@@ -20,8 +23,33 @@ export default function DeletePostDialog({
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }) {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const [password, setPassword] = useState('');
   const [isPasswordValid, setIsPasswordValid] = useState(true);
+
+  const deletePost = useCallback(
+    async (postId: string, password: string) => {
+      if (!password) {
+        setIsPasswordValid(false);
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        await PostService.deletePost(postId, password);
+        setIsOpen(false);
+        router.push('/posts');
+        toast.success('게시글이 삭제되었습니다');
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : '게시글 삭제에 실패했습니다';
+        toast.error(errorMessage);
+      }
+      setIsLoading(false);
+    },
+    [router, setIsOpen]
+  );
 
   useEffect(() => {
     if (!isOpen) {
@@ -30,33 +58,10 @@ export default function DeletePostDialog({
     }
   }, [isOpen]);
 
-  const deletePost = () =>
-    console.log(`비밀번호: ${password}, 게시글 ${postId} 삭제!`);
-  // const deleteComment = useCallback(
-  //   (params: { postId: string; commentId: number; password: string }) => {
-  //     deleteCommentMutation.mutate(params, {
-  //       onSuccess: () => setIsOpen(false),
-  //       onError: error => toast.error(error.message),
-  //     });
-  //   },
-  //   [deleteCommentMutation]
-  // );
-
-  const handleDelete = () => {
-    if (!password) {
-      setIsPasswordValid(false);
-      return;
-    }
-
-    deletePost();
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent showCloseButton={false} className='gap-0 rounded-sm'>
-        <DialogTitle className='sr-only'>
-          {'게시글 삭제 다이어로그'}
-        </DialogTitle>
+        <DialogTitle className='sr-only'>게시글 삭제 다이어로그</DialogTitle>
         <DialogDescription className='sr-only'>
           게시글을 삭제하기 위해 비밀번호를 입력해주세요.
         </DialogDescription>
@@ -83,16 +88,16 @@ export default function DeletePostDialog({
         <div className='flex justify-between items-center'>
           <button
             className={clsx(
-              'flex justify-center items-center px-6 h-10 rounded-sm font-bold text-white hover:bg-red-400'
-              // deleteCommentMutation.isPending ? 'bg-red-400' : 'bg-red-600'
+              'flex justify-center items-center px-6 h-10 rounded-sm font-bold text-white hover:bg-red-400',
+              isLoading ? 'bg-red-400' : 'bg-red-600'
             )}
-            onClick={handleDelete}
+            onClick={() => deletePost(postId, password)}
           >
-            {/* {deleteCommentMutation.isPending ? ( */}
-            <Loader2 size={18} strokeWidth={3} className='animate-spin' />
-            {/* ) : (
-              '삭제'
-            )} */}
+            {isLoading ? (
+              <Loader2 size={18} strokeWidth={3} className='animate-spin' />
+            ) : (
+              <div className='shrink-0'>삭제</div>
+            )}
           </button>
           <DialogClose asChild>
             <X className='w-10 h-10 p-2 cursor-pointer' />

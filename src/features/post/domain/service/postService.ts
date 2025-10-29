@@ -24,7 +24,6 @@ export async function createPost(params: {
 
 export async function deletePost(
   postId: string,
-  commentId: number,
   password: string
 ): Promise<void> {
   await PostRespository.deletePost(postId, password);
