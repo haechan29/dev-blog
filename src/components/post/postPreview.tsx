@@ -56,7 +56,7 @@ export default function PostPreview({
                   className={clsx(
                     'text-transparent group-hover:text-gray-900 absolute inset-x-0 top-0',
                     'transition-transform ease-linear duration-[0] group-hover:duration-[var(--scroll-duration)]',
-                    'group-hover:delay-[var(--scroll-delay)] delay-0 group-hover:translate-y-[calc(-100%+9rem)]'
+                    'delay-0 group-hover:delay-[var(--scroll-delay)] group-hover:translate-y-[calc(-100%+9rem)]'
                   )}
                   style={{
                     '--scroll-duration': `${plainText.length / 50}s`,
@@ -79,17 +79,21 @@ export default function PostPreview({
           )}
         >
           {tags.length > 0 && (
-            <div className='flex flex-wrap gap-2'>
-              {tags.map(tag => (
+            <div className='w-full flex overflow-x-auto scrollbar-hide gap-2'>
+              {tags.map((tag, index) => (
                 <div
                   key={tag}
-                  className='text-xs px-2 py-1 flex-shrink-0 border border-gray-300 rounded-full'
+                  className={clsx(
+                    'text-xs px-2 py-1 border border-gray-300 rounded-full whitespace-nowrap',
+                    index >= 3 && 'max-w-20 text-ellipsis overflow-clip'
+                  )}
                 >
                   {tag}
                 </div>
               ))}
             </div>
           )}
+
           <PostInfo {...post} />
         </div>
       </Link>
