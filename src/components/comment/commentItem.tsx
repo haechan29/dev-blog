@@ -1,9 +1,9 @@
 'use client';
 
 import CommentContentSection from '@/components/comment/commentContentSection';
-import DeleteCommentDialog from '@/components/comment/deleteCommentDialog';
+import CommentSettingsDropdown from '@/components/comment/commentSettingsDropdown';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
-import { Edit2, Trash2 } from 'lucide-react';
+import { MoreVertical } from 'lucide-react';
 import { useState } from 'react';
 
 export default function CommentItem({
@@ -33,19 +33,12 @@ export default function CommentItem({
           </div>
         </div>
 
-        <div className='flex space-x-2'>
-          <button
-            onClick={() => setIsEditing(prev => !prev)}
-            className='text-gray-400 hover:text-blue-600 transition-colors p-1'
-          >
-            <Edit2 size={16} />
-          </button>
-          <DeleteCommentDialog postId={comment.postId} commentId={comment.id}>
-            <button className='text-gray-400 hover:text-red-600 transition-colors p-1'>
-              <Trash2 size={16} />
-            </button>
-          </DeleteCommentDialog>
-        </div>
+        <CommentSettingsDropdown
+          comment={comment}
+          onEdit={() => setIsEditing(prev => !prev)}
+        >
+          <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2' />
+        </CommentSettingsDropdown>
       </section>
 
       <CommentContentSection

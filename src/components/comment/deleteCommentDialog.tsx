@@ -6,24 +6,24 @@ import {
   DialogContent,
   DialogDescription,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import useComments from '@/features/comment/hooks/useComments';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
-import { ReactNode, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
 export default function DeleteCommentDialog({
   postId,
   commentId,
-  children,
+  isOpen,
+  setIsOpen,
 }: {
   postId: string;
   commentId: number;
-  children: ReactNode;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
   const [password, setPassword] = useState('');
   const [isPasswordValid, setIsPasswordValid] = useState(true);
 
@@ -56,7 +56,6 @@ export default function DeleteCommentDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent showCloseButton={false} className='gap-0 rounded-sm'>
         <DialogTitle className='sr-only'>{'댓글 삭제 다이어로그'}</DialogTitle>
         <DialogDescription className='sr-only'>
