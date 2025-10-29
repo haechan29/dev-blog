@@ -24,11 +24,9 @@ import {
 export default function useWritePostForm({
   currentStepId,
   post,
-  password,
 }: {
   currentStepId: keyof typeof writePostSteps;
   post?: PostProps;
-  password?: string;
 }) {
   const router = useRouter();
   const [writePostForm, setWritePostForm] = useState<WritePostForm>({
@@ -47,7 +45,7 @@ export default function useWritePostForm({
       delimiter: '#',
     },
     password: {
-      value: password ?? '',
+      value: '',
       isEmptyAllowed: false,
       maxLength: 20,
     },
@@ -130,6 +128,25 @@ export default function useWritePostForm({
     writePostForm.title.value,
   ]);
 
+  const updatePost = useCallback(
+    async (postId: string) => {
+      const post = await PostService.updatePost({
+        postId,
+        title: writePostForm.title.value,
+        content: writePostForm.content.value,
+        tags: writePostForm.tags.value,
+        password: writePostForm.password.value,
+      });
+      return createPostProps(post);
+    },
+    [
+      writePostForm.content.value,
+      writePostForm.password.value,
+      writePostForm.tags.value,
+      writePostForm.title.value,
+    ]
+  );
+
   useEffect(
     () => setWritePostForm(prev => ({ ...prev, currentStepId })),
     [currentStepId]
@@ -151,6 +168,7 @@ export default function useWritePostForm({
     setInvalidField,
     resetInvalidField,
     createPost,
+    updatePost,
     setTitle,
     setTags,
     setPassword,

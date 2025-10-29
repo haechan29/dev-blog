@@ -34,7 +34,11 @@ function WritePageWithValidation() {
         onRestore={(draft: string) => writePostForm.setContent(draft)}
       />
       <div className='w-screen h-dvh flex flex-col'>
-        <WritePostToolbar removeDraft={removeDraft} {...writePostForm} />
+        <WritePostToolbar
+          publishPost={writePostForm.createPost}
+          removeDraft={removeDraft}
+          {...writePostForm}
+        />
         <div className='flex-1 min-h-0'>
           <WritePostForm {...writePostForm} />
         </div>

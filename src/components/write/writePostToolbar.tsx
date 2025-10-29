@@ -11,19 +11,23 @@ export default function WritePostToolbar({
   writePostForm: { currentStepId },
   getInvalidField,
   setInvalidField,
-  createPost,
+  publishPost,
   removeDraft,
 }: {
   writePostForm: WritePostFormProps;
   getInvalidField: () => string | null;
   setInvalidField: (invalidField: string) => void;
-  createPost: () => Promise<PostProps>;
+  publishPost: () => Promise<PostProps>;
   removeDraft: () => void;
 }) {
   const {
     writePostToolbar: { toolbarTexts, actionButtonText },
     onAction,
-  } = useWritePostToolbar({ currentStepId, createPost, removeDraft });
+  } = useWritePostToolbar({
+    currentStepId,
+    publishPost,
+    removeDraft,
+  });
 
   const onActionButtonClick = useCallback(() => {
     const invalidField = getInvalidField();

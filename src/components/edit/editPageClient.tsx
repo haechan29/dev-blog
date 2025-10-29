@@ -26,7 +26,10 @@ export default function EditPageClient({ post }: { post: PostProps }) {
 function EditPageWithValidation({ post }: { post: PostProps }) {
   const searchParams = useSearchParams();
   const step = searchParams.get('step') as keyof typeof writePostSteps;
-  const writePostForm = useWritePostForm({ currentStepId: step, post });
+  const writePostForm = useWritePostForm({
+    currentStepId: step,
+    post,
+  });
   const { draft, removeDraft } = useAutoSave({
     ...writePostForm,
     postId: post.id,
@@ -43,7 +46,11 @@ function EditPageWithValidation({ post }: { post: PostProps }) {
         onRestore={(draft: string) => writePostForm.setContent(draft)}
       />
       <div className='w-screen h-dvh flex flex-col'>
-        <WritePostToolbar removeDraft={removeDraft} {...writePostForm} />
+        <WritePostToolbar
+          publishPost={async () => writePostForm.updatePost(post.id)}
+          removeDraft={removeDraft}
+          {...writePostForm}
+        />
         <div className='flex-1 min-h-0'>
           <WritePostForm {...writePostForm} />
         </div>

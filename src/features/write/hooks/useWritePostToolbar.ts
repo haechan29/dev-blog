@@ -14,11 +14,11 @@ import toast from 'react-hot-toast';
 
 export default function useWritePostToolbar({
   currentStepId,
-  createPost,
+  publishPost,
   removeDraft,
 }: {
   currentStepId: keyof typeof writePostSteps;
-  createPost: () => Promise<PostProps>;
+  publishPost: () => Promise<PostProps>;
   removeDraft: () => void;
 }) {
   const navigate = useNavigationWithParams();
@@ -41,7 +41,7 @@ export default function useWritePostToolbar({
       case 'publish': {
         try {
           nProgress.start();
-          const post = await createPost();
+          const post = await publishPost();
           navigate({ pathname: `/posts/${post.id}` });
           removeDraft();
         } catch (error) {
@@ -56,7 +56,7 @@ export default function useWritePostToolbar({
         break;
       }
     }
-  }, [createPost, navigate, removeDraft, writePostToolbar.currentStepId]);
+  }, [publishPost, navigate, removeDraft, writePostToolbar.currentStepId]);
 
   useEffect(
     () => setWritePostToolbar(prev => ({ ...prev, currentStepId })),
