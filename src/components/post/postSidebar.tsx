@@ -8,16 +8,18 @@ import { PostProps } from '@/features/post/ui/postProps';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
+import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export default function PostSidebar({ posts }: { posts: PostProps[] }) {
-  const postSidebar = useSelector((state: RootState) => state.postSidebar);
+  const pathname = usePathname();
+  const isEditing = useMemo(() => pathname.includes('/edit'), [pathname]);
   const isLargerThanXl = useMediaQuery('(min-width: 1280px)');
-
+  const postSidebar = useSelector((state: RootState) => state.postSidebar);
   const isVisible = useMemo(
-    () => isLargerThanXl || postSidebar.isVisible,
-    [postSidebar, isLargerThanXl]
+    () => !isEditing && (isLargerThanXl || postSidebar.isVisible),
+    [isEditing, isLargerThanXl, postSidebar.isVisible]
   );
 
   const swipeHandlers = useSidebarSwipe();
