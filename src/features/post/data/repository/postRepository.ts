@@ -58,6 +58,30 @@ export async function createPost(params: {
   };
 }
 
+export async function updatePost({
+  postId,
+  ...requestBody
+}: {
+  postId: string;
+  title?: string;
+  content?: string;
+  tags?: string[];
+  password?: string;
+}): Promise<PostResponseDto> {
+  const response = await api.patch(`/api/posts/${postId}`, requestBody);
+  const post: Post = response.data;
+  return {
+    id: post.id,
+    authorName: post.author_name,
+    title: post.title,
+    tags: post.tags,
+    content: post.content,
+    createdAt: post.created_at,
+    updatedAt: post.updated_at,
+    authorId: post.author_id,
+  };
+}
+
 export async function deletePost(
   postId: string,
   password: string
