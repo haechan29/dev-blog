@@ -10,18 +10,18 @@ import {
 import { PostProps } from '@/features/post/ui/postProps';
 import { createRipple } from '@/lib/dom';
 import { Edit2, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function PostSettingsDropdown({
   children,
   post: { id: postId },
-  onEdit,
 }: {
   children: React.ReactNode;
   post: PostProps;
-  onEdit: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <>
@@ -43,7 +43,9 @@ export default function PostSettingsDropdown({
 
         <DropdownMenuContent align='end'>
           <DropdownMenuItem
-            onClick={onEdit}
+            onClick={() => {
+              router.push(`/posts/${postId}/edit?step=write`);
+            }}
             className='w-full flex items-center gap-2 cursor-pointer'
           >
             <Edit2 className='w-4 h-4 text-gray-500' />

@@ -1,7 +1,10 @@
 'use client';
 
 import * as PostService from '@/features/post/domain/service/postService';
-import { createProps as createPostProps } from '@/features/post/ui/postProps';
+import {
+  createProps as createPostProps,
+  PostProps,
+} from '@/features/post/ui/postProps';
 import { writePostSteps } from '@/features/write/constants/writePostStep';
 import {
   validate,
@@ -20,32 +23,36 @@ import {
 
 export default function useWritePostForm({
   currentStepId,
+  post,
+  password,
 }: {
   currentStepId: keyof typeof writePostSteps;
+  post?: PostProps;
+  password?: string;
 }) {
   const router = useRouter();
   const [writePostForm, setWritePostForm] = useState<WritePostForm>({
     currentStepId,
     invalidField: null,
     title: {
-      value: '',
+      value: post?.title ?? '',
       isEmptyAllowed: false,
       maxLength: 50,
     },
     tags: {
-      value: [],
+      value: post?.tags ?? [],
       isEmptyAllowed: true,
       maxTagLength: 30,
       maxTagsLength: 10,
       delimiter: '#',
     },
     password: {
-      value: '',
+      value: password ?? '',
       isEmptyAllowed: false,
       maxLength: 20,
     },
     content: {
-      value: '',
+      value: post?.content ?? '',
       isEmptyAllowed: false,
       maxLength: 50_000,
     },

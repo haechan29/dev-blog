@@ -12,37 +12,45 @@ export default function useAutoSave({
   writePostForm: {
     content: { value: content },
   },
+  postId,
 }: {
   writePostForm: WritePostFormProps;
+  postId?: string;
 }) {
   const debounce = useDebounce();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const localStorageKey = useMemo(() => {
+    return postId ? `${LOCAL_STORAGE_KEY}-${postId}` : LOCAL_STORAGE_KEY;
+  }, [postId]);
 
-  const saveDraft = useCallback((content: string) => {
-    try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, content);
-    } catch {}
+  const saveDraft = useCallback(
+    (content: string) => {
+      try {
+        localStorage.setItem(localStorageKey, content);
+      } catch {}
 
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(
-      () => saveDraft(content),
-      AUTO_SAVE_INTERVAL
-    );
-  }, []);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      intervalRef.current = setInterval(
+        () => saveDraft(content),
+        AUTO_SAVE_INTERVAL
+      );
+    },
+    [localStorageKey]
+  );
 
   const draft = useMemo(() => {
     try {
-      return localStorage.getItem(LOCAL_STORAGE_KEY);
+      return localStorage.getItem(localStorageKey);
     } catch {
       return null;
     }
-  }, []);
+  }, [localStorageKey]);
 
   const removeDraft = useCallback(() => {
     try {
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      localStorage.removeItem(localStorageKey);
     } catch {}
-  }, []);
+  }, [localStorageKey]);
 
   useEffect(() => {
     debounce(() => saveDraft(content), AUTO_SAVE_DELAY);
