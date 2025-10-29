@@ -17,6 +17,7 @@ export default function PostPreview({
   const { id, title, plainText, tags } = post;
   const isScrollAnimationEnabled =
     plainText.length >= MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION;
+
   return (
     <div
       className='relative flex flex-col group mb-8'
@@ -36,10 +37,10 @@ export default function PostPreview({
 
       <Link
         href={`/posts/${id}${tag ? `?tag=${tag}` : ''}`}
-        className='w-full text-gray-900'
+        className='w-full flex flex-col gap-4 text-gray-900'
       >
-        <div className='text-2xl font-semibold mb-4 line-clamp-2'>{title}</div>
-        <div className='mb-4 whitespace-pre-line'>
+        <div className='text-2xl font-semibold line-clamp-2'>{title}</div>
+        <div className='whitespace-pre-line'>
           {isScrollAnimationEnabled ? (
             <div className='relative h-18'>
               <div
@@ -72,20 +73,23 @@ export default function PostPreview({
 
         <div
           className={clsx(
+            'flex flex-col gap-4',
             isScrollAnimationEnabled &&
               'transition-opacity duration-300 ease-in-out delay-0 group-hover:delay-[var(--scale-delay)] group-hover:opacity-0'
           )}
         >
-          <div className='flex flex-wrap gap-2 mb-4'>
-            {tags.map(tag => (
-              <div
-                key={tag}
-                className='text-xs px-2 py-1 flex-shrink-0 border border-gray-300 rounded-full'
-              >
-                {tag}
-              </div>
-            ))}
-          </div>
+          {tags.length > 0 && (
+            <div className='flex flex-wrap gap-2'>
+              {tags.map(tag => (
+                <div
+                  key={tag}
+                  className='text-xs px-2 py-1 flex-shrink-0 border border-gray-300 rounded-full'
+                >
+                  {tag}
+                </div>
+              ))}
+            </div>
+          )}
           <PostInfo {...post} />
         </div>
       </Link>

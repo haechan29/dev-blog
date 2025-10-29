@@ -59,7 +59,7 @@ export default function WritePostTitle({
       onClick={onClick}
     >
       <div className='flex flex-1 min-w-0 overflow-x-auto scrollbar-hide items-center'>
-        <div className='w-fit shrink-0 relative text-xl font-semibold'>
+        <div className='shrink-0 relative text-xl font-semibold'>
           {!title ? (
             <span className='text-gray-400'>제목을 입력하세요</span>
           ) : (
