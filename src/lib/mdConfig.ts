@@ -4,6 +4,7 @@ import type {
   LeafDirective,
   TextDirective,
 } from 'mdast-util-directive';
+import { defaultSchema, type Options } from 'rehype-sanitize';
 import type { Node } from 'unist';
 import { visit } from 'unist-util-visit';
 
@@ -23,6 +24,38 @@ const elements: Record<string, HtmlElement> = {
   caption: { name: 'div', properties: { className: 'caption' } },
   hidefullscreen: { name: 'div', properties: { className: 'hide-fullscreen' } },
 };
+
+export const schema: Options = {
+  ...defaultSchema,
+  attributes: {
+    ...defaultSchema.attributes,
+    img: [
+      ...(defaultSchema.attributes?.img ?? []),
+      ['className', 'w-full', 'w-1/2'],
+    ],
+  },
+};
+
+export function handleImage() {
+  return (tree: Node) => {
+    visit(tree, node => {
+      if (!isDirectiveNode(node) || node.name !== 'img') return;
+      const { src, alt, size } = node.attributes || {};
+      if (!src) return;
+
+      node.data = {
+        hName: 'img',
+        hProperties: {
+          src,
+          ...(alt && { alt }),
+          className: size === 'large' ? 'w-full' : 'w-1/2',
+          'data-size': size,
+        },
+      };
+      return;
+    });
+  };
+}
 
 export function handleDirective() {
   return (tree: Node) => {

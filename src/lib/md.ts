@@ -1,4 +1,9 @@
-import { handleDirective, handleLink } from '@/lib/mdConfig';
+import {
+  handleDirective,
+  handleImage,
+  handleLink,
+  schema,
+} from '@/lib/mdConfig';
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSanitize from 'rehype-sanitize';
 import rehypeSlug from 'rehype-slug';
@@ -16,8 +21,9 @@ const processor = unified()
   .use(remarkBreaks) // convert line breaks to br tags
   .use(remarkDirective) // support custom directives like :::page
   .use(handleDirective) // process custom directives
+  .use(handleImage) // process custom image directives
   .use(remarkRehype) // convert markdown AST to HTML AST
-  .use(rehypeSanitize) // remove unsafe HTML tags and attributes
+  .use(rehypeSanitize, schema) // remove unsafe HTML tags and attributes
   .use(handleLink) // process links
   .use(rehypePrettyCode) // add syntax highlighting to code blocks
   .use(rehypeSlug) // add id attributes to headings
