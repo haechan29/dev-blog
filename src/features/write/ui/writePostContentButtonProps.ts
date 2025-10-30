@@ -1,7 +1,7 @@
 import { WritePostContentButton } from '@/features/write/domain/model/writePostContentButton';
 
 export type ButtonContent = {
-  type: 'text' | 'link' | 'table' | 'blockquote' | 'horizontalRule';
+  type: 'text' | 'link' | 'table' | 'blockquote' | 'horizontalRule' | 'image';
   style: string;
   value?: string;
 };
@@ -61,6 +61,14 @@ const buttonContents: Record<WritePostContentButton['id'], ButtonContent> = {
   },
   horizontalRule: {
     type: 'horizontalRule',
+    style: 'w-5 h-5',
+  },
+  image: {
+    type: 'image',
+    style: 'w-4 h-4',
+  },
+  imageLarge: {
+    type: 'image',
     style: 'w-5 h-5',
   },
 };
@@ -155,6 +163,20 @@ const writePostContentButtonProps: Record<
     label: '구분선',
     content: buttonContents['horizontalRule'],
     markdownBefore: '---\n',
+  },
+  image: {
+    action: 'insert',
+    label: '이미지',
+    content: buttonContents['image'],
+    markdownBefore: ':::img{src="',
+    markdownAfter: '" size="medium"}\n:::',
+  },
+  imageLarge: {
+    action: 'insert',
+    label: '큰 이미지',
+    content: buttonContents['imageLarge'],
+    markdownBefore: ':::img{src="',
+    markdownAfter: '" size="large"}\n:::',
   },
 };
 

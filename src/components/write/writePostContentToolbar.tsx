@@ -6,7 +6,7 @@ import {
   WritePostContentButtonProps,
 } from '@/features/write/ui/writePostContentButtonProps';
 import clsx from 'clsx';
-import { Grid2x2, Link, Minus, Quote } from 'lucide-react';
+import { Grid2x2, ImageIcon, Link, Minus, Quote } from 'lucide-react';
 import { useCallback } from 'react';
 
 export default function WritePostContentToolbar({
@@ -71,5 +71,7 @@ function ContentButton({
       return <Quote className={style} />;
     case 'horizontalRule':
       return <Minus className={style} />;
+    case 'image':
+      return <ImageIcon className={style} />;
   }
 }

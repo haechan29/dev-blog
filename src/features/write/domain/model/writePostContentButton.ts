@@ -11,6 +11,8 @@ export const writePostContentButtons: WritePostContentButton[] = [
   { id: 'strikethrough' },
   { id: 'unorderedList' },
   { id: 'orderedList' },
+  { id: 'image' },
+  { id: 'imageLarge' },
   { id: 'link' },
   { id: 'blockquote' },
   { id: 'horizontalRule' },
