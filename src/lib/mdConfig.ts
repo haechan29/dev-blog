@@ -73,21 +73,22 @@ export function rehypeImage() {
     let imageCounter = 0;
     visit(tree, 'element', (node: Element, index: number, parent: Element) => {
       if (node.tagName === 'img') {
+        const imageDropdownButton: Element = {
+          type: 'element',
+          tagName: 'button',
+          properties: {
+            className: 'image-dropdown-button absolute z-[1000] top-2 right-2',
+            id: `image-${imageCounter++}`,
+          },
+          children: [],
+        };
         const wrapper: Element = {
           type: 'element',
           tagName: 'div',
           properties: {
             className: 'image-wrapper w-fit relative',
           },
-          children: [
-            {
-              ...node,
-              properties: {
-                ...node.properties,
-                id: `img-${imageCounter++}`,
-              },
-            },
-          ],
+          children: [node, imageDropdownButton],
         };
         parent.children[index] = wrapper;
       }

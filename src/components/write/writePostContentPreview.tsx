@@ -1,8 +1,9 @@
 'use client';
 
+import ImageSettingsDropdown from '@/components/write/imageSettingsDropdown';
 import clsx from 'clsx';
 import { MoreVertical } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
 export default function WritePostContentPreview({
@@ -12,7 +13,21 @@ export default function WritePostContentPreview({
 }) {
   const contentRef = useRef<HTMLDivElement | null>(null);
   const moreButtonRef = useRef<HTMLDivElement | null>(null);
-  const [isImageDropdownOpen, setIsImageDropdownOpen] = useState(false);
+  const imageDropdownTriggerRef = useRef<HTMLDivElement | null>(null);
+  const [imageDropdownTriggerPosition, setImageDropdownTriggerPosition] =
+    useState({ top: '0px', left: '0px' });
+  const [isImageDropDownOpen, setIsImageDropDownOpen] = useState(false);
+
+  const handleImageDropdownClick = useCallback((event: MouseEvent) => {
+    const imageDropdownButton = (event.target as Element).closest(
+      '.image-dropdown-button'
+    );
+    const imageDropdownTrigger = imageDropdownTriggerRef.current;
+    if (!imageDropdownButton || !imageDropdownTrigger) return;
+    const { top, left } = imageDropdownButton.getBoundingClientRect();
+    setImageDropdownTriggerPosition({ top: `${top}px`, left: `${left}px` });
+    setIsImageDropDownOpen(true);
+  }, []);
 
   useEffect(() => {
     if (htmlSource === null) return;
@@ -21,28 +36,40 @@ export default function WritePostContentPreview({
     const moreButton = moreButtonRef.current;
 
     content.innerHTML = htmlSource;
-    content.querySelectorAll('.image-wrapper').forEach(imgWrapper => {
+    content.querySelectorAll('.image-wrapper').forEach(imageWrapper => {
+      const imageDropdownButton = imageWrapper.querySelector(
+        '.image-dropdown-button'
+      ) as HTMLButtonElement;
       const moreButtonClone = moreButton.cloneNode(true) as HTMLElement;
       moreButtonClone.style.display = 'block';
-      imgWrapper.appendChild(moreButtonClone);
+      imageDropdownButton.appendChild(moreButtonClone);
     });
-  }, [htmlSource]);
+
+    content.addEventListener('click', handleImageDropdownClick);
+    return () => content.removeEventListener('click', handleImageDropdownClick);
+  }, [handleImageDropdownClick, htmlSource]);
 
   return (
     <>
-      {/* <ImageSettingsDropdown
-        isOpen={isImageDropdownOpen}
-        setIsOpen={setIsImageDropdownOpen}
-      /> */}
-      <div
-        ref={moreButtonRef}
-        className='hidden absolute z-[1000] top-2 right-2'
+      <ImageSettingsDropdown
+        isOpen={isImageDropDownOpen}
+        setIsOpen={setIsImageDropDownOpen}
       >
+        <div
+          ref={imageDropdownTriggerRef}
+          onClick={() => console.log('클릭')}
+          className='w-9 h-9 rounded-full fixed z-[2000]'
+          style={{ ...imageDropdownTriggerPosition }}
+        />
+      </ImageSettingsDropdown>
+
+      <div ref={moreButtonRef} className='hidden'>
         <MoreVertical
           className={clsx(
-            'w-9 h-9 text-white rounded-full p-2 border',
+            'w-9 h-9 text-white rounded-full p-2',
             'bg-black/20 hover:bg-black/30'
           )}
+          aria-label='이미지 설정'
         />
       </div>
 
