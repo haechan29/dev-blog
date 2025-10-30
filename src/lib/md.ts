@@ -1,9 +1,4 @@
-import {
-  handleDirective,
-  handleImage,
-  handleLink,
-  schema,
-} from '@/lib/mdConfig';
+import { handleLink, remarkCustomDirectives, schema } from '@/lib/mdConfig';
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSanitize from 'rehype-sanitize';
 import rehypeSlug from 'rehype-slug';
@@ -20,8 +15,7 @@ const processor = unified()
   .use(remarkGfm) // support GitHub flavored markdown (tables, strikethrough, etc)
   .use(remarkBreaks) // convert line breaks to br tags
   .use(remarkDirective) // support custom directives like :::page
-  .use(handleDirective) // process custom directives
-  .use(handleImage) // process custom image directives
+  .use(remarkCustomDirectives) // process custom directives
   .use(remarkRehype) // convert markdown AST to HTML AST
   .use(rehypeSanitize, schema) // remove unsafe HTML tags and attributes
   .use(handleLink) // process links

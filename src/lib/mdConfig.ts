@@ -19,7 +19,7 @@ type HtmlElement = {
 
 type DirectiveNode = ContainerDirective | LeafDirective | TextDirective;
 
-const elements: Record<string, HtmlElement> = {
+const customElements: Record<string, HtmlElement> = {
   paged: { name: 'div', properties: { className: 'paged' } },
   caption: { name: 'div', properties: { className: 'caption' } },
   hidefullscreen: { name: 'div', properties: { className: 'hide-fullscreen' } },
@@ -31,41 +31,24 @@ export const schema: Options = {
     ...defaultSchema.attributes,
     img: [
       ...(defaultSchema.attributes?.img ?? []),
-      ['className', 'w-full', 'w-1/2'],
+      ['className', 'w-full', 'min-w-56 w-1/2'],
     ],
   },
 };
 
-export function handleImage() {
+export function remarkCustomDirectives() {
   return (tree: Node) => {
     visit(tree, node => {
-      if (!isDirectiveNode(node) || node.name !== 'img') return;
-      const { src, alt, size } = node.attributes || {};
-      if (!src) return;
-
-      node.data = {
-        hName: 'img',
-        hProperties: {
-          src,
-          ...(alt && { alt }),
-          className: size === 'large' ? 'w-full' : 'w-1/2',
-          'data-size': size,
-        },
-      };
-      return;
-    });
-  };
-}
-
-export function handleDirective() {
-  return (tree: Node) => {
-    visit(tree, node => {
-      if (!isDirectiveNode(node) || !elements[node.name]) return;
-      const { name, properties } = elements[node.name];
-      node.data = {
-        hName: name,
-        hProperties: properties,
-      };
+      if (!isDirectiveNode(node)) return;
+      if (customElements[node.name]) {
+        const { name, properties } = customElements[node.name];
+        node.data = {
+          hName: name,
+          hProperties: properties,
+        };
+      } else if (node.name === 'img') {
+        remarkImg(node);
+      }
     });
   };
 }
@@ -90,4 +73,18 @@ function isDirectiveNode(node: Node): node is DirectiveNode {
     node.type === 'leafDirective' ||
     node.type === 'textDirective'
   );
+}
+
+function remarkImg(node: DirectiveNode) {
+  const { src, alt, size } = node.attributes || {};
+  if (!src) return;
+
+  node.data = {
+    hName: 'img',
+    hProperties: {
+      src,
+      ...(alt && { alt }),
+      className: size === 'large' ? 'w-full' : 'min-w-56 w-1/2',
+    },
+  };
 }
