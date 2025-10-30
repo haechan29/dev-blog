@@ -1,6 +1,7 @@
 'use client';
 
 import ImageSettingsDropdown from '@/components/write/imageSettingsDropdown';
+import { canTouch } from '@/lib/browser';
 import clsx from 'clsx';
 import { MoreVertical } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -12,66 +13,126 @@ export default function WritePostContentPreview({
   htmlSource: string | null;
 }) {
   const contentRef = useRef<HTMLDivElement | null>(null);
-  const moreButtonRef = useRef<HTMLDivElement | null>(null);
-  const imageDropdownTriggerRef = useRef<HTMLDivElement | null>(null);
-  const [imageDropdownTriggerPosition, setImageDropdownTriggerPosition] =
-    useState({ top: '0px', left: '0px' });
-  const [isImageDropDownOpen, setIsImageDropDownOpen] = useState(false);
+  const [settingsButtonStatus, setSettingsButtonStatus] = useState({
+    isVisible: false,
+    top: '0px',
+    left: '0px',
+  });
+  const { isVisible, top, left } = settingsButtonStatus;
+  const [isImageButtonTouched, setIsImageButtonTouched] = useState(false);
+  const [isImageDropdownOpen, setIsImageDropdownOpen] = useState(false);
 
-  const handleImageDropdownClick = useCallback((event: MouseEvent) => {
-    const imageDropdownButton = (event.target as Element).closest(
-      '.image-dropdown-button'
-    );
-    const imageDropdownTrigger = imageDropdownTriggerRef.current;
-    if (!imageDropdownButton || !imageDropdownTrigger) return;
-    const { top, left } = imageDropdownButton.getBoundingClientRect();
-    setImageDropdownTriggerPosition({ top: `${top}px`, left: `${left}px` });
-    setIsImageDropDownOpen(true);
+  const onTouchStart = useCallback(
+    (event: TouchEvent) => {
+      const imageWrapper = (event.target as Element).closest('.image-wrapper');
+      if (!imageWrapper) return;
+
+      const imageButton = imageWrapper.querySelector(
+        '.image-button'
+      ) as Element;
+      const { top, left } = imageButton.getBoundingClientRect();
+      if (isImageButtonTouched) {
+        setIsImageButtonTouched(false);
+        setSettingsButtonStatus(prev => ({
+          ...prev,
+          isVisible: false,
+        }));
+      } else {
+        setIsImageButtonTouched(true);
+        setSettingsButtonStatus(() => ({
+          top: `${top}px`,
+          left: `${left}px`,
+          isVisible: true,
+        }));
+      }
+    },
+    [isImageButtonTouched]
+  );
+
+  const onMouseOver = useCallback((event: MouseEvent) => {
+    if (canTouch) return;
+    const imageWrapper = (event.target as Element).closest('.image-wrapper');
+    if (!imageWrapper) return;
+
+    const imageButton = imageWrapper.querySelector('.image-button') as Element;
+    const { top, left } = imageButton.getBoundingClientRect();
+    setSettingsButtonStatus(() => ({
+      top: `${top}px`,
+      left: `${left}px`,
+      isVisible: true,
+    }));
   }, []);
 
+  const onMouseOut = useCallback(() => {
+    if (canTouch) return;
+
+    setSettingsButtonStatus(prev => ({ ...prev, isVisible: false }));
+  }, []);
+
+  const updateIsImageDropdownVisible = useCallback(
+    (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.classList.contains('image-button')) return;
+
+      if (!isImageDropdownOpen) {
+        setIsImageDropdownOpen(true);
+      }
+    },
+    [isImageDropdownOpen]
+  );
+
   useEffect(() => {
-    if (htmlSource === null) return;
-    if (!contentRef.current || !moreButtonRef.current) return;
+    if (htmlSource === null || !contentRef.current) return;
     const content = contentRef.current;
-    const moreButton = moreButtonRef.current;
-
     content.innerHTML = htmlSource;
-    content.querySelectorAll('.image-wrapper').forEach(imageWrapper => {
-      const imageDropdownButton = imageWrapper.querySelector(
-        '.image-dropdown-button'
-      ) as HTMLButtonElement;
-      const moreButtonClone = moreButton.cloneNode(true) as HTMLElement;
-      moreButtonClone.style.display = 'block';
-      imageDropdownButton.appendChild(moreButtonClone);
-    });
 
-    content.addEventListener('click', handleImageDropdownClick);
-    return () => content.removeEventListener('click', handleImageDropdownClick);
-  }, [handleImageDropdownClick, htmlSource]);
+    content.addEventListener('click', updateIsImageDropdownVisible);
+    if (canTouch) {
+      content.addEventListener('touchstart', onTouchStart);
+    } else {
+      content.addEventListener('mouseover', onMouseOver);
+      content.addEventListener('mouseout', onMouseOut);
+    }
+    return () => {
+      content.removeEventListener('click', updateIsImageDropdownVisible);
+      if (canTouch) {
+        content.removeEventListener('touchstart', onTouchStart);
+      } else {
+        content.removeEventListener('mouseover', onMouseOver);
+        content.removeEventListener('mouseout', onMouseOut);
+      }
+    };
+  }, [
+    htmlSource,
+    onMouseOut,
+    onMouseOver,
+    onTouchStart,
+    updateIsImageDropdownVisible,
+  ]);
 
   return (
     <>
       <ImageSettingsDropdown
-        isOpen={isImageDropDownOpen}
-        setIsOpen={setIsImageDropDownOpen}
+        isOpen={isImageDropdownOpen}
+        setIsOpen={setIsImageDropdownOpen}
       >
         <div
-          ref={imageDropdownTriggerRef}
-          onClick={() => console.log('클릭')}
-          className='w-9 h-9 rounded-full fixed z-[2000]'
-          style={{ ...imageDropdownTriggerPosition }}
-        />
-      </ImageSettingsDropdown>
-
-      <div ref={moreButtonRef} className='hidden'>
-        <MoreVertical
           className={clsx(
-            'w-9 h-9 text-white rounded-full p-2',
-            'bg-black/20 hover:bg-black/30'
+            'fixed z-[2000] pointer-events-none',
+            !isVisible && 'opacity-0'
           )}
-          aria-label='이미지 설정'
-        />
-      </div>
+          style={{ top, left }}
+        >
+          <MoreVertical
+            className={clsx(
+              'w-9 h-9 text-white rounded-full p-2',
+              'bg-black/10 hover:bg-black/20'
+            )}
+            aria-label='이미지 설정'
+            aria-hidden={!isVisible}
+          />
+        </div>
+      </ImageSettingsDropdown>
 
       <div className='flex flex-col h-full'>
         <div
