@@ -160,7 +160,6 @@ body {
     @apply max-w-none text-gray-700 leading-relaxed break-words;
   }
 
-  /* 제목들 */
   .prose h1 {
     @apply text-xl xl:text-2xl font-bold text-gray-900 py-3 leading-tight;
   }
@@ -173,7 +172,6 @@ body {
     @apply xl:text-lg font-bold text-gray-900 py-1 leading-tight;
   }
 
-  /* 텍스트 */
   .prose p {
     @apply mb-4 text-base text-gray-900 leading-7;
   }
@@ -210,12 +208,10 @@ body {
     @apply text-xs align-super;
   }
 
-  /* 링크 */
   .prose a {
     @apply text-blue-600 hover:text-blue-800 underline;
   }
 
-  /* 리스트 */
   .prose ul {
     @apply mb-4 pl-6 list-disc;
   }
@@ -233,7 +229,6 @@ body {
     @apply mt-2 mb-0;
   }
 
-  /* 인용구 */
   .prose blockquote {
     @apply border-l-4 border-gray-300 pl-4 italic text-gray-600 my-4 bg-gray-50 py-2;
   }
@@ -242,7 +237,6 @@ body {
     @apply mb-0;
   }
 
-  /* 코드 */
   .prose code {
     @apply bg-gray-100 text-gray-800 px-2 py-1 rounded text-sm font-mono;
   }
@@ -255,7 +249,6 @@ body {
     @apply bg-transparent text-gray-100 p-0;
   }
 
-  /* 테이블 */
   .prose table {
     @apply w-full border-collapse my-4;
   }
@@ -276,14 +269,20 @@ body {
     @apply bg-gray-50;
   }
 
-  /* 구분선 */
   .prose hr {
     @apply border-0 border-t border-gray-300 my-8;
   }
 
-  /* 이미지 */
   .prose img {
     @apply max-w-full h-auto rounded-lg my-4;
+  }
+
+  .prose .image-wrapper {
+    @apply my-4;
+  }
+
+  .prose .image-wrapper img {
+    @apply my-0;
   }
 
   .prose figure {
@@ -294,7 +293,6 @@ body {
     @apply text-sm text-gray-600 text-center mt-2 italic;
   }
 
-  /* 기타 */
   .prose kbd {
     @apply bg-gray-200 border border-gray-300 rounded px-2 py-1 text-xs font-mono;
   }

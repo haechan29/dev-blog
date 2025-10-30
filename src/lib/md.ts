@@ -1,4 +1,9 @@
-import { handleLink, remarkCustomDirectives, schema } from '@/lib/mdConfig';
+import {
+  rehypeImage,
+  rehypeLink,
+  remarkCustomDirectives,
+  schema,
+} from '@/lib/mdConfig';
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSanitize from 'rehype-sanitize';
 import rehypeSlug from 'rehype-slug';
@@ -18,8 +23,9 @@ const processor = unified()
   .use(remarkCustomDirectives) // process custom directives
   .use(remarkRehype) // convert markdown AST to HTML AST
   .use(rehypeSanitize, schema) // remove unsafe HTML tags and attributes
-  .use(handleLink) // process links
+  .use(rehypeLink) // process links
   .use(rehypePrettyCode) // add syntax highlighting to code blocks
+  .use(rehypeImage) // add id attributes to images
   .use(rehypeSlug) // add id attributes to headings
   .use(rehypeStringify); // convert HTML AST to HTML string
 

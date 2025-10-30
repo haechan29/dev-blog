@@ -46,14 +46,12 @@ export function remarkCustomDirectives() {
           hName: name,
           hProperties: properties,
         };
-      } else if (node.name === 'img') {
-        remarkImg(node);
       }
     });
   };
 }
 
-export function handleLink() {
+export function rehypeLink() {
   return (tree: Node) => {
     visit(tree, 'element', (node: Element) => {
       if (node.tagName === 'a' && node.properties?.href) {
@@ -67,24 +65,40 @@ export function handleLink() {
   };
 }
 
+/**
+ * rehype plugin that wraps images with container div and adds unique IDs
+ */
+export function rehypeImage() {
+  return (tree: Node) => {
+    let imageCounter = 0;
+    visit(tree, 'element', (node: Element, index: number, parent: Element) => {
+      if (node.tagName === 'img') {
+        const wrapper: Element = {
+          type: 'element',
+          tagName: 'div',
+          properties: {
+            className: 'image-wrapper w-fit relative',
+          },
+          children: [
+            {
+              ...node,
+              properties: {
+                ...node.properties,
+                id: `img-${imageCounter++}`,
+              },
+            },
+          ],
+        };
+        parent.children[index] = wrapper;
+      }
+    });
+  };
+}
+
 function isDirectiveNode(node: Node): node is DirectiveNode {
   return (
     node.type === 'containerDirective' ||
     node.type === 'leafDirective' ||
     node.type === 'textDirective'
   );
-}
-
-function remarkImg(node: DirectiveNode) {
-  const { src, alt, size } = node.attributes || {};
-  if (!src) return;
-
-  node.data = {
-    hName: 'img',
-    hProperties: {
-      src,
-      ...(alt && { alt }),
-      className: size === 'large' ? 'w-full' : 'min-w-56 w-1/2',
-    },
-  };
 }
