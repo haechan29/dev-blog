@@ -77,8 +77,7 @@ export function rehypeImage() {
           type: 'element',
           tagName: 'button',
           properties: {
-            className:
-              'image-button absolute z-[1000] top-2 right-2 w-9 h-9 rounded-full',
+            className: 'image-button-wrapper absolute z-[1000] top-2 right-2',
             id: `image-${imageCounter++}`,
           },
           children: [],

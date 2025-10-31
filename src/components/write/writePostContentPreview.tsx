@@ -5,6 +5,7 @@ import { canTouch } from '@/lib/browser';
 import clsx from 'clsx';
 import { MoreVertical } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { ErrorBoundary } from 'react-error-boundary';
 
 export default function WritePostContentPreview({
@@ -13,80 +14,48 @@ export default function WritePostContentPreview({
   htmlSource: string | null;
 }) {
   const contentRef = useRef<HTMLDivElement | null>(null);
-  const [settingsButtonStatus, setSettingsButtonStatus] = useState({
-    isVisible: false,
-    top: '0px',
-    left: '0px',
-  });
-  const { isVisible, top, left } = settingsButtonStatus;
-  const [isImageButtonTouched, setIsImageButtonTouched] = useState(false);
   const [isImageDropdownOpen, setIsImageDropdownOpen] = useState(false);
+  const [currentImageButtonWrapper, setCurrentImageButtonWrapper] =
+    useState<Element | null>(null);
 
-  const onTouchStart = useCallback(
-    (event: TouchEvent) => {
-      const imageWrapper = (event.target as Element).closest('.image-wrapper');
-      if (!imageWrapper) return;
-
-      const imageButton = imageWrapper.querySelector(
-        '.image-button'
-      ) as Element;
-      const { top, left } = imageButton.getBoundingClientRect();
-      if (isImageButtonTouched) {
-        setIsImageButtonTouched(false);
-        setSettingsButtonStatus(prev => ({
-          ...prev,
-          isVisible: false,
-        }));
-      } else {
-        setIsImageButtonTouched(true);
-        setSettingsButtonStatus(() => ({
-          top: `${top}px`,
-          left: `${left}px`,
-          isVisible: true,
-        }));
-      }
-    },
-    [isImageButtonTouched]
-  );
-
-  const onMouseOver = useCallback((event: MouseEvent) => {
-    if (canTouch) return;
+  const onTouchStart = useCallback((event: TouchEvent) => {
     const imageWrapper = (event.target as Element).closest('.image-wrapper');
     if (!imageWrapper) return;
 
-    const imageButton = imageWrapper.querySelector('.image-button') as Element;
-    const { top, left } = imageButton.getBoundingClientRect();
-    setSettingsButtonStatus(() => ({
-      top: `${top}px`,
-      left: `${left}px`,
-      isVisible: true,
-    }));
+    const isTouched = imageWrapper.hasAttribute('data-is-touched');
+    if (isTouched) setIsImageDropdownOpen(false);
+    imageWrapper.toggleAttribute('data-is-touched');
+
+    const imageButtonWrapper = imageWrapper.querySelector(
+      '.image-button-wrapper'
+    ) as Element;
+    setCurrentImageButtonWrapper(prev =>
+      prev === imageButtonWrapper ? null : imageButtonWrapper
+    );
   }, []);
 
-  const onMouseOut = useCallback(() => {
-    if (canTouch) return;
+  const onMouseOver = useCallback((event: MouseEvent) => {
+    const imageWrapper = (event.target as Element).closest('.image-wrapper');
+    if (!imageWrapper) return;
 
-    setSettingsButtonStatus(prev => ({ ...prev, isVisible: false }));
+    const imageButtonWrapper = imageWrapper.querySelector(
+      '.image-button-wrapper'
+    ) as Element;
+    setCurrentImageButtonWrapper(imageButtonWrapper);
   }, []);
 
-  const updateIsImageDropdownVisible = useCallback(
-    (event: MouseEvent) => {
-      const target = event.target as Element;
-      if (!target.classList.contains('image-button')) return;
+  const onMouseOut = useCallback((event: MouseEvent) => {
+    const imageWrapper = (event.target as Element).closest('.image-wrapper');
+    if (!imageWrapper) return;
 
-      if (!isImageDropdownOpen) {
-        setIsImageDropdownOpen(true);
-      }
-    },
-    [isImageDropdownOpen]
-  );
+    setCurrentImageButtonWrapper(null);
+  }, []);
 
   useEffect(() => {
     if (htmlSource === null || !contentRef.current) return;
     const content = contentRef.current;
     content.innerHTML = htmlSource;
 
-    content.addEventListener('click', updateIsImageDropdownVisible);
     if (canTouch) {
       content.addEventListener('touchstart', onTouchStart);
     } else {
@@ -94,7 +63,6 @@ export default function WritePostContentPreview({
       content.addEventListener('mouseout', onMouseOut);
     }
     return () => {
-      content.removeEventListener('click', updateIsImageDropdownVisible);
       if (canTouch) {
         content.removeEventListener('touchstart', onTouchStart);
       } else {
@@ -102,37 +70,31 @@ export default function WritePostContentPreview({
         content.removeEventListener('mouseout', onMouseOut);
       }
     };
-  }, [
-    htmlSource,
-    onMouseOut,
-    onMouseOver,
-    onTouchStart,
-    updateIsImageDropdownVisible,
-  ]);
+  }, [htmlSource, onMouseOut, onMouseOver, onTouchStart]);
 
   return (
     <>
-      <ImageSettingsDropdown
-        isOpen={isImageDropdownOpen}
-        setIsOpen={setIsImageDropdownOpen}
-      >
-        <div
-          className={clsx(
-            'fixed z-[2000] pointer-events-none',
-            !isVisible && 'opacity-0'
-          )}
-          style={{ top, left }}
-        >
-          <MoreVertical
-            className={clsx(
-              'w-9 h-9 text-white rounded-full p-2',
-              'bg-black/10 hover:bg-black/20'
-            )}
-            aria-label='이미지 설정'
-            aria-hidden={!isVisible}
-          />
-        </div>
-      </ImageSettingsDropdown>
+      {currentImageButtonWrapper &&
+        createPortal(
+          <ImageSettingsDropdown
+            isOpen={isImageDropdownOpen}
+            setIsOpen={setIsImageDropdownOpen}
+          >
+            <div
+              onTouchStart={e => e.stopPropagation()}
+              aria-label={'이미지 설정'}
+              aria-hidden={currentImageButtonWrapper === null}
+            >
+              <MoreVertical
+                className={clsx(
+                  'w-9 h-9 text-white rounded-full p-2',
+                  'bg-black/10 hover:bg-black/20'
+                )}
+              />
+            </div>
+          </ImageSettingsDropdown>,
+          currentImageButtonWrapper
+        )}
 
       <div className='flex flex-col h-full'>
         <div
