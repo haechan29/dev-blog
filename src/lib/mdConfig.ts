@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type { Element } from 'hast';
 import type {
   ContainerDirective,
@@ -70,25 +71,21 @@ export function rehypeLink() {
  */
 export function rehypeImage() {
   return (tree: Node) => {
-    let imageCounter = 0;
+    let imageIndex = 0;
     visit(tree, 'element', (node: Element, index: number, parent: Element) => {
       if (node.tagName === 'img') {
-        const button: Element = {
-          type: 'element',
-          tagName: 'button',
-          properties: {
-            className: 'image-button-wrapper absolute z-[1000] top-2 right-2',
-            id: `image-${imageCounter++}`,
-          },
-          children: [],
-        };
         const wrapper: Element = {
           type: 'element',
           tagName: 'div',
           properties: {
-            className: 'image-wrapper w-fit relative',
+            'data-image-wrapper': '',
+            'data-image-index': `${imageIndex++}`,
+            className: clsx(
+              'w-fit relative',
+              'data-[is-active]:animate-pop data-[is-active]:[--scale:1.05]'
+            ),
           },
-          children: [node, button],
+          children: [node],
         };
         parent.children[index] = wrapper;
       }
