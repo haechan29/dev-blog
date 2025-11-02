@@ -1,7 +1,16 @@
 import { WritePostContentButton } from '@/features/write/domain/model/writePostContentButton';
 
 export type ButtonContent = {
-  type: 'text' | 'link' | 'table' | 'blockquote' | 'horizontalRule' | 'image';
+  type:
+    | 'text'
+    | 'link'
+    | 'table'
+    | 'blockquote'
+    | 'horizontalRule'
+    | 'image'
+    | 'imageLarge'
+    | 'imageSmall'
+    | 'imageCaption';
   style: string;
   value?: string;
 };
@@ -67,15 +76,32 @@ const buttonContents: Record<WritePostContentButton['id'], ButtonContent> = {
     type: 'image',
     style: 'w-4 h-4',
   },
+  imageLarge: {
+    type: 'imageLarge',
+    style: 'w-4 h-4',
+  },
+  imageSmall: {
+    type: 'imageSmall',
+    style: 'w-4 h-4',
+  },
+  imageCaption: {
+    type: 'imageCaption',
+    style: 'w-4 h-4',
+  },
 };
 
-export type WritePostContentButtonProps = {
+export interface WritePostContentButtonProps {
   action: 'insert' | 'toggle';
   label: string;
   content: ButtonContent;
   markdownBefore: string;
   markdownAfter?: string;
-};
+  directive?: {
+    name: 'image';
+    position: 'attribute' | 'content';
+    key?: string;
+  };
+}
 
 const writePostContentButtonProps: Record<
   WritePostContentButton['id'],
@@ -166,6 +192,39 @@ const writePostContentButtonProps: Record<
     content: buttonContents['image'],
     markdownBefore: ':::img{url="',
     markdownAfter: '" size="medium"}\n:::',
+  },
+  imageLarge: {
+    action: 'toggle',
+    label: '이미지 크게',
+    content: buttonContents['imageLarge'],
+    markdownBefore: 'large',
+    directive: {
+      name: 'image',
+      position: 'attribute',
+      key: 'size',
+    },
+  },
+  imageSmall: {
+    action: 'toggle',
+    label: '이미지 작게',
+    content: buttonContents['imageSmall'],
+    markdownBefore: 'medium',
+    directive: {
+      name: 'image',
+      position: 'attribute',
+      key: 'size',
+    },
+  },
+  imageCaption: {
+    action: 'insert',
+    label: '이미지 설명',
+    content: buttonContents['imageCaption'],
+    markdownBefore:
+      '이미지를 설명해주세요.\n# 태그로 구분된 문장은 전체화면에서 한 문장으로 구분됩니다.',
+    directive: {
+      name: 'image',
+      position: 'content',
+    },
   },
 };
 

@@ -6,7 +6,16 @@ import {
   WritePostContentButtonProps,
 } from '@/features/write/ui/writePostContentButtonProps';
 import clsx from 'clsx';
-import { Grid2x2, ImageIcon, Link, Minus, Quote } from 'lucide-react';
+import {
+  AlignCenter,
+  Expand,
+  Grid2x2,
+  ImageIcon,
+  Link,
+  Minus,
+  Quote,
+  Shrink,
+} from 'lucide-react';
 import { useCallback } from 'react';
 
 export default function WritePostContentToolbar({
@@ -73,5 +82,11 @@ function ContentButton({
       return <Minus className={style} />;
     case 'image':
       return <ImageIcon className={style} />;
+    case 'imageLarge':
+      return <Expand className={style} />;
+    case 'imageSmall':
+      return <Shrink className={style} />;
+    case 'imageCaption':
+      return <AlignCenter className={style} />;
   }
 }

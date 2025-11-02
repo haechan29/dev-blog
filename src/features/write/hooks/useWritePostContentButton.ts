@@ -11,6 +11,7 @@ type MarkdownParams = {
   textBefore: string;
   selectedText: string;
   textAfter: string;
+  derictive?: string;
   markdownBefore: string;
   markdownAfter?: string;
 };
@@ -25,10 +26,9 @@ export default function useWritePostContentButton({
   setContent: (content: string) => void;
 }) {
   const [contentButtons] = useState(writePostContentButtons);
-  const contentButtonProps = useMemo(
-    () => contentButtons.map(createProps),
-    [contentButtons]
-  );
+  const contentButtonProps = useMemo(() => {
+    return contentButtons.map(createProps);
+  }, [contentButtons]);
 
   const insertMarkdown = useCallback(
     ({

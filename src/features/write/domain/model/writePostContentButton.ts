@@ -16,4 +16,7 @@ export const writePostContentButtons: WritePostContentButton[] = [
   { id: 'blockquote' },
   { id: 'horizontalRule' },
   { id: 'table' },
+  { id: 'imageLarge' },
+  { id: 'imageSmall' },
+  { id: 'imageCaption' },
 ];
