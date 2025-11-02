@@ -105,7 +105,10 @@ function remarkImage(node: DirectiveNode, index: number, parent: Parent) {
           if (textNode.type === 'text' && textNode.value) {
             return {
               ...textNode,
-              value: textNode.value.replace(/#/g, ''),
+              value: textNode.value
+                .replace(/\\#/g, '__ESCAPED_HASH__')
+                .replace(/#/g, '')
+                .replace(/__ESCAPED_HASH__/g, '#'),
             };
           }
           return textNode;

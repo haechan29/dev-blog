@@ -90,18 +90,27 @@ const buttonContents: Record<WritePostContentButton['id'], ButtonContent> = {
   },
 };
 
-export interface WritePostContentButtonProps {
+export interface MarkdownButtonProps {
   action: 'insert' | 'toggle';
   label: string;
   content: ButtonContent;
   markdownBefore: string;
   markdownAfter?: string;
-  directive?: {
-    name: 'image';
-    position: 'attribute' | 'content';
-    key?: string;
-  };
 }
+
+export interface DirectiveButtonProps {
+  action: 'directive';
+  label: string;
+  content: ButtonContent;
+  name: 'image';
+  position: 'attribute' | 'content';
+  key?: string;
+  value: string;
+}
+
+export type WritePostContentButtonProps =
+  | MarkdownButtonProps
+  | DirectiveButtonProps;
 
 const writePostContentButtonProps: Record<
   WritePostContentButton['id'],
@@ -194,37 +203,31 @@ const writePostContentButtonProps: Record<
     markdownAfter: '" size="medium"}\n:::',
   },
   imageLarge: {
-    action: 'toggle',
+    action: 'directive',
     label: '이미지 크게',
     content: buttonContents['imageLarge'],
-    markdownBefore: 'large',
-    directive: {
-      name: 'image',
-      position: 'attribute',
-      key: 'size',
-    },
+    name: 'image',
+    position: 'attribute',
+    key: 'size',
+    value: 'large',
   },
   imageSmall: {
-    action: 'toggle',
+    action: 'directive',
     label: '이미지 작게',
     content: buttonContents['imageSmall'],
-    markdownBefore: 'medium',
-    directive: {
-      name: 'image',
-      position: 'attribute',
-      key: 'size',
-    },
+    name: 'image',
+    position: 'attribute',
+    key: 'size',
+    value: 'medium',
   },
   imageCaption: {
-    action: 'insert',
+    action: 'directive',
     label: '이미지 설명',
     content: buttonContents['imageCaption'],
-    markdownBefore:
-      '이미지를 설명해주세요.\n# 태그로 구분된 문장은 전체화면에서 한 문장으로 구분됩니다.',
-    directive: {
-      name: 'image',
-      position: 'content',
-    },
+    name: 'image',
+    position: 'content',
+    value:
+      '이미지를 설명해주세요. \\# 기호로 구분하면 전체화면에서 자막처럼 한 문장씩 나타납니다.\n#자막1\n#자막2',
   },
 };
 
