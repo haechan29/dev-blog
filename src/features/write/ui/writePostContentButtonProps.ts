@@ -39,11 +39,11 @@ const buttonContents: Record<WritePostContentButton['id'], ButtonContent> = {
   },
   link: {
     type: 'link',
-    style: 'w-[18] h-[18]',
+    style: 'w-4 h-4',
   },
   table: {
     type: 'table',
-    style: 'w-5 h-5',
+    style: 'w-4 h-4',
   },
   unorderedList: {
     type: 'text',
@@ -57,7 +57,7 @@ const buttonContents: Record<WritePostContentButton['id'], ButtonContent> = {
   },
   blockquote: {
     type: 'blockquote',
-    style: 'w-[14] h-[14] fill-gray-900',
+    style: 'w-4 h-4 fill-gray-900',
   },
   horizontalRule: {
     type: 'horizontalRule',
@@ -66,10 +66,6 @@ const buttonContents: Record<WritePostContentButton['id'], ButtonContent> = {
   image: {
     type: 'image',
     style: 'w-4 h-4',
-  },
-  imageLarge: {
-    type: 'image',
-    style: 'w-5 h-5',
   },
 };
 
@@ -168,15 +164,8 @@ const writePostContentButtonProps: Record<
     action: 'insert',
     label: '이미지',
     content: buttonContents['image'],
-    markdownBefore: ':::img{src="',
+    markdownBefore: ':::img{url="',
     markdownAfter: '" size="medium"}\n:::',
-  },
-  imageLarge: {
-    action: 'insert',
-    label: '큰 이미지',
-    content: buttonContents['imageLarge'],
-    markdownBefore: ':::img{src="',
-    markdownAfter: '" size="large"}\n:::',
   },
 };
 
