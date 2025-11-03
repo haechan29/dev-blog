@@ -128,12 +128,14 @@ function remarkImage(node: DirectiveNode, index?: number, parent?: Parent) {
 function remarkBGM(node: DirectiveNode, index?: number, parent?: Parent) {
   if (index === undefined || !parent) return;
 
-  const firstChild = node.children[0];
-  if (firstChild?.type !== 'text') return;
+  const { url, start } = node.attributes || {};
+  if (!url) return;
 
-  const youtubeUrl = firstChild.value;
-  const embedUrl = extractYouTubeEmbedUrl(youtubeUrl);
-  if (!embedUrl) return;
+  const { videoId, timeFromUrl } = parseYouTubeUrl(url);
+  if (!videoId) return;
+
+  const finalStart = start != null ? parseTimeToSeconds(start) : timeFromUrl;
+  const embedUrl = buildEmbedUrl(videoId, finalStart);
   const newNode = {
     type: 'html',
     value: `<iframe src="${embedUrl}" width="560" height="315" frameborder="0" allowfullscreen></iframe>`,
@@ -141,27 +143,33 @@ function remarkBGM(node: DirectiveNode, index?: number, parent?: Parent) {
   parent.children[index] = newNode;
 }
 
-function extractYouTubeEmbedUrl(youtubeUrl: string) {
+function parseYouTubeUrl(url: string) {
   try {
-    const url = new URL(youtubeUrl);
+    const urlObj = new URL(url);
     let videoId = null;
-    if (url.hostname.includes('youtube.com')) {
-      videoId = url.searchParams.get('v');
-    } else if (url.hostname === 'youtu.be') {
-      videoId = url.pathname.slice(1);
-    }
-    if (!videoId) return null;
+    let timeFromUrl = null;
 
-    let embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}`;
-    const t = url.searchParams.get('t');
-    if (t) {
-      const timeParam = parseTimeToSeconds(t);
-      embedUrl += `&start=${timeParam}`;
+    if (urlObj.hostname.includes('youtube.com')) {
+      videoId = urlObj.searchParams.get('v');
+    } else if (urlObj.hostname === 'youtu.be') {
+      videoId = urlObj.pathname.slice(1);
     }
-    return embedUrl;
+
+    const t = urlObj.searchParams.get('t');
+    if (t) {
+      timeFromUrl = parseTimeToSeconds(t);
+    }
+
+    return { videoId, timeFromUrl };
   } catch {
-    return null;
+    return { videoId: null, timeFromUrl: null };
   }
+}
+
+function buildEmbedUrl(videoId: string, startTime: number | null): string {
+  let embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}`;
+  if (startTime) embedUrl += `&start=${startTime}`;
+  return embedUrl;
 }
 
 function parseTimeToSeconds(timeStr: string): number {
