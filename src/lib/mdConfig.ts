@@ -82,7 +82,6 @@ function isDirectiveNode(node: Node): node is DirectiveNode {
 
 function remarkImage(node: DirectiveNode, index: number, parent: Parent) {
   const { url, alt, size } = node.attributes || {};
-  if (!url) return;
 
   const originalCaption = node.children
     .filter(child => child.type === 'paragraph')
@@ -129,7 +128,7 @@ function remarkImage(node: DirectiveNode, index: number, parent: Parent) {
     children: [
       {
         type: 'image',
-        url,
+        url: url || '',
         alt: alt || '',
         data: {
           hProperties: {

@@ -8,6 +8,7 @@ import {
 import clsx from 'clsx';
 import {
   AlignCenter,
+  Captions,
   Expand,
   Grid2x2,
   ImageIcon,
@@ -92,5 +93,7 @@ function ContentButton({
       return <Shrink className={style} />;
     case 'imageCaption':
       return <AlignCenter className={style} />;
+    case 'imageSubtitle':
+      return <Captions className={style} />;
   }
 }

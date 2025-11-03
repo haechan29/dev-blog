@@ -118,11 +118,22 @@ export default function useWritePostContentButton({
       } else if (position === 'content') {
         const lines = directiveText.split('\n');
         const firstLine = lines[0];
+        const directiveContent = lines.slice(1, -1).join('\n');
         const lastLine = lines[lines.length - 1];
+
+        const newContent = directiveContent.trim()
+          ? directiveContent.trimEnd() + ' ' + value
+          : value;
         newText =
-          textBefore + firstLine + '\n' + value + '\n' + lastLine + textAfter;
+          textBefore +
+          firstLine +
+          '\n' +
+          newContent +
+          '\n' +
+          lastLine +
+          textAfter;
         newCursorPosition =
-          content.length - textAfter.length - lastLine.length - 1;
+          newText.length - textAfter.length - lastLine.length - 1;
       }
 
       setContent(newText);

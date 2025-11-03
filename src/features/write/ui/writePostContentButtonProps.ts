@@ -10,7 +10,8 @@ export type ButtonContent = {
     | 'image'
     | 'imageLarge'
     | 'imageSmall'
-    | 'imageCaption';
+    | 'imageCaption'
+    | 'imageSubtitle';
   style: string;
   value?: string;
 };
@@ -87,6 +88,10 @@ const buttonContents: Record<WritePostContentButton['id'], ButtonContent> = {
   imageCaption: {
     type: 'imageCaption',
     style: 'w-4 h-4',
+  },
+  imageSubtitle: {
+    type: 'imageSubtitle',
+    style: 'w-5 h-5',
   },
 };
 
@@ -237,11 +242,18 @@ const writePostContentButtonProps: Record<
   imageCaption: {
     type: 'image',
     action: 'insert',
-    label: '이미지 설명',
+    label: '이미지 설명 추가',
     content: buttonContents['imageCaption'],
     position: 'content',
-    value:
-      '이미지를 설명해주세요. \\# 기호로 구분하면 전체화면에서 자막처럼 한 문장씩 나타납니다.\n#자막1 #자막2',
+    value: '이미지를 설명해주세요.',
+  },
+  imageSubtitle: {
+    type: 'image',
+    action: 'insert',
+    label: '이미지 자막 추가',
+    content: buttonContents['imageSubtitle'],
+    position: 'content',
+    value: '#자막은 전체화면에서 한 문장씩 표시됩니다.',
   },
 };
 
