@@ -8,22 +8,7 @@ import { defaultSchema, type Options } from 'rehype-sanitize';
 import type { Node, Parent } from 'unist';
 import { visit } from 'unist-util-visit';
 
-type HtmlElement = {
-  name: string;
-  properties: {
-    className?: string;
-    id?: string;
-    style?: string;
-  };
-};
-
 type DirectiveNode = ContainerDirective | LeafDirective | TextDirective;
-
-const customElements: Record<string, HtmlElement> = {
-  paged: { name: 'div', properties: { className: 'paged' } },
-  caption: { name: 'div', properties: { className: 'caption' } },
-  hidefullscreen: { name: 'div', properties: { className: 'hide-fullscreen' } },
-};
 
 export const schema: Options = {
   ...defaultSchema,
@@ -45,14 +30,10 @@ export function remarkCustomDirectives() {
   return (tree: Node) => {
     visit(tree, (node: Node, index?: number, parent?: Parent) => {
       if (!isDirectiveNode(node)) return;
-      if (customElements[node.name]) {
-        const { name, properties } = customElements[node.name];
-        node.data = {
-          hName: name,
-          hProperties: properties,
-        };
-      } else if (node.name === 'img' && index !== undefined && parent) {
+      if (node.name === 'img') {
         remarkImage(node, index, parent);
+      } else if (node.name === 'bgm') {
+        remarkBGM(node, index, parent);
       }
     });
   };
@@ -80,7 +61,8 @@ function isDirectiveNode(node: Node): node is DirectiveNode {
   );
 }
 
-function remarkImage(node: DirectiveNode, index: number, parent: Parent) {
+function remarkImage(node: DirectiveNode, index?: number, parent?: Parent) {
+  if (index === undefined || !parent) return;
   const { url, alt, size } = node.attributes || {};
 
   const originalCaption = node.children
@@ -141,4 +123,61 @@ function remarkImage(node: DirectiveNode, index: number, parent: Parent) {
   };
 
   parent.children[index] = imageContainer;
+}
+
+function remarkBGM(node: DirectiveNode, index?: number, parent?: Parent) {
+  if (index === undefined || !parent) return;
+
+  const firstChild = node.children[0];
+  if (firstChild?.type !== 'text') return;
+
+  const youtubeUrl = firstChild.value;
+  const embedUrl = extractYouTubeEmbedUrl(youtubeUrl);
+  if (!embedUrl) return;
+  const newNode = {
+    type: 'html',
+    value: `<iframe src="${embedUrl}" width="560" height="315" frameborder="0" allowfullscreen></iframe>`,
+  };
+  parent.children[index] = newNode;
+}
+
+function extractYouTubeEmbedUrl(youtubeUrl: string) {
+  try {
+    const url = new URL(youtubeUrl);
+    let videoId = null;
+    if (url.hostname.includes('youtube.com')) {
+      videoId = url.searchParams.get('v');
+    } else if (url.hostname === 'youtu.be') {
+      videoId = url.pathname.slice(1);
+    }
+    if (!videoId) return null;
+
+    let embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}`;
+    const t = url.searchParams.get('t');
+    if (t) {
+      const timeParam = parseTimeToSeconds(t);
+      embedUrl += `&start=${timeParam}`;
+    }
+    return embedUrl;
+  } catch {
+    return null;
+  }
+}
+
+function parseTimeToSeconds(timeStr: string): number {
+  let totalSeconds = 0;
+
+  const hours = timeStr.match(/(\d+)h/);
+  const minutes = timeStr.match(/(\d+)m/);
+  const seconds = timeStr.match(/(\d+)s/);
+
+  if (hours) totalSeconds += parseInt(hours[1]) * 3600;
+  if (minutes) totalSeconds += parseInt(minutes[1]) * 60;
+  if (seconds) totalSeconds += parseInt(seconds[1]);
+
+  if (!hours && !minutes && !seconds) {
+    totalSeconds = parseInt(timeStr) || 0;
+  }
+
+  return totalSeconds;
 }
