@@ -21,6 +21,7 @@ export default function useWritePostContentButton({
   setContent: (content: string) => void;
 }) {
   const [contentButtons] = useState(writePostContentButtons);
+  const [directiveType, setDirectiveType] = useState('markdown');
   const contentButtonProps = useMemo(() => {
     return contentButtons.map(createProps);
   }, [contentButtons]);
@@ -81,11 +82,11 @@ export default function useWritePostContentButton({
   );
 
   const handleDirectiveAction = useCallback(
-    ({ position, key, value }: DirectiveButtonProps) => {
+    ({ type, position, key, value }: DirectiveButtonProps) => {
       if (!contentEditorRef.current) return;
       const contentEditor = contentEditorRef.current;
       const { selectionStart, selectionEnd, value: content } = contentEditor;
-      const ranges = parseDirectiveRanges(content);
+      const ranges = parseDirectiveRanges(content, type);
 
       const range = ranges.find(([directiveStart, directiveEnd]) => {
         return selectionStart >= directiveStart && selectionEnd <= directiveEnd;
@@ -135,10 +136,10 @@ export default function useWritePostContentButton({
 
   const onAction = useCallback(
     (contentButtonProps: WritePostContentButtonProps) => {
-      const { action } = contentButtonProps;
-      if (action === 'insert' || action === 'toggle') {
+      const { type } = contentButtonProps;
+      if (type === 'markdown') {
         handleMarkdownAction(contentButtonProps);
-      } else if (action === 'directive') {
+      } else if (type === 'image') {
         handleDirectiveAction(contentButtonProps);
       }
     },
@@ -154,35 +155,51 @@ export default function useWritePostContentButton({
 
       const { selectionStart, selectionEnd } = contentEditor;
       const text = contentEditor.value;
-      const ranges = parseDirectiveRanges(text);
 
-      const isInDirective = ranges.some(([start, end]) => {
-        return selectionStart >= start && selectionEnd <= end;
-      });
-      if (isInDirective) {
+      const directiveTypes = contentButtonProps
+        .map(button => button.type)
+        .filter(type => type !== 'markdown');
+
+      let directiveType = 'markdown';
+      for (const type of directiveTypes) {
+        const ranges = parseDirectiveRanges(text, type);
+        const isInDirective = ranges.some(([start, end]) => {
+          return selectionStart >= start && selectionEnd <= end;
+        });
+        if (isInDirective) {
+          directiveType = type;
+          break;
+        }
       }
+      setDirectiveType(directiveType);
     };
 
     document.addEventListener('selectionchange', onSelectionChange);
     return () => {
       document.removeEventListener('selectionchange', onSelectionChange);
     };
-  }, [contentEditorRef]);
+  }, [contentButtonProps, contentEditorRef]);
 
   return {
     contentButtons: contentButtonProps,
+    directiveType,
     onAction,
   } as const;
 }
 
-function parseDirectiveRanges(text: string) {
-  const ranges = [];
-  const regex = new RegExp(IMAGE_DIRECTIVE_PATTERN, 'g');
-  let match;
+function parseDirectiveRanges(text: string, type: string) {
+  const ranges: number[][] = [];
 
+  let regex: RegExp;
+  if (type === 'image') {
+    regex = new RegExp(IMAGE_DIRECTIVE_PATTERN, 'g');
+  } else {
+    return ranges;
+  }
+
+  let match;
   while ((match = regex.exec(text)) !== null) {
     ranges.push([match.index, match.index + match[0].length]);
   }
-
   return ranges;
 }

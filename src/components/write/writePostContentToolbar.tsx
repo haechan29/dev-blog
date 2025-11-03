@@ -22,11 +22,13 @@ export default function WritePostContentToolbar({
   shouldAttachToolbarToBottom,
   toolbarTranslateY,
   contentButtons,
+  directiveType,
   onAction,
 }: {
   shouldAttachToolbarToBottom: boolean;
   toolbarTranslateY: string;
   contentButtons: WritePostContentButtonProps[];
+  directiveType: string;
   onAction: (editor: WritePostContentButtonProps) => void;
 }) {
   const onToolbarButtonClick = useCallback(
@@ -50,16 +52,18 @@ export default function WritePostContentToolbar({
         '--toolbar-translate-y': toolbarTranslateY,
       }}
     >
-      {contentButtons.map(button => (
-        <Tooltip key={button.label} text={button.label} direction='top'>
-          <button
-            onClick={() => onToolbarButtonClick(button)}
-            className='min-w-10 h-10 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer'
-          >
-            <ContentButton buttonContent={button.content} />
-          </button>
-        </Tooltip>
-      ))}
+      {contentButtons
+        .filter(button => directiveType === button.type)
+        .map(button => (
+          <Tooltip key={button.label} text={button.label} direction='top'>
+            <button
+              onClick={() => onToolbarButtonClick(button)}
+              className='min-w-10 h-10 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer'
+            >
+              <ContentButton buttonContent={button.content} />
+            </button>
+          </Tooltip>
+        ))}
     </div>
   );
 }

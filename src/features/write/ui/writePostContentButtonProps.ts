@@ -91,6 +91,7 @@ const buttonContents: Record<WritePostContentButton['id'], ButtonContent> = {
 };
 
 export interface MarkdownButtonProps {
+  type: 'markdown';
   action: 'insert' | 'toggle';
   label: string;
   content: ButtonContent;
@@ -99,10 +100,10 @@ export interface MarkdownButtonProps {
 }
 
 export interface DirectiveButtonProps {
-  action: 'directive';
+  type: 'image';
+  action: 'insert';
   label: string;
   content: ButtonContent;
-  name: 'image';
   position: 'attribute' | 'content';
   key?: string;
   value: string;
@@ -117,24 +118,28 @@ const writePostContentButtonProps: Record<
   WritePostContentButtonProps
 > = {
   heading1: {
+    type: 'markdown',
     action: 'insert',
     label: '큰 제목',
     content: buttonContents['heading1'],
     markdownBefore: '# ',
   },
   heading2: {
+    type: 'markdown',
     action: 'insert',
     label: '중간 제목',
     content: buttonContents['heading2'],
     markdownBefore: '## ',
   },
   heading3: {
+    type: 'markdown',
     action: 'insert',
     label: '작은 제목',
     content: buttonContents['heading3'],
     markdownBefore: '### ',
   },
   bold: {
+    type: 'markdown',
     action: 'toggle',
     label: '굵게',
     content: buttonContents['bold'],
@@ -142,6 +147,7 @@ const writePostContentButtonProps: Record<
     markdownAfter: '**',
   },
   italic: {
+    type: 'markdown',
     action: 'toggle',
     label: '기울이기',
     content: buttonContents['italic'],
@@ -149,6 +155,7 @@ const writePostContentButtonProps: Record<
     markdownAfter: '*',
   },
   strikethrough: {
+    type: 'markdown',
     action: 'toggle',
     label: '취소선',
     content: buttonContents['strikethrough'],
@@ -156,6 +163,7 @@ const writePostContentButtonProps: Record<
     markdownAfter: '~~',
   },
   link: {
+    type: 'markdown',
     action: 'insert',
     label: '링크 추가',
     content: buttonContents['link'],
@@ -163,6 +171,7 @@ const writePostContentButtonProps: Record<
     markdownAfter: '](url)',
   },
   table: {
+    type: 'markdown',
     action: 'insert',
     label: '표 만들기',
     content: buttonContents['table'],
@@ -170,6 +179,7 @@ const writePostContentButtonProps: Record<
     markdownAfter: ' | 제목2 |\n|-------|-------|\n| 내용1 | 내용2 |',
   },
   unorderedList: {
+    type: 'markdown',
     action: 'insert',
     label: '순서 없는 목록',
     content: buttonContents['unorderedList'],
@@ -177,6 +187,7 @@ const writePostContentButtonProps: Record<
     markdownAfter: '\n- 항목 2\n- 항목 3',
   },
   orderedList: {
+    type: 'markdown',
     action: 'insert',
     label: '순서 있는 목록',
     content: buttonContents['orderedList'],
@@ -184,18 +195,21 @@ const writePostContentButtonProps: Record<
     markdownAfter: '\n2. 항목 2\n3. 항목 3',
   },
   blockquote: {
+    type: 'markdown',
     action: 'insert',
     label: '인용문',
     content: buttonContents['blockquote'],
     markdownBefore: '> 내용',
   },
   horizontalRule: {
+    type: 'markdown',
     action: 'insert',
     label: '구분선',
     content: buttonContents['horizontalRule'],
     markdownBefore: '---\n',
   },
   image: {
+    type: 'markdown',
     action: 'insert',
     label: '이미지',
     content: buttonContents['image'],
@@ -203,31 +217,31 @@ const writePostContentButtonProps: Record<
     markdownAfter: '" size="medium"}\n:::',
   },
   imageLarge: {
-    action: 'directive',
+    type: 'image',
+    action: 'insert',
     label: '이미지 크게',
     content: buttonContents['imageLarge'],
-    name: 'image',
     position: 'attribute',
     key: 'size',
     value: 'large',
   },
   imageSmall: {
-    action: 'directive',
+    type: 'image',
+    action: 'insert',
     label: '이미지 작게',
     content: buttonContents['imageSmall'],
-    name: 'image',
     position: 'attribute',
     key: 'size',
     value: 'medium',
   },
   imageCaption: {
-    action: 'directive',
+    type: 'image',
+    action: 'insert',
     label: '이미지 설명',
     content: buttonContents['imageCaption'],
-    name: 'image',
     position: 'content',
     value:
-      '이미지를 설명해주세요. \\# 기호로 구분하면 전체화면에서 자막처럼 한 문장씩 나타납니다.\n#자막1\n#자막2',
+      '이미지를 설명해주세요. \\# 기호로 구분하면 전체화면에서 자막처럼 한 문장씩 나타납니다.\n#자막1 #자막2',
   },
 };
 
