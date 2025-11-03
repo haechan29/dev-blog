@@ -20,4 +20,6 @@ export const writePostContentButtons: WritePostContentButton[] = [
   { id: 'imageSmall' },
   { id: 'imageCaption' },
   { id: 'imageSubtitle' },
+  { id: 'addRow' },
+  { id: 'addColumn' },
 ];

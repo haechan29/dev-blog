@@ -5,6 +5,7 @@ import {
   createProps,
   DirectiveButtonProps,
   MarkdownButtonProps,
+  TableButtonProps,
   WritePostContentButtonProps,
 } from '@/features/write/ui/writePostContentButtonProps';
 import { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
@@ -21,7 +22,7 @@ export default function useWritePostContentButton({
   setContent: (content: string) => void;
 }) {
   const [contentButtons] = useState(writePostContentButtons);
-  const [directiveType, setDirectiveType] = useState('markdown');
+  const [activeType, setActiveType] = useState('markdown');
   const contentButtonProps = useMemo(() => {
     return contentButtons.map(createProps);
   }, [contentButtons]);
@@ -81,12 +82,12 @@ export default function useWritePostContentButton({
     [content, contentEditorRef, setContent]
   );
 
-  const handleDirectiveAction = useCallback(
-    ({ type, position, key, value }: DirectiveButtonProps) => {
+  const handleImageAction = useCallback(
+    ({ position, key, value }: DirectiveButtonProps) => {
       if (!contentEditorRef.current) return;
       const contentEditor = contentEditorRef.current;
       const { selectionStart, selectionEnd, value: content } = contentEditor;
-      const ranges = parseDirectiveRanges(content, type);
+      const ranges = parseImageRanges(content);
 
       const range = ranges.find(([directiveStart, directiveEnd]) => {
         return selectionStart >= directiveStart && selectionEnd <= directiveEnd;
@@ -145,16 +146,50 @@ export default function useWritePostContentButton({
     [contentEditorRef, setContent]
   );
 
+  const handleTableAction = useCallback(
+    ({ direction }: TableButtonProps) => {
+      if (!contentEditorRef.current) return;
+      const contentEditor = contentEditorRef.current;
+      const { selectionStart, selectionEnd, value: content } = contentEditor;
+      const ranges = parseTableRanges(content);
+
+      const range = ranges.find(([directiveStart, directiveEnd]) => {
+        return selectionStart >= directiveStart && selectionEnd <= directiveEnd;
+      });
+      if (!range) return;
+      const [rangeStart, rangeEnd] = range;
+      const [textBefore, tableText, textAfter] = [
+        content.substring(0, rangeStart),
+        content.substring(rangeStart, rangeEnd),
+        content.substring(rangeEnd),
+      ];
+
+      const { newTable, cursorPosition } =
+        direction === 'row' ? addRow(tableText) : addColumn(tableText);
+      const newText = textBefore + newTable + textAfter;
+      const newCursorPosition = rangeStart + cursorPosition;
+
+      setContent(newText);
+      setTimeout(() => {
+        contentEditor.focus();
+        contentEditor.setSelectionRange(newCursorPosition, newCursorPosition);
+      }, 0);
+    },
+    [contentEditorRef, setContent]
+  );
+
   const onAction = useCallback(
     (contentButtonProps: WritePostContentButtonProps) => {
       const { type } = contentButtonProps;
       if (type === 'markdown') {
         handleMarkdownAction(contentButtonProps);
       } else if (type === 'image') {
-        handleDirectiveAction(contentButtonProps);
+        handleImageAction(contentButtonProps);
+      } else if (type === 'table') {
+        handleTableAction(contentButtonProps);
       }
     },
-    [handleDirectiveAction, handleMarkdownAction]
+    [handleImageAction, handleMarkdownAction, handleTableAction]
   );
 
   useEffect(() => {
@@ -167,22 +202,23 @@ export default function useWritePostContentButton({
       const { selectionStart, selectionEnd } = contentEditor;
       const text = contentEditor.value;
 
-      const directiveTypes = contentButtonProps
+      const types = contentButtonProps
         .map(button => button.type)
         .filter(type => type !== 'markdown');
 
-      let directiveType = 'markdown';
-      for (const type of directiveTypes) {
-        const ranges = parseDirectiveRanges(text, type);
-        const isInDirective = ranges.some(([start, end]) => {
+      let activeType = 'markdown';
+      for (const type of types) {
+        const ranges = parseRanges(text, type);
+        if (!ranges) continue;
+        const isType = ranges.some(([start, end]) => {
           return selectionStart >= start && selectionEnd <= end;
         });
-        if (isInDirective) {
-          directiveType = type;
+        if (isType) {
+          activeType = type;
           break;
         }
       }
-      setDirectiveType(directiveType);
+      setActiveType(activeType);
     };
 
     document.addEventListener('selectionchange', onSelectionChange);
@@ -193,24 +229,85 @@ export default function useWritePostContentButton({
 
   return {
     contentButtons: contentButtonProps,
-    directiveType,
+    activeType,
     onAction,
   } as const;
 }
 
-function parseDirectiveRanges(text: string, type: string) {
-  const ranges: number[][] = [];
-
-  let regex: RegExp;
+function parseRanges(text: string, type: string) {
   if (type === 'image') {
-    regex = new RegExp(IMAGE_DIRECTIVE_PATTERN, 'g');
-  } else {
-    return ranges;
+    return parseImageRanges(text);
+  } else if (type === 'table') {
+    return parseTableRanges(text);
   }
+}
 
+function parseImageRanges(text: string) {
+  const ranges: number[][] = [];
+  const regex = new RegExp(IMAGE_DIRECTIVE_PATTERN, 'g');
   let match;
   while ((match = regex.exec(text)) !== null) {
     ranges.push([match.index, match.index + match[0].length]);
   }
   return ranges;
+}
+
+function parseTableRanges(text: string) {
+  const lines = text.split('\n');
+  const ranges: number[][] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+
+    if (/^\|[\s\-\|]+\|$/.test(line) && line.includes('-')) {
+      let start = i - 1;
+      while (start >= 0 && lines[start].trim().includes('|')) {
+        start--;
+      }
+      start++;
+
+      let end = i + 1;
+      while (end < lines.length && lines[end].trim().includes('|')) {
+        end++;
+      }
+
+      const startIndex =
+        lines.slice(0, start).join('\n').length + (start > 0 ? 1 : 0);
+      const endIndex = lines.slice(0, end).join('\n').length;
+
+      ranges.push([startIndex, endIndex]);
+    }
+  }
+
+  return ranges;
+}
+
+function addRow(tableText: string) {
+  const firstLine = tableText.match(/^.*$/m)?.[0];
+  if (!firstLine) return { newTable: tableText, cursorPosition: 0 };
+
+  const index = (firstLine.match(/\|/g) || []).length - 1;
+  const cells = Array.from({ length: index }, (_, i) => `내용${i + 1}`);
+  const newRow = `| ${cells.join(' | ')} |\n`;
+
+  const newTable = tableText + '\n' + newRow;
+  const cursorPosition =
+    tableText.length + 1 + newRow.indexOf('내용1') + '내용1'.length;
+
+  return { newTable, cursorPosition };
+}
+
+function addColumn(tableText: string) {
+  const lines = tableText.split('\n').filter(line => line.trim());
+  const index = lines[0].trim().split('|').length - 1;
+  lines[0] += ` 제목${index} |\n`;
+  lines[1] += '-------|\n';
+  for (let i = 2; i < lines.length; i++) {
+    lines[i] += ` 내용${index} |\n`;
+  }
+
+  const newTable = lines.join('');
+  const targetText = `제목${index}`;
+  const cursorPosition = newTable.indexOf(targetText) + targetText.length;
+  return { newTable, cursorPosition };
 }

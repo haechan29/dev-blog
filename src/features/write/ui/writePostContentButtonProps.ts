@@ -11,7 +11,9 @@ export type ButtonContent = {
     | 'imageLarge'
     | 'imageSmall'
     | 'imageCaption'
-    | 'imageSubtitle';
+    | 'imageSubtitle'
+    | 'addRow'
+    | 'addColumn';
   style: string;
   value?: string;
 };
@@ -93,6 +95,14 @@ const buttonContents: Record<WritePostContentButton['id'], ButtonContent> = {
     type: 'imageSubtitle',
     style: 'w-5 h-5',
   },
+  addRow: {
+    type: 'addRow',
+    style: 'w-4 h-4',
+  },
+  addColumn: {
+    type: 'addColumn',
+    style: 'w-4 h-4',
+  },
 };
 
 export interface MarkdownButtonProps {
@@ -102,6 +112,14 @@ export interface MarkdownButtonProps {
   content: ButtonContent;
   markdownBefore: string;
   markdownAfter?: string;
+}
+
+export interface TableButtonProps {
+  type: 'table';
+  action: 'insert';
+  label: string;
+  content: ButtonContent;
+  direction: 'row' | 'column';
 }
 
 export interface DirectiveButtonProps {
@@ -116,6 +134,7 @@ export interface DirectiveButtonProps {
 
 export type WritePostContentButtonProps =
   | MarkdownButtonProps
+  | TableButtonProps
   | DirectiveButtonProps;
 
 const writePostContentButtonProps: Record<
@@ -182,6 +201,20 @@ const writePostContentButtonProps: Record<
     content: buttonContents['table'],
     markdownBefore: '| 제목1',
     markdownAfter: ' | 제목2 |\n|-------|-------|\n| 내용1 | 내용2 |',
+  },
+  addRow: {
+    type: 'table',
+    action: 'insert',
+    label: '행 추가하기',
+    content: buttonContents['addRow'],
+    direction: 'row',
+  },
+  addColumn: {
+    type: 'table',
+    action: 'insert',
+    label: '열 추가하기',
+    content: buttonContents['addColumn'],
+    direction: 'column',
   },
   unorderedList: {
     type: 'markdown',

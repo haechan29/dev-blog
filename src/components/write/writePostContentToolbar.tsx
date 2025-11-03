@@ -9,12 +9,14 @@ import clsx from 'clsx';
 import {
   AlignCenter,
   Captions,
+  Columns,
   Expand,
   Grid2x2,
   ImageIcon,
   Link,
   Minus,
   Quote,
+  Rows,
   Shrink,
 } from 'lucide-react';
 import { useCallback } from 'react';
@@ -23,13 +25,13 @@ export default function WritePostContentToolbar({
   shouldAttachToolbarToBottom,
   toolbarTranslateY,
   contentButtons,
-  directiveType,
+  activeType,
   onAction,
 }: {
   shouldAttachToolbarToBottom: boolean;
   toolbarTranslateY: string;
   contentButtons: WritePostContentButtonProps[];
-  directiveType: string;
+  activeType: string;
   onAction: (editor: WritePostContentButtonProps) => void;
 }) {
   const onToolbarButtonClick = useCallback(
@@ -54,7 +56,7 @@ export default function WritePostContentToolbar({
       }}
     >
       {contentButtons
-        .filter(button => directiveType === button.type)
+        .filter(button => activeType === button.type)
         .map(button => (
           <Tooltip key={button.label} text={button.label} direction='top'>
             <button
@@ -95,5 +97,9 @@ function ContentButton({
       return <AlignCenter className={style} />;
     case 'imageSubtitle':
       return <Captions className={style} />;
+    case 'addRow':
+      return <Rows className={style} />;
+    case 'addColumn':
+      return <Columns className={style} />;
   }
 }
