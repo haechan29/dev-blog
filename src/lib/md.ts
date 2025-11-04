@@ -1,5 +1,6 @@
 import Bgm from '@/components/md/bgm';
 import ExternalLink from '@/components/md/externalLink';
+import ImageWithCaption from '@/components/md/imageWithCaption';
 import { rehypeBgm, remarkBgm, remarkImg, schema } from '@/lib/mdConfig';
 import React, { JSX } from 'react';
 import rehypePrettyCode from 'rehype-pretty-code';
@@ -32,6 +33,7 @@ const processor = unified()
       components: {
         a: ExternalLink,
         bgm: Bgm,
+        img: ImageWithCaption,
       },
     }
   );

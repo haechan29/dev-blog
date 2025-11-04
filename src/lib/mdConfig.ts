@@ -16,12 +16,11 @@ export const schema: Options = {
     ...defaultSchema.attributes,
     img: [
       ...(defaultSchema.attributes?.img ?? []),
-      ['className', 'w-full', 'min-w-56 w-1/2'],
+      ['data-size', 'large', 'medium'],
+      'data-caption',
     ],
     div: [
       ...(defaultSchema.attributes?.div ?? []),
-      'data-image-container',
-      'data-original-caption',
       'data-bgm',
       'data-video-id',
       'data-start-time',
@@ -35,10 +34,10 @@ export function remarkImg() {
       if (index === undefined || !parent) return;
       if (!isDirectiveNode(node) || node.name !== 'img') return;
 
-      const { url, alt, size } = node.attributes || {};
+      const { url, alt = '', size = 'medium' } = node.attributes || {};
       if (!url) return;
 
-      const originalCaption = node.children
+      const caption = node.children
         .filter(child => child.type === 'paragraph')
         .map(p =>
           p.children
@@ -51,51 +50,18 @@ export function remarkImg() {
         )
         .join('\n');
 
-      const caption = node.children.map(child => {
-        if (child.type === 'paragraph') {
-          return {
-            ...child,
-            children: child.children.map(textNode => {
-              if (textNode.type === 'text' && textNode.value) {
-                return {
-                  ...textNode,
-                  value: textNode.value
-                    .replace(/\\#/g, '__ESCAPED_HASH__')
-                    .replace(/#/g, '')
-                    .replace(/__ESCAPED_HASH__/g, '#'),
-                };
-              }
-              return textNode;
-            }),
-          };
-        }
-        return child;
-      });
-
-      const imageContainer = {
-        type: 'imageContainer',
+      const newNode = {
+        type: 'image',
+        url,
+        alt,
         data: {
           hProperties: {
-            'data-image-container': '',
-            'data-original-caption': originalCaption,
+            'data-size': size,
+            'data-caption': caption,
           },
         },
-        children: [
-          {
-            type: 'image',
-            url: url || '',
-            alt: alt || '',
-            data: {
-              hProperties: {
-                className: size === 'large' ? ['w-full'] : ['min-w-56 w-1/2'],
-              },
-            },
-          },
-          ...caption,
-        ],
       };
-
-      parent.children[index] = imageContainer;
+      parent.children[index] = newNode;
     });
   };
 }
