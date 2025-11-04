@@ -1,3 +1,7 @@
+'use client';
+
+import { useEffect, useMemo, useState } from 'react';
+
 export default function Bgm({
   'data-youtube-url': youtubeUrl,
   'data-start-time': startTime,
@@ -5,16 +9,30 @@ export default function Bgm({
   'data-youtube-url': string;
   'data-start-time': string;
 }) {
-  const { videoId, timeFromUrl } = parseYouTubeUrl(youtubeUrl);
-  const finalStartTime =
-    startTime != null ? parseTimeToSeconds(startTime) : timeFromUrl;
+  const [isError, setIsError] = useState(false);
+  const embedUrl = useMemo(() => {
+    const { videoId, timeFromUrl } = parseYouTubeUrl(youtubeUrl);
+    const finalStartTime =
+      startTime != null ? parseTimeToSeconds(startTime) : timeFromUrl;
 
-  if (!videoId) return;
-  const embedUrl = buildEmbedUrl(videoId, finalStartTime);
+    if (!videoId) return;
+    return buildEmbedUrl(videoId, finalStartTime);
+  }, [startTime, youtubeUrl]);
 
-  return (
+  useEffect(() => setIsError(false), [embedUrl]);
+
+  return isError || !embedUrl ? (
+    <div
+      className='flex flex-col items-center justify-center p-4 rounded-xl bg-gray-200 text-gray-700 m-4'
+      aria-label='유효하지 않은 링크입니다'
+    >
+      {`유효하지 않은 링크입니다 (${youtubeUrl})`}
+    </div>
+  ) : (
     <iframe
       src={embedUrl}
+      onError={() => setIsError(true)}
+      onLoad={() => setIsError(false)}
       width='560'
       height='315'
       frameBorder='0'
