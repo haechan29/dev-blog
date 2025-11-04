@@ -1,4 +1,6 @@
+import { LINE_BREAK_MARKER } from '@/lib/md';
 import type { Element } from 'hast';
+import { Paragraph, PhrasingContent } from 'mdast';
 import type {
   ContainerDirective,
   LeafDirective,
@@ -27,6 +29,26 @@ export const schema: Options = {
     ],
   },
 };
+
+export function remarkBreaks() {
+  return (tree: Node) => {
+    visit(tree, 'paragraph', (paragraph: Paragraph) => {
+      const newChildren: PhrasingContent[] = [];
+      paragraph.children.forEach(child => {
+        if (child.type === 'text' && child.value.includes(LINE_BREAK_MARKER)) {
+          const parts = child.value.split(LINE_BREAK_MARKER);
+          parts.forEach((part, index) => {
+            if (part) newChildren.push({ type: 'text', value: part });
+            if (index < parts.length - 1) newChildren.push({ type: 'break' });
+          });
+        } else {
+          newChildren.push(child);
+        }
+      });
+      paragraph.children = newChildren;
+    });
+  };
+}
 
 export function remarkImg() {
   return (tree: Node) => {
