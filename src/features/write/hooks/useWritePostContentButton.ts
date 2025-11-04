@@ -11,6 +11,8 @@ import {
 import { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
 
 const IMAGE_DIRECTIVE_PATTERN = ':::img[\\s\\S]*?:::';
+const BGM_DIRECTIVE_PATTERN = '::bgm\\{[^}]*\\}';
+const CURSOR_MARKER = '__NEW_CURSOR_POSITION__';
 
 export default function useWritePostContentButton({
   value: content,
@@ -82,12 +84,12 @@ export default function useWritePostContentButton({
     [content, contentEditorRef, setContent]
   );
 
-  const handleImageAction = useCallback(
-    ({ position, key, value }: DirectiveButtonProps) => {
+  const handleDirectiveAction = useCallback(
+    ({ type, position, key, value }: DirectiveButtonProps) => {
       if (!contentEditorRef.current) return;
       const contentEditor = contentEditorRef.current;
       const { selectionStart, selectionEnd, value: content } = contentEditor;
-      const ranges = parseImageRanges(content);
+      const ranges = parseDirectiveRanges(content, type);
 
       const range = ranges.find(([directiveStart, directiveEnd]) => {
         return selectionStart >= directiveStart && selectionEnd <= directiveEnd;
@@ -101,19 +103,20 @@ export default function useWritePostContentButton({
       ];
 
       let newText = '';
-      let newCursorPosition = selectionStart;
-
       if (position === 'attribute') {
         const attributeRegex = new RegExp(`${key}="[^"]*"`);
         if (attributeRegex.test(directiveText)) {
           newText =
             textBefore +
-            directiveText.replace(attributeRegex, `${key}="${value}"`) +
+            directiveText.replace(
+              attributeRegex,
+              `${key}="${value}${CURSOR_MARKER}"`
+            ) +
             textAfter;
         } else {
           newText =
             textBefore +
-            directiveText.replace(/}/, ` ${key}="${value}"`) +
+            directiveText.replace(/}/, ` ${key}="${value}${CURSOR_MARKER}"}`) +
             textAfter;
         }
       } else if (position === 'content') {
@@ -130,17 +133,25 @@ export default function useWritePostContentButton({
           firstLine +
           '\n' +
           newContent +
+          CURSOR_MARKER +
           '\n' +
           lastLine +
+          '\n' +
           textAfter;
-        newCursorPosition =
-          newText.length - textAfter.length - lastLine.length - 1;
       }
 
-      setContent(newText);
+      const newCursorPosition = newText.indexOf(CURSOR_MARKER);
+      const finalText = newText.replace(CURSOR_MARKER, '');
+      const finalCursorPosition =
+        newCursorPosition === -1 ? selectionStart : newCursorPosition;
+
+      setContent(finalText);
       setTimeout(() => {
         contentEditor.focus();
-        contentEditor.setSelectionRange(newCursorPosition, newCursorPosition);
+        contentEditor.setSelectionRange(
+          finalCursorPosition,
+          finalCursorPosition
+        );
       }, 0);
     },
     [contentEditorRef, setContent]
@@ -183,13 +194,13 @@ export default function useWritePostContentButton({
       const { type } = contentButtonProps;
       if (type === 'markdown') {
         handleMarkdownAction(contentButtonProps);
-      } else if (type === 'image') {
-        handleImageAction(contentButtonProps);
+      } else if (type === 'image' || type === 'bgm') {
+        handleDirectiveAction(contentButtonProps);
       } else if (type === 'table') {
         handleTableAction(contentButtonProps);
       }
     },
-    [handleImageAction, handleMarkdownAction, handleTableAction]
+    [handleDirectiveAction, handleMarkdownAction, handleTableAction]
   );
 
   useEffect(() => {
@@ -235,16 +246,24 @@ export default function useWritePostContentButton({
 }
 
 function parseRanges(text: string, type: string) {
-  if (type === 'image') {
-    return parseImageRanges(text);
+  if (type === 'image' || type === 'bgm') {
+    return parseDirectiveRanges(text, type);
   } else if (type === 'table') {
     return parseTableRanges(text);
   }
 }
 
-function parseImageRanges(text: string) {
+function parseDirectiveRanges(text: string, type: string) {
   const ranges: number[][] = [];
-  const regex = new RegExp(IMAGE_DIRECTIVE_PATTERN, 'g');
+  let regex: RegExp;
+  if (type === 'image') {
+    regex = new RegExp(IMAGE_DIRECTIVE_PATTERN, 'g');
+  } else if (type === 'bgm') {
+    regex = new RegExp(BGM_DIRECTIVE_PATTERN, 'g');
+  } else {
+    return ranges;
+  }
+
   let match;
   while ((match = regex.exec(text)) !== null) {
     ranges.push([match.index, match.index + match[0].length]);
