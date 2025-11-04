@@ -1,11 +1,12 @@
 'use client';
 
+import { Content } from '@/features/write/domain/types/content';
 import clsx from 'clsx';
 import { ChangeEvent, RefObject, useCallback, useMemo } from 'react';
 
 export default function WritePostContentEditor({
   contentEditorRef,
-  isError,
+  parsedContent,
   value: content,
   maxLength,
   isValid,
@@ -15,7 +16,7 @@ export default function WritePostContentEditor({
   setIsEditorFocused,
 }: {
   contentEditorRef: RefObject<HTMLTextAreaElement | null>;
-  isError: boolean;
+  parsedContent: Content;
   value: string;
   maxLength: number;
   isValid: boolean;
@@ -24,10 +25,15 @@ export default function WritePostContentEditor({
   resetInvalidField: () => void;
   setIsEditorFocused: (isEditorFocused: boolean) => void;
 }) {
+  const isError = useMemo(() => {
+    return parsedContent.status === 'error';
+  }, [parsedContent.status]);
+
   const isContentTooLong = useMemo(
     () => content.length > maxLength,
     [content.length, maxLength]
   );
+
   const onChange = useCallback(
     (e: ChangeEvent<HTMLTextAreaElement>) => {
       resetInvalidField();

@@ -123,6 +123,7 @@ export function remarkBgm() {
           },
         },
       };
+
       parent.children[index] = newNode;
     });
   };
@@ -146,20 +147,7 @@ export function rehypeBgm() {
   return (tree: Node) => {
     visit(tree, 'element', (node: Element) => {
       if (node.tagName === 'div' && 'data-bgm' in node.properties) {
-        const videoId = node.properties['data-video-id'] as string;
-        const startTime = node.properties['data-start-time'] as string;
-        const embedUrl = buildEmbedUrl(videoId, parseInt(startTime));
-        if (embedUrl == null) return;
-
-        node.tagName = 'iframe';
-        node.properties = {
-          src: embedUrl,
-          width: '560',
-          height: '315',
-          frameBorder: '0',
-          allowFullScreen: true,
-        };
-        node.children = [];
+        node.tagName = 'bgm';
       }
     });
   };
@@ -212,10 +200,4 @@ function parseTimeToSeconds(timeStr: string): number {
   }
 
   return totalSeconds;
-}
-
-function buildEmbedUrl(videoId: string, startTime: number | null): string {
-  let embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}`;
-  if (startTime) embedUrl += `&start=${startTime}`;
-  return embedUrl;
 }

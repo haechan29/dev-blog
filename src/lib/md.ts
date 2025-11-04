@@ -1,3 +1,4 @@
+import Bgm from '@/components/md/bgm';
 import {
   rehypeBgm,
   rehypeLink,
@@ -5,10 +6,11 @@ import {
   remarkImg,
   schema,
 } from '@/lib/mdConfig';
+import React, { JSX } from 'react';
 import rehypePrettyCode from 'rehype-pretty-code';
+import rehypeReact from 'rehype-react';
 import rehypeSanitize from 'rehype-sanitize';
 import rehypeSlug from 'rehype-slug';
-import rehypeStringify from 'rehype-stringify';
 import remarkBreaks from 'remark-breaks';
 import remarkDirective from 'remark-directive';
 import remarkGfm from 'remark-gfm';
@@ -29,9 +31,17 @@ const processor = unified()
   .use(rehypeBgm) // process bgm elements
   .use(rehypePrettyCode) // add syntax highlighting to code blocks
   .use(rehypeSlug) // add id attributes to headings
-  .use(rehypeStringify); // convert HTML AST to HTML string
+  .use(
+    rehypeReact as any, // convert HTML AST to React components
+    {
+      createElement: React.createElement,
+      components: {
+        bgm: Bgm,
+      },
+    }
+  );
 
 export async function processMd(source: string) {
   const result = await processor.process(source);
-  return String(result);
+  return result.result as JSX.Element;
 }
