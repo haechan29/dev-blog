@@ -1,11 +1,6 @@
 import Bgm from '@/components/md/bgm';
-import {
-  rehypeBgm,
-  rehypeLink,
-  remarkBgm,
-  remarkImg,
-  schema,
-} from '@/lib/mdConfig';
+import ExternalLink from '@/components/md/externalLink';
+import { rehypeBgm, remarkBgm, remarkImg, schema } from '@/lib/mdConfig';
 import React, { JSX } from 'react';
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeReact from 'rehype-react';
@@ -27,7 +22,6 @@ const processor = unified()
   .use(remarkBgm) // process bgm nodes
   .use(remarkRehype) // convert markdown AST to HTML AST
   .use(rehypeSanitize, schema) // remove unsafe HTML tags and attributes
-  .use(rehypeLink) // process link elements
   .use(rehypeBgm) // process bgm elements
   .use(rehypePrettyCode) // add syntax highlighting to code blocks
   .use(rehypeSlug) // add id attributes to headings
@@ -36,6 +30,7 @@ const processor = unified()
     {
       createElement: React.createElement,
       components: {
+        a: ExternalLink,
         bgm: Bgm,
       },
     }
