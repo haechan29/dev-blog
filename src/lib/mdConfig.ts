@@ -20,21 +20,110 @@ export const schema: Options = {
     ],
     div: [
       ...(defaultSchema.attributes?.div ?? []),
-      ['className', 'image-container'],
+      'data-image-container',
       'data-original-caption',
+      'data-bgm',
+      'data-video-id',
+      'data-start-time',
     ],
   },
 };
 
-export function remarkCustomDirectives() {
+export function remarkImg() {
   return (tree: Node) => {
     visit(tree, (node: Node, index?: number, parent?: Parent) => {
-      if (!isDirectiveNode(node)) return;
-      if (node.name === 'img') {
-        remarkImage(node, index, parent);
-      } else if (node.name === 'bgm') {
-        remarkBGM(node, index, parent);
-      }
+      if (index === undefined || !parent) return;
+      if (!isDirectiveNode(node) || node.name !== 'img') return;
+
+      const { url, alt, size } = node.attributes || {};
+
+      const originalCaption = node.children
+        .filter(child => child.type === 'paragraph')
+        .map(p =>
+          p.children
+            .map(child => {
+              if (child.type === 'text') return child.value;
+              if (child.type === 'break') return '\n';
+              return '';
+            })
+            .join('')
+        )
+        .join('\n');
+
+      const caption = node.children.map(child => {
+        if (child.type === 'paragraph') {
+          return {
+            ...child,
+            children: child.children.map(textNode => {
+              if (textNode.type === 'text' && textNode.value) {
+                return {
+                  ...textNode,
+                  value: textNode.value
+                    .replace(/\\#/g, '__ESCAPED_HASH__')
+                    .replace(/#/g, '')
+                    .replace(/__ESCAPED_HASH__/g, '#'),
+                };
+              }
+              return textNode;
+            }),
+          };
+        }
+        return child;
+      });
+
+      const imageContainer = {
+        type: 'imageContainer',
+        data: {
+          hProperties: {
+            'data-image-container': '',
+            'data-original-caption': originalCaption,
+          },
+        },
+        children: [
+          {
+            type: 'image',
+            url: url || '',
+            alt: alt || '',
+            data: {
+              hProperties: {
+                className: size === 'large' ? ['w-full'] : ['min-w-56 w-1/2'],
+              },
+            },
+          },
+          ...caption,
+        ],
+      };
+
+      parent.children[index] = imageContainer;
+    });
+  };
+}
+
+export function remarkBgm() {
+  return (tree: Node) => {
+    visit(tree, (node: Node, index?: number, parent?: Parent) => {
+      if (index === undefined || !parent) return;
+      if (!isDirectiveNode(node) || node.name !== 'bgm') return;
+
+      const { url, startTime } = node.attributes || {};
+      if (!url) return;
+
+      const { videoId, timeFromUrl } = parseYouTubeUrl(url);
+      const finalStartTime =
+        startTime != null ? parseTimeToSeconds(startTime) : timeFromUrl;
+
+      if (!videoId) return;
+      const newNode = {
+        type: 'bgm',
+        data: {
+          hProperties: {
+            'data-bgm': '',
+            'data-video-id': videoId,
+            'data-start-time': `${finalStartTime ?? 0}`,
+          },
+        },
+      };
+      parent.children[index] = newNode;
     });
   };
 }
@@ -53,94 +142,35 @@ export function rehypeLink() {
   };
 }
 
+export function rehypeBgm() {
+  return (tree: Node) => {
+    visit(tree, 'element', (node: Element) => {
+      if (node.tagName === 'div' && 'data-bgm' in node.properties) {
+        const videoId = node.properties['data-video-id'] as string;
+        const startTime = node.properties['data-start-time'] as string;
+        const embedUrl = buildEmbedUrl(videoId, parseInt(startTime));
+        if (embedUrl == null) return;
+
+        node.tagName = 'iframe';
+        node.properties = {
+          src: embedUrl,
+          width: '560',
+          height: '315',
+          frameBorder: '0',
+          allowFullScreen: true,
+        };
+        node.children = [];
+      }
+    });
+  };
+}
+
 function isDirectiveNode(node: Node): node is DirectiveNode {
   return (
     node.type === 'containerDirective' ||
     node.type === 'leafDirective' ||
     node.type === 'textDirective'
   );
-}
-
-function remarkImage(node: DirectiveNode, index?: number, parent?: Parent) {
-  if (index === undefined || !parent) return;
-  const { url, alt, size } = node.attributes || {};
-
-  const originalCaption = node.children
-    .filter(child => child.type === 'paragraph')
-    .map(p =>
-      p.children
-        .map(child => {
-          if (child.type === 'text') return child.value;
-          if (child.type === 'break') return '\n';
-          return '';
-        })
-        .join('')
-    )
-    .join('\n');
-
-  const caption = node.children.map(child => {
-    if (child.type === 'paragraph') {
-      return {
-        ...child,
-        children: child.children.map(textNode => {
-          if (textNode.type === 'text' && textNode.value) {
-            return {
-              ...textNode,
-              value: textNode.value
-                .replace(/\\#/g, '__ESCAPED_HASH__')
-                .replace(/#/g, '')
-                .replace(/__ESCAPED_HASH__/g, '#'),
-            };
-          }
-          return textNode;
-        }),
-      };
-    }
-    return child;
-  });
-
-  const imageContainer = {
-    type: 'imageContainer',
-    data: {
-      hProperties: {
-        className: ['image-container'],
-        'data-original-caption': originalCaption,
-      },
-    },
-    children: [
-      {
-        type: 'image',
-        url: url || '',
-        alt: alt || '',
-        data: {
-          hProperties: {
-            className: size === 'large' ? ['w-full'] : ['min-w-56 w-1/2'],
-          },
-        },
-      },
-      ...caption,
-    ],
-  };
-
-  parent.children[index] = imageContainer;
-}
-
-function remarkBGM(node: DirectiveNode, index?: number, parent?: Parent) {
-  if (index === undefined || !parent) return;
-
-  const { url, start } = node.attributes || {};
-  if (!url) return;
-
-  const { videoId, timeFromUrl } = parseYouTubeUrl(url);
-  if (!videoId) return;
-
-  const finalStart = start != null ? parseTimeToSeconds(start) : timeFromUrl;
-  const embedUrl = buildEmbedUrl(videoId, finalStart);
-  const newNode = {
-    type: 'html',
-    value: `<iframe src="${embedUrl}" width="560" height="315" frameborder="0" allowfullscreen></iframe>`,
-  };
-  parent.children[index] = newNode;
 }
 
 function parseYouTubeUrl(url: string) {
@@ -166,12 +196,6 @@ function parseYouTubeUrl(url: string) {
   }
 }
 
-function buildEmbedUrl(videoId: string, startTime: number | null): string {
-  let embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}`;
-  if (startTime) embedUrl += `&start=${startTime}`;
-  return embedUrl;
-}
-
 function parseTimeToSeconds(timeStr: string): number {
   let totalSeconds = 0;
 
@@ -188,4 +212,10 @@ function parseTimeToSeconds(timeStr: string): number {
   }
 
   return totalSeconds;
+}
+
+function buildEmbedUrl(videoId: string, startTime: number | null): string {
+  let embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}`;
+  if (startTime) embedUrl += `&start=${startTime}`;
+  return embedUrl;
 }
