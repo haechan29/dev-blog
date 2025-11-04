@@ -2,7 +2,6 @@ import { mdxComponents } from '@/lib/mdx/mdxComponents';
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSanitize from 'rehype-sanitize';
 import rehypeSlug from 'rehype-slug';
-import remarkBreaks from 'remark-breaks';
 import { PluggableList } from 'unified';
 
 const TEXT_TAGS = ['p', 'br'];
@@ -39,7 +38,6 @@ export const allowedSchema = {
 };
 
 export const mdxOptions = {
-  remarkPlugins: [remarkBreaks],
   rehypePlugins: [
     [rehypeSanitize, allowedSchema],
     rehypePrettyCode,
