@@ -23,9 +23,9 @@ const processor = unified()
   .use(remarkBgm) // process bgm nodes
   .use(remarkRehype) // convert markdown AST to HTML AST
   .use(rehypeSanitize, schema) // remove unsafe HTML tags and attributes
-  .use(rehypeBgm) // process bgm elements
   .use(rehypePrettyCode) // add syntax highlighting to code blocks
   .use(rehypeSlug) // add id attributes to headings
+  .use(rehypeBgm) // process bgm elements
   .use(
     rehypeReact as any, // convert HTML AST to React components
     {

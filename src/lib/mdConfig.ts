@@ -22,7 +22,7 @@ export const schema: Options = {
     div: [
       ...(defaultSchema.attributes?.div ?? []),
       'data-bgm',
-      'data-video-id',
+      'data-youtube-url',
       'data-start-time',
     ],
   },
@@ -75,18 +75,13 @@ export function remarkBgm() {
       const { youtubeUrl, startTime } = node.attributes || {};
       if (!youtubeUrl) return;
 
-      const { videoId, timeFromUrl } = parseYouTubeUrl(youtubeUrl);
-      const finalStartTime =
-        startTime != null ? parseTimeToSeconds(startTime) : timeFromUrl;
-
-      if (!videoId) return;
       const newNode = {
         type: 'bgm',
         data: {
           hProperties: {
             'data-bgm': '',
-            'data-video-id': videoId,
-            'data-start-time': `${finalStartTime ?? 0}`,
+            'data-youtube-url': youtubeUrl,
+            'data-start-time': startTime ?? '0',
           },
         },
       };
@@ -112,45 +107,4 @@ function isDirectiveNode(node: Node): node is DirectiveNode {
     node.type === 'leafDirective' ||
     node.type === 'textDirective'
   );
-}
-
-function parseYouTubeUrl(url: string) {
-  try {
-    const urlObj = new URL(url);
-    let videoId = null;
-    let timeFromUrl = null;
-
-    if (urlObj.hostname.includes('youtube.com')) {
-      videoId = urlObj.searchParams.get('v');
-    } else if (urlObj.hostname === 'youtu.be') {
-      videoId = urlObj.pathname.slice(1);
-    }
-
-    const t = urlObj.searchParams.get('t');
-    if (t) {
-      timeFromUrl = parseTimeToSeconds(t);
-    }
-
-    return { videoId, timeFromUrl };
-  } catch {
-    return { videoId: null, timeFromUrl: null };
-  }
-}
-
-function parseTimeToSeconds(timeStr: string): number {
-  let totalSeconds = 0;
-
-  const hours = timeStr.match(/(\d+)h/);
-  const minutes = timeStr.match(/(\d+)m/);
-  const seconds = timeStr.match(/(\d+)s/);
-
-  if (hours) totalSeconds += parseInt(hours[1]) * 3600;
-  if (minutes) totalSeconds += parseInt(minutes[1]) * 60;
-  if (seconds) totalSeconds += parseInt(seconds[1]);
-
-  if (!hours && !minutes && !seconds) {
-    totalSeconds = parseInt(timeStr) || 0;
-  }
-
-  return totalSeconds;
 }
