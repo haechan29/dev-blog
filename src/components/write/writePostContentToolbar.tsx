@@ -15,9 +15,11 @@ import {
   ImageIcon,
   Link,
   Minus,
+  Music,
   Quote,
   Rows,
   Shrink,
+  Timer,
 } from 'lucide-react';
 import { useCallback } from 'react';
 
@@ -101,5 +103,9 @@ function ContentButton({
       return <Rows className={style} />;
     case 'addColumn':
       return <Columns className={style} />;
+    case 'bgm':
+      return <Music className={style} />;
+    case 'bgmStartTime':
+      return <Timer className={style} />;
   }
 }

@@ -12,6 +12,7 @@ export const writePostContentButtons: WritePostContentButton[] = [
   { id: 'unorderedList' },
   { id: 'orderedList' },
   { id: 'image' },
+  { id: 'bgm' },
   { id: 'link' },
   { id: 'blockquote' },
   { id: 'horizontalRule' },
@@ -20,6 +21,7 @@ export const writePostContentButtons: WritePostContentButton[] = [
   { id: 'imageSmall' },
   { id: 'imageCaption' },
   { id: 'imageSubtitle' },
+  { id: 'bgmStartTime' },
   { id: 'addRow' },
   { id: 'addColumn' },
 ];

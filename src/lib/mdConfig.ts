@@ -105,10 +105,10 @@ export function remarkBgm() {
       if (index === undefined || !parent) return;
       if (!isDirectiveNode(node) || node.name !== 'bgm') return;
 
-      const { url, startTime } = node.attributes || {};
-      if (!url) return;
+      const { youtubeUrl, startTime } = node.attributes || {};
+      if (!youtubeUrl) return;
 
-      const { videoId, timeFromUrl } = parseYouTubeUrl(url);
+      const { videoId, timeFromUrl } = parseYouTubeUrl(youtubeUrl);
       const finalStartTime =
         startTime != null ? parseTimeToSeconds(startTime) : timeFromUrl;
 

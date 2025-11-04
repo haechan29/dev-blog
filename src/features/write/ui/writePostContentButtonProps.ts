@@ -13,7 +13,9 @@ export type ButtonContent = {
     | 'imageCaption'
     | 'imageSubtitle'
     | 'addRow'
-    | 'addColumn';
+    | 'addColumn'
+    | 'bgm'
+    | 'bgmStartTime';
   style: string;
   value?: string;
 };
@@ -103,6 +105,14 @@ const buttonContents: Record<WritePostContentButton['id'], ButtonContent> = {
     type: 'addColumn',
     style: 'w-4 h-4',
   },
+  bgm: {
+    type: 'bgm',
+    style: 'w-4 h-4',
+  },
+  bgmStartTime: {
+    type: 'bgmStartTime',
+    style: 'w-5 h-5',
+  },
 };
 
 export interface MarkdownButtonProps {
@@ -123,7 +133,7 @@ export interface TableButtonProps {
 }
 
 export interface DirectiveButtonProps {
-  type: 'image';
+  type: 'image' | 'bgm';
   action: 'insert';
   label: string;
   content: ButtonContent;
@@ -287,6 +297,23 @@ const writePostContentButtonProps: Record<
     content: buttonContents['imageSubtitle'],
     position: 'content',
     value: '#자막은 전체화면에서 한 문장씩 표시됩니다.',
+  },
+  bgm: {
+    type: 'markdown',
+    action: 'insert',
+    label: 'BGM',
+    content: buttonContents['bgm'],
+    markdownBefore: '::bgm{youtubeUrl="',
+    markdownAfter: '"}\n',
+  },
+  bgmStartTime: {
+    type: 'bgm',
+    action: 'insert',
+    label: '시작시간 설정',
+    content: buttonContents['bgmStartTime'],
+    position: 'attribute',
+    key: 'startTime',
+    value: '5',
   },
 };
 
