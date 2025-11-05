@@ -1,9 +1,10 @@
 import Comments from '@/components/comment/comments';
 import LikeButtonItem from '@/components/post/likeButtonItem';
-import PostContent from '@/components/post/postContent';
 import PostContentWrapper from '@/components/post/postContentWrapper';
 import PostHeader from '@/components/post/postHeader';
 import PostPageClient from '@/components/post/postPageClient';
+import PostParsedContent from '@/components/post/postParsedContent';
+import PostRawContent from '@/components/post/postRawContent';
 import PostToolbar from '@/components/post/postToolbar';
 import TableOfContentsItem from '@/components/post/tableOfContentsItem';
 import EnterFullscreenButton from '@/components/postViewer/enterFullscreenButton';
@@ -48,9 +49,11 @@ export default async function PostPage({
           </section>
         )}
 
-        <PostContentWrapper post={post}>
-          <PostContent content={post.content} />
-        </PostContentWrapper>
+        <PostContentWrapper
+          post={post}
+          parsed={<PostParsedContent content={post.content} />}
+          raw={<PostRawContent content={post.content} />}
+        />
 
         <Suspense>
           <LikeButtonItem postId={post.id} />

@@ -10,10 +10,12 @@ import { ReactNode, useRef } from 'react';
 
 export default function PostContentWrapper({
   post,
-  children,
+  parsed,
+  raw,
 }: {
   post: PostProps;
-  children: ReactNode;
+  parsed: ReactNode;
+  raw: ReactNode;
 }) {
   const postContentRef = useRef<HTMLDivElement | null>(null);
   const { page } = usePostParsing(postContentRef);
@@ -25,8 +27,9 @@ export default function PostContentWrapper({
   return (
     <>
       <PostViewer post={post} page={page} />
-      <div ref={postContentRef} className='mb-20'>
-        {children}
+      <div className='mb-20'>
+        <div ref={postContentRef}>{parsed}</div>
+        <div>{raw}</div>
       </div>
     </>
   );

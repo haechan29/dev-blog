@@ -1,7 +1,11 @@
 import { processMd } from '@/lib/md';
 import { ErrorBoundary } from 'react-error-boundary';
 
-export default async function PostContent({ content }: { content: string }) {
+export default async function PostParsedContent({
+  content,
+}: {
+  content: string;
+}) {
   try {
     const result = await processMd(content);
     return (
