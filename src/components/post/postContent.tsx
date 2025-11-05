@@ -1,17 +1,15 @@
-import { mdxComponents } from '@/lib/mdx/mdxComponents';
-import { mdxOptions } from '@/lib/mdx/mdxConfig';
-import { MDXRemote } from 'next-mdx-remote/rsc';
+import { processMd } from '@/lib/md';
+import { ErrorBoundary } from 'react-error-boundary';
 
-export default function PostContent({ content }: { content: string }) {
-  return (
-    <>
-      <MDXRemote
-        source={content}
-        components={mdxComponents}
-        options={{
-          mdxOptions,
-        }}
-      />
-    </>
-  );
+export default async function PostContent({ content }: { content: string }) {
+  try {
+    const result = await processMd(content);
+    return (
+      <ErrorBoundary fallback={<div>에러가 발생했습니다</div>}>
+        <div className='prose'>{result}</div>
+      </ErrorBoundary>
+    );
+  } catch {
+    return <div>에러가 발생했습니다</div>;
+  }
 }

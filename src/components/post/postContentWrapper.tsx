@@ -25,7 +25,7 @@ export default function PostContentWrapper({
   return (
     <>
       <PostViewer post={post} page={page} />
-      <div ref={postContentRef} className='prose mb-20'>
+      <div ref={postContentRef} className='mb-20'>
         {children}
       </div>
     </>
