@@ -30,7 +30,7 @@ export default function useWritePostContentButton({
   }, [contentButtons]);
 
   const handleMarkdownAction = useCallback(
-    ({ markdownBefore, markdownAfter = '' }: MarkdownButtonProps) => {
+    ({ isBlock, markdownBefore, markdownAfter = '' }: MarkdownButtonProps) => {
       if (!contentEditorRef.current) return;
       const contentEditor = contentEditorRef.current;
 
@@ -41,12 +41,17 @@ export default function useWritePostContentButton({
         content.substring(selectionEnd),
       ];
 
+      const shouldBreakBefore =
+        isBlock && textBefore.trim() && !textBefore.endsWith('\n');
+      const shouldBreakAfter = isBlock && !textAfter.startsWith('\n');
       const newText =
         textBefore +
+        (shouldBreakBefore ? '\n' : '') +
         markdownBefore +
         selectedText +
         CURSOR_MARKER +
         markdownAfter +
+        (shouldBreakAfter ? '\n' : '') +
         textAfter;
 
       const newCursorPosition = newText.indexOf(CURSOR_MARKER);
