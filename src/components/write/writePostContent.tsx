@@ -35,6 +35,11 @@ export default function WritePostContent({
 
   useEffect(() => {
     const parseMd = async (content: string) => {
+      if (content.length === 0) {
+        setParsedContent({ status: 'idle' });
+        return;
+      }
+
       setParsedContent({ status: 'loading' });
       try {
         const result = await processMd(content);

@@ -54,7 +54,6 @@ export default async function PostPage({
 
         <Suspense>
           <LikeButtonItem postId={post.id} />
-
           <Comments {...post} />
         </Suspense>
       </div>
