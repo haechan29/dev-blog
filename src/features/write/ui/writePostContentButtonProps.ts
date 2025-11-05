@@ -117,7 +117,6 @@ const buttonContents: Record<WritePostContentButton['id'], ButtonContent> = {
 
 export interface MarkdownButtonProps {
   type: 'markdown';
-  action: 'insert' | 'toggle';
   label: string;
   content: ButtonContent;
   markdownBefore: string;
@@ -126,7 +125,6 @@ export interface MarkdownButtonProps {
 
 export interface TableButtonProps {
   type: 'table';
-  action: 'insert';
   label: string;
   content: ButtonContent;
   direction: 'row' | 'column';
@@ -134,7 +132,6 @@ export interface TableButtonProps {
 
 export interface DirectiveButtonProps {
   type: 'image' | 'bgm';
-  action: 'insert';
   label: string;
   content: ButtonContent;
   position: 'attribute' | 'content';
@@ -153,28 +150,24 @@ const writePostContentButtonProps: Record<
 > = {
   heading1: {
     type: 'markdown',
-    action: 'insert',
     label: '큰 제목',
     content: buttonContents['heading1'],
     markdownBefore: '# ',
   },
   heading2: {
     type: 'markdown',
-    action: 'insert',
     label: '중간 제목',
     content: buttonContents['heading2'],
     markdownBefore: '## ',
   },
   heading3: {
     type: 'markdown',
-    action: 'insert',
     label: '작은 제목',
     content: buttonContents['heading3'],
     markdownBefore: '### ',
   },
   bold: {
     type: 'markdown',
-    action: 'toggle',
     label: '굵게',
     content: buttonContents['bold'],
     markdownBefore: '**',
@@ -182,7 +175,6 @@ const writePostContentButtonProps: Record<
   },
   italic: {
     type: 'markdown',
-    action: 'toggle',
     label: '기울이기',
     content: buttonContents['italic'],
     markdownBefore: '*',
@@ -190,7 +182,6 @@ const writePostContentButtonProps: Record<
   },
   strikethrough: {
     type: 'markdown',
-    action: 'toggle',
     label: '취소선',
     content: buttonContents['strikethrough'],
     markdownBefore: '~~',
@@ -198,7 +189,6 @@ const writePostContentButtonProps: Record<
   },
   link: {
     type: 'markdown',
-    action: 'insert',
     label: '링크 추가',
     content: buttonContents['link'],
     markdownBefore: '[링크',
@@ -206,7 +196,6 @@ const writePostContentButtonProps: Record<
   },
   table: {
     type: 'markdown',
-    action: 'insert',
     label: '표 만들기',
     content: buttonContents['table'],
     markdownBefore: '| 제목1',
@@ -214,21 +203,18 @@ const writePostContentButtonProps: Record<
   },
   addRow: {
     type: 'table',
-    action: 'insert',
     label: '행 추가하기',
     content: buttonContents['addRow'],
     direction: 'row',
   },
   addColumn: {
     type: 'table',
-    action: 'insert',
     label: '열 추가하기',
     content: buttonContents['addColumn'],
     direction: 'column',
   },
   unorderedList: {
     type: 'markdown',
-    action: 'insert',
     label: '순서 없는 목록',
     content: buttonContents['unorderedList'],
     markdownBefore: '- 항목 1',
@@ -236,7 +222,6 @@ const writePostContentButtonProps: Record<
   },
   orderedList: {
     type: 'markdown',
-    action: 'insert',
     label: '순서 있는 목록',
     content: buttonContents['orderedList'],
     markdownBefore: '1. 항목 1',
@@ -244,21 +229,18 @@ const writePostContentButtonProps: Record<
   },
   blockquote: {
     type: 'markdown',
-    action: 'insert',
     label: '인용문',
     content: buttonContents['blockquote'],
     markdownBefore: '> 내용',
   },
   horizontalRule: {
     type: 'markdown',
-    action: 'insert',
     label: '구분선',
     content: buttonContents['horizontalRule'],
     markdownBefore: '---\n',
   },
   image: {
     type: 'markdown',
-    action: 'insert',
     label: '이미지',
     content: buttonContents['image'],
     markdownBefore: ':::img{url="',
@@ -266,7 +248,6 @@ const writePostContentButtonProps: Record<
   },
   imageLarge: {
     type: 'image',
-    action: 'insert',
     label: '이미지 크게',
     content: buttonContents['imageLarge'],
     position: 'attribute',
@@ -275,7 +256,6 @@ const writePostContentButtonProps: Record<
   },
   imageSmall: {
     type: 'image',
-    action: 'insert',
     label: '이미지 작게',
     content: buttonContents['imageSmall'],
     position: 'attribute',
@@ -284,7 +264,6 @@ const writePostContentButtonProps: Record<
   },
   imageCaption: {
     type: 'image',
-    action: 'insert',
     label: '이미지 설명 추가',
     content: buttonContents['imageCaption'],
     position: 'content',
@@ -292,7 +271,6 @@ const writePostContentButtonProps: Record<
   },
   imageSubtitle: {
     type: 'image',
-    action: 'insert',
     label: '이미지 자막 추가',
     content: buttonContents['imageSubtitle'],
     position: 'content',
@@ -300,7 +278,6 @@ const writePostContentButtonProps: Record<
   },
   bgm: {
     type: 'markdown',
-    action: 'insert',
     label: 'BGM',
     content: buttonContents['bgm'],
     markdownBefore: '::bgm{youtubeUrl="',
@@ -308,7 +285,6 @@ const writePostContentButtonProps: Record<
   },
   bgmStartTime: {
     type: 'bgm',
-    action: 'insert',
     label: '시작시간 설정',
     content: buttonContents['bgmStartTime'],
     position: 'attribute',

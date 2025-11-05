@@ -30,7 +30,7 @@ export default function useWritePostContentButton({
   }, [contentButtons]);
 
   const handleMarkdownAction = useCallback(
-    ({ action, markdownBefore, markdownAfter = '' }: MarkdownButtonProps) => {
+    ({ markdownBefore, markdownAfter = '' }: MarkdownButtonProps) => {
       if (!contentEditorRef.current) return;
       const contentEditor = contentEditorRef.current;
 
@@ -40,45 +40,27 @@ export default function useWritePostContentButton({
         content.substring(selectionStart, selectionEnd),
         content.substring(selectionEnd),
       ];
-      const isWrapped = selectedText
-        ? selectedText.length >=
-            markdownBefore.length + (markdownAfter.length ?? 0) &&
-          selectedText.startsWith(markdownBefore) &&
-          selectedText.endsWith(markdownAfter)
-        : textBefore.endsWith(markdownBefore) &&
-          textAfter.startsWith(markdownAfter);
 
-      const shouldInsert = action === 'insert' || !isWrapped;
+      const newText =
+        textBefore +
+        markdownBefore +
+        selectedText +
+        CURSOR_MARKER +
+        markdownAfter +
+        textAfter;
 
-      let newText = '';
-      let newCursorPosition = 0;
+      const newCursorPosition = newText.indexOf(CURSOR_MARKER);
+      const finalText = newText.replace(CURSOR_MARKER, '');
+      const finalCursorPosition =
+        newCursorPosition === -1 ? selectionStart : newCursorPosition;
 
-      if (shouldInsert) {
-        newText =
-          textBefore +
-          markdownBefore +
-          selectedText +
-          markdownAfter +
-          textAfter;
-        newCursorPosition = selectedText
-          ? textBefore.length + newText.length
-          : textBefore.length + markdownBefore.length;
-      } else {
-        newText = selectedText
-          ? textBefore +
-            selectedText.slice(markdownBefore.length, -markdownAfter.length) +
-            textAfter
-          : textBefore.slice(0, -markdownBefore.length) +
-            textAfter.slice(markdownAfter.length);
-        newCursorPosition = selectedText
-          ? newText.length - textAfter.length
-          : textBefore.length - markdownBefore.length;
-      }
-
-      setContent(newText);
+      setContent(finalText);
       setTimeout(() => {
         contentEditor.focus();
-        contentEditor.setSelectionRange(newCursorPosition, newCursorPosition);
+        contentEditor.setSelectionRange(
+          finalCursorPosition,
+          finalCursorPosition
+        );
       }, 0);
     },
     [content, contentEditorRef, setContent]
