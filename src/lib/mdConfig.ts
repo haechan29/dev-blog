@@ -33,21 +33,36 @@ export const schema: Options = {
 export function remarkBreaks() {
   return (tree: Node, file: VFile) => {
     const source = String(file.value);
+    const lineBreaks = findLineBreaks(source);
+    let lineBreakIndex = 0;
 
     visit(tree, 'paragraph', (paragraph: Paragraph) => {
       const newChildren: PhrasingContent[] = [];
       paragraph.children.forEach(child => {
         if (child.type === 'text') {
-          const parts = child.value.split('\n');
-          let startOffset = child.position!.start.offset!;
-          parts.forEach(part => {
-            newChildren.push({ type: 'text', value: part });
-            const count = countLineBreaks(source, startOffset);
-            for (let i = 0; i < count; i++) {
+          const nodeStart = child.position!.start.offset!;
+          const nodeEnd = child.position!.end.offset!;
+          const currentLineBreaks = [[nodeStart, 0]];
+
+          while (lineBreakIndex < lineBreaks.length) {
+            const [breakStart, breakCount] = lineBreaks[lineBreakIndex];
+            if (breakStart > nodeEnd) break;
+            if (breakStart >= nodeStart) {
+              currentLineBreaks.push([breakStart, breakCount]);
+            }
+            lineBreakIndex++;
+          }
+
+          for (const [breakStart, breakCount] of currentLineBreaks) {
+            const value = source.slice(nodeStart, breakStart);
+            if (value) newChildren.push({ type: 'text', value });
+            for (let i = 0; i < breakCount; i++) {
               newChildren.push({ type: 'break' });
             }
-            startOffset += part.length + 1;
-          });
+          }
+          const [breakStart, breakCount] = currentLineBreaks.at(-1)!;
+          const value = source.slice(breakStart + breakCount, nodeEnd);
+          if (value) newChildren.push({ type: 'text', value });
         } else {
           newChildren.push(child);
         }
@@ -130,10 +145,18 @@ export function rehypeBgm() {
   };
 }
 
-function countLineBreaks(str: string, startIndex: number): number {
-  const substring = str.slice(startIndex);
-  const match = substring.match(/([^\n]+)(\n*)/);
-  return match ? match[2].length : 0;
+function findLineBreaks(str: string): [number, number][] {
+  const result: [number, number][] = [];
+  const regex = /\n+/g;
+  let match;
+
+  while ((match = regex.exec(str)) !== null) {
+    const startIndex = match.index;
+    const count = match[0].length;
+    result.push([startIndex, count]);
+  }
+
+  return result;
 }
 
 function isDirectiveNode(node: Node): node is DirectiveNode {
