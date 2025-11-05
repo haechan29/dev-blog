@@ -1,4 +1,3 @@
-import { LINE_BREAK_MARKER } from '@/lib/md';
 import type { Element } from 'hast';
 import { Paragraph, PhrasingContent } from 'mdast';
 import type {
@@ -9,6 +8,7 @@ import type {
 import { defaultSchema, type Options } from 'rehype-sanitize';
 import type { Node, Parent } from 'unist';
 import { visit } from 'unist-util-visit';
+import { VFile } from 'vfile';
 
 type DirectiveNode = ContainerDirective | LeafDirective | TextDirective;
 
@@ -31,15 +31,22 @@ export const schema: Options = {
 };
 
 export function remarkBreaks() {
-  return (tree: Node) => {
+  return (tree: Node, file: VFile) => {
+    const source = String(file.value);
+
     visit(tree, 'paragraph', (paragraph: Paragraph) => {
       const newChildren: PhrasingContent[] = [];
       paragraph.children.forEach(child => {
-        if (child.type === 'text' && child.value.includes(LINE_BREAK_MARKER)) {
-          const parts = child.value.split(LINE_BREAK_MARKER);
-          parts.forEach((part, index) => {
-            if (part) newChildren.push({ type: 'text', value: part });
-            if (index < parts.length - 1) newChildren.push({ type: 'break' });
+        if (child.type === 'text') {
+          const parts = child.value.split('\n');
+          let startOffset = child.position!.start.offset!;
+          parts.forEach(part => {
+            newChildren.push({ type: 'text', value: part });
+            const count = countLineBreaks(source, startOffset);
+            for (let i = 0; i < count; i++) {
+              newChildren.push({ type: 'break' });
+            }
+            startOffset += part.length + 1;
           });
         } else {
           newChildren.push(child);
@@ -121,6 +128,12 @@ export function rehypeBgm() {
       }
     });
   };
+}
+
+function countLineBreaks(str: string, startIndex: number): number {
+  const substring = str.slice(startIndex);
+  const match = substring.match(/([^\n]+)(\n*)/);
+  return match ? match[2].length : 0;
 }
 
 function isDirectiveNode(node: Node): node is DirectiveNode {

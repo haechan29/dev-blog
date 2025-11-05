@@ -47,13 +47,6 @@ const processor = unified()
   );
 
 export async function processMd(source: string) {
-  const newSource = processLineBreaks(source);
-  const result = await processor.process(newSource);
+  const result = await processor.process(source);
   return result.result as JSX.Element;
-}
-
-function processLineBreaks(source: string) {
-  return source.replace(/\n+/g, match => {
-    return LINE_BREAK_MARKER.repeat(match.length) + '\n\n';
-  });
 }
