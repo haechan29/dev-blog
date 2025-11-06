@@ -42,7 +42,7 @@ export function remarkBreaks() {
         if (child.type === 'text') {
           const nodeStart = child.position!.start.offset!;
           const nodeEnd = child.position!.end.offset!;
-          const currentLineBreaks = [[nodeStart, 0]];
+          const currentLineBreaks: [number, number][] = [];
 
           while (lineBreakIndex < lineBreaks.length) {
             const [breakStart, breakCount] = lineBreaks[lineBreakIndex];
@@ -52,17 +52,21 @@ export function remarkBreaks() {
             }
             lineBreakIndex++;
           }
+          currentLineBreaks.unshift([nodeStart, 0]);
+          currentLineBreaks.push([nodeEnd, 0]);
 
-          for (const [breakStart, breakCount] of currentLineBreaks) {
-            const value = source.slice(nodeStart, breakStart);
+          for (let i = 0; i + 1 < currentLineBreaks.length; i++) {
+            const [prevBreakStart, prevBreakCount] = currentLineBreaks[i];
+            const [nextBreakStart, nextBreakCount] = currentLineBreaks[i + 1];
+            const value = source.slice(
+              prevBreakStart + prevBreakCount,
+              nextBreakStart
+            );
             if (value) newChildren.push({ type: 'text', value });
-            for (let i = 0; i < breakCount; i++) {
+            for (let j = 0; j < nextBreakCount; j++) {
               newChildren.push({ type: 'break' });
             }
           }
-          const [breakStart, breakCount] = currentLineBreaks.at(-1)!;
-          const value = source.slice(breakStart + breakCount, nodeEnd);
-          if (value) newChildren.push({ type: 'text', value });
         } else {
           newChildren.push(child);
         }
