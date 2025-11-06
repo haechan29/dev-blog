@@ -23,7 +23,7 @@ export default function PostViewer({
   const postViewerRef = useRef<HTMLDivElement | null>(null);
   const handlers = useViewerHandler();
   useViewerFullscreen(postViewerRef);
-  useScrollLock(isViewerMode);
+  useScrollLock({ isLocked: isViewerMode });
 
   return (
     <div

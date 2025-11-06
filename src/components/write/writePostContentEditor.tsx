@@ -1,8 +1,9 @@
 'use client';
 
 import { Content } from '@/features/write/domain/types/content';
+import useScrollLock from '@/hooks/useScrollLock';
 import clsx from 'clsx';
-import { ChangeEvent, RefObject, useCallback, useMemo } from 'react';
+import { ChangeEvent, RefObject, useCallback, useMemo, useState } from 'react';
 
 export default function WritePostContentEditor({
   contentEditorRef,
@@ -25,6 +26,7 @@ export default function WritePostContentEditor({
   resetInvalidField: () => void;
   setIsEditorFocused: (isEditorFocused: boolean) => void;
 }) {
+  const [isLocked, setIsLocked] = useState(false);
   const isError = useMemo(() => {
     return parsedContent.status === 'error';
   }, [parsedContent.status]);
@@ -42,14 +44,24 @@ export default function WritePostContentEditor({
     [resetInvalidField, setContent]
   );
 
+  useScrollLock({ isLocked, allowedSelectors: ['[data-content-editor]'] });
+
   return (
     <div className='flex flex-col h-full'>
       <textarea
+        data-content-editor
         ref={contentEditorRef}
-        onFocus={() => setIsEditorFocused(true)}
-        onBlur={() => setIsEditorFocused(false)}
+        onFocus={() => {
+          setIsEditorFocused(true);
+          setIsLocked(true);
+        }}
+        onBlur={() => {
+          setIsEditorFocused(false);
+          setIsLocked(false);
+        }}
         value={content}
         onChange={onChange}
+        onTouchMove={e => e.stopPropagation()}
         placeholder='본문을 입력하세요'
         className={clsx(
           'flex-1 min-h-0 p-4 resize-none outline-none border',
