@@ -17,7 +17,7 @@ export default function WritePostForm({
           currentStepId === 'upload' && '-translate-x-[100vw]'
         )}
       >
-        <div className='w-[100vw] h-full overflow-y-auto scrollbar-hide px-4 lg:px-8 lg:pb-8'>
+        <div className='w-[100vw] h-full px-4 pb-4 lg:px-8 lg:pb-8'>
           <WritePostContent content={content} {...writePostForm} />
         </div>
         <div className='w-[100vw] h-full px-4 md:px-40 lg:56 xl:px-72'>

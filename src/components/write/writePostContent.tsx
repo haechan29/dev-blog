@@ -53,7 +53,7 @@ export default function WritePostContent({
   }, [content.value, debounce]);
 
   return (
-    <div className='h-full grid max-lg:grid-rows-[50%_100%] lg:grid-cols-2 gap-4'>
+    <div className='h-full grid max-lg:grid-rows-[calc(50%-0.5rem)_calc(50%-0.5rem)] lg:grid-cols-2 gap-4'>
       <div className='h-full flex flex-col max-lg:min-w-0 lg:min-h-0'>
         <WritePostContentToolbar {...contentToolbar} {...contentButton} />
         <div className='flex-1 min-h-0'>
@@ -69,7 +69,7 @@ export default function WritePostContent({
         </div>
       </div>
 
-      <div className='max-md:pb-4 max-lg:min-w-0 lg:min-h-0'>
+      <div className='max-lg:min-w-0 lg:min-h-0'>
         <WritePostContentPreview parsedContent={parsedContent} />
       </div>
     </div>
