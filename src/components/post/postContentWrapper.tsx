@@ -6,7 +6,9 @@ import useHeadingSync from '@/features/post/hooks/useHeadingSync';
 import useScrollTracker from '@/features/post/hooks/useScrollTracker';
 import { PostProps } from '@/features/post/ui/postProps';
 import usePostParsing from '@/features/postViewer/hooks/usePostParsing';
+import { RootState } from '@/lib/redux/store';
 import { ReactNode, useRef } from 'react';
+import { useSelector } from 'react-redux';
 
 export default function PostContentWrapper({
   post,
@@ -19,6 +21,7 @@ export default function PostContentWrapper({
 }) {
   const postContentRef = useRef<HTMLDivElement | null>(null);
   const { page } = usePostParsing(postContentRef);
+  const postReader = useSelector((state: RootState) => state.postReader);
 
   useContentTracker(postContentRef);
   useScrollTracker();
@@ -28,8 +31,11 @@ export default function PostContentWrapper({
     <>
       <PostViewer post={post} page={page} />
       <div className='mb-20'>
-        <div ref={postContentRef}>{parsed}</div>
-        <div>{raw}</div>
+        {postReader.mode === 'raw' ? (
+          <div>{raw}</div>
+        ) : (
+          <div ref={postContentRef}>{parsed}</div>
+        )}
       </div>
     </>
   );
