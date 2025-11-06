@@ -15,7 +15,7 @@ import { setMode } from '@/lib/redux/postReaderSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { Code2, Edit2, FileText, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { MouseEvent, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostSettingsDropdown({
@@ -32,6 +32,28 @@ export default function PostSettingsDropdown({
   const postReader = useSelector((state: RootState) => state.postReader);
   const [debouncedMode, setDebouncedMode] =
     useState<PostReader['mode']>('parsed');
+
+  const handleAction = useCallback(
+    (e: MouseEvent<HTMLElement>) => {
+      const actionAttribute = e.currentTarget.getAttribute('data-action');
+      switch (actionAttribute) {
+        case 'toggle-mode': {
+          const mode = postReader.mode === 'parsed' ? 'raw' : 'parsed';
+          dispatch(setMode(mode));
+          break;
+        }
+        case 'edit': {
+          router.push(`/posts/${postId}/edit?step=write`);
+          break;
+        }
+        case 'delete': {
+          if (!isOpen) setIsOpen(true);
+          break;
+        }
+      }
+    },
+    [dispatch, isOpen, postId, postReader.mode, router]
+  );
 
   useEffect(() => {
     debounce(() => {
@@ -59,10 +81,8 @@ export default function PostSettingsDropdown({
 
         <DropdownMenuContent align='end'>
           <DropdownMenuItem
-            onClick={() => {
-              const mode = postReader.mode === 'parsed' ? 'raw' : 'parsed';
-              dispatch(setMode(mode));
-            }}
+            data-action='toggle-mode'
+            onClick={handleAction}
             className='w-full flex items-center gap-2 cursor-pointer'
           >
             {debouncedMode === 'parsed' ? (
@@ -79,9 +99,8 @@ export default function PostSettingsDropdown({
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            onClick={() => {
-              router.push(`/posts/${postId}/edit?step=write`);
-            }}
+            data-action='edit'
+            onClick={handleAction}
             className='w-full flex items-center gap-2 cursor-pointer'
           >
             <Edit2 className='w-4 h-4 text-gray-500' />
@@ -89,9 +108,8 @@ export default function PostSettingsDropdown({
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            onClick={() => {
-              if (!isOpen) setIsOpen(true);
-            }}
+            data-action='delete'
+            onClick={handleAction}
             className='w-full flex items-center gap-2 cursor-pointer'
           >
             <Trash2 className='w-4 h-4 text-red-400' />
