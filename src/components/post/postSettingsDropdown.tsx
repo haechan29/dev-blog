@@ -8,15 +8,16 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import PostReader from '@/features/post/domain/model/postReader';
+import usePostReader from '@/features/post/hooks/usePostReader';
 import { PostProps } from '@/features/post/ui/postProps';
 import useDebounce from '@/hooks/useDebounce';
 import { createRipple } from '@/lib/dom';
 import { setMode } from '@/lib/redux/postReaderSlice';
-import { AppDispatch, RootState } from '@/lib/redux/store';
+import { AppDispatch } from '@/lib/redux/store';
 import { Code2, Edit2, FileText, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { MouseEvent, useCallback, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 export default function PostSettingsDropdown({
   children,
@@ -28,8 +29,10 @@ export default function PostSettingsDropdown({
   const [isOpen, setIsOpen] = useState(false);
   const debounce = useDebounce();
   const router = useRouter();
+  const {
+    postReader: { mode },
+  } = usePostReader();
   const dispatch = useDispatch<AppDispatch>();
-  const postReader = useSelector((state: RootState) => state.postReader);
   const [debouncedMode, setDebouncedMode] =
     useState<PostReader['mode']>('parsed');
 
@@ -38,8 +41,8 @@ export default function PostSettingsDropdown({
       const actionAttribute = e.currentTarget.getAttribute('data-action');
       switch (actionAttribute) {
         case 'toggle-mode': {
-          const mode = postReader.mode === 'parsed' ? 'raw' : 'parsed';
-          dispatch(setMode(mode));
+          const toggledMode = mode === 'parsed' ? 'raw' : 'parsed';
+          dispatch(setMode(toggledMode));
           break;
         }
         case 'edit': {
@@ -52,14 +55,14 @@ export default function PostSettingsDropdown({
         }
       }
     },
-    [dispatch, isOpen, postId, postReader.mode, router]
+    [dispatch, isOpen, mode, postId, router]
   );
 
   useEffect(() => {
     debounce(() => {
-      setDebouncedMode(postReader.mode);
+      setDebouncedMode(mode);
     }, 300);
-  }, [postReader.mode, debounce]);
+  }, [mode, debounce]);
 
   return (
     <>

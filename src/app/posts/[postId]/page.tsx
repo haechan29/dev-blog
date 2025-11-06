@@ -6,7 +6,6 @@ import PostPageClient from '@/components/post/postPageClient';
 import PostParsedContent from '@/components/post/postParsedContent';
 import PostRawContent from '@/components/post/postRawContent';
 import PostToolbar from '@/components/post/postToolbar';
-import TableOfContentsItem from '@/components/post/tableOfContentsItem';
 import EnterFullscreenButton from '@/components/postViewer/enterFullscreenButton';
 import { fetchPost } from '@/features/post/domain/service/postService';
 import { createProps } from '@/features/post/ui/postProps';
@@ -39,15 +38,6 @@ export default async function PostPage({
 
         <PostHeader post={post} />
         <div className='w-full h-[1px] bg-gray-200 mb-10' />
-
-        {post.headings.length > 0 && (
-          <section className='mb-10 xl:mb-0'>
-            <div className='block xl:hidden text-xl xl:text-2xl font-bold text-gray-900 mt-4 mb-2 leading-tight'>
-              목차
-            </div>
-            <TableOfContentsItem headings={post.headings} />
-          </section>
-        )}
 
         <PostContentWrapper
           post={post}
