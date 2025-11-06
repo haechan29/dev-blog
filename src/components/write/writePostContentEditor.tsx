@@ -2,8 +2,17 @@
 
 import { Content } from '@/features/write/domain/types/content';
 import useScrollLock from '@/hooks/useScrollLock';
+import { getScrollRatio } from '@/lib/scroll';
 import clsx from 'clsx';
-import { ChangeEvent, RefObject, useCallback, useMemo, useState } from 'react';
+import {
+  ChangeEvent,
+  FocusEvent,
+  RefObject,
+  UIEvent,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
 
 export default function WritePostContentEditor({
   contentEditorRef,
@@ -15,6 +24,7 @@ export default function WritePostContentEditor({
   setContent,
   resetInvalidField,
   setIsEditorFocused,
+  setScrollRatio,
 }: {
   contentEditorRef: RefObject<HTMLTextAreaElement | null>;
   parsedContent: Content;
@@ -25,6 +35,7 @@ export default function WritePostContentEditor({
   setContent: (content: string) => void;
   resetInvalidField: () => void;
   setIsEditorFocused: (isEditorFocused: boolean) => void;
+  setScrollRatio: (scrollRatio: number) => void;
 }) {
   const [isLocked, setIsLocked] = useState(false);
   const isError = useMemo(() => {
@@ -38,10 +49,37 @@ export default function WritePostContentEditor({
 
   const onChange = useCallback(
     (e: ChangeEvent<HTMLTextAreaElement>) => {
+      const textArea = e.currentTarget;
       resetInvalidField();
-      setContent(e.target.value);
+      setContent(textArea.value);
     },
     [resetInvalidField, setContent]
+  );
+
+  const onFocus = useCallback(
+    (e: FocusEvent<HTMLTextAreaElement>) => {
+      setIsEditorFocused(true);
+      setIsLocked(true);
+
+      const textArea = e.currentTarget;
+      const scrollRatio = getScrollRatio(textArea);
+      setScrollRatio(scrollRatio);
+    },
+    [setIsEditorFocused, setScrollRatio]
+  );
+
+  const onBlur = useCallback(() => {
+    setIsEditorFocused(false);
+    setIsLocked(false);
+  }, [setIsEditorFocused]);
+
+  const onScroll = useCallback(
+    (e: UIEvent<HTMLTextAreaElement>) => {
+      const textArea = e.currentTarget;
+      const scrollRatio = getScrollRatio(textArea);
+      setScrollRatio(scrollRatio);
+    },
+    [setScrollRatio]
   );
 
   useScrollLock({ isLocked, allowedSelectors: ['[data-content-editor]'] });
@@ -51,16 +89,11 @@ export default function WritePostContentEditor({
       <textarea
         data-content-editor
         ref={contentEditorRef}
-        onFocus={() => {
-          setIsEditorFocused(true);
-          setIsLocked(true);
-        }}
-        onBlur={() => {
-          setIsEditorFocused(false);
-          setIsLocked(false);
-        }}
+        onFocus={onFocus}
+        onBlur={onBlur}
         value={content}
         onChange={onChange}
+        onScroll={onScroll}
         onTouchMove={e => e.stopPropagation()}
         placeholder='본문을 입력하세요'
         className={clsx(

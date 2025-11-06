@@ -20,3 +20,8 @@ export function scrollToElement(
   window.addEventListener('scroll', handleScroll);
   element.scrollIntoView(options);
 }
+
+export function getScrollRatio(element: HTMLElement) {
+  const { scrollTop, scrollHeight, clientHeight } = element;
+  return scrollTop / (scrollHeight - clientHeight);
+}

@@ -25,6 +25,7 @@ export default function useAutoSave({
 
   const saveDraft = useCallback(
     (content: string) => {
+      if (!content.trim()) return;
       try {
         localStorage.setItem(localStorageKey, content);
       } catch {}
