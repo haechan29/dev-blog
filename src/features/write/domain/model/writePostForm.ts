@@ -1,7 +1,4 @@
-import { writePostSteps } from '@/features/write/constants/writePostStep';
-
 export interface WritePostForm {
-  currentStepId: keyof typeof writePostSteps;
   invalidField: string | null;
   title: {
     value: string;

@@ -1,8 +1,10 @@
+import { writePostSteps } from '@/features/write/constants/writePostStep';
 import WritePost from '@/features/write/domain/model/writePost';
 import { ContentEditorStatus } from '@/features/write/domain/types/contentEditorStatus';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: WritePost = {
+  currentStepId: 'write',
   contentEditorStatus: {
     isFocused: false,
     scrollRatio: 0,
@@ -13,6 +15,12 @@ const writePostSlice = createSlice({
   name: 'writePost',
   initialState,
   reducers: {
+    setCurrentStepId: (
+      state,
+      action: PayloadAction<keyof typeof writePostSteps>
+    ) => {
+      state.currentStepId = action.payload;
+    },
     setContentEditorStatus: (
       state,
       action: PayloadAction<ContentEditorStatus>
@@ -28,4 +36,5 @@ const writePostSlice = createSlice({
 });
 
 export default writePostSlice.reducer;
-export const { setContentEditorStatus } = writePostSlice.actions;
+export const { setCurrentStepId, setContentEditorStatus } =
+  writePostSlice.actions;

@@ -1,9 +1,7 @@
-import { writePostSteps } from '@/features/write/constants/writePostStep';
 import { WritePostForm } from '@/features/write/domain/model/writePostForm';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: WritePostForm = {
-  currentStepId: 'write',
   invalidField: null,
   title: {
     value: '',
@@ -33,12 +31,6 @@ const writePostFormSlice = createSlice({
   name: 'writePostForm',
   initialState,
   reducers: {
-    setCurrentStepId: (
-      state,
-      action: PayloadAction<keyof typeof writePostSteps>
-    ) => {
-      state.currentStepId = action.payload;
-    },
     setInvalidField: (state, action: PayloadAction<string | null>) => {
       state.invalidField = action.payload;
     },
@@ -58,11 +50,5 @@ const writePostFormSlice = createSlice({
 });
 
 export default writePostFormSlice.reducer;
-export const {
-  setCurrentStepId,
-  setInvalidField,
-  setTitle,
-  setTags,
-  setPassword,
-  setContent,
-} = writePostFormSlice.actions;
+export const { setInvalidField, setTitle, setTags, setPassword, setContent } =
+  writePostFormSlice.actions;

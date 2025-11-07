@@ -1,6 +1,6 @@
 import { Content } from '@/features/write/domain/types/content';
 import useWritePost from '@/features/write/hooks/useWritePost';
-import useThrottle from '@/hooks/useThrottle';
+import useDebounce from '@/hooks/useDebounce';
 import clsx from 'clsx';
 import { useEffect, useRef } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -11,18 +11,19 @@ export default function WritePostContentPreview({
   parsedContent: Content;
 }) {
   const previewRef = useRef<HTMLDivElement | null>(null);
-  const throttle = useThrottle();
+  const debounce = useDebounce();
   const {
-    writePost: { contentEditorStatus },
+    writePost: {
+      contentEditorStatus: { isFocused, scrollRatio },
+    },
   } = useWritePost();
 
   useEffect(() => {
-    throttle(() => {
+    debounce(() => {
       if (!previewRef.current) return;
-      const preview = previewRef.current;
+      if (!isFocused || scrollRatio === undefined) return;
 
-      if (!contentEditorStatus.isFocused) return;
-      const scrollRatio = contentEditorStatus.scrollRatio;
+      const preview = previewRef.current;
       const { scrollHeight, clientHeight } = preview;
       const scroll = scrollRatio * (scrollHeight - clientHeight);
       preview.scrollTo({
@@ -30,7 +31,7 @@ export default function WritePostContentPreview({
         behavior: 'smooth',
       });
     }, 100);
-  }, [contentEditorStatus, throttle]);
+  }, [isFocused, scrollRatio, debounce]);
 
   return (
     <div className='flex flex-col h-full'>

@@ -1,4 +1,5 @@
 import { writePostSteps } from '@/features/write/constants/writePostStep';
+import WritePost from '@/features/write/domain/model/writePost';
 import { WritePostForm } from '@/features/write/domain/model/writePostForm';
 
 export type WritePostFormProps = {
@@ -27,9 +28,12 @@ export type WritePostFormProps = {
   };
 };
 
-export function createProps(form: WritePostForm): WritePostFormProps {
+export function createProps(
+  writePost: WritePost,
+  form: WritePostForm
+): WritePostFormProps {
   return {
-    currentStepId: form.currentStepId,
+    currentStepId: writePost.currentStepId,
     title: {
       value: form.title.value,
       isValid: form.invalidField !== 'title',

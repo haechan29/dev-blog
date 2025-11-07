@@ -2,37 +2,31 @@
 
 import { PostProps } from '@/features/post/ui/postProps';
 import { writePostSteps } from '@/features/write/constants/writePostStep';
-import { WritePostToolbar } from '@/features/write/domain/model/writePostToolbar';
 import {
   createProps,
   WritePostToolbarProps,
 } from '@/features/write/ui/writePostToolbarProps';
 import useNavigationWithParams from '@/hooks/useNavigationWithParams';
+import { RootState } from '@/lib/redux/store';
 import nProgress from 'nprogress';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useSelector } from 'react-redux';
 
 export default function useWritePostToolbar({
-  currentStepId,
   publishPost,
   removeDraft,
 }: {
-  currentStepId: keyof typeof writePostSteps;
   publishPost: () => Promise<PostProps>;
   removeDraft: () => void;
 }) {
   const navigate = useNavigationWithParams();
-  const [writePostToolbar, setWritePostToolbar] = useState<WritePostToolbar>({
-    currentStepId,
-  });
-
-  const writePostToolbarProps: WritePostToolbarProps = useMemo(
-    () => createProps({ currentStepId }),
-    [currentStepId]
-  );
+  const writePost = useSelector((state: RootState) => state.writePost);
+  const [writePostToolbar, setWritePostToolbar] =
+    useState<WritePostToolbarProps>(createProps(writePost));
 
   const onAction = useCallback(async () => {
-    const currentStep = writePostSteps[writePostToolbar.currentStepId];
+    const currentStep = writePostSteps[writePost.currentStepId];
     switch (currentStep.action) {
       case 'next': {
         navigate({ setParams: { step: 'upload' } });
@@ -56,15 +50,15 @@ export default function useWritePostToolbar({
         break;
       }
     }
-  }, [publishPost, navigate, removeDraft, writePostToolbar.currentStepId]);
+  }, [navigate, publishPost, removeDraft, writePost.currentStepId]);
 
-  useEffect(
-    () => setWritePostToolbar(prev => ({ ...prev, currentStepId })),
-    [currentStepId]
-  );
+  useEffect(() => {
+    const writePostToolbar = createProps(writePost);
+    setWritePostToolbar(writePostToolbar);
+  }, [writePost]);
 
   return {
-    writePostToolbar: writePostToolbarProps,
+    writePostToolbar,
     onAction,
   } as const;
 }

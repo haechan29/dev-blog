@@ -2,7 +2,6 @@
 
 import { PostProps } from '@/features/post/ui/postProps';
 import useWritePost from '@/features/write/hooks/useWritePost';
-import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import useWritePostToolbar from '@/features/write/hooks/useWritePostToolbar';
 import { AppDispatch } from '@/lib/redux/store';
 import { setInvalidField } from '@/lib/redux/write/writePostFormSlice';
@@ -20,15 +19,11 @@ export default function WritePostToolbar({
 }) {
   const dispatch = useDispatch<AppDispatch>();
   const { getInvalidField } = useWritePost();
-  const {
-    writePostForm: { currentStepId },
-  } = useWritePostForm();
 
   const {
     writePostToolbar: { toolbarTexts, actionButtonText },
     onAction,
   } = useWritePostToolbar({
-    currentStepId,
     publishPost,
     removeDraft,
   });

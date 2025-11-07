@@ -17,11 +17,11 @@ export default function useWritePost() {
   const router = useRouter();
 
   const getInvalidField = useCallback(() => {
-    const currentStep = writePostSteps[writePostForm.currentStepId];
+    const currentStep = writePostSteps[writePost.currentStepId];
     return (
       currentStep.fields.find(field => !validate(writePostForm, field)) ?? null
     );
-  }, [writePostForm]);
+  }, [writePost.currentStepId, writePostForm]);
 
   const createPost = useCallback(async () => {
     const { title, content, tags, password } = writePostForm;
@@ -56,13 +56,13 @@ export default function useWritePost() {
 
   useEffect(() => {
     for (const step of Object.values(writePostSteps)) {
-      if (writePostForm.currentStepId === step.id) break;
+      if (writePost.currentStepId === step.id) break;
       const isValid = validate(writePostForm, ...step.fields);
       if (!isValid) {
         router.push(`/write?step=${step.id}`);
       }
     }
-  }, [router, writePostForm]);
+  }, [router, writePost.currentStepId, writePostForm]);
 
   return {
     writePost: writePostProps,
