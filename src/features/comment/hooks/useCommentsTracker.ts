@@ -1,6 +1,6 @@
 'use client';
 
-import { setAreCommentsVisible } from '@/lib/redux/postViewerSlice';
+import { setAreCommentsVisible } from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { RefObject, useEffect } from 'react';
 import { useDispatch } from 'react-redux';

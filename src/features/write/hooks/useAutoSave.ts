@@ -1,6 +1,6 @@
 'use client';
 
-import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
+import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import useDebounce from '@/hooks/useDebounce';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 
@@ -8,15 +8,12 @@ const AUTO_SAVE_DELAY = 3_000; // debounce delay after user stops typing
 const AUTO_SAVE_INTERVAL = 10_000; // periodic save interval from last save
 const LOCAL_STORAGE_KEY = 'draft-content';
 
-export default function useAutoSave({
-  writePostForm: {
-    content: { value: content },
-  },
-  postId,
-}: {
-  writePostForm: WritePostFormProps;
-  postId?: string;
-}) {
+export default function useAutoSave(postId?: string) {
+  const {
+    writePostForm: {
+      content: { value: content },
+    },
+  } = useWritePostForm();
   const debounce = useDebounce();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const localStorageKey = useMemo(() => {

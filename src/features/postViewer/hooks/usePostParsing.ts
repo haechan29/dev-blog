@@ -7,7 +7,7 @@ import useViewerContainerSize from '@/features/postViewer/hooks/useViewerContain
 import {
   setHeadingPageMapping,
   setPagination,
-} from '@/lib/redux/postPositionSlice';
+} from '@/lib/redux/post/postPositionSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';

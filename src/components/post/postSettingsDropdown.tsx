@@ -12,7 +12,7 @@ import usePostReader from '@/features/post/hooks/usePostReader';
 import { PostProps } from '@/features/post/ui/postProps';
 import useDebounce from '@/hooks/useDebounce';
 import { createRipple } from '@/lib/dom';
-import { setMode } from '@/lib/redux/postReaderSlice';
+import { setMode } from '@/lib/redux/post/postReaderSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { Code2, Edit2, FileText, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';

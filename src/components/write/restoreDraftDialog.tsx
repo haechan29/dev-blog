@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { AppDispatch } from '@/lib/redux/store';
-import { setContent } from '@/lib/redux/writePostSlice';
+import { setContent } from '@/lib/redux/write/writePostFormSlice';
 import { X } from 'lucide-react';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';

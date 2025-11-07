@@ -1,14 +1,14 @@
 'use client';
 
 import { Content } from '@/features/write/domain/types/content';
-import useWritePost from '@/features/write/hooks/useWritePost';
+import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import useScrollLock from '@/hooks/useScrollLock';
 import { AppDispatch } from '@/lib/redux/store';
 import {
   setContent,
-  setContentEditorStatus,
   setInvalidField,
-} from '@/lib/redux/writePostSlice';
+} from '@/lib/redux/write/writePostFormSlice';
+import { setContentEditorStatus } from '@/lib/redux/write/writePostSlice';
 import { getScrollRatio } from '@/lib/scroll';
 import clsx from 'clsx';
 import {
@@ -34,12 +34,10 @@ export default function WritePostContentEditor({
   setIsEditorFocused: (isEditorFocused: boolean) => void;
 }) {
   const {
-    writePost: {
-      writePostForm: {
-        content: { value: content, maxLength, isValid },
-      },
+    writePostForm: {
+      content: { value: content, maxLength, isValid },
     },
-  } = useWritePost();
+  } = useWritePostForm();
   const dispatch = useDispatch<AppDispatch>();
   const [isLocked, setIsLocked] = useState(false);
   const isError = useMemo(() => {

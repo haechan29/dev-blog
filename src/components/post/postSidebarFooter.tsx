@@ -1,7 +1,7 @@
 'use client';
 
 import Tooltip from '@/components/tooltip';
-import { setIsVisible } from '@/lib/redux/postSidebarSlice';
+import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { ChevronLeft, FileUser, Mail } from 'lucide-react';
 import Image from 'next/image';

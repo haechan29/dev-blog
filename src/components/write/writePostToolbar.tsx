@@ -2,9 +2,10 @@
 
 import { PostProps } from '@/features/post/ui/postProps';
 import useWritePost from '@/features/write/hooks/useWritePost';
+import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import useWritePostToolbar from '@/features/write/hooks/useWritePostToolbar';
 import { AppDispatch } from '@/lib/redux/store';
-import { setInvalidField } from '@/lib/redux/writePostSlice';
+import { setInvalidField } from '@/lib/redux/write/writePostFormSlice';
 import clsx from 'clsx';
 import { ChevronRight } from 'lucide-react';
 import { Fragment, useCallback } from 'react';
@@ -18,16 +19,16 @@ export default function WritePostToolbar({
   removeDraft: () => void;
 }) {
   const dispatch = useDispatch<AppDispatch>();
+  const { getInvalidField } = useWritePost();
   const {
-    writePost: { writePostForm },
-    getInvalidField,
-  } = useWritePost();
+    writePostForm: { currentStepId },
+  } = useWritePostForm();
 
   const {
     writePostToolbar: { toolbarTexts, actionButtonText },
     onAction,
   } = useWritePostToolbar({
-    currentStepId: writePostForm.currentStepId,
+    currentStepId,
     publishPost,
     removeDraft,
   });

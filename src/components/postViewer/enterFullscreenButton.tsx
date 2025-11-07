@@ -1,7 +1,7 @@
 'use client';
 
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
-import { setIsViewerMode } from '@/lib/redux/postViewerSlice';
+import { setIsViewerMode } from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { Maximize } from 'lucide-react';

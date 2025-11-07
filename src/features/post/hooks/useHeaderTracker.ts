@@ -1,6 +1,6 @@
 'use client';
 
-import { setIsHeaderVisible } from '@/lib/redux/postToolbarSlice';
+import { setIsHeaderVisible } from '@/lib/redux/post/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { RefObject, useEffect } from 'react';
 import { useDispatch } from 'react-redux';

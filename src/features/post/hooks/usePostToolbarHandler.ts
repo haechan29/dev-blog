@@ -2,8 +2,8 @@
 
 import Heading from '@/features/post/domain/model/heading';
 import usePostToolbar from '@/features/post/hooks/usePostToolbar';
-import { setCurrentHeading } from '@/lib/redux/postPositionSlice';
-import { setIsExpanded } from '@/lib/redux/postToolbarSlice';
+import { setCurrentHeading } from '@/lib/redux/post/postPositionSlice';
+import { setIsExpanded } from '@/lib/redux/post/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { scrollToElement } from '@/lib/scroll';
 import { useCallback } from 'react';

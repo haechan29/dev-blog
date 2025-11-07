@@ -1,7 +1,7 @@
 'use client';
 
 import useThrottle from '@/hooks/useThrottle';
-import { setIsScrollingDown } from '@/lib/redux/postToolbarSlice';
+import { setIsScrollingDown } from '@/lib/redux/post/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';

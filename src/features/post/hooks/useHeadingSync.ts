@@ -1,7 +1,7 @@
 import useHeadingTracker from '@/features/post/hooks/useHeadingTracker';
 import { PostProps } from '@/features/post/ui/postProps';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
-import { setCurrentHeading } from '@/lib/redux/postPositionSlice';
+import { setCurrentHeading } from '@/lib/redux/post/postPositionSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { scrollToElement } from '@/lib/scroll';
 import { RefObject, useCallback, useEffect } from 'react';

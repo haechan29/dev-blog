@@ -1,6 +1,6 @@
 'use client';
 
-import { setIsContentVisible } from '@/lib/redux/postToolbarSlice';
+import { setIsContentVisible } from '@/lib/redux/post/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { RefObject, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';

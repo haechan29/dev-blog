@@ -7,7 +7,7 @@ import TTSSection from '@/components/postViewer/ttsSection';
 import { Page } from '@/features/postViewer/domain/types/page';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import { canTouch } from '@/lib/browser';
-import { setIsMouseOnControlBar } from '@/lib/redux/postViewerSlice';
+import { setIsMouseOnControlBar } from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { useCallback } from 'react';

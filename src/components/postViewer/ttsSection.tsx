@@ -6,7 +6,7 @@ import { Page } from '@/features/postViewer/domain/types/page';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import useTTSPlayer from '@/features/postViewer/hooks/useTTSPlayer';
 import useTTSState from '@/features/postViewer/hooks/useTTSState';
-import { nextPage } from '@/lib/redux/postPositionSlice';
+import { nextPage } from '@/lib/redux/post/postPositionSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { Pause, Play } from 'lucide-react';

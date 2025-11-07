@@ -9,7 +9,7 @@ import { writePostSteps } from '@/features/write/constants/writePostStep';
 import useAutoSave from '@/features/write/hooks/useAutoSave';
 import useWritePost from '@/features/write/hooks/useWritePost';
 import { AppDispatch } from '@/lib/redux/store';
-import { setCurrentStepId } from '@/lib/redux/writePostSlice';
+import { setCurrentStepId } from '@/lib/redux/write/writePostFormSlice';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -30,14 +30,8 @@ function EditPageWithValidation({ post }: { post: PostProps }) {
   const searchParams = useSearchParams();
   const step = searchParams.get('step') as keyof typeof writePostSteps;
   const dispatch = useDispatch<AppDispatch>();
-  const {
-    writePost: { writePostForm },
-    updatePost,
-  } = useWritePost();
-  const { draft, removeDraft } = useAutoSave({
-    writePostForm,
-    postId: post.id,
-  });
+  const { updatePost } = useWritePost();
+  const { draft, removeDraft } = useAutoSave(post.id);
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {

@@ -4,15 +4,13 @@ import WritePostContent from '@/components/write/writePostContent';
 import WritePostPassword from '@/components/write/writePostPassword';
 import WritePostTag from '@/components/write/writePostTag';
 import WritePostTitle from '@/components/write/writePostTitle';
-import useWritePost from '@/features/write/hooks/useWritePost';
+import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import clsx from 'clsx';
 
 export default function WritePostForm() {
   const {
-    writePost: {
-      writePostForm: { currentStepId },
-    },
-  } = useWritePost();
+    writePostForm: { currentStepId },
+  } = useWritePostForm();
 
   return (
     <div className='w-[100vw] h-full overflow-x-hidden'>

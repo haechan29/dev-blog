@@ -1,7 +1,7 @@
 'use client';
 
 import { PostProps } from '@/features/post/ui/postProps';
-import { setIsVisible } from '@/lib/redux/postSidebarSlice';
+import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import Link from 'next/link';

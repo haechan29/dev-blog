@@ -6,7 +6,7 @@ import {
 } from '@/features/postViewer/domain/model/tts';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import useDebounce from '@/hooks/useDebounce';
-import { setIsControlBarTouched } from '@/lib/redux/postViewerSlice';
+import { setIsControlBarTouched } from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';

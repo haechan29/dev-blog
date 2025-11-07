@@ -1,12 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-import { postPositionMiddleware } from '@/lib/redux/postPositionMiddleware';
-import postPositionReducer from '@/lib/redux/postPositionSlice';
-import postReaderReducer from '@/lib/redux/postReaderSlice';
-import postSidebarReducer from '@/lib/redux/postSidebarSlice';
-import postToolbarReducer from '@/lib/redux/postToolbarSlice';
-import postViewerReducer from '@/lib/redux/postViewerSlice';
-import writePostReducer from '@/lib/redux/writePostSlice';
+import { postPositionMiddleware } from '@/lib/redux/post/postPositionMiddleware';
+import postPositionReducer from '@/lib/redux/post/postPositionSlice';
+import postReaderReducer from '@/lib/redux/post/postReaderSlice';
+import postSidebarReducer from '@/lib/redux/post/postSidebarSlice';
+import postToolbarReducer from '@/lib/redux/post/postToolbarSlice';
+import postViewerReducer from '@/lib/redux/post/postViewerSlice';
+import writePostFormReducer from '@/lib/redux/write/writePostFormSlice';
+import writePostReducer from '@/lib/redux/write/writePostSlice';
 import { Middleware } from '@reduxjs/toolkit';
 
 const middlewares: Middleware[] = [postPositionMiddleware];
@@ -19,6 +20,7 @@ export const store = configureStore({
     postViewer: postViewerReducer,
     postPosition: postPositionReducer,
     writePost: writePostReducer,
+    writePostForm: writePostFormReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware().concat(middlewares),

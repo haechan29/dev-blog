@@ -1,5 +1,5 @@
 import Tooltip from '@/components/tooltip';
-import { setIsViewerMode } from '@/lib/redux/postViewerSlice';
+import { setIsViewerMode } from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { Minimize } from 'lucide-react';
 import { useDispatch } from 'react-redux';

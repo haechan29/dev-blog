@@ -4,21 +4,19 @@ import WritePostContentEditor from '@/components/write/writePostContentEditor';
 import WritePostContentPreview from '@/components/write/writePostContentPreview';
 import WritePostContentToolbar from '@/components/write/writePostContentToolbar';
 import { Content } from '@/features/write/domain/types/content';
-import useWritePost from '@/features/write/hooks/useWritePost';
 import useWritePostContentButton from '@/features/write/hooks/useWritePostContentButton';
 import useWritePostContentToolbar from '@/features/write/hooks/useWritePostContentToolbar';
+import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import useDebounce from '@/hooks/useDebounce';
 import { processMd } from '@/lib/md';
 import { useEffect, useRef, useState } from 'react';
 
 export default function WritePostContent() {
   const {
-    writePost: {
-      writePostForm: {
-        content: { value: content },
-      },
+    writePostForm: {
+      content: { value: content },
     },
-  } = useWritePost();
+  } = useWritePostForm();
   const [parsedContent, setParsedContent] = useState<Content>({
     status: 'idle',
   });

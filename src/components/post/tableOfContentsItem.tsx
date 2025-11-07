@@ -2,7 +2,7 @@
 
 import Heading from '@/features/post/domain/model/heading';
 import useViewerToolbar from '@/features/postViewer/hooks/useViewerToolbar';
-import { setCurrentHeading } from '@/lib/redux/postPositionSlice';
+import { setCurrentHeading } from '@/lib/redux/post/postPositionSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { scrollToElement } from '@/lib/scroll';
 import clsx from 'clsx';

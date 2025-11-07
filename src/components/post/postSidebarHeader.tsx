@@ -1,6 +1,6 @@
 'use client';
 
-import { setIsVisible } from '@/lib/redux/postSidebarSlice';
+import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import Link from 'next/link';
 import { useDispatch } from 'react-redux';

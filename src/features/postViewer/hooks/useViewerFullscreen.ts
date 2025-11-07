@@ -2,7 +2,7 @@
 
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import useFullscreen from '@/hooks/useFullscreen';
-import { setIsViewerMode } from '@/lib/redux/postViewerSlice';
+import { setIsViewerMode } from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { RefObject, useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';

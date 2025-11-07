@@ -12,21 +12,19 @@ import { useSelector } from 'react-redux';
 
 export default function useWritePost() {
   const writePost = useSelector((state: RootState) => state.writePost);
+  const writePostForm = useSelector((state: RootState) => state.writePostForm);
   const [writePostProps, setWritePostProps] = useState(createProps(writePost));
   const router = useRouter();
 
   const getInvalidField = useCallback(() => {
-    const writePostForm = writePost.writePostForm;
     const currentStep = writePostSteps[writePostForm.currentStepId];
     return (
       currentStep.fields.find(field => !validate(writePostForm, field)) ?? null
     );
-  }, [writePost.writePostForm]);
+  }, [writePostForm]);
 
   const createPost = useCallback(async () => {
-    const {
-      writePostForm: { title, content, tags, password },
-    } = writePost;
+    const { title, content, tags, password } = writePostForm;
     const post = await PostService.createPost({
       title: title.value,
       content: content.value,
@@ -34,13 +32,11 @@ export default function useWritePost() {
       password: password.value,
     });
     return createPostProps(post);
-  }, [writePost]);
+  }, [writePostForm]);
 
   const updatePost = useCallback(
     async (postId: string) => {
-      const {
-        writePostForm: { title, content, tags, password },
-      } = writePost;
+      const { title, content, tags, password } = writePostForm;
       const post = await PostService.updatePost({
         postId,
         title: title.value,
@@ -50,7 +46,7 @@ export default function useWritePost() {
       });
       return createPostProps(post);
     },
-    [writePost]
+    [writePostForm]
   );
 
   useEffect(() => {
@@ -59,7 +55,6 @@ export default function useWritePost() {
   }, [writePost]);
 
   useEffect(() => {
-    const writePostForm = writePost.writePostForm;
     for (const step of Object.values(writePostSteps)) {
       if (writePostForm.currentStepId === step.id) break;
       const isValid = validate(writePostForm, ...step.fields);
@@ -67,7 +62,7 @@ export default function useWritePost() {
         router.push(`/write?step=${step.id}`);
       }
     }
-  }, [router, writePost.writePostForm]);
+  }, [router, writePostForm]);
 
   return {
     writePost: writePostProps,

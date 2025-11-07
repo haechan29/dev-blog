@@ -3,8 +3,8 @@
 import useDebounce from '@/hooks/useDebounce';
 import { canTouch, supportsFullscreen } from '@/lib/browser';
 import { createRipple } from '@/lib/dom';
-import { nextPage, previousPage } from '@/lib/redux/postPositionSlice';
-import { setIsTouched } from '@/lib/redux/postViewerSlice';
+import { nextPage, previousPage } from '@/lib/redux/post/postPositionSlice';
+import { setIsTouched } from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { MouseEvent, TouchEvent, useCallback } from 'react';
 import { useDispatch } from 'react-redux';

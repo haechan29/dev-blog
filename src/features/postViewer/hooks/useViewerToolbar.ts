@@ -4,12 +4,12 @@ import Heading from '@/features/post/domain/model/heading';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import useDebounce from '@/hooks/useDebounce';
 import { canTouch } from '@/lib/browser';
-import { setCurrentHeading } from '@/lib/redux/postPositionSlice';
+import { setCurrentHeading } from '@/lib/redux/post/postPositionSlice';
 import {
   setIsMouseOnToolbar,
   setIsToolbarExpanded,
   setIsToolbarTouched,
-} from '@/lib/redux/postViewerSlice';
+} from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';

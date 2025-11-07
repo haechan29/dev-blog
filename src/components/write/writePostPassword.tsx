@@ -1,8 +1,11 @@
 'use client';
 
-import useWritePost from '@/features/write/hooks/useWritePost';
+import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import { AppDispatch } from '@/lib/redux/store';
-import { setInvalidField, setPassword } from '@/lib/redux/writePostSlice';
+import {
+  setInvalidField,
+  setPassword,
+} from '@/lib/redux/write/writePostFormSlice';
 import clsx from 'clsx';
 import { Eye, EyeOff } from 'lucide-react';
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
@@ -10,12 +13,10 @@ import { useDispatch } from 'react-redux';
 
 export default function WritePostPassword() {
   const {
-    writePost: {
-      writePostForm: {
-        password: { value: password, maxLength, isValid },
-      },
+    writePostForm: {
+      password: { value: password, maxLength, isValid },
     },
-  } = useWritePost();
+  } = useWritePostForm();
   const dispatch = useDispatch<AppDispatch>();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isFocused, setIsFocused] = useState(false);

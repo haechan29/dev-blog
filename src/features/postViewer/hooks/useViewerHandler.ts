@@ -6,7 +6,7 @@ import { canTouch } from '@/lib/browser';
 import {
   setIsMouseMoved,
   setIsRotationFinished,
-} from '@/lib/redux/postViewerSlice';
+} from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { TransitionEvent, useCallback } from 'react';
 import { useDispatch } from 'react-redux';

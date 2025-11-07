@@ -3,7 +3,7 @@ import {
   previousPage,
   setCurrentPageIndex,
   setPagination,
-} from '@/lib/redux/postPositionSlice';
+} from '@/lib/redux/post/postPositionSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { MiddlewareParams } from '@/types/middlewareParams';
 import { isAnyOf, Middleware } from '@reduxjs/toolkit';

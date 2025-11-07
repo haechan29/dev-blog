@@ -8,7 +8,7 @@ import { writePostSteps } from '@/features/write/constants/writePostStep';
 import useAutoSave from '@/features/write/hooks/useAutoSave';
 import useWritePost from '@/features/write/hooks/useWritePost';
 import { AppDispatch } from '@/lib/redux/store';
-import { setCurrentStepId } from '@/lib/redux/writePostSlice';
+import { setCurrentStepId } from '@/lib/redux/write/writePostFormSlice';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -29,11 +29,8 @@ function WritePageWithValidation() {
   const searchParams = useSearchParams();
   const step = searchParams.get('step') as keyof typeof writePostSteps;
   const dispatch = useDispatch<AppDispatch>();
-  const {
-    writePost: { writePostForm },
-    createPost,
-  } = useWritePost();
-  const { draft, removeDraft } = useAutoSave({ writePostForm });
+  const { createPost } = useWritePost();
+  const { draft, removeDraft } = useAutoSave();
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {

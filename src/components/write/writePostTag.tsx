@@ -1,21 +1,19 @@
 'use client';
 
-import useWritePost from '@/features/write/hooks/useWritePost';
+import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import useWritePostTag from '@/features/write/hooks/useWritePostTag';
 import { AppDispatch } from '@/lib/redux/store';
-import { setInvalidField } from '@/lib/redux/writePostSlice';
+import { setInvalidField } from '@/lib/redux/write/writePostFormSlice';
 import clsx from 'clsx';
 import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function WritePostTag() {
   const {
-    writePost: {
-      writePostForm: {
-        tags: { value: tags, maxTagLength, maxTagsLength, isValid, delimiter },
-      },
+    writePostForm: {
+      tags: { value: tags, maxTagLength, maxTagsLength, isValid, delimiter },
     },
-  } = useWritePost();
+  } = useWritePostForm();
   const dispatch = useDispatch<AppDispatch>();
   const [isFocused, setIsFocused] = useState(false);
   const tagRef = useRef<HTMLInputElement | null>(null);

@@ -1,8 +1,11 @@
 'use client';
 
-import useWritePost from '@/features/write/hooks/useWritePost';
+import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import { AppDispatch } from '@/lib/redux/store';
-import { setInvalidField, setTitle } from '@/lib/redux/writePostSlice';
+import {
+  setInvalidField,
+  setTitle,
+} from '@/lib/redux/write/writePostFormSlice';
 import clsx from 'clsx';
 import {
   ChangeEvent,
@@ -16,12 +19,10 @@ import { useDispatch } from 'react-redux';
 
 export default function WritePostTitle() {
   const {
-    writePost: {
-      writePostForm: {
-        title: { value: title, isValid, maxLength },
-      },
+    writePostForm: {
+      title: { value: title, isValid, maxLength },
     },
-  } = useWritePost();
+  } = useWritePostForm();
   const dispatch = useDispatch<AppDispatch>();
   const [isFocused, setIsFocused] = useState(false);
   const isTitleTooLong = useMemo(

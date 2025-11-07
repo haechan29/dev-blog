@@ -1,7 +1,7 @@
 'use client';
 
 import { writePostContentButtons } from '@/features/write/domain/model/writePostContentButton';
-import useWritePost from '@/features/write/hooks/useWritePost';
+import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import {
   createProps,
   DirectiveButtonProps,
@@ -10,7 +10,7 @@ import {
   WritePostContentButtonProps,
 } from '@/features/write/ui/writePostContentButtonProps';
 import { AppDispatch } from '@/lib/redux/store';
-import { setContent } from '@/lib/redux/writePostSlice';
+import { setContent } from '@/lib/redux/write/writePostFormSlice';
 import { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -24,12 +24,10 @@ export default function useWritePostContentButton({
   contentEditorRef: RefObject<HTMLTextAreaElement | null>;
 }) {
   const {
-    writePost: {
-      writePostForm: {
-        content: { value: content },
-      },
+    writePostForm: {
+      content: { value: content },
     },
-  } = useWritePost();
+  } = useWritePostForm();
   const dispatch = useDispatch<AppDispatch>();
   const [contentButtons] = useState(writePostContentButtons);
   const [activeType, setActiveType] = useState('markdown');
