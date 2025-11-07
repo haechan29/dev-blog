@@ -6,6 +6,7 @@ import postReaderReducer from '@/lib/redux/postReaderSlice';
 import postSidebarReducer from '@/lib/redux/postSidebarSlice';
 import postToolbarReducer from '@/lib/redux/postToolbarSlice';
 import postViewerReducer from '@/lib/redux/postViewerSlice';
+import writePostReducer from '@/lib/redux/writePostSlice';
 import { Middleware } from '@reduxjs/toolkit';
 
 const middlewares: Middleware[] = [postPositionMiddleware];
@@ -17,6 +18,7 @@ export const store = configureStore({
     postSidebar: postSidebarReducer,
     postViewer: postViewerReducer,
     postPosition: postPositionReducer,
+    writePost: writePostReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware().concat(middlewares),
