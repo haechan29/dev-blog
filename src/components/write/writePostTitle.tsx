@@ -20,14 +20,15 @@ import { useDispatch } from 'react-redux';
 export default function WritePostTitle() {
   const {
     writePostForm: {
-      title: { value: title, isValid, maxLength },
+      title: { isValid, maxLength },
     },
   } = useWritePostForm();
+  const [titleInner, setTitleInner] = useState('');
   const dispatch = useDispatch<AppDispatch>();
   const [isFocused, setIsFocused] = useState(false);
   const isTitleTooLong = useMemo(
-    () => title.length > maxLength,
-    [maxLength, title.length]
+    () => titleInner.length > maxLength,
+    [maxLength, titleInner.length]
   );
   const titleRef = useRef<HTMLInputElement | null>(null);
 
@@ -37,23 +38,28 @@ export default function WritePostTitle() {
   const onChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       dispatch(setInvalidField(null));
-      dispatch(setTitle(e.currentTarget.value));
+      setTitleInner(e.currentTarget.value);
     },
     [dispatch]
   );
 
   useEffect(() => {
     if (!isFocused) {
-      const newTitle = title.slice(0, maxLength);
+      const newTitle = titleInner.slice(0, maxLength);
+      setTitleInner(newTitle);
       dispatch(setTitle(newTitle));
     }
-  }, [dispatch, isFocused, maxLength, title]);
+  }, [dispatch, isFocused, maxLength, titleInner]);
+
+  useEffect(() => {
+    dispatch(setTitle(titleInner));
+  }, [dispatch, titleInner]);
 
   return (
     <div
       className={clsx(
         'flex border rounded-lg gap-3 px-3 py-4',
-        !title && 'bg-gray-50',
+        !titleInner && 'bg-gray-50',
         !isValid || isTitleTooLong
           ? 'border-red-400 animate-shake'
           : isFocused
@@ -64,12 +70,14 @@ export default function WritePostTitle() {
     >
       <div className='flex flex-1 min-w-0 overflow-x-auto scrollbar-hide items-center'>
         <div className='shrink-0 relative text-xl font-semibold'>
-          {!title ? (
+          {!titleInner ? (
             <span className='text-gray-400'>제목을 입력하세요</span>
           ) : (
             <>
-              <span>{title.slice(0, maxLength)}</span>
-              <span className='text-red-500'>{title.slice(maxLength)}</span>
+              <span>{titleInner.slice(0, maxLength)}</span>
+              <span className='text-red-500'>
+                {titleInner.slice(maxLength)}
+              </span>
             </>
           )}
           <input
@@ -77,7 +85,7 @@ export default function WritePostTitle() {
             type='text'
             onFocus={onFocus}
             onBlur={onBlur}
-            value={title}
+            value={titleInner}
             onChange={onChange}
             className='absolute z-50 inset-0 outline-none text-transparent caret-gray-900'
           />
@@ -87,11 +95,11 @@ export default function WritePostTitle() {
       <div
         className={clsx(
           'flex text-sm gap-0.5 items-center',
-          (!isFocused || title.length < maxLength * 0.95) && 'hidden',
+          (!isFocused || titleInner.length < maxLength * 0.95) && 'hidden',
           isTitleTooLong && 'text-red-500'
         )}
       >
-        <div>{title.length}</div>
+        <div>{titleInner.length}</div>
         <div>/</div>
         <div>{maxLength}</div>
       </div>

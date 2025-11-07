@@ -18,6 +18,7 @@ import {
   RefObject,
   UIEvent,
   useCallback,
+  useEffect,
   useMemo,
   useState,
 } from 'react';
@@ -32,10 +33,11 @@ export default function WritePostContentEditor({
 }) {
   const {
     writePostForm: {
-      content: { value: content, maxLength, isValid },
+      draft,
+      content: { maxLength, isValid },
     },
   } = useWritePostForm();
-
+  const [contentInner, setContentInner] = useState('');
   const {
     contentToolbar: { shouldAttachToolbarToBottom },
   } = useContentToolbar();
@@ -47,15 +49,15 @@ export default function WritePostContentEditor({
   }, [parsedContent.status]);
 
   const isContentTooLong = useMemo(
-    () => content.length > maxLength,
-    [content.length, maxLength]
+    () => contentInner.length > maxLength,
+    [contentInner.length, maxLength]
   );
 
   const onChange = useCallback(
     (e: ChangeEvent<HTMLTextAreaElement>) => {
       const textArea = e.currentTarget;
       dispatch(setInvalidField(null));
-      dispatch(setContent(textArea.value));
+      setContentInner(textArea.value);
     },
     [dispatch]
   );
@@ -102,12 +104,21 @@ export default function WritePostContentEditor({
 
   useScrollLock({ isLocked, allowedSelectors: ['[data-content-editor]'] });
 
+  useEffect(() => {
+    if (!draft) return;
+    setContentInner(draft);
+  }, [draft]);
+
+  useEffect(() => {
+    dispatch(setContent(contentInner));
+  }, [contentInner, dispatch]);
+
   return (
     <div className='flex flex-col h-full'>
       <textarea
         data-content-editor
         ref={contentEditorRef}
-        value={content}
+        value={contentInner}
         onFocus={onFocus}
         onBlur={onBlur}
         onChange={onChange}
@@ -119,17 +130,17 @@ export default function WritePostContentEditor({
           isValid && !isError && !isContentTooLong
             ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
             : 'border-red-400 animate-shake',
-          !content && 'bg-gray-50'
+          !contentInner && 'bg-gray-50'
         )}
       />
       <div
         className={clsx(
           'flex justify-end items-center gap-1 text-sm p-2',
-          content.length < maxLength * 0.95 && 'hidden',
+          contentInner.length < maxLength * 0.95 && 'hidden',
           isContentTooLong && 'text-red-500'
         )}
       >
-        <div>{content.length.toLocaleString()}</div>
+        <div>{contentInner.length.toLocaleString()}</div>
         <div>/</div>
         <div>{maxLength.toLocaleString()}</div>
       </div>

@@ -22,6 +22,7 @@ export interface WritePostForm {
     isEmptyAllowed: boolean;
     maxLength: number;
   };
+  draft?: string;
 }
 
 export function validate(form: WritePostForm, ...fields: string[]) {

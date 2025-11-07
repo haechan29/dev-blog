@@ -14,15 +14,16 @@ import { useDispatch } from 'react-redux';
 export default function WritePostPassword() {
   const {
     writePostForm: {
-      password: { value: password, maxLength, isValid },
+      password: { maxLength, isValid },
     },
   } = useWritePostForm();
+  const [passwordInner, setPasswordInner] = useState('');
   const dispatch = useDispatch<AppDispatch>();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const isPasswordTooLong = useMemo(
-    () => password.length > maxLength,
-    [maxLength, password.length]
+    () => passwordInner.length > maxLength,
+    [maxLength, passwordInner.length]
   );
 
   const onFocus = useCallback(() => setIsFocused(true), []);
@@ -30,22 +31,28 @@ export default function WritePostPassword() {
   const onChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       dispatch(setInvalidField(null));
-      dispatch(setPassword(e.currentTarget.value));
+      setPasswordInner(e.currentTarget.value);
     },
     [dispatch]
   );
 
   useEffect(() => {
     if (!isFocused) {
-      dispatch(setPassword(password.slice(0, maxLength)));
+      const newPassword = passwordInner.slice(0, maxLength);
+      setPasswordInner(newPassword);
+      dispatch(setPassword(newPassword));
     }
-  }, [dispatch, isFocused, maxLength, password]);
+  }, [dispatch, isFocused, maxLength, passwordInner]);
+
+  useEffect(() => {
+    dispatch(setPassword(passwordInner));
+  }, [dispatch, passwordInner]);
 
   return (
     <div
       className={clsx(
         'flex border rounded-lg gap-3 p-3',
-        !isPasswordVisible && !password && 'bg-gray-50',
+        !isPasswordVisible && !passwordInner && 'bg-gray-50',
         !isValid || isPasswordTooLong
           ? 'border-red-400 animate-shake'
           : isFocused
@@ -57,7 +64,7 @@ export default function WritePostPassword() {
         type={isPasswordVisible ? 'text' : 'password'}
         onFocus={onFocus}
         onBlur={onBlur}
-        value={password}
+        value={passwordInner}
         onChange={onChange}
         placeholder='비밀번호'
         className='flex-1 min-w-0 text-sm outline-none'
@@ -66,11 +73,11 @@ export default function WritePostPassword() {
       <div
         className={clsx(
           'flex text-sm gap-0.5 items-center',
-          (!isFocused || password.length < maxLength * 0.95) && 'hidden',
+          (!isFocused || passwordInner.length < maxLength * 0.95) && 'hidden',
           isPasswordTooLong && 'text-red-500'
         )}
       >
-        <div>{password.length}</div>
+        <div>{passwordInner.length}</div>
         <div>/</div>
         <div>{maxLength}</div>
       </div>

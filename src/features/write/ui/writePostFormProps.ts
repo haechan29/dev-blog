@@ -26,6 +26,7 @@ export type WritePostFormProps = {
     isValid: boolean;
     maxLength: number;
   };
+  draft?: string;
 };
 
 export function createProps(
@@ -34,6 +35,7 @@ export function createProps(
 ): WritePostFormProps {
   return {
     currentStepId: writePost.currentStepId,
+    draft: form.draft,
     title: {
       value: form.title.value,
       isValid: form.invalidField !== 'title',

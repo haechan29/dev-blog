@@ -1,18 +1,29 @@
 'use client';
 
 import useWritePostForm from '@/features/write/hooks/useWritePostForm';
-import { AppDispatch } from '@/lib/redux/store';
-import { setTags } from '@/lib/redux/write/writePostFormSlice';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
-export default function useWritePostTag({ isFocused }: { isFocused: boolean }) {
+export default function useWritePostTag({
+  isFocused,
+  tags,
+  setTags,
+}: {
+  isFocused: boolean;
+  tags: string[];
+  setTags: Dispatch<SetStateAction<string[]>>;
+}) {
   const {
     writePostForm: {
-      tags: { value: tags, maxTagLength, maxTagsLength, delimiter },
+      tags: { maxTagLength, maxTagsLength, delimiter },
     },
   } = useWritePostForm();
-  const dispatch = useDispatch<AppDispatch>();
   const [tag, setTag] = useState(delimiter);
   const isTagEmpty = useMemo(() => tag === delimiter, [delimiter, tag]);
 
@@ -24,17 +35,17 @@ export default function useWritePostTag({ isFocused }: { isFocused: boolean }) {
         .map(tag => tag.slice(0, maxTagLength))
         .filter(tag => tag.trim());
 
-      dispatch(setTags([...new Set([...tags, ...newTags])]));
+      setTags(prev => [...new Set([...prev, ...newTags])]);
       setTag(delimiter);
     },
-    [delimiter, dispatch, maxTagLength, tags]
+    [delimiter, maxTagLength, setTags]
   );
 
   const deleteTag = useCallback(() => {
     if (tags.length === 0) return;
     setTag(tags.pop()!);
-    dispatch(setTags(tags));
-  }, [dispatch, tags]);
+    setTags(tags);
+  }, [setTags, tags]);
 
   const updateTag = useCallback(
     (tag: string) => {
@@ -59,10 +70,10 @@ export default function useWritePostTag({ isFocused }: { isFocused: boolean }) {
   }, [delimiter, tag]);
 
   useEffect(() => {
-    if (!isFocused && tags.length > maxTagsLength) {
-      dispatch(setTags(tags.slice(0, maxTagsLength)));
+    if (!isFocused) {
+      setTags(prev => prev.slice(0, maxTagsLength));
     }
-  }, [dispatch, isFocused, maxTagsLength, tags]);
+  }, [isFocused, maxTagsLength, setTags]);
 
   return {
     tag,

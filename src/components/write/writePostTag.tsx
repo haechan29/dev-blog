@@ -3,31 +3,41 @@
 import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import useWritePostTag from '@/features/write/hooks/useWritePostTag';
 import { AppDispatch } from '@/lib/redux/store';
-import { setInvalidField } from '@/lib/redux/write/writePostFormSlice';
+import { setInvalidField, setTags } from '@/lib/redux/write/writePostFormSlice';
 import clsx from 'clsx';
-import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
+import {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function WritePostTag() {
   const {
     writePostForm: {
-      tags: { value: tags, maxTagLength, maxTagsLength, isValid, delimiter },
+      tags: { maxTagLength, maxTagsLength, isValid, delimiter },
     },
   } = useWritePostForm();
+  const [tagsInner, setTagsInner] = useState<string[]>([]);
   const dispatch = useDispatch<AppDispatch>();
   const [isFocused, setIsFocused] = useState(false);
   const tagRef = useRef<HTMLInputElement | null>(null);
 
   const { tag, isTagEmpty, insertTag, updateTag } = useWritePostTag({
     isFocused,
+    tags: tagsInner,
+    setTags: setTagsInner,
   });
   const isTagTooLong = useMemo(
     () => tag.length > maxTagLength,
     [maxTagLength, tag.length]
   );
   const areTagsTooMany = useMemo(
-    () => tags.length > maxTagsLength,
-    [maxTagsLength, tags.length]
+    () => tagsInner.length > maxTagsLength,
+    [maxTagsLength, tagsInner.length]
   );
 
   const onClick = useCallback(() => tagRef.current?.focus(), []);
@@ -45,6 +55,10 @@ export default function WritePostTag() {
     [dispatch, updateTag]
   );
 
+  useEffect(() => {
+    dispatch(setTags(tagsInner));
+  }, [dispatch, tagsInner]);
+
   return (
     <div
       className={clsx(
@@ -55,12 +69,12 @@ export default function WritePostTag() {
           ? 'border-blue-500'
           : 'border-gray-200 hover:border-blue-500',
         isTagEmpty && 'text-gray-400',
-        tags.length === 0 && isTagEmpty && 'bg-gray-50'
+        tagsInner.length === 0 && isTagEmpty && 'bg-gray-50'
       )}
       onClick={onClick}
     >
       <div className='flex flex-1 min-w-0 overflow-x-auto scrollbar-hide gap-2 items-center'>
-        {tags.map((tag, index) => (
+        {tagsInner.map((tag, index) => (
           <div
             key={tag}
             className={clsx(
@@ -75,7 +89,7 @@ export default function WritePostTag() {
         <div
           className={clsx(
             'w-fit shrink-0 relative text-sm',
-            !isFocused && tags.length > 0 && 'opacity-0'
+            !isFocused && tagsInner.length > 0 && 'opacity-0'
           )}
         >
           {isTagEmpty ? (
@@ -115,13 +129,13 @@ export default function WritePostTag() {
           className={clsx(
             'flex text-sm gap-0.5 items-center',
             areTagsTooMany ? 'text-red-500' : 'text-blue-500',
-            (tags.length === 0 ||
+            (tagsInner.length === 0 ||
               !isFocused ||
               tag.length >= maxTagLength * 0.95) &&
               'hidden'
           )}
         >
-          <div>{tags.length}</div>
+          <div>{tagsInner.length}</div>
           <div>/</div>
           <div>{maxTagsLength}</div>
         </div>
