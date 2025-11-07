@@ -5,7 +5,6 @@ import useContentToolbar from '@/features/write/hooks/useContentToolbar';
 import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import useScrollLock from '@/hooks/useScrollLock';
 import { AppDispatch } from '@/lib/redux/store';
-import { setIsEditorFocused } from '@/lib/redux/write/contentToolbarSlice';
 import {
   setContent,
   setInvalidField,
@@ -63,7 +62,7 @@ export default function WritePostContentEditor({
 
   const onFocus = useCallback(
     (e: FocusEvent<HTMLTextAreaElement>) => {
-      dispatch(setIsEditorFocused(true));
+      dispatch(setContentEditorStatus({ isFocused: true }));
       setIsLocked(true);
 
       const textArea = e.currentTarget;
@@ -78,7 +77,7 @@ export default function WritePostContentEditor({
   );
 
   const onBlur = useCallback(() => {
-    dispatch(setIsEditorFocused(false));
+    dispatch(setContentEditorStatus({ isFocused: false }));
     setIsLocked(false);
 
     dispatch(

@@ -1,3 +1,4 @@
+import WritePost from '@/features/write/domain/model/writePost';
 import { WritePostContentToolbar } from '@/features/write/domain/model/writePostContentToolbar';
 
 export type WritePostContentToolbarProps = {
@@ -6,12 +7,13 @@ export type WritePostContentToolbarProps = {
 };
 
 export function createProps(
+  writePost: WritePost,
   contentToolbar: WritePostContentToolbar
 ): WritePostContentToolbarProps {
   return {
     shouldAttachToolbarToBottom: contentToolbar.canTouch,
     toolbarTranslateY:
-      contentToolbar.isEditorFocused && contentToolbar.canTouch
+      writePost.contentEditorStatus.isFocused && contentToolbar.canTouch
         ? `calc(${-contentToolbar.keyboardHeight}px - 100%)`
         : '0px',
   };

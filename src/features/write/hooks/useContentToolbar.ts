@@ -16,11 +16,14 @@ import { useDispatch, useSelector } from 'react-redux';
 
 export default function useContentToolbar() {
   const dispatch = useDispatch<AppDispatch>();
+  const writePost = useSelector((state: RootState) => state.writePost);
   const contentToolbar = useSelector((state: RootState) => {
     return state.contentToolbar;
   });
   const [contentToolbarProps, setContentToolbarProps] =
-    useState<WritePostContentToolbarProps>(createProps(contentToolbar));
+    useState<WritePostContentToolbarProps>(
+      createProps(writePost, contentToolbar)
+    );
   const { keyboardHeight } = useKeyboardHeight();
 
   useLayoutEffect(() => {
@@ -28,9 +31,9 @@ export default function useContentToolbar() {
   }, [dispatch]);
 
   useEffect(() => {
-    const newContentToolbar = createProps(contentToolbar);
+    const newContentToolbar = createProps(writePost, contentToolbar);
     setContentToolbarProps(newContentToolbar);
-  }, [contentToolbar]);
+  }, [contentToolbar, writePost]);
 
   useEffect(() => {
     dispatch(setKeyboardHeight(keyboardHeight));

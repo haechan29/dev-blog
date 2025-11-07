@@ -2,7 +2,6 @@ import { WritePostContentToolbar } from '@/features/write/domain/model/writePost
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: WritePostContentToolbar = {
-  isEditorFocused: false,
   canTouch: false,
   keyboardHeight: 0,
 };
@@ -11,9 +10,6 @@ const contentToolbarSlice = createSlice({
   name: 'contentToolbar',
   initialState,
   reducers: {
-    setIsEditorFocused: (state, action: PayloadAction<boolean>) => {
-      state.isEditorFocused = action.payload;
-    },
     setCanTouch: (state, action: PayloadAction<boolean>) => {
       state.canTouch = action.payload;
     },
@@ -24,5 +20,4 @@ const contentToolbarSlice = createSlice({
 });
 
 export default contentToolbarSlice.reducer;
-export const { setIsEditorFocused, setCanTouch, setKeyboardHeight } =
-  contentToolbarSlice.actions;
+export const { setCanTouch, setKeyboardHeight } = contentToolbarSlice.actions;

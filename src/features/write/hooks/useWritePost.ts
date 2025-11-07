@@ -2,9 +2,9 @@
 
 import * as PostService from '@/features/post/domain/service/postService';
 import { createProps as createPostProps } from '@/features/post/ui/postProps';
-import { createProps } from '@/features/post/ui/writePostProps';
 import { writePostSteps } from '@/features/write/constants/writePostStep';
 import { validate } from '@/features/write/domain/model/writePostForm';
+import { createProps } from '@/features/write/ui/writePostProps';
 import { RootState } from '@/lib/redux/store';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';

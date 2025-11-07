@@ -1,4 +1,4 @@
-import WritePost from '@/features/post/domain/model/writePost';
+import WritePost from '@/features/write/domain/model/writePost';
 import { ContentEditorStatus } from '@/features/write/domain/types/contentEditorStatus';
 
 export interface WritePostProps {
