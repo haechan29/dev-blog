@@ -1,7 +1,13 @@
 'use client';
 
 import { Content } from '@/features/write/domain/types/content';
+import {
+  ContentEditorBlurStatus,
+  ContentEditorFocusStatus,
+} from '@/features/write/domain/types/contentEditorStatus';
 import useScrollLock from '@/hooks/useScrollLock';
+import { AppDispatch } from '@/lib/redux/store';
+import { setContentEditorStatus } from '@/lib/redux/writePostSlice';
 import { getScrollRatio } from '@/lib/scroll';
 import clsx from 'clsx';
 import {
@@ -13,6 +19,7 @@ import {
   useMemo,
   useState,
 } from 'react';
+import { useDispatch } from 'react-redux';
 
 export default function WritePostContentEditor({
   contentEditorRef,
@@ -24,7 +31,6 @@ export default function WritePostContentEditor({
   setContent,
   resetInvalidField,
   setIsEditorFocused,
-  setScrollRatio,
 }: {
   contentEditorRef: RefObject<HTMLTextAreaElement | null>;
   parsedContent: Content;
@@ -35,8 +41,8 @@ export default function WritePostContentEditor({
   setContent: (content: string) => void;
   resetInvalidField: () => void;
   setIsEditorFocused: (isEditorFocused: boolean) => void;
-  setScrollRatio: (scrollRatio: number) => void;
 }) {
+  const dispatch = useDispatch<AppDispatch>();
   const [isLocked, setIsLocked] = useState(false);
   const isError = useMemo(() => {
     return parsedContent.status === 'error';
@@ -63,23 +69,36 @@ export default function WritePostContentEditor({
 
       const textArea = e.currentTarget;
       const scrollRatio = getScrollRatio(textArea);
-      setScrollRatio(scrollRatio);
+      const contentEditorStatus = {
+        isFocused: true,
+        scrollRatio,
+      };
+      dispatch(setContentEditorStatus(contentEditorStatus));
     },
-    [setIsEditorFocused, setScrollRatio]
+    [dispatch, setIsEditorFocused]
   );
 
   const onBlur = useCallback(() => {
     setIsEditorFocused(false);
     setIsLocked(false);
-  }, [setIsEditorFocused]);
+
+    const contentEditorStatus: ContentEditorBlurStatus = {
+      isFocused: false,
+    };
+    dispatch(setContentEditorStatus(contentEditorStatus));
+  }, [dispatch, setIsEditorFocused]);
 
   const onScroll = useCallback(
     (e: UIEvent<HTMLTextAreaElement>) => {
       const textArea = e.currentTarget;
       const scrollRatio = getScrollRatio(textArea);
-      setScrollRatio(scrollRatio);
+      const contentEditorStatus: ContentEditorFocusStatus = {
+        isFocused: true,
+        scrollRatio,
+      };
+      dispatch(setContentEditorStatus(contentEditorStatus));
     },
-    [setScrollRatio]
+    [dispatch]
   );
 
   useScrollLock({ isLocked, allowedSelectors: ['[data-content-editor]'] });

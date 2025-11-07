@@ -32,7 +32,6 @@ export default function WritePostContent({
     contentEditorRef,
     setContent,
   });
-  const [scrollRatio, setScrollRatio] = useState(0);
 
   useEffect(() => {
     const parseMd = async (content: string) => {
@@ -66,16 +65,12 @@ export default function WritePostContent({
             setContent={setContent}
             resetInvalidField={resetInvalidField}
             setIsEditorFocused={setIsEditorFocused}
-            setScrollRatio={setScrollRatio}
           />
         </div>
       </div>
 
       <div className='max-lg:min-w-0 lg:min-h-0'>
-        <WritePostContentPreview
-          parsedContent={parsedContent}
-          scrollRatio={scrollRatio}
-        />
+        <WritePostContentPreview parsedContent={parsedContent} />
       </div>
     </div>
   );
