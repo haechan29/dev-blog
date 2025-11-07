@@ -10,7 +10,7 @@ import useWritePost from '@/features/write/hooks/useWritePost';
 import { AppDispatch } from '@/lib/redux/store';
 import { setCurrentStepId } from '@/lib/redux/writePostSlice';
 import { useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function WritePage() {
@@ -27,21 +27,28 @@ export default function WritePage() {
 
 function WritePageWithValidation() {
   const searchParams = useSearchParams();
+  const step = searchParams.get('step') as keyof typeof writePostSteps;
   const dispatch = useDispatch<AppDispatch>();
   const {
     writePost: { writePostForm },
     createPost,
   } = useWritePost();
   const { draft, removeDraft } = useAutoSave({ writePostForm });
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    const step = searchParams.get('step') as keyof typeof writePostSteps;
     dispatch(setCurrentStepId(step));
-  }, [dispatch, searchParams]);
+  }, [dispatch, step]);
+
+  useEffect(() => {
+    if (draft && step === 'write') {
+      setIsOpen(true);
+    }
+  }, [draft, step]);
 
   return (
     <>
-      <RestoreDraftDialog draft={draft} />
+      <RestoreDraftDialog draft={draft} isOpen={isOpen} setIsOpen={setIsOpen} />
       <div className='w-screen h-dvh flex flex-col'>
         <WritePostToolbar publishPost={createPost} removeDraft={removeDraft} />
         <div className='flex-1 min-h-0'>

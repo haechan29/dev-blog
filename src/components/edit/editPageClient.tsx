@@ -11,7 +11,7 @@ import useWritePost from '@/features/write/hooks/useWritePost';
 import { AppDispatch } from '@/lib/redux/store';
 import { setCurrentStepId } from '@/lib/redux/writePostSlice';
 import { useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function EditPageClient({ post }: { post: PostProps }) {
@@ -28,26 +28,32 @@ export default function EditPageClient({ post }: { post: PostProps }) {
 
 function EditPageWithValidation({ post }: { post: PostProps }) {
   const searchParams = useSearchParams();
+  const step = searchParams.get('step') as keyof typeof writePostSteps;
   const dispatch = useDispatch<AppDispatch>();
   const {
     writePost: { writePostForm },
     updatePost,
   } = useWritePost();
-
   const { draft, removeDraft } = useAutoSave({
     writePostForm,
     postId: post.id,
   });
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    const step = searchParams.get('step') as keyof typeof writePostSteps;
     dispatch(setCurrentStepId(step));
     return () => removeDraft();
-  }, [dispatch, removeDraft, searchParams]);
+  }, [dispatch, removeDraft, step]);
+
+  useEffect(() => {
+    if (draft && step === 'write') {
+      setIsOpen(true);
+    }
+  }, [draft, step]);
 
   return (
     <>
-      <RestoreDraftDialog draft={draft} />
+      <RestoreDraftDialog draft={draft} isOpen={isOpen} setIsOpen={setIsOpen} />
       <div className='w-screen h-dvh flex flex-col'>
         <WritePostToolbar
           publishPost={async () => updatePost(post.id)}

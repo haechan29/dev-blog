@@ -6,12 +6,14 @@ import { createProps } from '@/features/post/ui/writePostProps';
 import { writePostSteps } from '@/features/write/constants/writePostStep';
 import { validate } from '@/features/write/domain/model/writePostForm';
 import { RootState } from '@/lib/redux/store';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 export default function useWritePost() {
   const writePost = useSelector((state: RootState) => state.writePost);
   const [writePostProps, setWritePostProps] = useState(createProps(writePost));
+  const router = useRouter();
 
   const getInvalidField = useCallback(() => {
     const writePostForm = writePost.writePostForm;
@@ -55,6 +57,17 @@ export default function useWritePost() {
     const writePostProps = createProps(writePost);
     setWritePostProps(writePostProps);
   }, [writePost]);
+
+  useEffect(() => {
+    const writePostForm = writePost.writePostForm;
+    for (const step of Object.values(writePostSteps)) {
+      if (writePostForm.currentStepId === step.id) break;
+      const isValid = validate(writePostForm, ...step.fields);
+      if (!isValid) {
+        router.push(`/write?step=${step.id}`);
+      }
+    }
+  }, [router, writePost.writePostForm]);
 
   return {
     writePost: writePostProps,
