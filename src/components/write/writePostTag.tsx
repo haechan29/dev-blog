@@ -1,29 +1,27 @@
 'use client';
 
+import useWritePost from '@/features/write/hooks/useWritePost';
 import useWritePostTag from '@/features/write/hooks/useWritePostTag';
-import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
-import { SetState } from '@/types/react';
+import { AppDispatch } from '@/lib/redux/store';
+import { setInvalidField } from '@/lib/redux/writePostSlice';
 import clsx from 'clsx';
 import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
-export default function WritePostTag({
-  tags: { value: tags, maxTagLength, maxTagsLength, isValid, delimiter },
-  setTags,
-  resetInvalidField,
-}: {
-  tags: WritePostFormProps['tags'];
-  setTags: SetState<string[]>;
-  resetInvalidField: () => void;
-}) {
+export default function WritePostTag() {
+  const {
+    writePost: {
+      writePostForm: {
+        tags: { value: tags, maxTagLength, maxTagsLength, isValid, delimiter },
+      },
+    },
+  } = useWritePost();
+  const dispatch = useDispatch<AppDispatch>();
   const [isFocused, setIsFocused] = useState(false);
   const tagRef = useRef<HTMLInputElement | null>(null);
+
   const { tag, isTagEmpty, insertTag, updateTag } = useWritePostTag({
-    tags,
     isFocused,
-    maxTagLength,
-    maxTagsLength,
-    delimiter,
-    setTags,
   });
   const isTagTooLong = useMemo(
     () => tag.length > maxTagLength,
@@ -43,10 +41,10 @@ export default function WritePostTag({
 
   const onChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      updateTag(e.target.value);
-      resetInvalidField();
+      updateTag(e.currentTarget.value);
+      dispatch(setInvalidField(null));
     },
-    [resetInvalidField, updateTag]
+    [dispatch, updateTag]
   );
 
   return (

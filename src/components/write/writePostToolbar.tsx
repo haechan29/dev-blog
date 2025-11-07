@@ -1,30 +1,33 @@
 'use client';
 
 import { PostProps } from '@/features/post/ui/postProps';
+import useWritePost from '@/features/write/hooks/useWritePost';
 import useWritePostToolbar from '@/features/write/hooks/useWritePostToolbar';
-import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
+import { AppDispatch } from '@/lib/redux/store';
+import { setInvalidField } from '@/lib/redux/writePostSlice';
 import clsx from 'clsx';
 import { ChevronRight } from 'lucide-react';
 import { Fragment, useCallback } from 'react';
+import { useDispatch } from 'react-redux';
 
 export default function WritePostToolbar({
-  writePostForm: { currentStepId },
-  getInvalidField,
-  setInvalidField,
   publishPost,
   removeDraft,
 }: {
-  writePostForm: WritePostFormProps;
-  getInvalidField: () => string | null;
-  setInvalidField: (invalidField: string) => void;
   publishPost: () => Promise<PostProps>;
   removeDraft: () => void;
 }) {
+  const dispatch = useDispatch<AppDispatch>();
+  const {
+    writePost: { writePostForm },
+    getInvalidField,
+  } = useWritePost();
+
   const {
     writePostToolbar: { toolbarTexts, actionButtonText },
     onAction,
   } = useWritePostToolbar({
-    currentStepId,
+    currentStepId: writePostForm.currentStepId,
     publishPost,
     removeDraft,
   });
@@ -32,11 +35,11 @@ export default function WritePostToolbar({
   const onActionButtonClick = useCallback(() => {
     const invalidField = getInvalidField();
     if (invalidField) {
-      setInvalidField(invalidField);
+      dispatch(setInvalidField(invalidField));
     } else {
       onAction();
     }
-  }, [getInvalidField, onAction, setInvalidField]);
+  }, [dispatch, getInvalidField, onAction]);
 
   return (
     <div

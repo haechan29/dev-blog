@@ -7,22 +7,24 @@ import {
   DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { AppDispatch } from '@/lib/redux/store';
+import { setContent } from '@/lib/redux/writePostSlice';
 import { X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 export default function RestoreDraftDialog({
   draft,
-  onRestore,
 }: {
   draft: string | null;
-  onRestore: (draft: string) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
 
   const onConfirmButtonClick = useCallback(() => {
-    if (draft) onRestore(draft);
+    if (draft) dispatch(setContent(draft));
     setIsOpen(false);
-  }, [draft, onRestore]);
+  }, [dispatch, draft]);
 
   useEffect(() => {
     if (draft) setIsOpen(true);

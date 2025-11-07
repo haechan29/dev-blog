@@ -5,9 +5,14 @@ import {
   ContentEditorBlurStatus,
   ContentEditorFocusStatus,
 } from '@/features/write/domain/types/contentEditorStatus';
+import useWritePost from '@/features/write/hooks/useWritePost';
 import useScrollLock from '@/hooks/useScrollLock';
 import { AppDispatch } from '@/lib/redux/store';
-import { setContentEditorStatus } from '@/lib/redux/writePostSlice';
+import {
+  setContent,
+  setContentEditorStatus,
+  setInvalidField,
+} from '@/lib/redux/writePostSlice';
 import { getScrollRatio } from '@/lib/scroll';
 import clsx from 'clsx';
 import {
@@ -24,24 +29,21 @@ import { useDispatch } from 'react-redux';
 export default function WritePostContentEditor({
   contentEditorRef,
   parsedContent,
-  value: content,
-  maxLength,
-  isValid,
   shouldAttachToolbarToBottom,
-  setContent,
-  resetInvalidField,
   setIsEditorFocused,
 }: {
   contentEditorRef: RefObject<HTMLTextAreaElement | null>;
   parsedContent: Content;
-  value: string;
-  maxLength: number;
-  isValid: boolean;
   shouldAttachToolbarToBottom: boolean;
-  setContent: (content: string) => void;
-  resetInvalidField: () => void;
   setIsEditorFocused: (isEditorFocused: boolean) => void;
 }) {
+  const {
+    writePost: {
+      writePostForm: {
+        content: { value: content, maxLength, isValid },
+      },
+    },
+  } = useWritePost();
   const dispatch = useDispatch<AppDispatch>();
   const [isLocked, setIsLocked] = useState(false);
   const isError = useMemo(() => {
@@ -56,10 +58,10 @@ export default function WritePostContentEditor({
   const onChange = useCallback(
     (e: ChangeEvent<HTMLTextAreaElement>) => {
       const textArea = e.currentTarget;
-      resetInvalidField();
-      setContent(textArea.value);
+      dispatch(setInvalidField(null));
+      dispatch(setContent(textArea.value));
     },
-    [resetInvalidField, setContent]
+    [dispatch]
   );
 
   const onFocus = useCallback(
@@ -108,12 +110,11 @@ export default function WritePostContentEditor({
       <textarea
         data-content-editor
         ref={contentEditorRef}
+        value={content}
         onFocus={onFocus}
         onBlur={onBlur}
-        value={content}
         onChange={onChange}
         onScroll={onScroll}
-        onTouchMove={e => e.stopPropagation()}
         placeholder='본문을 입력하세요'
         className={clsx(
           'flex-1 min-h-0 p-4 resize-none outline-none border',

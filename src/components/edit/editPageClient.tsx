@@ -7,9 +7,12 @@ import WritePostToolbar from '@/components/write/writePostToolbar';
 import { PostProps } from '@/features/post/ui/postProps';
 import { writePostSteps } from '@/features/write/constants/writePostStep';
 import useAutoSave from '@/features/write/hooks/useAutoSave';
-import useWritePostForm from '@/features/write/hooks/useWritePostForm';
+import useWritePost from '@/features/write/hooks/useWritePost';
+import { AppDispatch } from '@/lib/redux/store';
+import { setCurrentStepId } from '@/lib/redux/writePostSlice';
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 
 export default function EditPageClient({ post }: { post: PostProps }) {
   return (
@@ -25,34 +28,33 @@ export default function EditPageClient({ post }: { post: PostProps }) {
 
 function EditPageWithValidation({ post }: { post: PostProps }) {
   const searchParams = useSearchParams();
-  const step = searchParams.get('step') as keyof typeof writePostSteps;
-  const writePostForm = useWritePostForm({
-    currentStepId: step,
-    post,
-  });
+  const dispatch = useDispatch<AppDispatch>();
+  const {
+    writePost: { writePostForm },
+    updatePost,
+  } = useWritePost();
+
   const { draft, removeDraft } = useAutoSave({
-    ...writePostForm,
+    writePostForm,
     postId: post.id,
   });
 
   useEffect(() => {
+    const step = searchParams.get('step') as keyof typeof writePostSteps;
+    dispatch(setCurrentStepId(step));
     return () => removeDraft();
-  }, [removeDraft]);
+  }, [dispatch, removeDraft, searchParams]);
 
   return (
     <>
-      <RestoreDraftDialog
-        draft={draft}
-        onRestore={(draft: string) => writePostForm.setContent(draft)}
-      />
+      <RestoreDraftDialog draft={draft} />
       <div className='w-screen h-dvh flex flex-col'>
         <WritePostToolbar
-          publishPost={async () => writePostForm.updatePost(post.id)}
+          publishPost={async () => updatePost(post.id)}
           removeDraft={removeDraft}
-          {...writePostForm}
         />
         <div className='flex-1 min-h-0'>
-          <WritePostForm {...writePostForm} />
+          <WritePostForm />
         </div>
       </div>
     </>

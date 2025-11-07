@@ -6,8 +6,12 @@ import WritePostForm from '@/components/write/writePostForm';
 import WritePostToolbar from '@/components/write/writePostToolbar';
 import { writePostSteps } from '@/features/write/constants/writePostStep';
 import useAutoSave from '@/features/write/hooks/useAutoSave';
-import useWritePostForm from '@/features/write/hooks/useWritePostForm';
+import useWritePost from '@/features/write/hooks/useWritePost';
+import { AppDispatch } from '@/lib/redux/store';
+import { setCurrentStepId } from '@/lib/redux/writePostSlice';
 import { useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 
 export default function WritePage() {
   return (
@@ -23,24 +27,25 @@ export default function WritePage() {
 
 function WritePageWithValidation() {
   const searchParams = useSearchParams();
-  const step = searchParams.get('step') as keyof typeof writePostSteps;
-  const writePostForm = useWritePostForm({ currentStepId: step });
-  const { draft, removeDraft } = useAutoSave(writePostForm);
+  const dispatch = useDispatch<AppDispatch>();
+  const {
+    writePost: { writePostForm },
+    createPost,
+  } = useWritePost();
+  const { draft, removeDraft } = useAutoSave({ writePostForm });
+
+  useEffect(() => {
+    const step = searchParams.get('step') as keyof typeof writePostSteps;
+    dispatch(setCurrentStepId(step));
+  }, [dispatch, searchParams]);
 
   return (
     <>
-      <RestoreDraftDialog
-        draft={draft}
-        onRestore={(draft: string) => writePostForm.setContent(draft)}
-      />
+      <RestoreDraftDialog draft={draft} />
       <div className='w-screen h-dvh flex flex-col'>
-        <WritePostToolbar
-          publishPost={writePostForm.createPost}
-          removeDraft={removeDraft}
-          {...writePostForm}
-        />
+        <WritePostToolbar publishPost={createPost} removeDraft={removeDraft} />
         <div className='flex-1 min-h-0'>
-          <WritePostForm {...writePostForm} />
+          <WritePostForm />
         </div>
       </div>
     </>

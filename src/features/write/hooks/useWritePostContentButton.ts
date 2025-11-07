@@ -1,6 +1,7 @@
 'use client';
 
 import { writePostContentButtons } from '@/features/write/domain/model/writePostContentButton';
+import useWritePost from '@/features/write/hooks/useWritePost';
 import {
   createProps,
   DirectiveButtonProps,
@@ -8,21 +9,28 @@ import {
   TableButtonProps,
   WritePostContentButtonProps,
 } from '@/features/write/ui/writePostContentButtonProps';
+import { AppDispatch } from '@/lib/redux/store';
+import { setContent } from '@/lib/redux/writePostSlice';
 import { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 const IMAGE_DIRECTIVE_PATTERN = ':::img[\\s\\S]*?:::';
 const BGM_DIRECTIVE_PATTERN = '::bgm\\{[^}]*\\}';
 const CURSOR_MARKER = '__NEW_CURSOR_POSITION__';
 
 export default function useWritePostContentButton({
-  value: content,
   contentEditorRef,
-  setContent,
 }: {
-  value: string;
   contentEditorRef: RefObject<HTMLTextAreaElement | null>;
-  setContent: (content: string) => void;
 }) {
+  const {
+    writePost: {
+      writePostForm: {
+        content: { value: content },
+      },
+    },
+  } = useWritePost();
+  const dispatch = useDispatch<AppDispatch>();
   const [contentButtons] = useState(writePostContentButtons);
   const [activeType, setActiveType] = useState('markdown');
   const contentButtonProps = useMemo(() => {
@@ -59,7 +67,7 @@ export default function useWritePostContentButton({
       const finalCursorPosition =
         newCursorPosition === -1 ? selectionStart : newCursorPosition;
 
-      setContent(finalText);
+      dispatch(setContent(finalText));
       setTimeout(() => {
         contentEditor.focus();
         contentEditor.setSelectionRange(
@@ -68,7 +76,7 @@ export default function useWritePostContentButton({
         );
       }, 0);
     },
-    [content, contentEditorRef, setContent]
+    [content, contentEditorRef, dispatch]
   );
 
   const handleDirectiveAction = useCallback(
@@ -132,7 +140,7 @@ export default function useWritePostContentButton({
       const finalCursorPosition =
         newCursorPosition === -1 ? selectionStart : newCursorPosition;
 
-      setContent(finalText);
+      dispatch(setContent(finalText));
       setTimeout(() => {
         contentEditor.focus();
         contentEditor.setSelectionRange(
@@ -141,7 +149,7 @@ export default function useWritePostContentButton({
         );
       }, 0);
     },
-    [contentEditorRef, setContent]
+    [contentEditorRef, dispatch]
   );
 
   const handleTableAction = useCallback(
@@ -167,13 +175,13 @@ export default function useWritePostContentButton({
       const newText = textBefore + newTable + textAfter;
       const newCursorPosition = rangeStart + cursorPosition;
 
-      setContent(newText);
+      dispatch(setContent(newText));
       setTimeout(() => {
         contentEditor.focus();
         contentEditor.setSelectionRange(newCursorPosition, newCursorPosition);
       }, 0);
     },
-    [contentEditorRef, setContent]
+    [contentEditorRef, dispatch]
   );
 
   const onAction = useCallback(

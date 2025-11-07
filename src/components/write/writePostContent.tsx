@@ -4,34 +4,28 @@ import WritePostContentEditor from '@/components/write/writePostContentEditor';
 import WritePostContentPreview from '@/components/write/writePostContentPreview';
 import WritePostContentToolbar from '@/components/write/writePostContentToolbar';
 import { Content } from '@/features/write/domain/types/content';
+import useWritePost from '@/features/write/hooks/useWritePost';
 import useWritePostContentButton from '@/features/write/hooks/useWritePostContentButton';
 import useWritePostContentToolbar from '@/features/write/hooks/useWritePostContentToolbar';
-import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
 import useDebounce from '@/hooks/useDebounce';
 import { processMd } from '@/lib/md';
-import { SetState } from '@/types/react';
 import { useEffect, useRef, useState } from 'react';
 
-export default function WritePostContent({
-  content,
-  setContent,
-  resetInvalidField,
-}: {
-  content: WritePostFormProps['content'];
-  setContent: SetState<string>;
-  resetInvalidField: () => void;
-}) {
+export default function WritePostContent() {
+  const {
+    writePost: {
+      writePostForm: {
+        content: { value: content },
+      },
+    },
+  } = useWritePost();
   const [parsedContent, setParsedContent] = useState<Content>({
     status: 'idle',
   });
   const debounce = useDebounce();
   const contentEditorRef = useRef<HTMLTextAreaElement | null>(null);
   const { contentToolbar, setIsEditorFocused } = useWritePostContentToolbar();
-  const contentButton = useWritePostContentButton({
-    ...content,
-    contentEditorRef,
-    setContent,
-  });
+  const contentButton = useWritePostContentButton({ contentEditorRef });
 
   useEffect(() => {
     const parseMd = async (content: string) => {
@@ -49,8 +43,8 @@ export default function WritePostContent({
       }
     };
 
-    debounce(() => parseMd(content.value), 300);
-  }, [content.value, debounce]);
+    debounce(() => parseMd(content), 300);
+  }, [content, debounce]);
 
   return (
     <div className='h-full grid max-lg:grid-rows-[calc(50%-0.5rem)_calc(50%-0.5rem)] lg:grid-cols-2 gap-4'>
@@ -60,10 +54,7 @@ export default function WritePostContent({
           <WritePostContentEditor
             contentEditorRef={contentEditorRef}
             parsedContent={parsedContent}
-            {...content}
             {...contentToolbar}
-            setContent={setContent}
-            resetInvalidField={resetInvalidField}
             setIsEditorFocused={setIsEditorFocused}
           />
         </div>

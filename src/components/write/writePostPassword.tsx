@@ -1,20 +1,22 @@
 'use client';
 
-import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
-import { SetState } from '@/types/react';
+import useWritePost from '@/features/write/hooks/useWritePost';
+import { AppDispatch } from '@/lib/redux/store';
+import { setInvalidField, setPassword } from '@/lib/redux/writePostSlice';
 import clsx from 'clsx';
 import { Eye, EyeOff } from 'lucide-react';
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
-export default function WritePostPassword({
-  password: { value: password, maxLength, isValid },
-  setPassword,
-  resetInvalidField,
-}: {
-  password: WritePostFormProps['password'];
-  setPassword: SetState<string>;
-  resetInvalidField: () => void;
-}) {
+export default function WritePostPassword() {
+  const {
+    writePost: {
+      writePostForm: {
+        password: { value: password, maxLength, isValid },
+      },
+    },
+  } = useWritePost();
+  const dispatch = useDispatch<AppDispatch>();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const isPasswordTooLong = useMemo(
@@ -26,17 +28,17 @@ export default function WritePostPassword({
   const onBlur = useCallback(() => setIsFocused(false), []);
   const onChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      resetInvalidField();
-      setPassword(e.target.value);
+      dispatch(setInvalidField(null));
+      dispatch(setPassword(e.currentTarget.value));
     },
-    [resetInvalidField, setPassword]
+    [dispatch]
   );
 
   useEffect(() => {
     if (!isFocused) {
-      setPassword(prev => prev.slice(0, maxLength));
+      dispatch(setPassword(password.slice(0, maxLength)));
     }
-  }, [isFocused, maxLength, setPassword]);
+  }, [dispatch, isFocused, maxLength, password]);
 
   return (
     <div

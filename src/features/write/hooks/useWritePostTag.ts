@@ -1,23 +1,20 @@
 'use client';
 
-import { SetState } from '@/types/react';
+import useWritePost from '@/features/write/hooks/useWritePost';
+import { AppDispatch } from '@/lib/redux/store';
+import { setTags } from '@/lib/redux/writePostSlice';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
-export default function useWritePostTag({
-  tags,
-  isFocused,
-  maxTagLength,
-  maxTagsLength,
-  delimiter,
-  setTags,
-}: {
-  tags: string[];
-  isFocused: boolean;
-  maxTagLength: number;
-  maxTagsLength: number;
-  delimiter: string;
-  setTags: SetState<string[]>;
-}) {
+export default function useWritePostTag({ isFocused }: { isFocused: boolean }) {
+  const {
+    writePost: {
+      writePostForm: {
+        tags: { value: tags, maxTagLength, maxTagsLength, delimiter },
+      },
+    },
+  } = useWritePost();
+  const dispatch = useDispatch<AppDispatch>();
   const [tag, setTag] = useState(delimiter);
   const isTagEmpty = useMemo(() => tag === delimiter, [delimiter, tag]);
 
@@ -28,17 +25,18 @@ export default function useWritePostTag({
         .map(tag => (tag.startsWith(delimiter) ? tag.slice(1) : tag))
         .map(tag => tag.slice(0, maxTagLength))
         .filter(tag => tag.trim());
-      setTags(prev => [...new Set([...prev, ...newTags])]);
+
+      dispatch(setTags([...new Set([...tags, ...newTags])]));
       setTag(delimiter);
     },
-    [delimiter, maxTagLength, setTags]
+    [delimiter, dispatch, maxTagLength, tags]
   );
 
   const deleteTag = useCallback(() => {
     if (tags.length === 0) return;
     setTag(tags.pop()!);
-    setTags(tags);
-  }, [setTag, setTags, tags]);
+    dispatch(setTags(tags));
+  }, [dispatch, tags]);
 
   const updateTag = useCallback(
     (tag: string) => {
@@ -63,10 +61,10 @@ export default function useWritePostTag({
   }, [delimiter, tag]);
 
   useEffect(() => {
-    if (!isFocused) {
-      setTags(prev => prev.slice(0, maxTagsLength));
+    if (!isFocused && tags.length > maxTagsLength) {
+      dispatch(setTags(tags.slice(0, maxTagsLength)));
     }
-  }, [isFocused, maxTagsLength, setTags]);
+  }, [dispatch, isFocused, maxTagsLength, tags]);
 
   return {
     tag,

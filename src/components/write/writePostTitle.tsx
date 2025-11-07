@@ -1,7 +1,8 @@
 'use client';
 
-import { WritePostFormProps } from '@/features/write/ui/writePostFormProps';
-import { SetState } from '@/types/react';
+import useWritePost from '@/features/write/hooks/useWritePost';
+import { AppDispatch } from '@/lib/redux/store';
+import { setInvalidField, setTitle } from '@/lib/redux/writePostSlice';
 import clsx from 'clsx';
 import {
   ChangeEvent,
@@ -11,16 +12,17 @@ import {
   useRef,
   useState,
 } from 'react';
+import { useDispatch } from 'react-redux';
 
-export default function WritePostTitle({
-  title: { value: title, isValid, maxLength },
-  setTitle,
-  resetInvalidField,
-}: {
-  title: WritePostFormProps['title'];
-  setTitle: SetState<string>;
-  resetInvalidField: () => void;
-}) {
+export default function WritePostTitle() {
+  const {
+    writePost: {
+      writePostForm: {
+        title: { value: title, isValid, maxLength },
+      },
+    },
+  } = useWritePost();
+  const dispatch = useDispatch<AppDispatch>();
   const [isFocused, setIsFocused] = useState(false);
   const isTitleTooLong = useMemo(
     () => title.length > maxLength,
@@ -33,17 +35,18 @@ export default function WritePostTitle({
   const onBlur = useCallback(() => setIsFocused(false), []);
   const onChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      resetInvalidField();
-      setTitle(e.target.value);
+      dispatch(setInvalidField(null));
+      dispatch(setTitle(e.currentTarget.value));
     },
-    [resetInvalidField, setTitle]
+    [dispatch]
   );
 
   useEffect(() => {
     if (!isFocused) {
-      setTitle(prev => prev.slice(0, maxLength));
+      const newTitle = title.slice(0, maxLength);
+      dispatch(setTitle(newTitle));
     }
-  }, [isFocused, maxLength, setTitle]);
+  }, [dispatch, isFocused, maxLength, title]);
 
   return (
     <div
