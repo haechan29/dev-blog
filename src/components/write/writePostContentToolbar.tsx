@@ -1,6 +1,7 @@
 'use client';
 
 import Tooltip from '@/components/tooltip';
+import useContentToolbar from '@/features/write/hooks/useContentToolbar';
 import {
   ButtonContent,
   WritePostContentButtonProps,
@@ -24,18 +25,18 @@ import {
 import { useCallback } from 'react';
 
 export default function WritePostContentToolbar({
-  shouldAttachToolbarToBottom,
-  toolbarTranslateY,
   contentButtons,
   activeType,
   onAction,
 }: {
-  shouldAttachToolbarToBottom: boolean;
-  toolbarTranslateY: string;
   contentButtons: WritePostContentButtonProps[];
   activeType: string;
   onAction: (editor: WritePostContentButtonProps) => void;
 }) {
+  const {
+    contentToolbar: { shouldAttachToolbarToBottom, toolbarTranslateY },
+  } = useContentToolbar();
+
   const onToolbarButtonClick = useCallback(
     (button: WritePostContentButtonProps) => onAction(button),
     [onAction]

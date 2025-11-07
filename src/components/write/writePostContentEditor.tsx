@@ -1,9 +1,11 @@
 'use client';
 
 import { Content } from '@/features/write/domain/types/content';
+import useContentToolbar from '@/features/write/hooks/useContentToolbar';
 import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import useScrollLock from '@/hooks/useScrollLock';
 import { AppDispatch } from '@/lib/redux/store';
+import { setIsEditorFocused } from '@/lib/redux/write/contentToolbarSlice';
 import {
   setContent,
   setInvalidField,
@@ -25,19 +27,20 @@ import { useDispatch } from 'react-redux';
 export default function WritePostContentEditor({
   contentEditorRef,
   parsedContent,
-  shouldAttachToolbarToBottom,
-  setIsEditorFocused,
 }: {
   contentEditorRef: RefObject<HTMLTextAreaElement | null>;
   parsedContent: Content;
-  shouldAttachToolbarToBottom: boolean;
-  setIsEditorFocused: (isEditorFocused: boolean) => void;
 }) {
   const {
     writePostForm: {
       content: { value: content, maxLength, isValid },
     },
   } = useWritePostForm();
+
+  const {
+    contentToolbar: { shouldAttachToolbarToBottom },
+  } = useContentToolbar();
+
   const dispatch = useDispatch<AppDispatch>();
   const [isLocked, setIsLocked] = useState(false);
   const isError = useMemo(() => {
@@ -60,7 +63,7 @@ export default function WritePostContentEditor({
 
   const onFocus = useCallback(
     (e: FocusEvent<HTMLTextAreaElement>) => {
-      setIsEditorFocused(true);
+      dispatch(setIsEditorFocused(true));
       setIsLocked(true);
 
       const textArea = e.currentTarget;
@@ -71,11 +74,11 @@ export default function WritePostContentEditor({
       };
       dispatch(setContentEditorStatus(contentEditorStatus));
     },
-    [dispatch, setIsEditorFocused]
+    [dispatch]
   );
 
   const onBlur = useCallback(() => {
-    setIsEditorFocused(false);
+    dispatch(setIsEditorFocused(false));
     setIsLocked(false);
 
     dispatch(
@@ -83,7 +86,7 @@ export default function WritePostContentEditor({
         isFocused: false,
       })
     );
-  }, [dispatch, setIsEditorFocused]);
+  }, [dispatch]);
 
   const onScroll = useCallback(
     (e: UIEvent<HTMLTextAreaElement>) => {

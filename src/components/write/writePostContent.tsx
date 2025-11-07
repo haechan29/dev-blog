@@ -5,7 +5,6 @@ import WritePostContentPreview from '@/components/write/writePostContentPreview'
 import WritePostContentToolbar from '@/components/write/writePostContentToolbar';
 import { Content } from '@/features/write/domain/types/content';
 import useWritePostContentButton from '@/features/write/hooks/useWritePostContentButton';
-import useWritePostContentToolbar from '@/features/write/hooks/useWritePostContentToolbar';
 import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import useDebounce from '@/hooks/useDebounce';
 import { processMd } from '@/lib/md';
@@ -22,7 +21,6 @@ export default function WritePostContent() {
   });
   const debounce = useDebounce();
   const contentEditorRef = useRef<HTMLTextAreaElement | null>(null);
-  const { contentToolbar, setIsEditorFocused } = useWritePostContentToolbar();
   const contentButton = useWritePostContentButton({ contentEditorRef });
 
   useEffect(() => {
@@ -47,13 +45,11 @@ export default function WritePostContent() {
   return (
     <div className='h-full grid max-lg:grid-rows-[calc(50%-0.5rem)_calc(50%-0.5rem)] lg:grid-cols-2 gap-4'>
       <div className='h-full flex flex-col max-lg:min-w-0 lg:min-h-0'>
-        <WritePostContentToolbar {...contentToolbar} {...contentButton} />
+        <WritePostContentToolbar {...contentButton} />
         <div className='flex-1 min-h-0'>
           <WritePostContentEditor
             contentEditorRef={contentEditorRef}
             parsedContent={parsedContent}
-            {...contentToolbar}
-            setIsEditorFocused={setIsEditorFocused}
           />
         </div>
       </div>
