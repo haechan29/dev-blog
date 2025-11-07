@@ -1,12 +1,4 @@
-export interface ContentEditorBlurStatus {
-  isFocused: false;
+export interface ContentEditorStatus {
+  isFocused: boolean;
+  scrollRatio?: number;
 }
-
-export interface ContentEditorFocusStatus {
-  isFocused: true;
-  scrollRatio: number;
-}
-
-export type ContentEditorStatus =
-  | ContentEditorBlurStatus
-  | ContentEditorFocusStatus;

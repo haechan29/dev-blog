@@ -1,10 +1,6 @@
 'use client';
 
 import { Content } from '@/features/write/domain/types/content';
-import {
-  ContentEditorBlurStatus,
-  ContentEditorFocusStatus,
-} from '@/features/write/domain/types/contentEditorStatus';
 import useWritePost from '@/features/write/hooks/useWritePost';
 import useScrollLock from '@/hooks/useScrollLock';
 import { AppDispatch } from '@/lib/redux/store';
@@ -84,17 +80,18 @@ export default function WritePostContentEditor({
     setIsEditorFocused(false);
     setIsLocked(false);
 
-    const contentEditorStatus: ContentEditorBlurStatus = {
-      isFocused: false,
-    };
-    dispatch(setContentEditorStatus(contentEditorStatus));
+    dispatch(
+      setContentEditorStatus({
+        isFocused: false,
+      })
+    );
   }, [dispatch, setIsEditorFocused]);
 
   const onScroll = useCallback(
     (e: UIEvent<HTMLTextAreaElement>) => {
       const textArea = e.currentTarget;
       const scrollRatio = getScrollRatio(textArea);
-      const contentEditorStatus: ContentEditorFocusStatus = {
+      const contentEditorStatus = {
         isFocused: true,
         scrollRatio,
       };
