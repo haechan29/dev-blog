@@ -26,7 +26,11 @@ export type WritePostFormProps = {
     isValid: boolean;
     maxLength: number;
   };
-  draft?: string;
+  draft: {
+    tags: string[];
+    title?: string;
+    content?: string;
+  };
 };
 
 export function createProps(

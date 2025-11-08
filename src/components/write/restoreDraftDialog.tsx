@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { AppDispatch } from '@/lib/redux/store';
-import { setDraft } from '@/lib/redux/write/writePostFormSlice';
+import { setDraftContent } from '@/lib/redux/write/writePostFormSlice';
 import { X } from 'lucide-react';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
@@ -25,7 +25,7 @@ export default function RestoreDraftDialog({
   const dispatch = useDispatch<AppDispatch>();
 
   const onConfirmButtonClick = useCallback(() => {
-    if (draft) dispatch(setDraft(draft));
+    if (draft) dispatch(setDraftContent(draft));
     setIsOpen(false);
   }, [dispatch, draft, setIsOpen]);
 

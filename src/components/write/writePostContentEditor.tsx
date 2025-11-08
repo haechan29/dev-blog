@@ -33,7 +33,7 @@ export default function WritePostContentEditor({
 }) {
   const {
     writePostForm: {
-      draft,
+      draft: { content: draft },
       content: { maxLength, isValid },
     },
   } = useWritePostForm();

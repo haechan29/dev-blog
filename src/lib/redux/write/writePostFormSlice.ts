@@ -25,6 +25,9 @@ const initialState: WritePostForm = {
     isEmptyAllowed: false,
     maxLength: 50_000,
   },
+  draft: {
+    tags: [],
+  },
 };
 
 const writePostFormSlice = createSlice({
@@ -34,8 +37,14 @@ const writePostFormSlice = createSlice({
     setInvalidField: (state, action: PayloadAction<string | null>) => {
       state.invalidField = action.payload;
     },
-    setDraft: (state, action: PayloadAction<string>) => {
-      state.draft = action.payload;
+    setDraftTitle: (state, action: PayloadAction<string>) => {
+      state.draft.title = action.payload;
+    },
+    setDraftTags: (state, action: PayloadAction<string[]>) => {
+      state.draft.tags = action.payload;
+    },
+    setDraftContent: (state, action: PayloadAction<string>) => {
+      state.draft.content = action.payload;
     },
     setTitle: (state, action: PayloadAction<string>) => {
       state.title.value = action.payload;
@@ -55,7 +64,9 @@ const writePostFormSlice = createSlice({
 export default writePostFormSlice.reducer;
 export const {
   setInvalidField,
-  setDraft,
+  setDraftTitle,
+  setDraftTags,
+  setDraftContent,
   setTitle,
   setTags,
   setPassword,

@@ -9,6 +9,11 @@ import { writePostSteps } from '@/features/write/constants/writePostStep';
 import useAutoSave from '@/features/write/hooks/useAutoSave';
 import useWritePost from '@/features/write/hooks/useWritePost';
 import { AppDispatch } from '@/lib/redux/store';
+import {
+  setDraftContent,
+  setDraftTags,
+  setDraftTitle,
+} from '@/lib/redux/write/writePostFormSlice';
 import { setCurrentStepId } from '@/lib/redux/write/writePostSlice';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -38,6 +43,12 @@ function EditPageWithValidation({ post }: { post: PostProps }) {
     dispatch(setCurrentStepId(step));
     return () => removeDraft();
   }, [dispatch, removeDraft, step]);
+
+  useEffect(() => {
+    dispatch(setDraftContent(post.content));
+    dispatch(setDraftTitle(post.title));
+    dispatch(setDraftTags(post.tags));
+  }, [dispatch, post.content, post.tags, post.title]);
 
   useEffect(() => {
     if (draft && step === 'write') {

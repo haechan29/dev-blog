@@ -22,7 +22,11 @@ export interface WritePostForm {
     isEmptyAllowed: boolean;
     maxLength: number;
   };
-  draft?: string;
+  draft: {
+    tags: string[];
+    title?: string;
+    content?: string;
+  };
 }
 
 export function validate(form: WritePostForm, ...fields: string[]) {
