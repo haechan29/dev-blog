@@ -10,7 +10,9 @@ export default async function PostParsedContent({
     const result = await processMd(content);
     return (
       <ErrorBoundary fallback={<div>에러가 발생했습니다</div>}>
-        <div className='prose'>{result}</div>
+        <div data-post-content className='prose'>
+          {result}
+        </div>
       </ErrorBoundary>
     );
   } catch {

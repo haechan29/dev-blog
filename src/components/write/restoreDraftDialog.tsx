@@ -45,7 +45,7 @@ export default function RestoreDraftDialog({
         </div>
 
         <div className='bg-gray-50 p-4 rounded-sm mb-6 border'>
-          <div className='text-sm text-gray-700 line-clamp-3 leading-relaxed break-all'>
+          <div className='text-sm text-gray-700 line-clamp-3 leading-relaxed break-keep wrap-anywhere'>
             {draft}
           </div>
         </div>

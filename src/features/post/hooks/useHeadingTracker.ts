@@ -2,13 +2,11 @@
 
 import Heading from '@/features/post/domain/model/heading';
 import useThrottle from '@/hooks/useThrottle';
-import { RefObject, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function useHeadingTracker({
-  postContentRef,
   headings,
 }: {
-  postContentRef: RefObject<HTMLElement | null>;
   headings: Heading[];
 }) {
   const throttle = useThrottle();
@@ -18,8 +16,8 @@ export default function useHeadingTracker({
   );
 
   useEffect(() => {
-    if (typeof window === 'undefined' || !postContentRef.current) return;
-    const postContent = postContentRef.current;
+    const postContent = document.querySelector('[data-post-content]');
+    if (typeof window === 'undefined' || !postContent) return;
 
     const positionMap = new Map<Heading, number>();
     headings.forEach(heading => {
@@ -32,7 +30,7 @@ export default function useHeadingTracker({
     });
 
     setPositionMap(positionMap);
-  }, [headings, postContentRef]);
+  }, [headings]);
 
   const getCurrentHeading = useCallback(() => {
     if (typeof window === 'undefined' || !positionMap) return null;

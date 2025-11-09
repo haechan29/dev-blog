@@ -9,12 +9,10 @@ import {
   setPagination,
 } from '@/lib/redux/post/postPositionSlice';
 import { AppDispatch } from '@/lib/redux/store';
-import { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function usePostParsing(
-  postContentRef: RefObject<HTMLElement | null>
-) {
+export default function usePostParsing() {
   const dispatch = useDispatch<AppDispatch>();
 
   const [pages, setPages] = useState<Page[] | null>(null);
@@ -28,9 +26,9 @@ export default function usePostParsing(
   }, [pageNumber, pages]);
 
   const parsePost = useCallback(() => {
-    if (!containerSize || !postContentRef.current) return;
+    const postContent = document.querySelector('[data-post-content]');
+    if (!containerSize || !postContent) return;
 
-    const postContent = postContentRef.current;
     const { width: containerWidth, height: containerHeight } = containerSize;
 
     const { pages, headingPageMapping } = parsePostInner({
@@ -42,7 +40,7 @@ export default function usePostParsing(
     dispatch(setHeadingPageMapping(headingPageMapping));
     dispatch(setPagination({ current: 0, total: pages.length }));
     setPages(pages);
-  }, [containerSize, dispatch, postContentRef]);
+  }, [containerSize, dispatch]);
 
   useEffect(() => {
     const timer = setTimeout(parsePost, 100);

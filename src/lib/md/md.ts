@@ -9,7 +9,7 @@ import {
   remarkSpacer,
   remarkTextBreaks,
 } from '@/lib/md/remark';
-import React, { JSX } from 'react';
+import { createElement, Fragment, JSX } from 'react';
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeReact from 'rehype-react';
 import rehypeSanitize from 'rehype-sanitize';
@@ -38,7 +38,8 @@ const processor = unified()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     rehypeReact as any, // convert HTML AST to React components
     {
-      createElement: React.createElement,
+      createElement,
+      Fragment,
       components: {
         a: ExternalLink,
         bgm: Bgm,

@@ -8,7 +8,7 @@ import usePostReader from '@/features/post/hooks/usePostReader';
 import useScrollTracker from '@/features/post/hooks/useScrollTracker';
 import { PostProps } from '@/features/post/ui/postProps';
 import usePostParsing from '@/features/postViewer/hooks/usePostParsing';
-import { ReactNode, useRef } from 'react';
+import { ReactNode } from 'react';
 
 export default function PostContentWrapper({
   post,
@@ -19,15 +19,14 @@ export default function PostContentWrapper({
   parsed: ReactNode;
   raw: ReactNode;
 }) {
-  const postContentRef = useRef<HTMLDivElement | null>(null);
-  const { page } = usePostParsing(postContentRef);
+  const { page } = usePostParsing();
   const {
     postReader: { mode, isTableVisible },
   } = usePostReader();
 
-  useContentTracker(postContentRef);
+  useContentTracker();
   useScrollTracker();
-  useHeadingSync(postContentRef, post);
+  useHeadingSync(post);
 
   return (
     <>
@@ -41,13 +40,7 @@ export default function PostContentWrapper({
       )}
 
       <PostViewer post={post} page={page} />
-      <div className='mb-20'>
-        {mode === 'raw' ? (
-          <div>{raw}</div>
-        ) : (
-          <div ref={postContentRef}>{parsed}</div>
-        )}
-      </div>
+      <div className='mb-20'>{mode === 'raw' ? <>{raw}</> : <>{parsed}</>}</div>
     </>
   );
 }

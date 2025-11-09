@@ -4,16 +4,13 @@ import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import { setCurrentHeading } from '@/lib/redux/post/postPositionSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { scrollToElement } from '@/lib/scroll';
-import { RefObject, useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function useHeadingSync(
-  postContentRef: RefObject<HTMLElement | null>,
-  post: PostProps
-) {
+export default function useHeadingSync(post: PostProps) {
   const dispatch = useDispatch<AppDispatch>();
   const { currentHeading, isViewerMode } = usePostViewer();
-  const { heading } = useHeadingTracker({ postContentRef, ...post });
+  const { heading } = useHeadingTracker(post);
 
   const scrollToCurrentHeading = useCallback(() => {
     if (!currentHeading) return;
