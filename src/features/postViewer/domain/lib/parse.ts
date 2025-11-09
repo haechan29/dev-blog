@@ -2,6 +2,7 @@ import Heading from '@/features/post/domain/model/heading';
 import { HeadingPageMapping } from '@/features/postViewer/domain/types/headingPageMapping';
 import { Page } from '@/features/postViewer/domain/types/page';
 import { getIntrinsicSize } from '@/lib/dom';
+import { cn } from '@/lib/utils';
 
 /**
  * Parses post into pages and creates heading-page mapping.
@@ -29,8 +30,6 @@ export function parsePost({
   let currentPage: Page = [];
   let currentHeight = 0;
 
-  let wasLastElementPaged = false;
-
   function registerHeading(element: Element, pageIndex: number) {
     const level = parseInt(element.tagName.substring(1));
 
@@ -48,38 +47,42 @@ export function parsePost({
   Array.from(postElement.children)
     .filter(child => !excludeClassNames.includes(child.className))
     .forEach(child => {
-      const isPagedElement = child.classList.contains('paged');
-      const isCaptionElement = child.classList.contains('caption');
+      const isImageWithCaption = child.matches('[data-image-with-caption]');
       const isHeadingElement = child.matches('h1, h2, h3, h4, h5, h6');
       const hasNonEmptyContent =
         currentPage.length > 0 && !currentPage.every(isEmptyContent);
 
-      if (isPagedElement) {
-        // save current page before creating paged element
+      if (isImageWithCaption) {
+        // save current page before creating new pages
         if (hasNonEmptyContent) {
           pages.push([...currentPage]);
           currentPage = [];
           currentHeight = 0;
         }
 
-        const pagedElement = createPagedElement(
+        const imagePage = createImagePage(
           child,
           containerWidth,
           containerHeight
         );
-        pages.push([pagedElement]);
-      } else if (isCaptionElement && wasLastElementPaged) {
-        const lastPage = pages.pop()!;
-        const pagedElement = lastPage[0];
 
-        // split caption into sentences and create separate page for each
-        const sentences = getSentences(child);
-        sentences.forEach(sentence => {
-          const pagedElementClone = pagedElement.cloneNode(true) as HTMLElement;
-          const captionElement = createCaptionElement(sentence);
+        const caption = child.getAttribute('data-caption');
+        if (caption) {
+          const newCaptions = caption
+            .replace(/\\#/g, '__ESCAPED_HASH__')
+            .replace(/#/g, '')
+            .replace(/__ESCAPED_HASH__/g, '#')
+            .split('\n');
 
-          pages.push([pagedElementClone, captionElement]);
-        });
+          newCaptions.forEach(caption => {
+            const imagePageClone = imagePage.cloneNode(true) as HTMLElement;
+            const captionElement = createCaptionElement(caption);
+
+            pages.push([imagePageClone, captionElement]);
+          });
+        } else {
+          pages.push([imagePage]);
+        }
       } else if (isHeadingElement) {
         // heading belongs to next page if current page has content, otherwise current page.
         const pageIndex = hasNonEmptyContent ? pages.length + 1 : pages.length;
@@ -109,8 +112,6 @@ export function parsePost({
           currentHeight += elementHeight;
         }
       }
-
-      wasLastElementPaged = isPagedElement;
     });
 
   const hasNonEmptyContent =
@@ -129,13 +130,16 @@ export function parsePost({
   };
 }
 
-function createPagedElement(
+function createImagePage(
   element: Element,
   containerWidth: number,
   containerHeight: number
 ): Element {
-  const pagedClone = element.cloneNode(false) as HTMLElement;
-  pagedClone.className += ' w-full h-full flex justify-center items-center';
+  const imageClone = element.cloneNode(false) as HTMLElement;
+  imageClone.className = cn(
+    'w-full h-full flex justify-center items-center',
+    imageClone.className
+  );
 
   const child = element.firstElementChild as HTMLElement;
   if (child) {
@@ -144,11 +148,11 @@ function createPagedElement(
     const { width, height } = getIntrinsicSize(clone);
     const scale = Math.min(containerWidth / width, containerHeight / height);
     clone.style.setProperty('--scale', scale.toString());
-    clone.className += ' scale-[var(--scale)] origin-center';
+    clone.className = cn('scale-[var(--scale)] origin-center', clone.className);
 
-    pagedClone.appendChild(clone);
+    imageClone.appendChild(clone);
   }
-  return pagedClone;
+  return imageClone;
 }
 
 function createCaptionElement(sentence: string) {
@@ -158,18 +162,10 @@ function createCaptionElement(sentence: string) {
 
   const content = document.createElement('div');
   content.className =
-    'bg-black/70 text-white text-center break-keep text-balance px-2 py-1';
+    'bg-black/70 text-white text-center break-keep wrap-anywhere text-balance px-2 py-1';
   content.textContent = sentence;
   captionElement.appendChild(content);
   return captionElement;
-}
-
-function getSentences(element: Element): string[] {
-  const text = element.textContent || '';
-  return text
-    .split(/(?<=[.!?])\s+/) // split sentences by punctuation marks (., !, ?)
-    .map(s => s.trim())
-    .filter(s => s.length > 0);
 }
 
 function getElementHeight(element: Element) {
