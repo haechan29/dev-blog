@@ -43,8 +43,8 @@ export default function useWritePostTag({
 
   const deleteTag = useCallback(() => {
     if (tags.length === 0) return;
-    setTag(tags.pop()!);
-    setTags(tags);
+    setTag(tags.at(-1)!);
+    setTags(tags.slice(0, -1));
   }, [setTags, tags]);
 
   const updateTag = useCallback(

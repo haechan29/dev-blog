@@ -34,7 +34,7 @@ export default function WritePostContentEditor({
   const {
     writePostForm: {
       draft: { content: draft },
-      content: { maxLength, isValid },
+      content: { value: content, isUserInput, maxLength, isValid },
     },
   } = useWritePostForm();
   const [contentInner, setContentInner] = useState('');
@@ -110,8 +110,14 @@ export default function WritePostContentEditor({
   }, [draft]);
 
   useEffect(() => {
-    dispatch(setContent(contentInner));
+    dispatch(setContent({ value: contentInner, isUserInput: true }));
   }, [contentInner, dispatch]);
+
+  useEffect(() => {
+    if (!isUserInput) {
+      setContentInner(content);
+    }
+  }, [content, isUserInput]);
 
   return (
     <div className='flex flex-col h-full'>

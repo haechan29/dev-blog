@@ -21,7 +21,7 @@ export default function WritePostTitle() {
   const {
     writePostForm: {
       draft: { title: draft },
-      title: { isValid, maxLength },
+      title: { value: title, isUserInput, isValid, maxLength },
     },
   } = useWritePostForm();
   const [titleInner, setTitleInner] = useState('');
@@ -48,7 +48,6 @@ export default function WritePostTitle() {
     if (!isFocused) {
       const newTitle = titleInner.slice(0, maxLength);
       setTitleInner(newTitle);
-      dispatch(setTitle(newTitle));
     }
   }, [dispatch, isFocused, maxLength, titleInner]);
 
@@ -58,8 +57,14 @@ export default function WritePostTitle() {
   }, [draft]);
 
   useEffect(() => {
-    dispatch(setTitle(titleInner));
+    dispatch(setTitle({ value: titleInner, isUserInput: true }));
   }, [dispatch, titleInner]);
+
+  useEffect(() => {
+    if (!isUserInput) {
+      setTitleInner(title);
+    }
+  }, [isUserInput, title]);
 
   return (
     <div

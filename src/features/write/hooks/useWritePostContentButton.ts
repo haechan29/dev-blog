@@ -65,14 +65,14 @@ export default function useWritePostContentButton({
       const finalCursorPosition =
         newCursorPosition === -1 ? selectionStart : newCursorPosition;
 
-      dispatch(setContent(finalText));
+      dispatch(setContent({ value: finalText, isUserInput: false }));
       setTimeout(() => {
         contentEditor.focus();
         contentEditor.setSelectionRange(
           finalCursorPosition,
           finalCursorPosition
         );
-      }, 0);
+      }, 100);
     },
     [content, contentEditorRef, dispatch]
   );
@@ -138,14 +138,14 @@ export default function useWritePostContentButton({
       const finalCursorPosition =
         newCursorPosition === -1 ? selectionStart : newCursorPosition;
 
-      dispatch(setContent(finalText));
+      dispatch(setContent({ value: finalText, isUserInput: false }));
       setTimeout(() => {
         contentEditor.focus();
         contentEditor.setSelectionRange(
           finalCursorPosition,
           finalCursorPosition
         );
-      }, 0);
+      }, 100);
     },
     [contentEditorRef, dispatch]
   );
@@ -173,11 +173,11 @@ export default function useWritePostContentButton({
       const newText = textBefore + newTable + textAfter;
       const newCursorPosition = rangeStart + cursorPosition;
 
-      dispatch(setContent(newText));
+      dispatch(setContent({ value: newText, isUserInput: false }));
       setTimeout(() => {
         contentEditor.focus();
         contentEditor.setSelectionRange(newCursorPosition, newCursorPosition);
-      }, 0);
+      }, 100);
     },
     [contentEditorRef, dispatch]
   );

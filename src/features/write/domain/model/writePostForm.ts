@@ -2,11 +2,13 @@ export interface WritePostForm {
   invalidField: string | null;
   title: {
     value: string;
+    isUserInput: boolean;
     isEmptyAllowed: boolean;
     maxLength: number;
   };
   tags: {
     value: string[];
+    isUserInput: boolean;
     isEmptyAllowed: boolean;
     maxTagLength: number;
     maxTagsLength: number;
@@ -19,6 +21,7 @@ export interface WritePostForm {
   };
   content: {
     value: string;
+    isUserInput: boolean;
     isEmptyAllowed: boolean;
     maxLength: number;
   };

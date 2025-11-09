@@ -6,11 +6,13 @@ export type WritePostFormProps = {
   currentStepId: keyof typeof writePostSteps;
   title: {
     value: string;
+    isUserInput: boolean;
     isValid: boolean;
     maxLength: number;
   };
   tags: {
     value: string[];
+    isUserInput: boolean;
     isValid: boolean;
     maxTagLength: number;
     maxTagsLength: number;
@@ -23,6 +25,7 @@ export type WritePostFormProps = {
   };
   content: {
     value: string;
+    isUserInput: boolean;
     isValid: boolean;
     maxLength: number;
   };
@@ -42,11 +45,13 @@ export function createProps(
     draft: form.draft,
     title: {
       value: form.title.value,
+      isUserInput: form.title.isUserInput,
       isValid: form.invalidField !== 'title',
       maxLength: form.title.maxLength,
     },
     tags: {
       value: form.tags.value,
+      isUserInput: form.tags.isUserInput,
       isValid: form.invalidField !== 'tags',
       maxTagLength: form.tags.maxTagLength,
       maxTagsLength: form.tags.maxTagsLength,
@@ -59,6 +64,7 @@ export function createProps(
     },
     content: {
       value: form.content.value,
+      isUserInput: form.content.isUserInput,
       isValid: form.invalidField !== 'content',
       maxLength: form.content.maxLength,
     },

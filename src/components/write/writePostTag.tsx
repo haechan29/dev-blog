@@ -19,7 +19,14 @@ export default function WritePostTag() {
   const {
     writePostForm: {
       draft: { tags: draft },
-      tags: { maxTagLength, maxTagsLength, isValid, delimiter },
+      tags: {
+        value: tags,
+        isUserInput,
+        maxTagLength,
+        maxTagsLength,
+        isValid,
+        delimiter,
+      },
     },
   } = useWritePostForm();
   const [tagsInner, setTagsInner] = useState<string[]>([]);
@@ -61,8 +68,14 @@ export default function WritePostTag() {
   }, [draft]);
 
   useEffect(() => {
-    dispatch(setTags(tagsInner));
+    dispatch(setTags({ value: tagsInner, isUserInput: true }));
   }, [dispatch, tagsInner]);
+
+  useEffect(() => {
+    if (!isUserInput) {
+      setTagsInner(tags);
+    }
+  }, [isUserInput, tags]);
 
   return (
     <div
