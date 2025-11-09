@@ -69,7 +69,7 @@ export function remarkSpacer() {
       while (lineBreakIndex >= 0) {
         const [breakStart, breakCount] = lineBreaks[lineBreakIndex];
         if (breakStart < nodeEnd) break;
-        if (breakStart === nodeEnd) {
+        if (breakStart === nodeEnd && breakCount >= 2) {
           tree.children.splice(i + 1, 0, {
             type: 'spacer',
             data: {

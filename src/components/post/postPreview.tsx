@@ -40,7 +40,7 @@ export default function PostPreview({
         className='w-full flex flex-col gap-4 text-gray-900'
       >
         <div className='text-2xl font-semibold line-clamp-2'>{title}</div>
-        <div className='whitespace-pre-line'>
+        <div className='whitespace-pre-wrap break-all'>
           {isScrollAnimationEnabled ? (
             <div className='relative h-18'>
               <div

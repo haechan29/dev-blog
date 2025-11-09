@@ -37,7 +37,6 @@ export default function usePostParsing(
       postElement: postContent,
       containerWidth,
       containerHeight,
-      excludeClassNames: ['hide-fullscreen'],
     });
 
     dispatch(setHeadingPageMapping(headingPageMapping));

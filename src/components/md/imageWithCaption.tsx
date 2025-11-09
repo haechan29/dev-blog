@@ -25,7 +25,12 @@ export default function ImageWithCaption({
   useEffect(() => setIsError(false), [src]);
 
   return (
-    <div className='flex flex-col gap-4'>
+    <div
+      data-image-with-caption
+      data-size={size}
+      data-caption={caption}
+      className='flex flex-col gap-4'
+    >
       {isError ? (
         <div
           className='flex items-center justify-center p-4 rounded-xl bg-gray-200 text-gray-700 m-4'
@@ -40,7 +45,7 @@ export default function ImageWithCaption({
           width={1000}
           height={1000}
           onError={() => setIsError(true)}
-          onLoadingComplete={() => setIsError(false)}
+          onLoad={() => setIsError(false)}
           className={clsx(
             'h-auto',
             size === 'large' ? 'w-full' : 'min-w-56 w-1/2'

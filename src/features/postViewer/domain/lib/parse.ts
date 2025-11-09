@@ -46,12 +46,7 @@ export function parsePost({
   }
 
   Array.from(postElement.children)
-    .filter(
-      child =>
-        !excludeClassNames.every(className =>
-          child.className.includes(className)
-        )
-    )
+    .filter(child => !excludeClassNames.includes(child.className))
     .forEach(child => {
       const isPagedElement = child.classList.contains('paged');
       const isCaptionElement = child.classList.contains('caption');
