@@ -1,5 +1,5 @@
 import type { Element } from 'hast';
-import { Paragraph, PhrasingContent } from 'mdast';
+import { Paragraph, PhrasingContent, Root } from 'mdast';
 import type {
   ContainerDirective,
   LeafDirective,
@@ -26,12 +26,14 @@ export const schema: Options = {
       'data-bgm',
       'data-youtube-url',
       'data-start-time',
+      'data-spacer',
+      'data-lines',
     ],
   },
 };
 
-export function remarkBreaks() {
-  return (tree: Node, file: VFile) => {
+export function remarkTextBreaks() {
+  return (tree: Root, file: VFile) => {
     const source = String(file.value);
     const lineBreaks = findLineBreaks(source);
     let lineBreakIndex = 0;
@@ -46,8 +48,8 @@ export function remarkBreaks() {
 
           while (lineBreakIndex < lineBreaks.length) {
             const [breakStart, breakCount] = lineBreaks[lineBreakIndex];
-            if (breakStart > nodeEnd) break;
-            if (breakStart >= nodeStart) {
+            if (breakStart >= nodeEnd) break;
+            if (breakStart > nodeStart) {
               currentLineBreaks.push([breakStart, breakCount]);
             }
             lineBreakIndex++;
@@ -76,8 +78,38 @@ export function remarkBreaks() {
   };
 }
 
+export function remarkSpacer() {
+  return (tree: Root, file: VFile) => {
+    const source = String(file.value);
+    const lineBreaks = findLineBreaks(source);
+    let lineBreakIndex = lineBreaks.length - 1;
+
+    for (let i = tree.children.length - 1; i >= 0; i--) {
+      const child = tree.children[i];
+      const nodeEnd = child.position!.end.offset!;
+
+      while (lineBreakIndex >= 0) {
+        const [breakStart, breakCount] = lineBreaks[lineBreakIndex];
+        if (breakStart < nodeEnd) break;
+        if (breakStart === nodeEnd) {
+          tree.children.splice(i + 1, 0, {
+            type: 'spacer',
+            data: {
+              hProperties: {
+                'data-spacer': '',
+                'data-lines': `${breakCount - 1}`,
+              },
+            },
+          });
+        }
+        lineBreakIndex--;
+      }
+    }
+  };
+}
+
 export function remarkImg() {
-  return (tree: Node) => {
+  return (tree: Root) => {
     visit(tree, (node: Node, index?: number, parent?: Parent) => {
       if (index === undefined || !parent) return;
       if (!isDirectiveNode(node) || node.name !== 'img') return;
@@ -115,7 +147,7 @@ export function remarkImg() {
 }
 
 export function remarkBgm() {
-  return (tree: Node) => {
+  return (tree: Root) => {
     visit(tree, (node: Node, index?: number, parent?: Parent) => {
       if (index === undefined || !parent) return;
       if (!isDirectiveNode(node) || node.name !== 'bgm') return;
@@ -144,6 +176,16 @@ export function rehypeBgm() {
     visit(tree, 'element', (node: Element) => {
       if (node.tagName === 'div' && 'data-bgm' in node.properties) {
         node.tagName = 'bgm';
+      }
+    });
+  };
+}
+
+export function rehypeSpacer() {
+  return (tree: Node) => {
+    visit(tree, 'element', (node: Element) => {
+      if (node.tagName === 'div' && 'data-spacer' in node.properties) {
+        node.tagName = 'spacer';
       }
     });
   };
