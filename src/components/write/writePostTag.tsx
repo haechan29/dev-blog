@@ -18,7 +18,6 @@ import { useDispatch } from 'react-redux';
 export default function WritePostTag() {
   const {
     writePostForm: {
-      draft: { tags: draft },
       tags: {
         value: tags,
         isUserInput,
@@ -62,10 +61,6 @@ export default function WritePostTag() {
     },
     [dispatch, updateTag]
   );
-
-  useEffect(() => {
-    setTagsInner(draft);
-  }, [draft]);
 
   useEffect(() => {
     dispatch(setTags({ value: tagsInner, isUserInput: true }));

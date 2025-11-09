@@ -20,7 +20,6 @@ import { useDispatch } from 'react-redux';
 export default function WritePostTitle() {
   const {
     writePostForm: {
-      draft: { title: draft },
       title: { value: title, isUserInput, isValid, maxLength },
     },
   } = useWritePostForm();
@@ -50,11 +49,6 @@ export default function WritePostTitle() {
       setTitleInner(newTitle);
     }
   }, [dispatch, isFocused, maxLength, titleInner]);
-
-  useEffect(() => {
-    if (!draft) return;
-    setTitleInner(draft);
-  }, [draft]);
 
   useEffect(() => {
     dispatch(setTitle({ value: titleInner, isUserInput: true }));

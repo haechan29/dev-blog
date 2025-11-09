@@ -33,7 +33,6 @@ export default function WritePostContentEditor({
 }) {
   const {
     writePostForm: {
-      draft: { content: draft },
       content: { value: content, isUserInput, maxLength, isValid },
     },
   } = useWritePostForm();
@@ -103,11 +102,6 @@ export default function WritePostContentEditor({
   );
 
   useScrollLock({ isLocked, allowedSelectors: ['[data-content-editor]'] });
-
-  useEffect(() => {
-    if (!draft) return;
-    setContentInner(draft);
-  }, [draft]);
 
   useEffect(() => {
     dispatch(setContent({ value: contentInner, isUserInput: true }));
