@@ -1,4 +1,4 @@
-import { processMd } from '@/lib/md';
+import { processMd } from '@/lib/md/md';
 import { ErrorBoundary } from 'react-error-boundary';
 
 export default async function PostParsedContent({

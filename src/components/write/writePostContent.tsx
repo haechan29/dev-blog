@@ -7,7 +7,7 @@ import { Content } from '@/features/write/domain/types/content';
 import useWritePostContentButton from '@/features/write/hooks/useWritePostContentButton';
 import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import useDebounce from '@/hooks/useDebounce';
-import { processMd } from '@/lib/md';
+import { processMd } from '@/lib/md/md';
 import { useEffect, useRef, useState } from 'react';
 
 export default function WritePostContent() {

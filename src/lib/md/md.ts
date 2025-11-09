@@ -2,15 +2,13 @@ import Bgm from '@/components/md/bgm';
 import ExternalLink from '@/components/md/externalLink';
 import ImageWithCaption from '@/components/md/imageWithCaption';
 import Spacer from '@/components/md/spacer';
+import { rehypeBgm, rehypeSpacer, schema } from '@/lib/md/rehype';
 import {
-  rehypeBgm,
-  rehypeSpacer,
   remarkBgm,
   remarkImg,
   remarkSpacer,
   remarkTextBreaks,
-  schema,
-} from '@/lib/mdConfig';
+} from '@/lib/md/remark';
 import React, { JSX } from 'react';
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeReact from 'rehype-react';
@@ -21,8 +19,6 @@ import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { unified } from 'unified';
-
-export const LINE_BREAK_MARKER = '{{LINE_BREAK}}';
 
 const processor = unified()
   .use(remarkParse) // parse markdown text into AST
