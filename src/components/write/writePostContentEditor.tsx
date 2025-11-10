@@ -54,21 +54,17 @@ export default function WritePostContentEditor({
       const textArea = e.currentTarget;
       dispatch(setInvalidField(null));
       setContentInner(textArea.value);
-      dispatch(setContentEditorStatus({ isFocused: true, shouldScroll: true }));
     },
     [dispatch]
   );
 
   const onFocus = useCallback(() => {
-    dispatch(setContentEditorStatus({ isFocused: true, shouldScroll: true }));
+    dispatch(setContentEditorStatus({ isFocused: true }));
     setIsLocked(true);
   }, [dispatch]);
 
   const onBlur = useCallback(() => {
-    const newStatus = setContentEditorStatus({
-      isFocused: false,
-      shouldScroll: false,
-    });
+    const newStatus = setContentEditorStatus({ isFocused: false });
     dispatch(newStatus);
     setIsLocked(false);
   }, [dispatch]);
@@ -84,6 +80,21 @@ export default function WritePostContentEditor({
       setContentInner(content);
     }
   }, [content, isUserInput]);
+
+  useEffect(() => {
+    const onSelectionChange = () => {
+      const activeElement = document.activeElement;
+      const isActive =
+        activeElement?.hasAttribute('data-content-editor') ?? false;
+      if (!isActive) return;
+      const cursorPosition = (activeElement as HTMLTextAreaElement)
+        .selectionStart;
+      dispatch(setContentEditorStatus({ cursorPosition }));
+    };
+    document.addEventListener('selectionchange', onSelectionChange);
+    return () =>
+      document.removeEventListener('selectionchange', onSelectionChange);
+  }, [dispatch]);
 
   return (
     <div className='flex flex-col h-full'>

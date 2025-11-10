@@ -7,7 +7,7 @@ const initialState: WritePost = {
   currentStepId: 'write',
   contentEditorStatus: {
     isFocused: false,
-    scrollRatio: 0,
+    cursorPosition: 0,
   },
 };
 
@@ -23,13 +23,11 @@ const writePostSlice = createSlice({
     },
     setContentEditorStatus: (
       state,
-      action: PayloadAction<ContentEditorStatus>
+      action: PayloadAction<Partial<ContentEditorStatus>>
     ) => {
-      const prevScrollRatio = state.contentEditorStatus.scrollRatio;
-      const { isFocused, scrollRatio } = action.payload;
       state.contentEditorStatus = {
-        isFocused,
-        scrollRatio: scrollRatio ?? prevScrollRatio,
+        ...state.contentEditorStatus,
+        ...action.payload,
       };
     },
   },
