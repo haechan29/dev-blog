@@ -1,6 +1,5 @@
 'use client';
 
-import { Content } from '@/features/write/domain/types/content';
 import useContentToolbar from '@/features/write/hooks/useContentToolbar';
 import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import useScrollLock from '@/hooks/useScrollLock';
@@ -11,22 +10,13 @@ import {
 } from '@/lib/redux/write/writePostFormSlice';
 import { setContentEditorStatus } from '@/lib/redux/write/writePostSlice';
 import clsx from 'clsx';
-import {
-  ChangeEvent,
-  RefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function WritePostContentEditor({
-  contentEditorRef,
-  parsedContent,
+  isError,
 }: {
-  contentEditorRef: RefObject<HTMLTextAreaElement | null>;
-  parsedContent: Content;
+  isError: boolean;
 }) {
   const {
     writePostForm: {
@@ -40,10 +30,6 @@ export default function WritePostContentEditor({
 
   const dispatch = useDispatch<AppDispatch>();
   const [isLocked, setIsLocked] = useState(false);
-  const isError = useMemo(() => {
-    return parsedContent.status === 'error';
-  }, [parsedContent.status]);
-
   const isContentTooLong = useMemo(
     () => contentInner.length > maxLength,
     [contentInner.length, maxLength]
@@ -100,7 +86,6 @@ export default function WritePostContentEditor({
     <div className='flex flex-col h-full'>
       <textarea
         data-content-editor
-        ref={contentEditorRef}
         value={contentInner}
         onFocus={onFocus}
         onBlur={onBlur}

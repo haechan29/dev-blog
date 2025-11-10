@@ -2,10 +2,8 @@
 
 import Tooltip from '@/components/tooltip';
 import useContentToolbar from '@/features/write/hooks/useContentToolbar';
-import {
-  ButtonContent,
-  WritePostContentButtonProps,
-} from '@/features/write/ui/writePostContentButtonProps';
+import useWritePostContentButton from '@/features/write/hooks/useWritePostContentButton';
+import { ButtonContent } from '@/features/write/ui/writePostContentButtonProps';
 import clsx from 'clsx';
 import {
   AlignCenter,
@@ -22,25 +20,12 @@ import {
   Shrink,
   Timer,
 } from 'lucide-react';
-import { useCallback } from 'react';
 
-export default function WritePostContentToolbar({
-  contentButtons,
-  activeType,
-  onAction,
-}: {
-  contentButtons: WritePostContentButtonProps[];
-  activeType: string;
-  onAction: (editor: WritePostContentButtonProps) => void;
-}) {
+export default function WritePostContentToolbar() {
+  const { contentButtons, activeType, onAction } = useWritePostContentButton();
   const {
     contentToolbar: { shouldAttachToolbarToBottom, toolbarTranslateY },
   } = useContentToolbar();
-
-  const onToolbarButtonClick = useCallback(
-    (button: WritePostContentButtonProps) => onAction(button),
-    [onAction]
-  );
 
   return (
     <div
@@ -63,7 +48,7 @@ export default function WritePostContentToolbar({
         .map(button => (
           <Tooltip key={button.label} text={button.label} direction='top'>
             <button
-              onClick={() => onToolbarButtonClick(button)}
+              onClick={() => onAction(button)}
               className='min-w-10 h-10 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer'
             >
               <ContentButton buttonContent={button.content} />

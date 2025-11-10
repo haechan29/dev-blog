@@ -11,18 +11,14 @@ import {
 } from '@/features/write/ui/writePostContentButtonProps';
 import { AppDispatch } from '@/lib/redux/store';
 import { setContent } from '@/lib/redux/write/writePostFormSlice';
-import { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 const IMAGE_DIRECTIVE_PATTERN = ':::img[\\s\\S]*?:::';
 const BGM_DIRECTIVE_PATTERN = '::bgm\\{[^}]*\\}';
 const CURSOR_MARKER = '__NEW_CURSOR_POSITION__';
 
-export default function useWritePostContentButton({
-  contentEditorRef,
-}: {
-  contentEditorRef: RefObject<HTMLTextAreaElement | null>;
-}) {
+export default function useWritePostContentButton() {
   const {
     writePostForm: {
       content: { value: content },
@@ -37,8 +33,10 @@ export default function useWritePostContentButton({
 
   const handleMarkdownAction = useCallback(
     ({ isBlock, markdownBefore, markdownAfter = '' }: MarkdownButtonProps) => {
-      if (!contentEditorRef.current) return;
-      const contentEditor = contentEditorRef.current;
+      const contentEditor = document.querySelector(
+        '[data-content-editor]'
+      ) as HTMLTextAreaElement;
+      if (!contentEditor) return;
 
       const { selectionStart, selectionEnd } = contentEditor;
       const [textBefore, selectedText, textAfter] = [
@@ -74,13 +72,15 @@ export default function useWritePostContentButton({
         );
       }, 100);
     },
-    [content, contentEditorRef, dispatch]
+    [content, dispatch]
   );
 
   const handleDirectiveAction = useCallback(
     ({ type, position, key, value }: DirectiveButtonProps) => {
-      if (!contentEditorRef.current) return;
-      const contentEditor = contentEditorRef.current;
+      const contentEditor = document.querySelector(
+        '[data-content-editor]'
+      ) as HTMLTextAreaElement;
+      if (!contentEditor) return;
       const { selectionStart, selectionEnd, value: content } = contentEditor;
       const ranges = parseDirectiveRanges(content, type);
 
@@ -147,13 +147,15 @@ export default function useWritePostContentButton({
         );
       }, 100);
     },
-    [contentEditorRef, dispatch]
+    [dispatch]
   );
 
   const handleTableAction = useCallback(
     ({ direction }: TableButtonProps) => {
-      if (!contentEditorRef.current) return;
-      const contentEditor = contentEditorRef.current;
+      const contentEditor = document.querySelector(
+        '[data-content-editor]'
+      ) as HTMLTextAreaElement;
+      if (!contentEditor) return;
       const { selectionStart, selectionEnd, value: content } = contentEditor;
       const ranges = parseTableRanges(content);
 
@@ -179,7 +181,7 @@ export default function useWritePostContentButton({
         contentEditor.setSelectionRange(newCursorPosition, newCursorPosition);
       }, 100);
     },
-    [contentEditorRef, dispatch]
+    [dispatch]
   );
 
   const onAction = useCallback(
@@ -198,8 +200,10 @@ export default function useWritePostContentButton({
 
   useEffect(() => {
     const onSelectionChange = () => {
-      if (!contentEditorRef.current) return;
-      const contentEditor = contentEditorRef.current;
+      const contentEditor = document.querySelector(
+        '[data-content-editor]'
+      ) as HTMLTextAreaElement;
+      if (!contentEditor) return;
       const activeElement = document.activeElement;
       if (activeElement !== contentEditor) return;
 
@@ -229,7 +233,7 @@ export default function useWritePostContentButton({
     return () => {
       document.removeEventListener('selectionchange', onSelectionChange);
     };
-  }, [contentButtonProps, contentEditorRef]);
+  }, [contentButtonProps]);
 
   return {
     contentButtons: contentButtonProps,
