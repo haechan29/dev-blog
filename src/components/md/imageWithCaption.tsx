@@ -8,11 +8,15 @@ export default function ImageWithCaption({
   src,
   'data-size': size,
   'data-caption': caption,
+  'data-start-offset': startOffset,
+  'data-end-offset': endOffset,
   alt = '',
 }: {
   src: string;
   'data-size': 'medium' | 'large';
   'data-caption': string;
+  'data-start-offset': string;
+  'data-end-offset': string;
   alt?: string;
 }) {
   const [isError, setIsError] = useState(false);
@@ -27,6 +31,8 @@ export default function ImageWithCaption({
   return (
     <div
       data-image-with-caption
+      data-start-offset={startOffset}
+      data-end-offset={endOffset}
       data-size={size}
       data-caption={caption}
       className='flex flex-col gap-4'

@@ -122,11 +122,13 @@ export function remarkImg() {
         .join('\n');
 
       const newNode = {
+        ...node,
         type: 'image',
         url,
         alt,
         data: {
           hProperties: {
+            ...(node.data?.hProperties ?? {}),
             'data-size': size,
             'data-caption': caption,
           },
@@ -147,6 +149,7 @@ export function remarkBgm() {
       if (!youtubeUrl) return;
 
       const newNode = {
+        ...node,
         type: 'bgm',
         data: {
           hProperties: {

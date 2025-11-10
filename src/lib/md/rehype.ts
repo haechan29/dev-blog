@@ -2,12 +2,6 @@ import type { Element, ElementContent, Node, Parent, Root } from 'hast';
 import { defaultSchema, type Options } from 'rehype-sanitize';
 import { visit } from 'unist-util-visit';
 
-type NodeStatus = {
-  node: Node;
-  index: number;
-  parent: Parent;
-};
-
 export const schema: Options = {
   ...defaultSchema,
   attributes: {

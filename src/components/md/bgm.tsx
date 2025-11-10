@@ -5,9 +5,13 @@ import { useEffect, useMemo, useState } from 'react';
 export default function Bgm({
   'data-youtube-url': youtubeUrl,
   'data-start-time': startTime,
+  'data-start-offset': startOffset,
+  'data-end-offset': endOffset,
 }: {
   'data-youtube-url': string;
   'data-start-time': string;
+  'data-start-offset': string;
+  'data-end-offset': string;
 }) {
   const [isError, setIsError] = useState(false);
   const embedUrl = useMemo(() => {
@@ -23,6 +27,8 @@ export default function Bgm({
 
   return isError || !embedUrl ? (
     <div
+      data-start-offset={startOffset}
+      data-end-offset={endOffset}
       className='flex flex-col items-center justify-center p-4 rounded-xl bg-gray-200 text-gray-700 m-4'
       aria-label='유효하지 않은 링크입니다'
     >
@@ -30,6 +36,8 @@ export default function Bgm({
     </div>
   ) : (
     <iframe
+      data-start-offset={startOffset}
+      data-end-offset={endOffset}
       src={embedUrl}
       onError={() => setIsError(true)}
       onLoad={() => setIsError(false)}
