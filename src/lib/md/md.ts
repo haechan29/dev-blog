@@ -2,7 +2,7 @@ import Bgm from '@/components/md/bgm';
 import ExternalLink from '@/components/md/externalLink';
 import ImageWithCaption from '@/components/md/imageWithCaption';
 import Spacer from '@/components/md/spacer';
-import { rehypeBgm, rehypeOffset, rehypeSpacer, schema } from '@/lib/md/rehype';
+import { rehypeOffset, rehypeTagName, schema } from '@/lib/md/rehype';
 import {
   remarkBgm,
   remarkImg,
@@ -30,11 +30,10 @@ const processor = unified()
   .use(remarkBgm) // process bgm nodes
   .use(remarkRehype) // convert markdown AST to HTML AST
   .use(rehypeSanitize, schema) // remove unsafe HTML tags and attributes
-  .use(rehypeOffset) // add offset attribute to element
   .use(rehypePrettyCode) // add syntax highlighting to code blocks
   .use(rehypeSlug) // add id attributes to headings
-  .use(rehypeBgm) // process bgm elements
-  .use(rehypeSpacer) // process spacer elements
+  .use(rehypeOffset) // add offset attribute to element
+  .use(rehypeTagName) // set tag name to custom elements
   .use(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     rehypeReact as any, // convert HTML AST to React components

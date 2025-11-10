@@ -87,7 +87,7 @@ export function remarkSpacer() {
             },
             data: {
               hProperties: {
-                'data-spacer': '',
+                'data-tag-name': 'spacer',
                 'data-lines': `${breakCount - 1}`,
               },
             },
@@ -153,7 +153,7 @@ export function remarkBgm() {
         type: 'bgm',
         data: {
           hProperties: {
-            'data-bgm': '',
+            'data-tag-name': 'bgm',
             'data-youtube-url': youtubeUrl,
             'data-start-time': startTime ?? '0',
           },

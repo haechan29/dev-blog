@@ -13,10 +13,9 @@ export const schema: Options = {
     ],
     div: [
       ...(defaultSchema.attributes?.div ?? []),
-      'data-bgm',
+      ['data-tag-name', 'bgm', 'spacer'],
       'data-youtube-url',
       'data-start-time',
-      'data-spacer',
       'data-lines',
     ],
   },
@@ -52,21 +51,11 @@ export function rehypeOffset() {
   };
 }
 
-export function rehypeBgm() {
+export function rehypeTagName() {
   return (tree: Root) => {
     visit(tree, 'element', (element: Element) => {
-      if (element.tagName === 'div' && 'data-bgm' in element.properties) {
-        element.tagName = 'bgm';
-      }
-    });
-  };
-}
-
-export function rehypeSpacer() {
-  return (tree: Root) => {
-    visit(tree, 'element', (element: Element) => {
-      if (element.tagName === 'div' && 'data-spacer' in element.properties) {
-        element.tagName = 'spacer';
+      if (element.tagName === 'div' && 'data-tag-name' in element.properties) {
+        element.tagName = element.properties['data-tag-name'] as string;
       }
     });
   };
