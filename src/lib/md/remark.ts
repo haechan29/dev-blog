@@ -20,8 +20,9 @@ export function remarkTextBreaks() {
       const newChildren: PhrasingContent[] = [];
       paragraph.children.forEach(child => {
         if (child.type === 'text') {
-          const nodeStart = child.position!.start.offset!;
-          const nodeEnd = child.position!.end.offset!;
+          const { start: positionStart, end: positionEnd } = child.position!;
+          const nodeStart = positionStart!.offset!;
+          const nodeEnd = positionEnd!.offset!;
           const currentLineBreaks: [number, number][] = [];
 
           while (lineBreakIndex < lineBreaks.length) {
@@ -38,11 +39,18 @@ export function remarkTextBreaks() {
           for (let i = 0; i + 1 < currentLineBreaks.length; i++) {
             const [prevBreakStart, prevBreakCount] = currentLineBreaks[i];
             const [nextBreakStart, nextBreakCount] = currentLineBreaks[i + 1];
-            const value = source.slice(
-              prevBreakStart + prevBreakCount,
-              nextBreakStart
-            );
-            if (value) newChildren.push({ type: 'text', value });
+            const textStart = prevBreakStart + prevBreakCount;
+            const textEnd = nextBreakStart;
+            const value = source.slice(textStart, textEnd);
+            if (value)
+              newChildren.push({
+                type: 'text',
+                value,
+                position: {
+                  start: { ...positionStart, offset: textStart },
+                  end: { ...positionEnd, offset: textEnd },
+                },
+              });
             for (let j = 0; j < nextBreakCount; j++) {
               newChildren.push({ type: 'break' });
             }
@@ -64,7 +72,8 @@ export function remarkSpacer() {
 
     for (let i = tree.children.length - 1; i >= 0; i--) {
       const child = tree.children[i];
-      const nodeEnd = child.position!.end.offset!;
+      const { start: positionStart, end: positionEnd } = child.position!;
+      const nodeEnd = positionEnd.offset!;
 
       while (lineBreakIndex >= 0) {
         const [breakStart, breakCount] = lineBreaks[lineBreakIndex];
@@ -72,6 +81,10 @@ export function remarkSpacer() {
         if (breakStart === nodeEnd && breakCount >= 2) {
           tree.children.splice(i + 1, 0, {
             type: 'spacer',
+            position: {
+              start: { ...positionStart, offset: nodeEnd + 1 },
+              end: { ...positionEnd, offset: nodeEnd + breakCount - 1 },
+            },
             data: {
               hProperties: {
                 'data-spacer': '',

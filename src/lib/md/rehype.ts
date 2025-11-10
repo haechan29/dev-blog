@@ -1,7 +1,6 @@
 import type { Element, ElementContent, Node, Parent, Root } from 'hast';
 import { defaultSchema, type Options } from 'rehype-sanitize';
 import { visit } from 'unist-util-visit';
-import { VFile } from 'vfile';
 
 type NodeStatus = {
   node: Node;
@@ -29,46 +28,33 @@ export const schema: Options = {
   },
 };
 
-export function rehypeCursor() {
-  return (tree: Root, file: VFile) => {
-    const cursorPosition = file.data.cursorPosition;
-    if (typeof cursorPosition !== 'number') return;
-
-    let minLength: number | null = null;
-    let targetStatus: NodeStatus | null = null;
-
+export function rehypeOffset() {
+  return (tree: Root) => {
     visit(tree, (node: Node, index?: number, parent?: Parent) => {
       if (index === undefined || !parent) return;
 
-      const nodeStart = node.position?.start.offset;
-      const nodeEnd = node.position?.end.offset;
-      if (nodeStart === undefined || nodeEnd === undefined) return;
-      const length = nodeEnd - nodeStart;
+      const startOffset = node.position?.start.offset;
+      const endOffset = node.position?.end.offset;
+      if (startOffset === undefined || endOffset === undefined) return;
 
-      if (nodeStart < cursorPosition && cursorPosition <= nodeEnd) {
-        if (minLength === null || length <= minLength) {
-          minLength = length;
-          targetStatus = { node, index, parent };
-        }
+      if (node.type === 'element') {
+        const element = node as Element;
+        element.properties['data-start-offset'] = `${startOffset}`;
+        element.properties['data-end-offset'] = `${endOffset}`;
+      } else {
+        const spanElement: ElementContent = {
+          type: 'element' as const,
+          tagName: 'span',
+          properties: {
+            'data-start-offset': `${startOffset}`,
+            'data-end-offset': `${endOffset}`,
+          },
+          children: [node as ElementContent],
+          position: node.position,
+        };
+        parent.children[index] = spanElement;
       }
     });
-
-    if (targetStatus === null) return;
-    const { node, index, parent } = targetStatus as NodeStatus;
-    if (node.type === 'element') {
-      (node as Element).properties['data-has-cursor'] = '';
-    } else {
-      const spanElement: ElementContent = {
-        type: 'element' as const,
-        tagName: 'span',
-        properties: {
-          'data-has-cursor': '',
-        },
-        children: [node as ElementContent],
-        position: node.position,
-      };
-      parent.children[index] = spanElement;
-    }
   };
 }
 
