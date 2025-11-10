@@ -10,13 +10,10 @@ import {
   setInvalidField,
 } from '@/lib/redux/write/writePostFormSlice';
 import { setContentEditorStatus } from '@/lib/redux/write/writePostSlice';
-import { getScrollRatio } from '@/lib/scroll';
 import clsx from 'clsx';
 import {
   ChangeEvent,
-  FocusEvent,
   RefObject,
-  UIEvent,
   useCallback,
   useEffect,
   useMemo,
@@ -57,49 +54,24 @@ export default function WritePostContentEditor({
       const textArea = e.currentTarget;
       dispatch(setInvalidField(null));
       setContentInner(textArea.value);
+      dispatch(setContentEditorStatus({ isFocused: true, shouldScroll: true }));
     },
     [dispatch]
   );
 
-  const onFocus = useCallback(
-    (e: FocusEvent<HTMLTextAreaElement>) => {
-      dispatch(setContentEditorStatus({ isFocused: true }));
-      setIsLocked(true);
-
-      const textArea = e.currentTarget;
-      const scrollRatio = getScrollRatio(textArea);
-      const contentEditorStatus = {
-        isFocused: true,
-        scrollRatio,
-      };
-      dispatch(setContentEditorStatus(contentEditorStatus));
-    },
-    [dispatch]
-  );
-
-  const onBlur = useCallback(() => {
-    dispatch(setContentEditorStatus({ isFocused: false }));
-    setIsLocked(false);
-
-    dispatch(
-      setContentEditorStatus({
-        isFocused: false,
-      })
-    );
+  const onFocus = useCallback(() => {
+    dispatch(setContentEditorStatus({ isFocused: true, shouldScroll: true }));
+    setIsLocked(true);
   }, [dispatch]);
 
-  const onScroll = useCallback(
-    (e: UIEvent<HTMLTextAreaElement>) => {
-      const textArea = e.currentTarget;
-      const scrollRatio = getScrollRatio(textArea);
-      const contentEditorStatus = {
-        isFocused: true,
-        scrollRatio,
-      };
-      dispatch(setContentEditorStatus(contentEditorStatus));
-    },
-    [dispatch]
-  );
+  const onBlur = useCallback(() => {
+    const newStatus = setContentEditorStatus({
+      isFocused: false,
+      shouldScroll: false,
+    });
+    dispatch(newStatus);
+    setIsLocked(false);
+  }, [dispatch]);
 
   useScrollLock({ isLocked, allowedSelectors: ['[data-content-editor]'] });
 
@@ -122,7 +94,6 @@ export default function WritePostContentEditor({
         onFocus={onFocus}
         onBlur={onBlur}
         onChange={onChange}
-        onScroll={onScroll}
         placeholder='본문을 입력하세요'
         className={clsx(
           'flex-1 min-h-0 p-4 resize-none outline-none border',

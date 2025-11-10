@@ -1,4 +1,4 @@
 export interface ContentEditorStatus {
   isFocused: boolean;
-  scrollRatio?: number;
+  shouldScroll: boolean;
 }

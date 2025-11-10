@@ -25,17 +25,19 @@ export default function WritePostContent() {
 
   useEffect(() => {
     const parseMd = async (content: string) => {
-      if (content.length === 0) {
+      if (!contentEditorRef.current || content.length === 0) {
         setParsedContent({ status: 'idle' });
         return;
       }
+      const contentEditor = contentEditorRef.current;
 
       setParsedContent({ status: 'loading' });
       try {
-        const result = await processMd(content);
+        const result = await processMd(content, contentEditor.selectionStart);
         setParsedContent({ status: 'success', value: result });
-      } catch {
+      } catch (error) {
         setParsedContent({ status: 'error' });
+        console.log(error);
       }
     };
 
