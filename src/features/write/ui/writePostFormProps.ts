@@ -4,6 +4,7 @@ import { WritePostForm } from '@/features/write/domain/model/writePostForm';
 
 export type WritePostFormProps = {
   currentStepId: keyof typeof writePostSteps;
+  isParseError: boolean;
   title: {
     value: string;
     isUserInput: boolean;
@@ -37,6 +38,7 @@ export function createProps(
 ): WritePostFormProps {
   return {
     currentStepId: writePost.currentStepId,
+    isParseError: form.isParseError,
     title: {
       value: form.title.value,
       isUserInput: form.title.isUserInput,

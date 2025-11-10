@@ -13,13 +13,10 @@ import clsx from 'clsx';
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function WritePostContentEditor({
-  isError,
-}: {
-  isError: boolean;
-}) {
+export default function WritePostContentEditor() {
   const {
     writePostForm: {
+      isParseError,
       content: { value: content, isUserInput, maxLength, isValid },
     },
   } = useWritePostForm();
@@ -78,8 +75,9 @@ export default function WritePostContentEditor({
       dispatch(setContentEditorStatus({ cursorPosition }));
     };
     document.addEventListener('selectionchange', onSelectionChange);
-    return () =>
+    return () => {
       document.removeEventListener('selectionchange', onSelectionChange);
+    };
   }, [dispatch]);
 
   return (
@@ -94,7 +92,7 @@ export default function WritePostContentEditor({
         className={clsx(
           'flex-1 min-h-0 p-4 resize-none outline-none border',
           shouldAttachToolbarToBottom ? 'rounded-lg' : 'rounded-b-lg',
-          isValid && !isError && !isContentTooLong
+          isValid && !isParseError && !isContentTooLong
             ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
             : 'border-red-400 animate-shake',
           !contentInner && 'bg-gray-50'

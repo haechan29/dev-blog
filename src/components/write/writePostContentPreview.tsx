@@ -1,22 +1,51 @@
 import { Content } from '@/features/write/domain/types/content';
 import useWritePost from '@/features/write/hooks/useWritePost';
+import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import useDebounce from '@/hooks/useDebounce';
+import { processMd } from '@/lib/md/md';
+import { AppDispatch } from '@/lib/redux/store';
+import { setIsParseError } from '@/lib/redux/write/writePostFormSlice';
 import { scrollToElement } from '@/lib/scroll';
 import clsx from 'clsx';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
+import { useDispatch } from 'react-redux';
 
-export default function WritePostContentPreview({
-  parsedContent,
-}: {
-  parsedContent: Content;
-}) {
-  const debounce = useDebounce();
+export default function WritePostContentPreview() {
+  const dispatch = useDispatch<AppDispatch>();
+  const debounceScroll = useDebounce();
+  const debounceParse = useDebounce();
+
+  const {
+    writePostForm: {
+      content: { value: content },
+    },
+  } = useWritePostForm();
+
   const {
     writePost: {
       contentEditorStatus: { isFocused, cursorPosition },
     },
   } = useWritePost();
+
+  const [parsedContent, setParsedContent] = useState<Content>({
+    status: 'idle',
+  });
+
+  const parseMd = useCallback(async (content: string) => {
+    if (content.length === 0) {
+      setParsedContent({ status: 'idle' });
+      return;
+    }
+    setParsedContent({ status: 'loading' });
+
+    try {
+      const result = await processMd(content);
+      setParsedContent({ status: 'success', value: result });
+    } catch {
+      setParsedContent({ status: 'error' });
+    }
+  }, []);
 
   const scrollToCursorPosition = useCallback(
     (contentPreview: Element, cursorPosition: number) => {
@@ -45,12 +74,21 @@ export default function WritePostContentPreview({
   );
 
   useEffect(() => {
-    debounce(() => {
+    debounceScroll(() => {
       const contentPreview = document.querySelector('[data-content-preview]');
       if (!contentPreview) return;
       scrollToCursorPosition(contentPreview, cursorPosition);
     }, 100);
-  }, [cursorPosition, debounce, isFocused, scrollToCursorPosition]);
+  }, [cursorPosition, debounceScroll, isFocused, scrollToCursorPosition]);
+
+  useEffect(() => {
+    debounceParse(() => parseMd(content), 300);
+  }, [content, debounceParse, parseMd]);
+
+  useEffect(() => {
+    const isParseError = parsedContent.status === 'error';
+    dispatch(setIsParseError(isParseError));
+  }, [dispatch, parsedContent.status]);
 
   return (
     <div className='flex flex-col h-full'>

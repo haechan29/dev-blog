@@ -1,5 +1,6 @@
 export interface WritePostForm {
   invalidField: string | null;
+  isParseError: boolean;
   title: {
     value: string;
     isUserInput: boolean;

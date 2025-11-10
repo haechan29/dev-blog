@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: WritePostForm = {
   invalidField: null,
+  isParseError: false,
   title: {
     value: '',
     isUserInput: false,
@@ -36,6 +37,9 @@ const writePostFormSlice = createSlice({
   reducers: {
     setInvalidField: (state, action: PayloadAction<string | null>) => {
       state.invalidField = action.payload;
+    },
+    setIsParseError: (state, action: PayloadAction<boolean>) => {
+      state.isParseError = action.payload;
     },
     setTitle: (
       state,
@@ -77,5 +81,11 @@ const writePostFormSlice = createSlice({
 });
 
 export default writePostFormSlice.reducer;
-export const { setInvalidField, setTitle, setTags, setPassword, setContent } =
-  writePostFormSlice.actions;
+export const {
+  setInvalidField,
+  setIsParseError,
+  setTitle,
+  setTags,
+  setPassword,
+  setContent,
+} = writePostFormSlice.actions;
