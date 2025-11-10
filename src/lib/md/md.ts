@@ -2,7 +2,7 @@ import Bgm from '@/components/md/bgm';
 import ExternalLink from '@/components/md/externalLink';
 import ImageWithCaption from '@/components/md/imageWithCaption';
 import Spacer from '@/components/md/spacer';
-import { rehypeBgm, rehypeSpacer, schema } from '@/lib/md/rehype';
+import { rehypeBgm, rehypeCursor, rehypeSpacer, schema } from '@/lib/md/rehype';
 import {
   remarkBgm,
   remarkImg,
@@ -19,6 +19,7 @@ import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { unified } from 'unified';
+import { VFile } from 'vfile';
 
 const processor = unified()
   .use(remarkParse) // parse markdown text into AST
@@ -30,6 +31,7 @@ const processor = unified()
   .use(remarkBgm) // process bgm nodes
   .use(remarkRehype) // convert markdown AST to HTML AST
   .use(rehypeSanitize, schema) // remove unsafe HTML tags and attributes
+  .use(rehypeCursor) // add marker attribute to element containing cursor position
   .use(rehypePrettyCode) // add syntax highlighting to code blocks
   .use(rehypeSlug) // add id attributes to headings
   .use(rehypeBgm) // process bgm elements
@@ -49,7 +51,8 @@ const processor = unified()
     }
   );
 
-export async function processMd(source: string) {
-  const result = await processor.process(source);
+export async function processMd(source: string, cursorPosition?: number) {
+  const file = new VFile({ value: source, data: { cursorPosition } });
+  const result = await processor.process(file);
   return result.result as JSX.Element;
 }
