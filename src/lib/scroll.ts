@@ -1,4 +1,4 @@
-export function scrollToElement(
+export function scrollIntoElement(
   element: Element,
   options?: boolean | ScrollIntoViewOptions,
   callback?: () => void

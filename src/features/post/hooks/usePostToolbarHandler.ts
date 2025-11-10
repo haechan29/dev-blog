@@ -5,7 +5,7 @@ import usePostToolbar from '@/features/post/hooks/usePostToolbar';
 import { setCurrentHeading } from '@/lib/redux/post/postPositionSlice';
 import { setIsExpanded } from '@/lib/redux/post/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
-import { scrollToElement } from '@/lib/scroll';
+import { scrollIntoElement } from '@/lib/scroll';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -21,7 +21,7 @@ export default function usePostToolbarHandler() {
       if (postToolbar.mode === 'expanded') {
         const element = document.getElementById(heading.id);
         if (element) {
-          scrollToElement(
+          scrollIntoElement(
             element,
             {
               behavior: 'smooth',

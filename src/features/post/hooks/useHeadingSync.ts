@@ -3,7 +3,7 @@ import { PostProps } from '@/features/post/ui/postProps';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import { setCurrentHeading } from '@/lib/redux/post/postPositionSlice';
 import { AppDispatch } from '@/lib/redux/store';
-import { scrollToElement } from '@/lib/scroll';
+import { scrollIntoElement } from '@/lib/scroll';
 import { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -18,7 +18,7 @@ export default function useHeadingSync(post: PostProps) {
     const element = document.getElementById(currentHeading.id);
     if (!element) return;
 
-    scrollToElement(element);
+    scrollIntoElement(element);
   }, [currentHeading]);
 
   useEffect(() => {

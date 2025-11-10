@@ -1,7 +1,7 @@
 'use client';
 
 import useViewerToolbar from '@/features/postViewer/hooks/useViewerToolbar';
-import { scrollToElement } from '@/lib/scroll';
+import { scrollIntoElement } from '@/lib/scroll';
 import { RefObject, useEffect } from 'react';
 
 export default function useScrollToContent(
@@ -16,7 +16,7 @@ export default function useScrollToContent(
     if (!content) return;
 
     const scrollToContent = () =>
-      scrollToElement(content, {
+      scrollIntoElement(content, {
         behavior: 'smooth',
         block: 'nearest',
       });
