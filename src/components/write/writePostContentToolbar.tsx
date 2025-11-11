@@ -8,6 +8,7 @@ import clsx from 'clsx';
 import {
   AlignCenter,
   Captions,
+  Code2,
   Columns,
   Expand,
   Grid2x2,
@@ -69,6 +70,8 @@ function ContentButton({
       return <div className={style}>{value}</div>;
     case 'link':
       return <Link className={style} />;
+    case 'code':
+      return <Code2 className={style} />;
     case 'table':
       return <Grid2x2 className={style} />;
     case 'blockquote':

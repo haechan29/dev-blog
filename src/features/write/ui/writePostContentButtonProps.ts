@@ -5,6 +5,7 @@ export type ButtonContent = {
     | 'text'
     | 'link'
     | 'table'
+    | 'code'
     | 'blockquote'
     | 'horizontalRule'
     | 'image'
@@ -53,6 +54,10 @@ const buttonContents: Record<WritePostContentButton['id'], ButtonContent> = {
   },
   link: {
     type: 'link',
+    style: 'w-4 h-4',
+  },
+  code: {
+    type: 'code',
     style: 'w-4 h-4',
   },
   table: {
@@ -201,6 +206,14 @@ const writePostContentButtonProps: Record<
     isBlock: false,
     markdownBefore: '[링크',
     markdownAfter: '](url)',
+  },
+  code: {
+    type: 'markdown',
+    label: '코드 블록 추가',
+    content: buttonContents['code'],
+    isBlock: true,
+    markdownBefore: '```\n코드를 입력해주세요.',
+    markdownAfter: '\n```',
   },
   table: {
     type: 'markdown',
