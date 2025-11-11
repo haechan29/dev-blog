@@ -118,6 +118,11 @@ const buttonContents: Record<WritePostContentButton['id'], ButtonContent> = {
     type: 'bgmStartTime',
     style: 'w-5 h-5',
   },
+  codeLanguage: {
+    type: 'text',
+    style: 'text-sm font-semibold',
+    value: 'JS',
+  },
 };
 
 export interface MarkdownButtonProps {
@@ -136,6 +141,13 @@ export interface TableButtonProps {
   direction: 'row' | 'column';
 }
 
+export interface CodeButtonProps {
+  type: 'code';
+  label: string;
+  content: ButtonContent;
+  field: 'language';
+}
+
 export interface DirectiveButtonProps {
   type: 'image' | 'bgm';
   label: string;
@@ -148,6 +160,7 @@ export interface DirectiveButtonProps {
 export type WritePostContentButtonProps =
   | MarkdownButtonProps
   | TableButtonProps
+  | CodeButtonProps
   | DirectiveButtonProps;
 
 const writePostContentButtonProps: Record<
@@ -318,6 +331,12 @@ const writePostContentButtonProps: Record<
     position: 'attribute',
     key: 'startTime',
     value: '5',
+  },
+  codeLanguage: {
+    type: 'code',
+    label: '언어 설정',
+    content: buttonContents['codeLanguage'],
+    field: 'language',
   },
 };
 

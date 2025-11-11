@@ -25,4 +25,5 @@ export const writePostContentButtons: WritePostContentButton[] = [
   { id: 'bgmStartTime' },
   { id: 'addRow' },
   { id: 'addColumn' },
+  { id: 'codeLanguage' },
 ];
