@@ -1,7 +1,8 @@
 'use client';
 
 import useYoutubePlayer from '@/hooks/useYoutubePlayer';
-import { Music, Pause, Play } from 'lucide-react';
+import { createRipple } from '@/lib/dom';
+import { Loader2, Music, Pause, Play } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 export interface YoutubePlayerData {
@@ -25,7 +26,7 @@ export default function Bgm({
     videoId: null,
     start: null,
   });
-  const { isReady, isPlaying, isError, togglePlay } = useYoutubePlayer({
+  const { isPlaying, isError, isWaiting, togglePlay } = useYoutubePlayer({
     ...playerData,
     containerRef: bgmRef,
   });
@@ -56,17 +57,36 @@ export default function Bgm({
         <div className='p-2 w-fit h-fit bg-white rounded-md'>
           <Music className='w-4 h-4' />
         </div>
-        <button
-          className='py-2 px-3 w-fit h-fit'
-          onClick={togglePlay}
-          aria-label={isPlaying ? 'bgm 일시중지' : 'bgm 재생'}
-        >
-          {isPlaying ? (
-            <Pause className='w-4 h-4 stroke-gray-900 fill-white' />
-          ) : (
-            <Play className='w-4 h-4 stroke-gray-900 fill-white' />
+        <div className='flex items-center justify-center relative'>
+          <button
+            className='p-2 mx-1 w-fit h-fit cursor-pointer hover:bg-gray-200 rounded-md'
+            onClick={togglePlay}
+            onTouchStart={e => {
+              const touch = e.touches[0];
+              createRipple({
+                clientX: touch.clientX,
+                clientY: touch.clientY,
+                currentTarget: e.currentTarget,
+              });
+            }}
+            aria-label={isPlaying ? 'bgm 일시중지' : 'bgm 재생'}
+          >
+            {isPlaying ? (
+              <Pause className='w-4 h-4 stroke-gray-900 fill-white' />
+            ) : (
+              <Play className='w-4 h-4 hover:stroke-2 stroke-gray-900 fill-white' />
+            )}
+          </button>
+
+          {isWaiting && (
+            <div className='w-8 h-8 absolute inset-0 m-auto z-50 bg-gray-100/50 pointer-events-none'>
+              <Loader2
+                strokeWidth={2}
+                className='w-8 h-8 animate-spin stroke-gray-400'
+              />
+            </div>
           )}
-        </button>
+        </div>
       </div>
     </div>
   );
