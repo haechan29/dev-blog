@@ -5,7 +5,6 @@ import useDebounce from '@/hooks/useDebounce';
 import { processMd } from '@/lib/md/md';
 import { AppDispatch } from '@/lib/redux/store';
 import { setIsParseError } from '@/lib/redux/write/writePostFormSlice';
-import { scrollToElement } from '@/lib/scroll';
 import clsx from 'clsx';
 import { useCallback, useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -13,8 +12,7 @@ import { useDispatch } from 'react-redux';
 
 export default function WritePostContentPreview() {
   const dispatch = useDispatch<AppDispatch>();
-  const debounceScroll = useDebounce();
-  const debounceParse = useDebounce();
+  const debounce = useDebounce();
 
   const {
     writePostForm: {
@@ -24,7 +22,7 @@ export default function WritePostContentPreview() {
 
   const {
     writePost: {
-      contentEditorStatus: { isFocused, cursorPosition },
+      contentEditorStatus: { cursorPosition, cursorOffset },
     },
   } = useWritePost();
 
@@ -32,23 +30,8 @@ export default function WritePostContentPreview() {
     status: 'idle',
   });
 
-  const parseMd = useCallback(async (content: string) => {
-    if (content.length === 0) {
-      setParsedContent({ status: 'idle' });
-      return;
-    }
-    setParsedContent({ status: 'loading' });
-
-    try {
-      const result = await processMd(content);
-      setParsedContent({ status: 'success', value: result });
-    } catch {
-      setParsedContent({ status: 'error' });
-    }
-  }, []);
-
   const scrollToCursorPosition = useCallback(
-    (contentPreview: Element, cursorPosition: number) => {
+    (contentPreview: Element, cursorPosition: number, cursorOffset: number) => {
       let minLength: number | null = null;
       let targetElement: Element | null = null;
 
@@ -68,22 +51,51 @@ export default function WritePostContentPreview() {
       });
 
       if (!targetElement) return;
-      scrollToElement(targetElement, { behavior: 'smooth' });
+      const previewOffsetTop = (contentPreview as HTMLElement).offsetTop;
+      const targetOffsetTop = (targetElement as HTMLElement).offsetTop;
+      const offsetTop = targetOffsetTop - previewOffsetTop;
+      contentPreview.scrollTo({
+        behavior: 'smooth',
+        top: offsetTop - cursorOffset,
+      });
     },
     []
   );
 
   useEffect(() => {
-    debounceScroll(() => {
-      const contentPreview = document.querySelector('[data-content-preview]');
-      if (!contentPreview) return;
-      scrollToCursorPosition(contentPreview, cursorPosition);
-    }, 100);
-  }, [cursorPosition, debounceScroll, isFocused, scrollToCursorPosition]);
+    const parseMd = async (content: string) => {
+      if (parsedContent.status === 'loading') return;
+      if (content.length === 0) {
+        setParsedContent({ status: 'idle' });
+        return;
+      }
+      setParsedContent({ status: 'loading' });
+
+      try {
+        const result = await processMd(content);
+        setParsedContent({ status: 'success', value: result });
+      } catch {
+        setParsedContent({ status: 'error' });
+      }
+    };
+
+    parseMd(content);
+  }, [content, parsedContent.status]);
 
   useEffect(() => {
-    debounceParse(() => parseMd(content), 300);
-  }, [content, debounceParse, parseMd]);
+    debounce(() => {
+      if (parsedContent.status !== 'success') return;
+      const contentPreview = document.querySelector('[data-content-preview]');
+      if (!contentPreview) return;
+      scrollToCursorPosition(contentPreview, cursorPosition, cursorOffset);
+    }, 100);
+  }, [
+    cursorOffset,
+    cursorPosition,
+    debounce,
+    parsedContent.status,
+    scrollToCursorPosition,
+  ]);
 
   useEffect(() => {
     const isParseError = parsedContent.status === 'error';

@@ -8,6 +8,7 @@ const initialState: WritePost = {
   contentEditorStatus: {
     isFocused: false,
     cursorPosition: 0,
+    cursorOffset: 0,
   },
 };
 
