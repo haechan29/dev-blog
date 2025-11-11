@@ -1,6 +1,7 @@
 'use client';
 
 import useYoutubePlayer from '@/hooks/useYoutubePlayer';
+import { Music, Pause, Play } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 export interface YoutubePlayerData {
@@ -49,11 +50,25 @@ export default function Bgm({
       {`유효하지 않은 링크입니다 (${youtubeUrl})`}
     </div>
   ) : (
-    <div
-      data-start-offset={startOffset}
-      data-end-offset={endOffset}
-      ref={bgmRef}
-    />
+    <div data-start-offset={startOffset} data-end-offset={endOffset}>
+      <div ref={bgmRef} className='hidden' />
+      <div className='flex w-fit gap-2 p-2 rounded-lg bg-gray-100 items-center'>
+        <div className='p-2 w-fit h-fit bg-white rounded-md'>
+          <Music className='w-4 h-4' />
+        </div>
+        <button
+          className='py-2 px-3 w-fit h-fit'
+          onClick={togglePlay}
+          aria-label={isPlaying ? 'bgm 일시중지' : 'bgm 재생'}
+        >
+          {isPlaying ? (
+            <Pause className='w-4 h-4 stroke-gray-900 fill-white' />
+          ) : (
+            <Play className='w-4 h-4 stroke-gray-900 fill-white' />
+          )}
+        </button>
+      </div>
+    </div>
   );
 }
 
