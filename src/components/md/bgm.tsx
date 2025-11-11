@@ -1,6 +1,12 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import useYoutubePlayer from '@/hooks/useYoutubePlayer';
+import { useEffect, useRef, useState } from 'react';
+
+export interface YoutubePlayerData {
+  videoId: string | null;
+  start: number | null;
+}
 
 export default function Bgm({
   'data-youtube-url': youtubeUrl,
@@ -13,19 +19,27 @@ export default function Bgm({
   'data-start-offset': string;
   'data-end-offset': string;
 }) {
-  const [isError, setIsError] = useState(false);
-  const embedUrl = useMemo(() => {
+  const bgmRef = useRef<HTMLDivElement | null>(null);
+  const [playerData, setPlayerData] = useState<YoutubePlayerData>({
+    videoId: null,
+    start: null,
+  });
+  const { isReady, isPlaying, isError, togglePlay } = useYoutubePlayer({
+    ...playerData,
+    containerRef: bgmRef,
+  });
+
+  useEffect(() => {
     const { videoId, timeFromUrl } = parseYouTubeUrl(youtubeUrl);
     const finalStartTime =
       startTime != null ? parseTimeToSeconds(startTime) : timeFromUrl;
-
-    if (!videoId) return;
-    return buildEmbedUrl(videoId, finalStartTime);
+    setPlayerData({
+      videoId,
+      start: finalStartTime,
+    });
   }, [startTime, youtubeUrl]);
 
-  useEffect(() => setIsError(false), [embedUrl]);
-
-  return isError || !embedUrl ? (
+  return isError ? (
     <div
       data-start-offset={startOffset}
       data-end-offset={endOffset}
@@ -35,16 +49,10 @@ export default function Bgm({
       {`유효하지 않은 링크입니다 (${youtubeUrl})`}
     </div>
   ) : (
-    <iframe
+    <div
       data-start-offset={startOffset}
       data-end-offset={endOffset}
-      src={embedUrl}
-      onError={() => setIsError(true)}
-      onLoad={() => setIsError(false)}
-      width='560'
-      height='315'
-      frameBorder='0'
-      allowFullScreen
+      ref={bgmRef}
     />
   );
 }
@@ -88,10 +96,4 @@ function parseTimeToSeconds(timeStr: string): number {
   }
 
   return totalSeconds;
-}
-
-function buildEmbedUrl(videoId: string, startTime: number | null): string {
-  let embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}`;
-  if (startTime) embedUrl += `&start=${startTime}`;
-  return embedUrl;
 }
