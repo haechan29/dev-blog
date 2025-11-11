@@ -3,6 +3,7 @@
 import { writePostContentButtons } from '@/features/write/domain/model/writePostContentButton';
 import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import {
+  CodeButtonProps,
   createProps,
   DirectiveButtonProps,
   MarkdownButtonProps,
@@ -16,6 +17,7 @@ import { useDispatch } from 'react-redux';
 
 const IMAGE_DIRECTIVE_PATTERN = ':::img[\\s\\S]*?:::';
 const BGM_DIRECTIVE_PATTERN = '::bgm\\{[^}]*\\}';
+const CODE_PATTERN = '```[\\s\\S]*?```';
 const CURSOR_MARKER = '__NEW_CURSOR_POSITION__';
 
 export default function useWritePostContentButton() {
@@ -184,6 +186,48 @@ export default function useWritePostContentButton() {
     [dispatch]
   );
 
+  const handleCodeAction = useCallback(
+    ({ field }: CodeButtonProps) => {
+      const contentEditor = document.querySelector(
+        '[data-content-editor]'
+      ) as HTMLTextAreaElement;
+      if (!contentEditor) return;
+      const { selectionStart, selectionEnd, value: content } = contentEditor;
+      const ranges = parseCodeRanges(content);
+
+      const range = ranges.find(([rangeStart, rangeEnd]) => {
+        return selectionStart >= rangeStart && selectionEnd <= rangeEnd;
+      });
+      if (!range) return;
+      const [rangeStart, rangeEnd] = range;
+      const [textBefore, codeText, textAfter] = [
+        content.substring(0, rangeStart),
+        content.substring(rangeStart, rangeEnd),
+        content.substring(rangeEnd),
+      ];
+
+      if (field === 'language') {
+        const firstLineEnd = codeText.indexOf('\n');
+        if (firstLineEnd < 0) return;
+        const firstLine = codeText.slice(0, firstLineEnd);
+        const restLines = codeText.slice(firstLineEnd);
+        const language = firstLine.slice(3);
+        const newLanguages = ['', 'javascript', 'python', 'text', ''];
+        const newLanguage = newLanguages[newLanguages.indexOf(language) + 1];
+        const newText =
+          textBefore + '```' + newLanguage + restLines + textAfter;
+        const newCursorPosition = textBefore.length + 3 + newLanguage.length;
+
+        dispatch(setContent({ value: newText, isUserInput: false }));
+        setTimeout(() => {
+          contentEditor.focus();
+          contentEditor.setSelectionRange(newCursorPosition, newCursorPosition);
+        }, 100);
+      }
+    },
+    [dispatch]
+  );
+
   const onAction = useCallback(
     (contentButtonProps: WritePostContentButtonProps) => {
       const { type } = contentButtonProps;
@@ -193,9 +237,16 @@ export default function useWritePostContentButton() {
         handleDirectiveAction(contentButtonProps);
       } else if (type === 'table') {
         handleTableAction(contentButtonProps);
+      } else if (type === 'code') {
+        handleCodeAction(contentButtonProps);
       }
     },
-    [handleDirectiveAction, handleMarkdownAction, handleTableAction]
+    [
+      handleCodeAction,
+      handleDirectiveAction,
+      handleMarkdownAction,
+      handleTableAction,
+    ]
   );
 
   useEffect(() => {
@@ -247,25 +298,23 @@ function parseRanges(text: string, type: string) {
     return parseDirectiveRanges(text, type);
   } else if (type === 'table') {
     return parseTableRanges(text);
+  } else if (type === 'code') {
+    return parseCodeRanges(text);
   }
 }
 
 function parseDirectiveRanges(text: string, type: string) {
-  const ranges: number[][] = [];
   let regex: RegExp;
   if (type === 'image') {
     regex = new RegExp(IMAGE_DIRECTIVE_PATTERN, 'g');
   } else if (type === 'bgm') {
     regex = new RegExp(BGM_DIRECTIVE_PATTERN, 'g');
   } else {
-    return ranges;
+    return [];
   }
 
-  let match;
-  while ((match = regex.exec(text)) !== null) {
-    ranges.push([match.index, match.index + match[0].length]);
-  }
-  return ranges;
+  const matches = [...text.matchAll(regex)];
+  return matches.map(match => [match.index, match.index + match[0].length]);
 }
 
 function parseTableRanges(text: string) {
@@ -296,6 +345,12 @@ function parseTableRanges(text: string) {
   }
 
   return ranges;
+}
+
+function parseCodeRanges(text: string) {
+  const codeBlockRegex = new RegExp(CODE_PATTERN, 'g');
+  const matches = [...text.matchAll(codeBlockRegex)];
+  return matches.map(match => [match.index, match.index + match[0].length]);
 }
 
 function addRow(tableText: string) {
