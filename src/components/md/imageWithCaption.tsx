@@ -34,7 +34,6 @@ export default function ImageWithCaption({
       data-start-offset={startOffset}
       data-end-offset={endOffset}
       data-size={size}
-      data-caption={caption}
       className='flex flex-col gap-4'
     >
       {isError ? (
@@ -58,7 +57,7 @@ export default function ImageWithCaption({
           )}
         />
       )}
-      <div className='flex flex-col'>
+      <div data-caption className='flex flex-col'>
         {newCaptions.map((caption, index) => (
           <div key={index}>{caption}</div>
         ))}

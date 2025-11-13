@@ -1,7 +1,8 @@
 'use client';
 
 import useViewerContainerSize from '@/features/postViewer/hooks/useViewerContainerSize';
-import { useEffect, useState } from 'react';
+import useThrottle from '@/hooks/useThrottle';
+import { useCallback, useEffect, useState } from 'react';
 
 type Page = {
   startOffset: number;
@@ -14,9 +15,10 @@ export default function useFullscreenPagination({
   rawContent: string;
 }) {
   const [pages, setPages] = useState<Page[]>([]);
+  const throttle = useThrottle();
   const containerSize = useViewerContainerSize();
 
-  useEffect(() => {
+  const measure = useCallback(() => {
     const postContent = document.querySelector('[data-post-content]');
     if (!postContent || !containerSize) return;
 
@@ -28,6 +30,7 @@ export default function useFullscreenPagination({
 
     elements.forEach(element => {
       if (currentPageElements.length === 0 && isEmptyContent(element)) return;
+      if (element.hasAttribute('data-caption')) return;
 
       const height = element.getBoundingClientRect().height;
 
@@ -55,7 +58,19 @@ export default function useFullscreenPagination({
     }
 
     setPages(calculatedPages);
-  }, [containerSize, rawContent]);
+  }, [containerSize]);
+
+  useEffect(() => {
+    const postContent = document.querySelector('[data-post-content]');
+    if (!postContent) return;
+
+    measure();
+
+    const observer = new ResizeObserver(() => throttle(measure, 300));
+    observer.observe(postContent);
+
+    return () => observer.disconnect();
+  }, [rawContent, measure, throttle]);
 
   return { pages };
 }
