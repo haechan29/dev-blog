@@ -31,9 +31,12 @@ const writePostSlice = createSlice({
         ...action.payload,
       };
     },
+    setActiveVideoId: (state, action: PayloadAction<string>) => {
+      state.activeVideoId = action.payload;
+    },
   },
 });
 
 export default writePostSlice.reducer;
-export const { setCurrentStepId, setContentEditorStatus } =
+export const { setCurrentStepId, setContentEditorStatus, setActiveVideoId } =
   writePostSlice.actions;

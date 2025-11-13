@@ -3,10 +3,12 @@ import { ContentEditorStatus } from '@/features/write/domain/types/contentEditor
 
 export interface WritePostProps {
   contentEditorStatus: ContentEditorStatus;
+  activeVideoId?: string;
 }
 
 export function createProps(writePost: WritePost): WritePostProps {
   return {
     contentEditorStatus: writePost.contentEditorStatus,
+    activeVideoId: writePost.activeVideoId,
   };
 }

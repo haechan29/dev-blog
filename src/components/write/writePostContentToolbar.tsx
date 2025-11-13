@@ -37,7 +37,7 @@ export default function WritePostContentToolbar() {
         'transition-transform duration-300 ease-in-out',
         'translate-y-[var(--toolbar-translate-y)]',
         shouldAttachToolbarToBottom
-          ? 'fixed inset-x-0 w-screen top-[100%] bg-white/80 backdrop-blur-md touch-pan-x'
+          ? 'fixed inset-x-0 z-50 w-screen top-[100%] bg-white/80 backdrop-blur-md touch-pan-x'
           : 'rounded-t-lg border-t border-x'
       )}
       style={{

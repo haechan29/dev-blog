@@ -1,9 +1,10 @@
 'use client';
 
 import useYoutubePlayer from '@/hooks/useYoutubePlayer';
+import { canTouch } from '@/lib/browser';
 import { createRipple } from '@/lib/dom';
 import { Loader2, Music, Pause, Play } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export interface YoutubePlayerData {
   videoId: string | null;
@@ -21,14 +22,12 @@ export default function Bgm({
   'data-start-offset': string;
   'data-end-offset': string;
 }) {
-  const bgmRef = useRef<HTMLDivElement | null>(null);
   const [playerData, setPlayerData] = useState<YoutubePlayerData>({
     videoId: null,
     start: null,
   });
   const { isPlaying, isError, isWaiting, togglePlay } = useYoutubePlayer({
     ...playerData,
-    containerRef: bgmRef,
   });
 
   useEffect(() => {
@@ -52,7 +51,11 @@ export default function Bgm({
     </div>
   ) : (
     <div data-start-offset={startOffset} data-end-offset={endOffset}>
-      <div ref={bgmRef} className='hidden' />
+      <div
+        data-bgm-player
+        data-bgm-video-id={playerData.videoId ?? ''}
+        className='hidden'
+      />
       <div className='flex w-fit gap-2 p-2 rounded-lg bg-gray-100 items-center'>
         <div className='p-2 w-fit h-fit bg-white rounded-md'>
           <Music className='w-4 h-4' />
@@ -60,14 +63,9 @@ export default function Bgm({
         <div className='flex items-center justify-center relative'>
           <button
             className='p-2 mx-1 w-fit h-fit cursor-pointer hover:bg-gray-200 rounded-md'
-            onClick={togglePlay}
-            onTouchStart={e => {
-              const touch = e.touches[0];
-              createRipple({
-                clientX: touch.clientX,
-                clientY: touch.clientY,
-                currentTarget: e.currentTarget,
-              });
+            onClick={e => {
+              if (canTouch) createRipple(e);
+              togglePlay();
             }}
             aria-label={isPlaying ? 'bgm 일시중지' : 'bgm 재생'}
           >
