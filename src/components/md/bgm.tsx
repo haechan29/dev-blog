@@ -3,6 +3,7 @@
 import useYoutubePlayer from '@/hooks/useYoutubePlayer';
 import { canTouch } from '@/lib/browser';
 import { createRipple } from '@/lib/dom';
+import clsx from 'clsx';
 import { Loader2, Music, Pause, Play } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -40,23 +41,27 @@ export default function Bgm({
     });
   }, [startTime, youtubeUrl]);
 
-  return isError ? (
-    <div
-      data-start-offset={startOffset}
-      data-end-offset={endOffset}
-      className='flex flex-col items-center justify-center p-4 rounded-xl bg-gray-200 text-gray-700 m-4'
-      aria-label='유효하지 않은 링크입니다'
-    >
-      {`유효하지 않은 링크입니다 (${youtubeUrl})`}
-    </div>
-  ) : (
+  return (
     <div data-start-offset={startOffset} data-end-offset={endOffset}>
+      {isError && (
+        <div className='flex flex-col w-fit justify-center p-4 gap-2 rounded-xl bg-gray-200 text-gray-700 m-4'>
+          <div>{`유효하지 않은 유튜브 링크입니다`}</div>
+          <div className='text-sm'>{`(${youtubeUrl})`}</div>
+        </div>
+      )}
+
       <div
         data-bgm-player
         data-bgm-video-id={playerData.videoId ?? ''}
         className='hidden'
       />
-      <div className='flex w-fit gap-2 p-2 rounded-lg bg-gray-100 items-center'>
+
+      <div
+        className={clsx(
+          'flex w-fit gap-2 p-2 rounded-lg bg-gray-100 items-center',
+          isError && 'hidden'
+        )}
+      >
         <div className='p-2 w-fit h-fit bg-white rounded-md'>
           <Music className='w-4 h-4' />
         </div>

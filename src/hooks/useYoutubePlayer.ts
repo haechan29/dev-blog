@@ -38,27 +38,33 @@ export default function useYoutubePlayer({
     setIsPlaying(false);
     setWaiting(false);
     setIsReady(false);
-    playerRef.current?.destroy?.();
+    container.innerHTML = '';
+    const bgmPlayer = document.createElement('div');
+    container.appendChild(bgmPlayer);
 
-    playerRef.current = new window.YT.Player(container, {
-      videoId,
-      playerVars: {
-        loop: 1,
-        playlist: videoId,
-        start,
-      },
-      events: {
-        onReady: () => {
-          setIsReady(true);
+    try {
+      playerRef.current = new window.YT.Player(bgmPlayer, {
+        videoId,
+        playerVars: {
+          loop: 1,
+          playlist: videoId,
+          start,
         },
-        onError: () => {
-          setIsError(true);
+        events: {
+          onReady: () => {
+            setIsReady(true);
+          },
+          onError: () => {
+            setIsError(true);
+          },
+          onStateChange: (event: any) => {
+            setIsPlaying(event.data === window.YT.PlayerState.PLAYING);
+          },
         },
-        onStateChange: (event: any) => {
-          setIsPlaying(event.data === window.YT.PlayerState.PLAYING);
-        },
-      },
-    });
+      });
+    } catch {
+      setIsError(true);
+    }
   }, []);
 
   const togglePlay = useCallback(() => {
@@ -77,9 +83,6 @@ export default function useYoutubePlayer({
   }, [dispatch, isPlaying, isReady, videoId]);
 
   useEffect(() => {
-    if (videoId === null) return;
-    const newStart = start ?? 0;
-
     if (!window.YT) {
       const script = document.createElement('script');
       script.src = 'https://www.youtube.com/iframe_api';
@@ -90,16 +93,21 @@ export default function useYoutubePlayer({
       };
     }
 
+    return () => {
+      playerRef.current?.destroy?.();
+      playerRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (videoId === null) return;
+    const newStart = start ?? 0;
+
     if (window.YT?.Player) {
       initPlayer(videoId, newStart);
     } else {
       onYoutubeAPIReady.push(() => initPlayer(videoId, newStart));
     }
-
-    return () => {
-      playerRef.current?.destroy?.();
-      playerRef.current = null;
-    };
   }, [initPlayer, start, videoId]);
 
   useEffect(() => {
