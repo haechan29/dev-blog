@@ -4,7 +4,7 @@ import useYoutubePlayer from '@/hooks/useYoutubePlayer';
 import { canTouch } from '@/lib/browser';
 import { createRipple } from '@/lib/dom';
 import clsx from 'clsx';
-import { Loader2, Music, Pause, Play } from 'lucide-react';
+import { Loader2, Maximize, Minimize, Music, Pause, Play } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export interface YoutubePlayerData {
@@ -30,6 +30,7 @@ export default function Bgm({
   const { isPlaying, isError, isWaiting, togglePlay } = useYoutubePlayer({
     ...playerData,
   });
+  const [isVideoVisible, setIsVideoVisible] = useState(false);
 
   useEffect(() => {
     const { videoId, timeFromUrl } = parseYouTubeUrl(youtubeUrl);
@@ -50,46 +51,65 @@ export default function Bgm({
         </div>
       )}
 
-      <div
-        data-bgm-player
-        data-bgm-video-id={playerData.videoId ?? ''}
-        className='hidden'
-      />
-
-      <div
-        className={clsx(
-          'flex w-fit gap-2 p-2 rounded-lg bg-gray-100 items-center',
-          isError && 'hidden'
-        )}
-      >
-        <div className='p-2 w-fit h-fit bg-white rounded-md'>
-          <Music className='w-4 h-4' />
-        </div>
-        <div className='flex items-center justify-center relative'>
-          <button
-            className='p-2 mx-1 w-fit h-fit cursor-pointer hover:bg-gray-200 rounded-md'
-            onClick={e => {
-              if (canTouch) createRipple(e);
-              togglePlay();
-            }}
-            aria-label={isPlaying ? 'bgm 일시중지' : 'bgm 재생'}
-          >
-            {isPlaying ? (
-              <Pause className='w-4 h-4 stroke-gray-900 fill-white' />
-            ) : (
-              <Play className='w-4 h-4 hover:stroke-2 stroke-gray-900 fill-white' />
-            )}
-          </button>
-
-          {isWaiting && (
-            <div className='w-8 h-8 absolute inset-0 m-auto z-50 bg-gray-100/50 pointer-events-none'>
-              <Loader2
-                strokeWidth={2}
-                className='w-8 h-8 animate-spin stroke-gray-400'
-              />
-            </div>
+      <div className='flex flex-col gap-2'>
+        <div
+          className={clsx(
+            'flex w-fit gap-2 p-2 rounded-lg bg-gray-100 items-center',
+            isError && 'hidden'
           )}
+        >
+          <div className='p-2 w-fit h-fit bg-white rounded-md'>
+            <Music className='w-4 h-4' />
+          </div>
+          <div className='flex items-center gap-1'>
+            <div className='flex items-center justify-center relative'>
+              <button
+                className='p-2 w-fit h-fit cursor-pointer hover:bg-gray-200 rounded-md'
+                onClick={e => {
+                  if (canTouch) createRipple(e);
+                  togglePlay();
+                }}
+                aria-label={isPlaying ? 'bgm 일시중지' : 'bgm 재생'}
+              >
+                {isPlaying ? (
+                  <Pause className='w-4 h-4 stroke-gray-900 fill-white' />
+                ) : (
+                  <Play className='w-4 h-4 stroke-gray-900 fill-white' />
+                )}
+              </button>
+
+              {isWaiting && (
+                <div className='w-8 h-8 absolute inset-0 m-auto z-50 bg-gray-100/50 pointer-events-none'>
+                  <Loader2
+                    strokeWidth={2}
+                    className='w-8 h-8 animate-spin stroke-gray-400'
+                  />
+                </div>
+              )}
+            </div>
+
+            <button
+              aria-label={isVideoVisible ? '영상 감추기' : '영상 보기'}
+              onClick={e => {
+                if (canTouch) createRipple(e);
+                setIsVideoVisible(prev => !prev);
+              }}
+              className='p-2 w-fit h-fit cursor-pointer hover:bg-gray-200 rounded-md'
+            >
+              {isVideoVisible ? (
+                <Minimize className='w-4 h-4 hover:animate-pop hover:[--scale:0.8]' />
+              ) : (
+                <Maximize className='w-4 h-4 hover:animate-pop' />
+              )}
+            </button>
+          </div>
         </div>
+
+        <div
+          data-bgm-player
+          data-bgm-video-id={playerData.videoId ?? ''}
+          className={clsx(!isVideoVisible && 'hidden')}
+        />
       </div>
     </div>
   );
