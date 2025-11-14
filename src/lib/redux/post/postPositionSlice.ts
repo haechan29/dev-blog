@@ -1,10 +1,8 @@
-import Heading from '@/features/post/domain/model/heading';
 import PostPosition from '@/features/post/domain/model/postPosition';
 import { Page } from '@/features/postViewer/domain/types/page';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: PostPosition = {
-  currentHeading: null,
   pages: [],
   currentPageIndex: 0,
 };
@@ -13,9 +11,6 @@ const postPositionSlice = createSlice({
   name: 'currentHeading',
   initialState,
   reducers: {
-    setCurrentHeading: (state, action: PayloadAction<Heading | null>) => {
-      state.currentHeading = action.payload;
-    },
     setCurrentPageIndex: (state, action: PayloadAction<number>) => {
       state.currentPageIndex = action.payload;
     },
@@ -32,10 +27,5 @@ const postPositionSlice = createSlice({
 });
 
 export default postPositionSlice.reducer;
-export const {
-  setCurrentHeading,
-  setCurrentPageIndex,
-  nextPage,
-  previousPage,
-  setPages,
-} = postPositionSlice.actions;
+export const { setCurrentPageIndex, nextPage, previousPage, setPages } =
+  postPositionSlice.actions;

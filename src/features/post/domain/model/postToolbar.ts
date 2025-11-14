@@ -7,5 +7,6 @@ export default interface PostToolbar {
   isScrollingDown: boolean;
   isExpanded: boolean;
   headings: Heading[];
+  currentHeading: Heading | null;
   title?: string;
 }

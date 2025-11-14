@@ -4,7 +4,7 @@ import Heading from '@/features/post/domain/model/heading';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import useDebounce from '@/hooks/useDebounce';
 import { canTouch } from '@/lib/browser';
-import { setCurrentHeading } from '@/lib/redux/post/postPositionSlice';
+import { setCurrentHeading } from '@/lib/redux/post/postToolbarSlice';
 import {
   setIsMouseOnToolbar,
   setIsToolbarExpanded,

@@ -1,4 +1,3 @@
-import Heading from '@/features/post/domain/model/heading';
 import PostPosition from '@/features/post/domain/model/postPosition';
 import { PostViewer } from '@/features/postViewer/domain/model/postViewer';
 
@@ -9,7 +8,6 @@ export default interface PostViewerProps {
   isToolbarExpanded: boolean;
   pageNumber: number | null;
   totalPages: number | null;
-  currentHeading: Heading | null;
 }
 
 export function createProps({
@@ -32,7 +30,6 @@ export function createProps({
       postViewer.isRotationFinished,
     pageNumber: postPosition.currentPageIndex + 1,
     totalPages: postPosition.pages.length + 1,
-    currentHeading: postPosition.currentHeading,
     ...postViewer,
   };
 }
