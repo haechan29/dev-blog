@@ -1,5 +1,6 @@
 'use client';
 
+import Heading from '@/features/post/domain/model/heading';
 import useViewerContainerSize from '@/features/postViewer/hooks/useViewerContainerSize';
 import useThrottle from '@/hooks/useThrottle';
 import { useCallback, useEffect, useState } from 'react';
@@ -7,6 +8,7 @@ import { useCallback, useEffect, useState } from 'react';
 type Page = {
   startOffset: number;
   endOffset: number;
+  heading: Heading | null;
 };
 
 export default function useFullscreenPagination({
@@ -24,12 +26,32 @@ export default function useFullscreenPagination({
 
     const elements = Array.from(postContent.children) as HTMLElement[];
 
-    const calculatedPages: Page[] = [];
+    const totalPages: Page[] = [];
     let currentPageElements: HTMLElement[] = [];
     let currentHeight = 0;
+    let pendingHeading: Heading | null = null;
 
     elements.forEach(element => {
       if (currentPageElements.length === 0 && isEmptyContent(element)) return;
+
+      if (element.matches('h1, h2, h3, h4, h5, h6')) {
+        if (currentPageElements.length > 0) {
+          totalPages.push({
+            startOffset: Number(currentPageElements[0].dataset.startOffset),
+            endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
+            heading: pendingHeading,
+          });
+        }
+
+        pendingHeading = {
+          id: element.id,
+          text: element.textContent || '',
+          level: parseInt(element.tagName.substring(1)),
+        };
+        currentPageElements = [];
+        currentHeight = 0;
+        return;
+      }
 
       const height = element.getBoundingClientRect().height;
 
@@ -37,10 +59,12 @@ export default function useFullscreenPagination({
         currentHeight + height > containerSize.height &&
         currentPageElements.length > 0
       ) {
-        calculatedPages.push({
+        totalPages.push({
           startOffset: Number(currentPageElements[0].dataset.startOffset),
           endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
+          heading: pendingHeading,
         });
+        pendingHeading = null;
         currentPageElements = [element];
         currentHeight = height;
       } else {
@@ -50,13 +74,14 @@ export default function useFullscreenPagination({
     });
 
     if (currentPageElements.length > 0) {
-      calculatedPages.push({
+      totalPages.push({
         startOffset: Number(currentPageElements[0].dataset.startOffset),
         endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
+        heading: pendingHeading,
       });
     }
 
-    setPages(calculatedPages);
+    setPages(totalPages);
   }, [containerSize]);
 
   useEffect(() => {
