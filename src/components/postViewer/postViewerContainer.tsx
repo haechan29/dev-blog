@@ -3,12 +3,24 @@
 import { Page } from '@/features/postViewer/domain/types/page';
 import useClickTouchNavigationHandler from '@/features/postViewer/hooks/useClickTouchNavigationHandler';
 import useKeyboardWheelNavigation from '@/features/postViewer/hooks/useKeyboardWheelNavigation';
+import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
+import useViewerPagination from '@/features/postViewer/hooks/useViewerPagination';
 import { supportsFullscreen } from '@/lib/browser';
+import { processMd } from '@/lib/md/md';
 import clsx from 'clsx';
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { JSX, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
-export default function PostViewerContainer({ page }: { page: Page | null }) {
+export default function PostViewerContainer({
+  page,
+  content,
+}: {
+  page: Page | null;
+  content: string;
+}) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const { pages } = useViewerPagination({ rawContent: content });
+  const { pageNumber } = usePostViewer();
+  const [result, setResult] = useState<JSX.Element | null>(null);
   const navigationHandler = useClickTouchNavigationHandler();
   useKeyboardWheelNavigation();
 
@@ -26,19 +38,33 @@ export default function PostViewerContainer({ page }: { page: Page | null }) {
     );
   }, []);
 
-  useEffect(() => {
-    if (typeof document === 'undefined' || !page || !containerRef.current)
-      return;
+  // useEffect(() => {
+  //   if (typeof document === 'undefined' || !page || !containerRef.current)
+  //     return;
 
-    const container = containerRef.current;
-    container.innerHTML = '';
-    const wrapper = document.createElement('div');
-    wrapper.className = 'relative w-full h-full';
-    page.forEach(element => {
-      wrapper.appendChild(element);
-    });
-    container.appendChild(wrapper);
-  }, [page]);
+  //   const container = containerRef.current;
+  //   container.innerHTML = '';
+  //   const wrapper = document.createElement('div');
+  //   wrapper.className = 'relative w-full h-full';
+  //   page.forEach(element => {
+  //     wrapper.appendChild(element);
+  //   });
+  //   container.appendChild(wrapper);
+  // }, [page]);
+
+  useEffect(() => {
+    const render = async () => {
+      if (pageNumber === null) return;
+      const pageIndex = pageNumber - 1;
+      if (pageIndex >= pages.length) return;
+      const { startOffset, endOffset } = pages[pageIndex];
+      await processMd({
+        source: content.slice(startOffset, endOffset),
+        mode: 'viewer',
+      }).then(result => setResult(result));
+    };
+    render();
+  }, [content, pageNumber, pages]);
 
   return (
     <div
@@ -50,8 +76,10 @@ export default function PostViewerContainer({ page }: { page: Page | null }) {
         'h-[calc(var(--fullscreen-height)/var(--container-scale))]',
         'p-[calc(var(--container-padding)/var(--container-scale))]',
         'scale-[var(--container-scale)]',
-        !page && 'hidden'
+        !result && 'hidden'
       )}
-    />
+    >
+      {result}
+    </div>
   );
 }

@@ -72,7 +72,7 @@ export default function WritePostContentPreview() {
       setParsedContent({ status: 'loading' });
 
       try {
-        const result = await processMd(content);
+        const result = await processMd({ source: content, mode: 'preview' });
         setParsedContent({ status: 'success', value: result });
       } catch {
         setParsedContent({ status: 'error' });

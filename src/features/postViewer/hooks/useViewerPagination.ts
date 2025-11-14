@@ -11,7 +11,7 @@ type Page = {
   heading: Heading | null;
 };
 
-export default function useFullscreenPagination({
+export default function useViewerPagination({
   rawContent,
 }: {
   rawContent: string;
@@ -21,10 +21,10 @@ export default function useFullscreenPagination({
   const containerSize = useViewerContainerSize();
 
   const measure = useCallback(() => {
-    const postContent = document.querySelector('[data-post-content]');
-    if (!postContent || !containerSize) return;
+    const viewer = document.querySelector('[data-viewer-measurement]');
+    if (!viewer || !containerSize) return;
 
-    const elements = Array.from(postContent.children) as HTMLElement[];
+    const elements = Array.from(viewer.children) as HTMLElement[];
 
     const totalPages: Page[] = [];
     let currentPageElements: HTMLElement[] = [];
@@ -56,7 +56,8 @@ export default function useFullscreenPagination({
       const height = element.getBoundingClientRect().height;
 
       if (
-        currentHeight + height > containerSize.height &&
+        (currentHeight + height > containerSize.height ||
+          element.matches('[data-image-with-caption]')) &&
         currentPageElements.length > 0
       ) {
         totalPages.push({
@@ -73,7 +74,10 @@ export default function useFullscreenPagination({
       }
     });
 
-    if (currentPageElements.length > 0) {
+    if (
+      currentPageElements.length > 0 &&
+      currentPageElements.some(element => !isEmptyContent(element))
+    ) {
       totalPages.push({
         startOffset: Number(currentPageElements[0].dataset.startOffset),
         endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
@@ -85,13 +89,13 @@ export default function useFullscreenPagination({
   }, [containerSize]);
 
   useEffect(() => {
-    const postContent = document.querySelector('[data-post-content]');
-    if (!postContent) return;
+    const viewer = document.querySelector('[data-viewer-measurement]');
+    if (!viewer) return;
 
     measure();
 
     const observer = new ResizeObserver(() => throttle(measure, 300));
-    observer.observe(postContent);
+    observer.observe(viewer);
 
     return () => observer.disconnect();
   }, [rawContent, measure, throttle]);

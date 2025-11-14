@@ -7,7 +7,7 @@ export default async function PostParsedContent({
   content: string;
 }) {
   try {
-    const result = await processMd(content);
+    const result = await processMd({ source: content, mode: 'reader' });
     return (
       <ErrorBoundary fallback={<div>에러가 발생했습니다</div>}>
         <div data-post-content className='prose'>
