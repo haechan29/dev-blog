@@ -19,25 +19,25 @@ export default function TTSSection() {
   const dispatch = useDispatch<AppDispatch>();
   const { pageNumber, isViewerMode } = usePostViewer();
 
-  const onClick = useCallback(() => {
-    setIsPlaying(prev => !prev);
-    dispatch(setIsControlBarTouched(true));
-    debounce(() => dispatch(setIsControlBarTouched(false)), 2000);
-  }, [debounce, dispatch]);
-
   const { startReading, pauseReading, stopReading } = useTTSPlayer({
     onFinishElement: () => setElementIndex(prev => prev + 1),
     onFinishPage: () => dispatch(nextPage()),
   });
 
+  const onClick = useCallback(() => {
+    setIsPlaying(isPlaying => {
+      // if (isPlaying) startReading(elementIndex);
+      // else pauseReading();
+      return !isPlaying;
+    });
+    dispatch(setIsControlBarTouched(true));
+    debounce(() => dispatch(setIsControlBarTouched(false)), 2000);
+  }, [debounce, dispatch]);
+
   useEffect(() => {
     if (isPlaying) startReading(elementIndex);
     else pauseReading();
   }, [elementIndex, isPlaying, pauseReading, startReading]);
-
-  useEffect(() => {
-    return () => console.log('unmount');
-  }, []);
 
   useEffect(() => {
     if (!isViewerMode) {

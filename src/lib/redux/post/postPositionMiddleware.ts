@@ -2,7 +2,6 @@ import {
   nextPage,
   previousPage,
   setCurrentPageIndex,
-  setPagination,
 } from '@/lib/redux/post/postPositionSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { MiddlewareParams } from '@/types/middlewareParams';
@@ -14,10 +13,6 @@ export const postPositionMiddleware: Middleware<
   RootState,
   AppDispatch
 > = store => next => action => {
-  if (isAnyOf(setPagination)(action)) {
-    return handleSetPagination({ store, next, action });
-  }
-
   if (isAnyOf(setCurrentPageIndex)(action)) {
     return handleSetCurrentPageIndex({ store, next, action });
   }
@@ -33,27 +28,12 @@ export const postPositionMiddleware: Middleware<
   return next(action);
 };
 
-function handleSetPagination({
-  store,
-  next,
-  action,
-}: MiddlewareParams<ReturnType<typeof setPagination>>) {
-  const pagination = action.payload;
-  if (!pagination) return next(action);
-
-  const { current, total } = pagination;
-  if (current < 0 || current >= total) return;
-
-  return next(action);
-}
-
 function handleSetCurrentPageIndex({
   store,
   next,
   action,
 }: MiddlewareParams<ReturnType<typeof setCurrentPageIndex>>) {
-  const { total } = store.getState().postPosition.pagination!;
-
+  const total = store.getState().postPosition.pages.length;
   const pageIndex = action.payload;
   if (pageIndex === null) return;
   if (pageIndex < 0 || pageIndex >= total) return;
@@ -66,7 +46,8 @@ function handleNextPage({
   next,
   action,
 }: MiddlewareParams<ReturnType<typeof nextPage>>) {
-  const { current, total } = store.getState().postPosition.pagination!;
+  const current = store.getState().postPosition.currentPageIndex;
+  const total = store.getState().postPosition.pages.length;
 
   if (current >= total - 1) {
     toast.success('마지막 페이지입니다.', {
@@ -84,7 +65,7 @@ function handlePreviousPage({
   next,
   action,
 }: MiddlewareParams<ReturnType<typeof previousPage>>) {
-  const { current } = store.getState().postPosition.pagination!;
+  const current = store.getState().postPosition.currentPageIndex;
   if (current <= 0) {
     toast.success('첫 페이지입니다.', {
       id: 'post-viewer',

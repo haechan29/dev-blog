@@ -30,14 +30,8 @@ export function createProps({
       postViewer.isToolbarTouched ||
       postViewer.isControlBarTouched ||
       postViewer.isRotationFinished,
-    pageNumber:
-      postPosition.pagination !== null
-        ? postPosition.pagination.current + 1
-        : null,
-    totalPages:
-      postPosition.pagination !== null
-        ? postPosition.pagination.total + 1
-        : null,
+    pageNumber: postPosition.currentPageIndex + 1,
+    totalPages: postPosition.pages.length + 1,
     currentHeading: postPosition.currentHeading,
     ...postViewer,
   };

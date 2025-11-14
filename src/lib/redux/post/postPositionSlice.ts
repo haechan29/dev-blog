@@ -1,16 +1,12 @@
 import Heading from '@/features/post/domain/model/heading';
-import PostPosition, {
-  syncHeadingWithPage,
-  syncPageWithHeading,
-} from '@/features/post/domain/model/postPosition';
-import { HeadingPageMapping } from '@/features/postViewer/domain/types/headingPageMapping';
-import { Pagination } from '@/features/postViewer/domain/types/pagination';
+import PostPosition from '@/features/post/domain/model/postPosition';
+import { Page } from '@/features/postViewer/domain/types/page';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: PostPosition = {
   currentHeading: null,
-  pagination: null,
-  headingPageMapping: null,
+  pages: [],
+  currentPageIndex: 0,
 };
 
 const postPositionSlice = createSlice({
@@ -19,48 +15,18 @@ const postPositionSlice = createSlice({
   reducers: {
     setCurrentHeading: (state, action: PayloadAction<Heading | null>) => {
       state.currentHeading = action.payload;
-
-      const postPosition = syncPageWithHeading(state);
-      if (postPosition) state.pagination = postPosition.pagination;
-    },
-    setPagination: (state, action: PayloadAction<Pagination | null>) => {
-      state.pagination = action.payload;
-
-      const postPosition = syncHeadingWithPage(state);
-      if (postPosition) state.currentHeading = postPosition.currentHeading;
     },
     setCurrentPageIndex: (state, action: PayloadAction<number>) => {
-      state.pagination = {
-        ...state.pagination!,
-        current: action.payload,
-      };
-
-      const postPosition = syncHeadingWithPage(state);
-      if (postPosition) state.currentHeading = postPosition.currentHeading;
+      state.currentPageIndex = action.payload;
     },
     nextPage: state => {
-      state.pagination = {
-        ...state.pagination!,
-        current: state.pagination!.current + 1,
-      };
-
-      const postPosition = syncHeadingWithPage(state);
-      if (postPosition) state.currentHeading = postPosition.currentHeading;
+      state.currentPageIndex = state.currentPageIndex + 1;
     },
     previousPage: state => {
-      state.pagination = {
-        ...state.pagination!,
-        current: state.pagination!.current - 1,
-      };
-
-      const postPosition = syncHeadingWithPage(state);
-      if (postPosition) state.currentHeading = postPosition.currentHeading;
+      state.currentPageIndex = state.currentPageIndex - 1;
     },
-    setHeadingPageMapping: (
-      state,
-      action: PayloadAction<HeadingPageMapping | null>
-    ) => {
-      state.headingPageMapping = action.payload;
+    setPages: (state, action: PayloadAction<Page[]>) => {
+      state.pages = action.payload;
     },
   },
 });
@@ -68,9 +34,8 @@ const postPositionSlice = createSlice({
 export default postPositionSlice.reducer;
 export const {
   setCurrentHeading,
-  setPagination,
   setCurrentPageIndex,
   nextPage,
   previousPage,
-  setHeadingPageMapping,
+  setPages,
 } = postPositionSlice.actions;
