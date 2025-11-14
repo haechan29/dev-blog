@@ -30,7 +30,6 @@ export default function useFullscreenPagination({
 
     elements.forEach(element => {
       if (currentPageElements.length === 0 && isEmptyContent(element)) return;
-      if (element.hasAttribute('data-caption')) return;
 
       const height = element.getBoundingClientRect().height;
 

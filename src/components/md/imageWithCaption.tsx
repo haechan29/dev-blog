@@ -10,6 +10,7 @@ export default function ImageWithCaption({
   'data-caption': caption,
   'data-start-offset': startOffset,
   'data-end-offset': endOffset,
+  'data-mode': mode,
   alt = '',
 }: {
   src: string;
@@ -17,6 +18,7 @@ export default function ImageWithCaption({
   'data-caption': string;
   'data-start-offset': string;
   'data-end-offset': string;
+  'data-mode': 'preview' | 'reader' | 'viewer';
   alt?: string;
 }) {
   const [isError, setIsError] = useState(false);
@@ -28,22 +30,22 @@ export default function ImageWithCaption({
 
   useEffect(() => setIsError(false), [src]);
 
-  return (
+  return isError ? (
     <div
-      data-image-with-caption
-      data-start-offset={startOffset}
-      data-end-offset={endOffset}
-      data-size={size}
-      className='flex flex-col gap-4'
+      className='flex items-center justify-center p-4 rounded-xl bg-gray-200 text-gray-700 m-4'
+      aria-label='이미지를 불러올 수 없습니다'
     >
-      {isError ? (
-        <div
-          className='flex items-center justify-center p-4 rounded-xl bg-gray-200 text-gray-700 m-4'
-          aria-label='이미지를 불러올 수 없습니다'
-        >
-          {'이미지를 불러올 수 없습니다'}
-        </div>
-      ) : (
+      {'이미지를 불러올 수 없습니다'}
+    </div>
+  ) : mode === 'viewer' ? (
+    newCaptions.map((caption, index) => (
+      <div
+        key={index}
+        data-image-with-caption
+        data-start-offset={startOffset}
+        data-end-offset={endOffset}
+        className='w-full h-full flex justify-center items-center relative'
+      >
         <Image
           src={src}
           alt={alt}
@@ -51,13 +53,33 @@ export default function ImageWithCaption({
           height={1000}
           onError={() => setIsError(true)}
           onLoad={() => setIsError(false)}
-          className={clsx(
-            'h-auto',
-            size === 'large' ? 'w-full' : 'min-w-56 w-1/2'
-          )}
+          className='w-full h-full object-contain'
         />
-      )}
-      <div data-caption className='flex flex-col'>
+        <div className='absolute bottom-4 inset-x-0 mx-auto'>{caption}</div>
+      </div>
+    ))
+  ) : (
+    <div
+      data-image-with-caption
+      data-start-offset={startOffset}
+      data-end-offset={endOffset}
+      data-size={size}
+      className='flex flex-col gap-4'
+    >
+      <Image
+        src={src}
+        alt={alt}
+        width={1000}
+        height={1000}
+        onError={() => setIsError(true)}
+        onLoad={() => setIsError(false)}
+        className={clsx(
+          'h-auto',
+          size === 'large' ? 'w-full' : 'min-w-56 w-1/2'
+        )}
+      />
+
+      <div className='flex flex-col'>
         {newCaptions.map((caption, index) => (
           <div key={index}>{caption}</div>
         ))}

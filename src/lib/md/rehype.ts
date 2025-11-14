@@ -1,6 +1,7 @@
 import type { Element, ElementContent, Node, Parent, Root } from 'hast';
 import { defaultSchema, type Options } from 'rehype-sanitize';
 import { visit } from 'unist-util-visit';
+import { VFile } from 'vfile';
 
 export const schema: Options = {
   ...defaultSchema,
@@ -47,6 +48,16 @@ export function rehypeOffset() {
         };
         parent.children[index] = spanElement;
       }
+    });
+  };
+}
+
+export function rehypeMode() {
+  return (tree: Root, file: VFile) => {
+    const mode = file.data.mode;
+    if (typeof mode !== 'string') return;
+    visit(tree, 'element', (element: Element) => {
+      element.properties['data-mode'] = `${mode}`;
     });
   };
 }
