@@ -1,4 +1,3 @@
-import PostPosition from '@/features/post/domain/model/postPosition';
 import { PostViewer } from '@/features/postViewer/domain/model/postViewer';
 
 export default interface PostViewerProps {
@@ -12,10 +11,8 @@ export default interface PostViewerProps {
 
 export function createProps({
   postViewer,
-  postPosition,
 }: {
   postViewer: PostViewer;
-  postPosition: PostPosition;
 }): PostViewerProps {
   return {
     isButtonVisible: !postViewer.areCommentsVisible && !postViewer.isViewerMode,
@@ -28,8 +25,8 @@ export function createProps({
       postViewer.isToolbarTouched ||
       postViewer.isControlBarTouched ||
       postViewer.isRotationFinished,
-    pageNumber: postPosition.currentPageIndex + 1,
-    totalPages: postPosition.pages.length + 1,
+    pageNumber: postViewer.currentPageIndex + 1,
+    totalPages: postViewer.pages.length + 1,
     ...postViewer,
   };
 }

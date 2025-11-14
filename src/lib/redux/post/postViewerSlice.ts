@@ -1,4 +1,5 @@
 import { PostViewer } from '@/features/postViewer/domain/model/postViewer';
+import { Page } from '@/features/postViewer/domain/types/page';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: PostViewer = {
@@ -12,6 +13,8 @@ const initialState: PostViewer = {
   isToolbarTouched: false,
   isControlBarTouched: false,
   isRotationFinished: false,
+  pages: [],
+  currentPageIndex: 0,
 };
 
 const postViewerSlice = createSlice({
@@ -48,6 +51,18 @@ const postViewerSlice = createSlice({
     setIsRotationFinished: (state, action: PayloadAction<boolean>) => {
       state.isRotationFinished = action.payload;
     },
+    setCurrentPageIndex: (state, action: PayloadAction<number>) => {
+      state.currentPageIndex = action.payload;
+    },
+    nextPage: state => {
+      state.currentPageIndex = state.currentPageIndex + 1;
+    },
+    previousPage: state => {
+      state.currentPageIndex = state.currentPageIndex - 1;
+    },
+    setPages: (state, action: PayloadAction<Page[]>) => {
+      state.pages = action.payload;
+    },
   },
 });
 
@@ -63,4 +78,8 @@ export const {
   setIsToolbarTouched,
   setIsControlBarTouched,
   setIsRotationFinished,
+  setCurrentPageIndex,
+  nextPage,
+  previousPage,
+  setPages,
 } = postViewerSlice.actions;

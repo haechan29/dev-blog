@@ -2,13 +2,13 @@ import {
   nextPage,
   previousPage,
   setCurrentPageIndex,
-} from '@/lib/redux/post/postPositionSlice';
+} from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { MiddlewareParams } from '@/types/middlewareParams';
 import { isAnyOf, Middleware } from '@reduxjs/toolkit';
 import toast from 'react-hot-toast';
 
-export const postPositionMiddleware: Middleware<
+export const postViewerMiddleware: Middleware<
   unknown,
   RootState,
   AppDispatch
@@ -33,7 +33,7 @@ function handleSetCurrentPageIndex({
   next,
   action,
 }: MiddlewareParams<ReturnType<typeof setCurrentPageIndex>>) {
-  const total = store.getState().postPosition.pages.length;
+  const total = store.getState().postViewer.pages.length;
   const pageIndex = action.payload;
   if (pageIndex === null) return;
   if (pageIndex < 0 || pageIndex >= total) return;
@@ -46,8 +46,8 @@ function handleNextPage({
   next,
   action,
 }: MiddlewareParams<ReturnType<typeof nextPage>>) {
-  const current = store.getState().postPosition.currentPageIndex;
-  const total = store.getState().postPosition.pages.length;
+  const current = store.getState().postViewer.currentPageIndex;
+  const total = store.getState().postViewer.pages.length;
 
   if (current >= total - 1) {
     toast.success('마지막 페이지입니다.', {
@@ -65,7 +65,7 @@ function handlePreviousPage({
   next,
   action,
 }: MiddlewareParams<ReturnType<typeof previousPage>>) {
-  const current = store.getState().postPosition.currentPageIndex;
+  const current = store.getState().postViewer.currentPageIndex;
   if (current <= 0) {
     toast.success('첫 페이지입니다.', {
       id: 'post-viewer',

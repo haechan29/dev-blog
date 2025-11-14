@@ -1,4 +1,4 @@
-import { Heading } from 'mdast';
+import Heading from '@/features/post/domain/model/heading';
 
 export interface Page {
   startOffset: number;
