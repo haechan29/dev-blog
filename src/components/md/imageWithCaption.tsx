@@ -16,17 +16,18 @@ export default function ImageWithCaption({
   src: string;
   'data-size': 'medium' | 'large';
   'data-caption': string;
+  'data-viewer-caption': string;
   'data-start-offset': string;
   'data-end-offset': string;
   'data-mode': 'preview' | 'reader' | 'viewer';
   alt?: string;
 }) {
   const [isError, setIsError] = useState(false);
-  const newCaptions = caption
-    .replace(/\\#/g, '__ESCAPED_HASH__')
-    .replace(/#/g, '')
-    .replace(/__ESCAPED_HASH__/g, '#')
-    .split('\n');
+  const [captions, setCaptions] = useState<string[]>([]);
+
+  useEffect(() => {
+    setCaptions(JSON.parse(caption));
+  }, [caption]);
 
   useEffect(() => setIsError(false), [src]);
 
@@ -38,26 +39,19 @@ export default function ImageWithCaption({
       {'이미지를 불러올 수 없습니다'}
     </div>
   ) : mode === 'viewer' ? (
-    newCaptions.map((caption, index) => (
-      <div
-        key={index}
-        data-image-with-caption
-        data-start-offset={startOffset}
-        data-end-offset={endOffset}
-        className='w-full h-full flex justify-center items-center relative'
-      >
-        <Image
-          src={src}
-          alt={alt}
-          width={1000}
-          height={1000}
-          onError={() => setIsError(true)}
-          onLoad={() => setIsError(false)}
-          className='w-full h-full object-contain'
-        />
-        <div className='absolute bottom-4 inset-x-0 mx-auto'>{caption}</div>
-      </div>
-    ))
+    <Image
+      data-image-with-caption
+      data-caption={caption}
+      data-start-offset={startOffset}
+      data-end-offset={endOffset}
+      src={src}
+      alt={alt}
+      width={1000}
+      height={1000}
+      onError={() => setIsError(true)}
+      onLoad={() => setIsError(false)}
+      className='w-full h-full object-contain'
+    />
   ) : (
     <div
       data-image-with-caption
@@ -80,7 +74,7 @@ export default function ImageWithCaption({
       />
 
       <div className='flex flex-col'>
-        {newCaptions.map((caption, index) => (
+        {captions.map((caption, index) => (
           <div key={index}>{caption}</div>
         ))}
       </div>

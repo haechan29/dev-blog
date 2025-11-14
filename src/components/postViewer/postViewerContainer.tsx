@@ -20,7 +20,10 @@ export default function PostViewerContainer({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const { pages } = useViewerPagination({ rawContent: content });
   const { pageNumber } = usePostViewer();
-  const [result, setResult] = useState<JSX.Element | null>(null);
+  const [result, setResult] = useState<{
+    result: JSX.Element;
+    caption?: string;
+  } | null>(null);
   const navigationHandler = useClickTouchNavigationHandler();
   useKeyboardWheelNavigation();
 
@@ -57,11 +60,16 @@ export default function PostViewerContainer({
       if (pageNumber === null) return;
       const pageIndex = pageNumber - 1;
       if (pageIndex >= pages.length) return;
-      const { startOffset, endOffset } = pages[pageIndex];
+      const { startOffset, endOffset, caption } = pages[pageIndex];
       await processMd({
         source: content.slice(startOffset, endOffset),
         mode: 'viewer',
-      }).then(result => setResult(result));
+      }).then(result => {
+        setResult({
+          result,
+          caption,
+        });
+      });
     };
     render();
   }, [content, pageNumber, pages]);
@@ -79,7 +87,19 @@ export default function PostViewerContainer({
         !result && 'hidden'
       )}
     >
-      {result}
+      <div className='w-full h-full relative'>
+        {result?.result}
+        <div
+          className={clsx(
+            'absolute bottom-0 inset-x-0 mx-auto',
+            !result?.caption && 'hidden'
+          )}
+        >
+          <div className='bg-black/70 text-white text-center break-keep wrap-anywhere text-balance px-2 py-1'>
+            {result?.caption}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

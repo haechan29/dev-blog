@@ -9,6 +9,7 @@ type Page = {
   startOffset: number;
   endOffset: number;
   heading: Heading | null;
+  caption?: string;
 };
 
 export default function useViewerPagination({
@@ -56,8 +57,35 @@ export default function useViewerPagination({
       const height = element.getBoundingClientRect().height;
 
       if (
-        (currentHeight + height > containerSize.height ||
-          element.matches('[data-image-with-caption]')) &&
+        element.matches('[data-image-with-caption]') &&
+        currentPageElements.length > 0
+      ) {
+        const dataCaption = element.dataset.caption;
+        if (dataCaption === undefined) return;
+        const captions: string[] = JSON.parse(dataCaption);
+
+        totalPages.push({
+          startOffset: Number(currentPageElements[0].dataset.startOffset),
+          endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
+          heading: pendingHeading,
+        });
+
+        pendingHeading = null;
+        currentPageElements = [];
+        currentHeight = 0;
+
+        captions.forEach(caption => {
+          totalPages.push({
+            startOffset: Number(element.dataset.startOffset),
+            endOffset: Number(element.dataset.endOffset),
+            heading: pendingHeading,
+            caption,
+          });
+        });
+      }
+
+      if (
+        currentHeight + height > containerSize.height &&
         currentPageElements.length > 0
       ) {
         totalPages.push({
