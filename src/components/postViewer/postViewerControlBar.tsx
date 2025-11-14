@@ -4,7 +4,6 @@ import ProgressSection from '@/components/postViewer//progressSection';
 import ExitFullscreenButton from '@/components/postViewer/exitFullscreenButton';
 import PageIndicatorSection from '@/components/postViewer/pageIndicatorSection';
 import TTSSection from '@/components/postViewer/ttsSection';
-import { Page } from '@/features/postViewer/domain/types/page';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import { canTouch } from '@/lib/browser';
 import { setIsMouseOnControlBar } from '@/lib/redux/post/postViewerSlice';
@@ -13,7 +12,7 @@ import clsx from 'clsx';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function PostViewerControlBar({ page }: { page: Page | null }) {
+export default function PostViewerControlBar() {
   const dispatch = useDispatch<AppDispatch>();
   const { areBarsVisible } = usePostViewer();
 
@@ -45,7 +44,7 @@ export default function PostViewerControlBar({ page }: { page: Page | null }) {
 
         <div className='flex w-full mb-3 justify-between items-center'>
           <div className='flex items-center'>
-            <TTSSection page={page} />
+            <TTSSection />
             <PageIndicatorSection />
           </div>
 

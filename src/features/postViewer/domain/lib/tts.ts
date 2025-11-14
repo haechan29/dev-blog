@@ -16,9 +16,3 @@ export function getKoreanVoice() {
       (voice.name.includes('Google') || voice.name.includes('Microsoft'))
   );
 }
-
-export function isReadable(element: Element) {
-  const hasText = element.textContent.trim().length > 0;
-  const isPaged = element.classList.contains('paged');
-  return hasText && !isPaged;
-}

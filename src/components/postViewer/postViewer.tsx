@@ -4,7 +4,6 @@ import PostViewerContainer from '@/components/postViewer/postViewerContainer';
 import PostViewerControlBar from '@/components/postViewer/postViewerControlBar';
 import PostViewerToolbar from '@/components/postViewer/postViewerToolbar';
 import { PostProps } from '@/features/post/ui/postProps';
-import { Page } from '@/features/postViewer/domain/types/page';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import useViewerFullscreen from '@/features/postViewer/hooks/useViewerFullscreen';
 import useViewerHandler from '@/features/postViewer/hooks/useViewerHandler';
@@ -13,13 +12,7 @@ import { processMd } from '@/lib/md/md';
 import { JSX, useEffect, useRef, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 
-export default function PostViewer({
-  post,
-  page,
-}: {
-  post: PostProps;
-  page: Page | null;
-}) {
+export default function PostViewer({ post }: { post: PostProps }) {
   const { isViewerMode } = usePostViewer();
   const postViewerRef = useRef<HTMLDivElement | null>(null);
   const handlers = useViewerHandler();
@@ -47,8 +40,8 @@ export default function PostViewer({
         <Toaster toasterId='post-viewer' />
 
         <PostViewerToolbar {...post} />
-        <PostViewerContainer page={page} {...post} />
-        <PostViewerControlBar page={page} />
+        <PostViewerContainer {...post} />
+        <PostViewerControlBar />
       </div>
 
       <div
