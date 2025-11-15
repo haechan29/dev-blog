@@ -10,37 +10,40 @@ import {
   setIsWaiting,
 } from '@/lib/redux/bgmControllerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
-import clsx from 'clsx';
 import { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-export default function BgmController() {
+export default function useBgmController() {
   const dispatch = useDispatch<AppDispatch>();
   const playerRef = useRef<any>(null);
-  const {
-    isPlaying,
-    isWaiting,
-    isReady,
-    isVideoVisible,
-    position,
-    requestedBgm,
-  } = useSelector((state: RootState) => state.bgmController);
+  const { isPlaying, isWaiting, isReady, isVideoVisible, requestedBgm } =
+    useSelector((state: RootState) => state.bgmController);
 
   const initPlayer = useCallback(
-    ({ videoId, start }: { videoId: string | null; start: number | null }) => {
-      if (videoId === null) return;
+    ({
+      videoId,
+      start,
+      containerId,
+    }: {
+      videoId: string | null;
+      start: number | null;
+      containerId: string | null;
+    }) => {
+      if (videoId === null || containerId === null) return;
       const newStart = start ?? 0;
 
-      const bgmController = document.querySelector('[data-bgm-controller]');
-      if (!bgmController) return;
+      const container = document.querySelector(
+        `[data-bgm-container-id="${containerId}"]`
+      );
+      if (!container) return;
 
       dispatch(setIsError(false));
       dispatch(setIsPlaying(false));
       dispatch(setIsWaiting(false));
       dispatch(setIsReady(false));
-      bgmController.innerHTML = '';
+      container.innerHTML = '';
       const bgmPlayer = document.createElement('div');
-      bgmController.appendChild(bgmPlayer);
+      container.appendChild(bgmPlayer);
 
       try {
         playerRef.current = new window.YT.Player(bgmPlayer, {
@@ -125,15 +128,4 @@ export default function BgmController() {
       window.removeEventListener('resize', hideOnMove);
     };
   }, [dispatch, isVideoVisible]);
-
-  return (
-    <div
-      data-bgm-controller
-      className={clsx('fixed z-[4000]', !isVideoVisible && 'hidden')}
-      style={{
-        top: position?.top ?? 0,
-        left: position?.left ?? 0,
-      }}
-    />
-  );
 }

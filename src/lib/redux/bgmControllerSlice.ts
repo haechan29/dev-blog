@@ -1,5 +1,4 @@
 import { BgmController } from '@/features/post/domain/model/bgmController';
-import { Position } from '@/types/position';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: BgmController = {
@@ -9,10 +8,10 @@ const initialState: BgmController = {
   isReady: false,
   isVideoVisible: false,
   currentVideoId: null,
-  position: null,
   requestedBgm: {
     videoId: null,
     start: null,
+    containerId: null,
   },
 };
 
@@ -38,9 +37,6 @@ const bgmControllerSlice = createSlice({
     hideVideo: state => {
       state.isVideoVisible = false;
     },
-    setPosition: (state, action: PayloadAction<Position>) => {
-      state.position = action.payload;
-    },
     setRequestedBgm: (
       state,
       action: PayloadAction<BgmController['requestedBgm']>
@@ -52,6 +48,7 @@ const bgmControllerSlice = createSlice({
       state.requestedBgm = {
         videoId: null,
         start: null,
+        containerId: null,
       };
     },
   },
@@ -65,7 +62,6 @@ export const {
   setIsReady,
   toggleIsVideoVisible,
   hideVideo,
-  setPosition,
   setRequestedBgm,
   clearRequestedBgm,
 } = bgmControllerSlice.actions;
