@@ -6,9 +6,9 @@ export default interface PostViewerProps {
   isViewerMode: boolean;
   areBarsVisible: boolean;
   isToolbarExpanded: boolean;
-  page: Page | null;
   pageNumber: number | null;
   totalPages: number | null;
+  page?: Page;
 }
 
 export function createProps({
@@ -27,15 +27,14 @@ export function createProps({
       postViewer.isToolbarTouched ||
       postViewer.isControlBarTouched ||
       postViewer.isRotationFinished,
-    page:
-      postViewer.currentPageIndex === null
-        ? null
-        : postViewer.pages[postViewer.currentPageIndex],
     pageNumber:
       postViewer.currentPageIndex === null
         ? null
         : postViewer.currentPageIndex + 1,
     totalPages: postViewer.pages.length + 1,
+    ...(postViewer.currentPageIndex !== null && {
+      page: postViewer.pages[postViewer.currentPageIndex],
+    }),
     ...postViewer,
   };
 }

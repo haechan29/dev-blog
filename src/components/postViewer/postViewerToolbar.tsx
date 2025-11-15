@@ -1,7 +1,6 @@
 'use client';
 
 import Heading from '@/features/post/domain/model/heading';
-import usePostReader from '@/features/post/hooks/usePostReader';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import useDebounce from '@/hooks/useDebounce';
 import { canTouch } from '@/lib/browser';
@@ -26,10 +25,7 @@ export default function PostViewerToolbar({
   headings: Heading[];
 }) {
   const { areBarsVisible } = usePostViewer();
-  const {
-    postReader: { currentHeading },
-  } = usePostReader();
-  const { isViewerMode } = usePostViewer();
+  const { page, isViewerMode } = usePostViewer();
   const contentsRef = useRef<Map<string, HTMLDivElement>>(new Map());
 
   const dispatch = useDispatch<AppDispatch>();
@@ -58,9 +54,9 @@ export default function PostViewerToolbar({
   );
 
   useEffect(() => {
-    if (!isViewerMode || !currentHeading) return;
+    if (!isViewerMode || !page?.heading) return;
 
-    const content = contentsRef.current.get(currentHeading.id);
+    const content = contentsRef.current.get(page.heading.id);
     if (!content) return;
 
     const scrollToContent = () => {
@@ -71,7 +67,7 @@ export default function PostViewerToolbar({
     };
     content.addEventListener('transitionend', scrollToContent);
     return () => content.removeEventListener('transitionend', scrollToContent);
-  }, [currentHeading, isViewerMode]);
+  }, [isViewerMode, page?.heading]);
 
   return (
     <div
@@ -90,13 +86,13 @@ export default function PostViewerToolbar({
         onMouseLeave={onMouseLeave}
         className='flex flex-col p-2 md:p-4 lg:p-6'
       >
-        <Title title={title} heading={currentHeading} />
+        <Title title={title} heading={page?.heading ?? null} />
 
         <div className='flex w-full items-start'>
           <Content
             contentsRef={contentsRef}
             isExpanded={isExpanded}
-            heading={currentHeading}
+            heading={page?.heading ?? null}
             headings={headings}
             onContentClick={onContentClick}
           />
