@@ -16,7 +16,6 @@ export default function useScrollToContent(
 
     const content = contentsRef.current.get(currentHeading.id);
     if (!content) return;
-    console.log(content);
 
     const scrollToContent = () => {
       scrollIntoElement(content, {
