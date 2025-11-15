@@ -2,12 +2,14 @@
 
 import { canTouch } from '@/lib/browser';
 import { createRipple } from '@/lib/dom';
-import { setAction } from '@/lib/redux/bgmControllerSlice';
-import { AppDispatch } from '@/lib/redux/store';
+import {
+  setRequestedBgm,
+  toggleIsVideoVisible,
+} from '@/lib/redux/bgmControllerSlice';
+import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { Loader2, Maximize, Minimize, Music, Pause, Play } from 'lucide-react';
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function Bgm({
   'data-youtube-url': youtubeUrl,
@@ -21,12 +23,8 @@ export default function Bgm({
   'data-end-offset': string;
 }) {
   const dispatch = useDispatch<AppDispatch>();
-  const { isPlaying, isError, isWaiting } = {
-    isPlaying: false,
-    isError: false,
-    isWaiting: false,
-  };
-  const [isVideoVisible, setIsVideoVisible] = useState(false);
+  const { isPlaying, isError, isWaiting, currentVideoId, isVideoVisible } =
+    useSelector((state: RootState) => state.bgmController);
 
   return (
     <div data-start-offset={startOffset} data-end-offset={endOffset}>
@@ -53,13 +51,8 @@ export default function Bgm({
                 className='p-2 w-fit h-fit cursor-pointer hover:bg-gray-200 rounded-md'
                 onClick={e => {
                   if (canTouch) createRipple(e);
-                  const payload = parseYouTubeUrl(youtubeUrl, startTime);
-                  dispatch(
-                    setAction({
-                      type: 'togglePlay',
-                      payload,
-                    })
-                  );
+                  const bgm = parseYouTubeUrl(youtubeUrl, startTime);
+                  dispatch(setRequestedBgm(bgm));
                 }}
                 aria-label={isPlaying ? 'bgm 일시중지' : 'bgm 재생'}
               >
@@ -84,8 +77,7 @@ export default function Bgm({
               aria-label={isVideoVisible ? '영상 감추기' : '영상 보기'}
               onClick={e => {
                 if (canTouch) createRipple(e);
-                dispatch(setAction({ type: 'showVideo' }));
-                setIsVideoVisible(prev => !prev);
+                dispatch(toggleIsVideoVisible());
               }}
               className='p-2 w-fit h-fit cursor-pointer hover:bg-gray-200 rounded-md'
             >

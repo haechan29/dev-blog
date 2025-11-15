@@ -1,18 +1,15 @@
 export interface BgmController {
   isPlaying: boolean;
   isError: boolean;
+  /**
+   * not ready and will play when ready
+   */
   isWaiting: boolean;
   isReady: boolean;
-  action:
-    | {
-        type: 'togglePlay';
-        payload: {
-          videoId: string | null;
-          start: number | null;
-        };
-      }
-    | {
-        type: 'showVideo';
-      }
-    | null;
+  isVideoVisible: boolean;
+  currentVideoId: string | null;
+  requestedBgm: {
+    videoId: string | null;
+    start: number | null;
+  };
 }

@@ -2,6 +2,7 @@
 'use client';
 
 import {
+  clearRequestedBgm,
   setIsError,
   setIsPlaying,
   setIsReady,
@@ -14,10 +15,9 @@ import { useDispatch, useSelector } from 'react-redux';
 export default function BgmController() {
   const dispatch = useDispatch<AppDispatch>();
   const playerRef = useRef<any>(null);
-  const { isPlaying, isWaiting, isReady, action } = useSelector(
+  const { isPlaying, isWaiting, isReady, requestedBgm } = useSelector(
     (state: RootState) => state.bgmController
   );
-  const actionTypeRef = useRef<string | null>(null);
 
   const initPlayer = useCallback(
     ({ videoId, start }: { videoId: string | null; start: number | null }) => {
@@ -78,31 +78,25 @@ export default function BgmController() {
   }, []);
 
   useEffect(() => {
-    if (!action || actionTypeRef.current === action.type) return;
-    actionTypeRef.current = action.type;
-    switch (action.type) {
-      case 'togglePlay': {
-        const prevVideoId = playerRef.current?.getVideoData?.().video_id;
-        if (prevVideoId === null || prevVideoId !== action.payload.videoId) {
-          if (window.YT?.Player) {
-            initPlayer(action.payload);
-          } else {
-            window.onYouTubeIframeAPIReady = () => initPlayer(action.payload);
-          }
-        }
-
-        if (!isReady) {
-          dispatch(setIsWaiting(true));
-        } else if (isPlaying) {
-          playerRef.current?.pauseVideo?.();
-        } else {
-          playerRef.current?.playVideo?.();
-        }
-      }
-      case 'showVideo': {
+    if (requestedBgm.videoId === null) return;
+    const prevVideoId = playerRef.current?.getVideoData?.().video_id;
+    if (prevVideoId === null || prevVideoId !== requestedBgm.videoId) {
+      if (window.YT?.Player) {
+        initPlayer(requestedBgm);
+      } else {
+        window.onYouTubeIframeAPIReady = () => initPlayer(requestedBgm);
       }
     }
-  }, [action, dispatch, initPlayer, isPlaying, isReady]);
+
+    if (!isReady) {
+      dispatch(setIsWaiting(true));
+    } else if (isPlaying) {
+      playerRef.current?.pauseVideo?.();
+    } else {
+      playerRef.current?.playVideo?.();
+    }
+    dispatch(clearRequestedBgm());
+  }, [dispatch, initPlayer, isPlaying, isReady, requestedBgm]);
 
   useEffect(() => {
     if (isReady && isWaiting) {

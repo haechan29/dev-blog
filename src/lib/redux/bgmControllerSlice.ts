@@ -6,7 +6,12 @@ const initialState: BgmController = {
   isError: false,
   isWaiting: false,
   isReady: false,
-  action: null,
+  isVideoVisible: false,
+  currentVideoId: null,
+  requestedBgm: {
+    videoId: null,
+    start: null,
+  },
 };
 
 const bgmControllerSlice = createSlice({
@@ -25,12 +30,32 @@ const bgmControllerSlice = createSlice({
     setIsReady: (state, action: PayloadAction<boolean>) => {
       state.isReady = action.payload;
     },
-    setAction: (state, action: PayloadAction<BgmController['action']>) => {
-      state.action = action.payload;
+    toggleIsVideoVisible: state => {
+      state.isVideoVisible = !state.isVideoVisible;
+    },
+    setRequestedBgm: (
+      state,
+      action: PayloadAction<BgmController['requestedBgm']>
+    ) => {
+      state.requestedBgm = action.payload;
+    },
+    clearRequestedBgm: state => {
+      state.currentVideoId = state.requestedBgm.videoId;
+      state.requestedBgm = {
+        videoId: null,
+        start: null,
+      };
     },
   },
 });
 
 export default bgmControllerSlice.reducer;
-export const { setIsPlaying, setIsError, setIsWaiting, setIsReady, setAction } =
-  bgmControllerSlice.actions;
+export const {
+  setIsPlaying,
+  setIsError,
+  setIsWaiting,
+  setIsReady,
+  toggleIsVideoVisible,
+  setRequestedBgm,
+  clearRequestedBgm,
+} = bgmControllerSlice.actions;
