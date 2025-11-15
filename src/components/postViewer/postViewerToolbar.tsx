@@ -4,18 +4,18 @@ import Heading from '@/features/post/domain/model/heading';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import useDebounce from '@/hooks/useDebounce';
 import { canTouch } from '@/lib/browser';
-import { setCurrentHeading } from '@/lib/redux/post/postReaderSlice';
 import {
+  setCurrentPageIndex,
   setIsMouseOnToolbar,
   setIsToolbarExpanded,
   setIsToolbarTouched,
 } from '@/lib/redux/post/postViewerSlice';
-import { AppDispatch } from '@/lib/redux/store';
+import { AppDispatch, RootState } from '@/lib/redux/store';
 import { scrollIntoElement } from '@/lib/scroll';
 import clsx from 'clsx';
 import { ChevronDown } from 'lucide-react';
 import { RefObject, useCallback, useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostViewerToolbar({
   title,
@@ -27,6 +27,7 @@ export default function PostViewerToolbar({
   const { areBarsVisible } = usePostViewer();
   const { page, isViewerMode } = usePostViewer();
   const contentsRef = useRef<Map<string, HTMLDivElement>>(new Map());
+  const pages = useSelector((state: RootState) => state.postViewer.pages);
 
   const dispatch = useDispatch<AppDispatch>();
   const debounce = useDebounce();
@@ -44,13 +45,20 @@ export default function PostViewerToolbar({
 
   const onContentClick = useCallback(
     (heading: Heading) => {
-      if (isExpanded) dispatch(setCurrentHeading(heading));
+      if (isExpanded) {
+        const pageIndex = pages.findIndex(page => {
+          return page.heading && page.heading.id == heading.id;
+        });
+        if (pageIndex >= 0) {
+          dispatch(setCurrentPageIndex(pageIndex));
+        }
+      }
       dispatch(setIsToolbarExpanded(!isExpanded));
 
       dispatch(setIsToolbarTouched(true));
       debounce(() => dispatch(setIsToolbarTouched(false)), 2000);
     },
-    [debounce, dispatch, isExpanded]
+    [debounce, dispatch, isExpanded, pages]
   );
 
   useEffect(() => {
