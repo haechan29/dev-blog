@@ -4,18 +4,24 @@ import SidebarButton from '@/components/post/sidebarButton';
 import Heading from '@/features/post/domain/model/heading';
 import usePostToolbar from '@/features/post/hooks/usePostToolbar';
 import { PostToolbarProps } from '@/features/post/ui/postToolbarProps';
+import useThrottle from '@/hooks/useThrottle';
 import { setCurrentHeading } from '@/lib/redux/post/postReaderSlice';
-import { setIsExpanded } from '@/lib/redux/post/postToolbarSlice';
+import {
+  setIsExpanded,
+  setIsScrollingDown,
+} from '@/lib/redux/post/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { scrollIntoElement } from '@/lib/scroll';
 import clsx from 'clsx';
 import { ChevronDown, ChevronRight } from 'lucide-react';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function PostToolbar() {
   const dispatch = useDispatch<AppDispatch>();
   const postToolbar = usePostToolbar();
+  const lastScrollYRef = useRef(0);
+  const throttle = useThrottle();
 
   const breadcrumb = useMemo(() => {
     return postToolbar.mode === 'basic' ||
@@ -51,16 +57,31 @@ export default function PostToolbar() {
     [dispatch, postToolbar.mode]
   );
 
-  const onExpandButtonClick = useCallback(
-    () => dispatch(setIsExpanded(postToolbar.mode !== 'expanded')),
-    [dispatch, postToolbar.mode]
-  );
+  const onExpandButtonClick = useCallback(() => {
+    dispatch(setIsExpanded(postToolbar.mode !== 'expanded'));
+  }, [dispatch, postToolbar.mode]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      throttle(() => {
+        const currentScrollY = window.scrollY;
+        const lastScrollY = lastScrollYRef.current;
+        dispatch(setIsScrollingDown(currentScrollY > lastScrollY));
+        lastScrollYRef.current = currentScrollY;
+
+        dispatch(setIsExpanded(false));
+      }, 100);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [dispatch, postToolbar.mode, throttle]);
 
   return (
     <div
       className={clsx(
-        'sticky top-0 z-40 w-full flex flex-col p-2 bg-white/80 backdrop-blur-md',
-        'xl:ml-[var(--sidebar-width)]',
+        'fixed top-0 z-40 w-full flex flex-col p-2 bg-white/80 backdrop-blur-md',
+        'xl:ml-[var(--sidebar-width)] block xl:hidden',
         'transition-transform duration-300 ease-in-out',
         postToolbar.isVisible ? 'translate-y-0' : '-translate-y-full'
       )}

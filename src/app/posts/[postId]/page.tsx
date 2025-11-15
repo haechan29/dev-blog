@@ -22,12 +22,10 @@ export default async function PostPage({
 
   return (
     <>
-      <div className='block xl:hidden'>
-        <PostToolbar />
-      </div>
+      <PostToolbar />
       <div
         className={clsx(
-          'px-10 xl:px-20 py-14',
+          'max-lg:mt-10 px-10 xl:px-20 py-14',
           'xl:ml-[var(--sidebar-width)]',
           'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
         )}

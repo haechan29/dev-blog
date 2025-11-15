@@ -5,7 +5,6 @@ import PostViewer from '@/components/postViewer/postViewer';
 import useContentTracker from '@/features/post/hooks/useContentTracker';
 import useHeadingSync from '@/features/post/hooks/useHeadingSync';
 import usePostReader from '@/features/post/hooks/usePostReader';
-import useScrollTracker from '@/features/post/hooks/useScrollTracker';
 import { PostProps } from '@/features/post/ui/postProps';
 import { ReactNode } from 'react';
 
@@ -23,7 +22,6 @@ export default function PostContentWrapper({
   } = usePostReader();
 
   useContentTracker();
-  useScrollTracker();
   useHeadingSync();
 
   return (
