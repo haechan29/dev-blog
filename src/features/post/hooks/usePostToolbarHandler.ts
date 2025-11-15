@@ -2,10 +2,8 @@
 
 import Heading from '@/features/post/domain/model/heading';
 import usePostToolbar from '@/features/post/hooks/usePostToolbar';
-import {
-  setCurrentHeading,
-  setIsExpanded,
-} from '@/lib/redux/post/postToolbarSlice';
+import { setCurrentHeading } from '@/lib/redux/post/postReaderSlice';
+import { setIsExpanded } from '@/lib/redux/post/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { scrollIntoElement } from '@/lib/scroll';
 import { useCallback } from 'react';
@@ -21,7 +19,8 @@ export default function usePostToolbarHandler() {
         dispatch(setIsExpanded(true));
       }
       if (postToolbar.mode === 'expanded') {
-        const element = document.getElementById(heading.id);
+        const postContent = document.querySelector('[data-post-content]');
+        const element = postContent?.querySelector(`#${heading.id}`);
         if (element) {
           scrollIntoElement(
             element,

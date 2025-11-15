@@ -23,7 +23,7 @@ export default function PostToolbar() {
 
   const { onContentClick, onExpandButtonClick } = usePostToolbarHandler();
 
-  const contentsRef = useRef<Map<string, HTMLDivElement>>(new Map());
+  const contentsRef = useRef<Map<string, HTMLElement>>(new Map());
   useScrollToContent(contentsRef);
 
   return (

@@ -1,6 +1,7 @@
 'use client';
 
 import Heading from '@/features/post/domain/model/heading';
+import usePostReader from '@/features/post/hooks/usePostReader';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import useScrollToContent from '@/features/postViewer/hooks/useScrollToContent';
 import useViewerToolbar from '@/features/postViewer/hooks/useViewerToolbar';
@@ -16,13 +17,11 @@ export default function PostViewerToolbar({
   headings: Heading[];
 }) {
   const { areBarsVisible } = usePostViewer();
+  const { isExpanded, toggleIsExpanded, onContentClick, ...handlers } =
+    useViewerToolbar();
   const {
-    isExpanded,
-    currentHeading,
-    toggleIsExpanded,
-    onContentClick,
-    ...handlers
-  } = useViewerToolbar();
+    postReader: { currentHeading },
+  } = usePostReader();
 
   const contentsRef = useRef<Map<string, HTMLDivElement>>(new Map());
   useScrollToContent(contentsRef);
@@ -97,7 +96,8 @@ function Content({
             }}
             onClick={() => onContentClick(item)}
             className={clsx(
-              'w-full text-base md:text-lg lg:text-xl text-left text-white md:text-gray-900 transition-discrete|opacity duration-300 ease-in',
+              'w-full text-base md:text-lg lg:text-xl text-left text-white md:text-gray-900',
+              'transition-discrete|opacity duration-300 ease-in',
               isExpanded || heading?.id === item.id
                 ? 'h-6 opacity-100'
                 : 'h-0 opacity-0',

@@ -1,8 +1,8 @@
 'use client';
 
 import Heading from '@/features/post/domain/model/heading';
-import useViewerToolbar from '@/features/postViewer/hooks/useViewerToolbar';
-import { setCurrentHeading } from '@/lib/redux/post/postToolbarSlice';
+import usePostReader from '@/features/post/hooks/usePostReader';
+import { setCurrentHeading } from '@/lib/redux/post/postReaderSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { scrollIntoElement } from '@/lib/scroll';
 import clsx from 'clsx';
@@ -14,10 +14,13 @@ export default function TableOfContentsItem({
   headings: Heading[];
 }) {
   const dispatch = useDispatch<AppDispatch>();
-  const { currentHeading } = useViewerToolbar();
+  const {
+    postReader: { currentHeading },
+  } = usePostReader();
 
   const handleClick = (heading: Heading) => {
-    const element = document.getElementById(heading.id);
+    const postContent = document.querySelector('[data-post-content]');
+    const element = postContent?.querySelector(`#${heading.id}`);
     if (element) {
       scrollIntoElement(
         element,

@@ -9,7 +9,6 @@ const initialState: PostToolbar = {
   isScrollingDown: false,
   isExpanded: false,
   headings: [],
-  currentHeading: null,
 };
 
 const postToolbarSlice = createSlice({
@@ -34,9 +33,6 @@ const postToolbarSlice = createSlice({
     setHeadings: (state, action: PayloadAction<Heading[]>) => {
       state.headings = action.payload;
     },
-    setCurrentHeading: (state, action: PayloadAction<Heading | null>) => {
-      state.currentHeading = action.payload;
-    },
     setTitle: (state, action: PayloadAction<string>) => {
       state.title = action.payload;
     },
@@ -51,6 +47,5 @@ export const {
   setIsExpanded,
   setTag,
   setHeadings,
-  setCurrentHeading,
   setTitle,
 } = postToolbarSlice.actions;

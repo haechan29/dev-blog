@@ -4,7 +4,7 @@ import Heading from '@/features/post/domain/model/heading';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import useDebounce from '@/hooks/useDebounce';
 import { canTouch } from '@/lib/browser';
-import { setCurrentHeading } from '@/lib/redux/post/postToolbarSlice';
+import { setCurrentHeading } from '@/lib/redux/post/postReaderSlice';
 import {
   setIsMouseOnToolbar,
   setIsToolbarExpanded,
@@ -17,7 +17,7 @@ import { useDispatch } from 'react-redux';
 export default function useViewerToolbar() {
   const dispatch = useDispatch<AppDispatch>();
   const debounce = useDebounce();
-  const { currentHeading, isToolbarExpanded } = usePostViewer();
+  const { isToolbarExpanded } = usePostViewer();
 
   const toggleIsExpanded = useCallback(() => {
     dispatch(setIsToolbarExpanded(!isToolbarExpanded));
@@ -46,7 +46,6 @@ export default function useViewerToolbar() {
 
   return {
     isExpanded: isToolbarExpanded,
-    currentHeading,
     toggleIsExpanded,
     onContentClick,
     onMouseEnter,

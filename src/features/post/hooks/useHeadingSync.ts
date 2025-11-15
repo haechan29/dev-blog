@@ -3,7 +3,7 @@
 import { findHeadingByScroll } from '@/features/post/domain/lib/heading';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import useThrottle from '@/hooks/useThrottle';
-import { setCurrentHeading } from '@/lib/redux/post/postToolbarSlice';
+import { setCurrentHeading } from '@/lib/redux/post/postReaderSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { scrollIntoElement } from '@/lib/scroll';
 import { useEffect } from 'react';

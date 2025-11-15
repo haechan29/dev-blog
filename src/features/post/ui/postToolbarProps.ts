@@ -1,4 +1,5 @@
 import Heading from '@/features/post/domain/model/heading';
+import PostReader from '@/features/post/domain/model/postReader';
 import PostToolbar from '@/features/post/domain/model/postToolbar';
 
 export type EmptyToolbarProps = {
@@ -34,8 +35,10 @@ export type PostToolbarProps =
 
 export function createProps({
   postToolbar,
+  postReader,
 }: {
   postToolbar: PostToolbar;
+  postReader: PostReader;
 }): PostToolbarProps {
   const mode = getMode(postToolbar);
   switch (mode) {
@@ -55,7 +58,7 @@ export function createProps({
       const items = [
         postToolbar.tag,
         postToolbar.title!,
-        postToolbar.currentHeading?.text,
+        postReader.currentHeading?.text,
       ].filter(item => item != null);
       const lastItem = items.pop()!;
       return {
@@ -73,7 +76,7 @@ export function createProps({
         breadcrumb: postToolbar.tag
           ? [postToolbar.tag, postToolbar.title!]
           : [postToolbar.title!],
-        title: postToolbar.currentHeading!.text,
+        title: postReader.currentHeading!.text,
         headings: postToolbar.headings,
       };
   }

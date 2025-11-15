@@ -6,5 +6,6 @@ import { useSelector } from 'react-redux';
 
 export default function usePostToolbar() {
   const postToolbar = useSelector((state: RootState) => state.postToolbar);
-  return createProps({ postToolbar });
+  const postReader = useSelector((state: RootState) => state.postReader);
+  return createProps({ postToolbar, postReader });
 }
