@@ -1,3 +1,5 @@
+import { Position } from '@/types/position';
+
 export interface BgmController {
   isPlaying: boolean;
   isError: boolean;
@@ -8,6 +10,7 @@ export interface BgmController {
   isReady: boolean;
   isVideoVisible: boolean;
   currentVideoId: string | null;
+  position: Position | null;
   requestedBgm: {
     videoId: string | null;
     start: number | null;

@@ -3,21 +3,28 @@
 
 import {
   clearRequestedBgm,
+  hideVideo,
   setIsError,
   setIsPlaying,
   setIsReady,
   setIsWaiting,
 } from '@/lib/redux/bgmControllerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
+import clsx from 'clsx';
 import { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function BgmController() {
   const dispatch = useDispatch<AppDispatch>();
   const playerRef = useRef<any>(null);
-  const { isPlaying, isWaiting, isReady, requestedBgm } = useSelector(
-    (state: RootState) => state.bgmController
-  );
+  const {
+    isPlaying,
+    isWaiting,
+    isReady,
+    isVideoVisible,
+    position,
+    requestedBgm,
+  } = useSelector((state: RootState) => state.bgmController);
 
   const initPlayer = useCallback(
     ({ videoId, start }: { videoId: string | null; start: number | null }) => {
@@ -105,10 +112,28 @@ export default function BgmController() {
     }
   }, [dispatch, isReady, isWaiting]);
 
+  useEffect(() => {
+    if (!isVideoVisible) return;
+
+    const hideOnMove = () => dispatch(hideVideo());
+
+    window.addEventListener('scroll', hideOnMove, { passive: true });
+    window.addEventListener('resize', hideOnMove, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', hideOnMove);
+      window.removeEventListener('resize', hideOnMove);
+    };
+  }, [dispatch, isVideoVisible]);
+
   return (
     <div
       data-bgm-controller
-      className='fixed top-0 left-0 right-0 mx-auto bg-black w-40 h-40'
+      className={clsx('fixed z-[4000]', !isVideoVisible && 'hidden')}
+      style={{
+        top: position?.top ?? 0,
+        left: position?.left ?? 0,
+      }}
     />
   );
 }
