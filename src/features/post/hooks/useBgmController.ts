@@ -16,8 +16,14 @@ import { useDispatch, useSelector } from 'react-redux';
 export default function useBgmController() {
   const dispatch = useDispatch<AppDispatch>();
   const playerRef = useRef<any>(null);
-  const { isPlaying, isWaiting, isReady, isVideoVisible, requestedBgm } =
-    useSelector((state: RootState) => state.bgmController);
+  const {
+    isPlaying,
+    isWaiting,
+    isReady,
+    isVideoVisible,
+    currentVideoId,
+    requestedBgm,
+  } = useSelector((state: RootState) => state.bgmController);
 
   const initPlayer = useCallback(
     ({
@@ -41,6 +47,8 @@ export default function useBgmController() {
       dispatch(setIsPlaying(false));
       dispatch(setIsWaiting(false));
       dispatch(setIsReady(false));
+      playerRef.current?.destroy?.();
+
       container.innerHTML = '';
       const bgmPlayer = document.createElement('div');
       container.appendChild(bgmPlayer);
@@ -89,8 +97,7 @@ export default function useBgmController() {
 
   useEffect(() => {
     if (requestedBgm.videoId === null) return;
-    const prevVideoId = playerRef.current?.getVideoData?.().video_id;
-    if (prevVideoId === null || prevVideoId !== requestedBgm.videoId) {
+    if (currentVideoId === null || currentVideoId !== requestedBgm.videoId) {
       if (window.YT?.Player) {
         initPlayer(requestedBgm);
       } else {
@@ -98,7 +105,7 @@ export default function useBgmController() {
       }
     }
 
-    if (!isReady) {
+    if (!(isReady && currentVideoId === requestedBgm.videoId)) {
       dispatch(setIsWaiting(true));
     } else if (isPlaying) {
       playerRef.current?.pauseVideo?.();
@@ -106,7 +113,7 @@ export default function useBgmController() {
       playerRef.current?.playVideo?.();
     }
     dispatch(clearRequestedBgm());
-  }, [dispatch, initPlayer, isPlaying, isReady, requestedBgm]);
+  }, [currentVideoId, dispatch, initPlayer, isPlaying, isReady, requestedBgm]);
 
   useEffect(() => {
     if (isReady && isWaiting) {

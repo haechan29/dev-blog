@@ -3,8 +3,11 @@
 import WritePostContentEditor from '@/components/write/writePostContentEditor';
 import WritePostContentPreview from '@/components/write/writePostContentPreview';
 import WritePostContentToolbar from '@/components/write/writePostContentToolbar';
+import useBgmController from '@/features/post/hooks/useBgmController';
 
 export default function WritePostContent() {
+  useBgmController();
+
   return (
     <div className='h-full grid max-lg:grid-rows-[calc(50%-0.5rem)_calc(50%-0.5rem)] lg:grid-cols-2 gap-4'>
       <div className='h-full flex flex-col max-lg:min-w-0 lg:min-h-0'>
