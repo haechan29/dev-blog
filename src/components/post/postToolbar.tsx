@@ -3,14 +3,18 @@
 import SidebarButton from '@/components/post/sidebarButton';
 import Heading from '@/features/post/domain/model/heading';
 import usePostToolbar from '@/features/post/hooks/usePostToolbar';
-import usePostToolbarHandler from '@/features/post/hooks/usePostToolbarHandler';
 import { PostToolbarProps } from '@/features/post/ui/postToolbarProps';
-import useScrollToContent from '@/features/postViewer/hooks/useScrollToContent';
+import { setCurrentHeading } from '@/lib/redux/post/postReaderSlice';
+import { setIsExpanded } from '@/lib/redux/post/postToolbarSlice';
+import { AppDispatch } from '@/lib/redux/store';
+import { scrollIntoElement } from '@/lib/scroll';
 import clsx from 'clsx';
 import { ChevronDown, ChevronRight } from 'lucide-react';
-import { RefObject, useMemo, useRef } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useDispatch } from 'react-redux';
 
 export default function PostToolbar() {
+  const dispatch = useDispatch<AppDispatch>();
   const postToolbar = usePostToolbar();
 
   const breadcrumb = useMemo(() => {
@@ -21,10 +25,36 @@ export default function PostToolbar() {
       : [];
   }, [postToolbar]);
 
-  const { onContentClick, onExpandButtonClick } = usePostToolbarHandler();
+  const onContentClick = useCallback(
+    (heading: Heading) => {
+      if (postToolbar.mode === 'collapsed') {
+        dispatch(setIsExpanded(true));
+      }
+      if (postToolbar.mode === 'expanded') {
+        const postContent = document.querySelector('[data-post-content]');
+        const element = postContent?.querySelector(`#${heading.id}`);
+        if (element) {
+          scrollIntoElement(
+            element,
+            {
+              behavior: 'smooth',
+              block: 'start',
+            },
+            () => {
+              dispatch(setCurrentHeading(heading));
+              dispatch(setIsExpanded(false));
+            }
+          );
+        }
+      }
+    },
+    [dispatch, postToolbar.mode]
+  );
 
-  const contentsRef = useRef<Map<string, HTMLElement>>(new Map());
-  useScrollToContent(contentsRef);
+  const onExpandButtonClick = useCallback(
+    () => dispatch(setIsExpanded(postToolbar.mode !== 'expanded')),
+    [dispatch, postToolbar.mode]
+  );
 
   return (
     <div
@@ -39,11 +69,7 @@ export default function PostToolbar() {
 
       <div className='flex w-full items-start'>
         <SidebarButton />
-        <Content
-          contentsRef={contentsRef}
-          postToolbar={postToolbar}
-          onClick={onContentClick}
-        />
+        <Content postToolbar={postToolbar} onClick={onContentClick} />
         <ExpandButton mode={postToolbar.mode} onClick={onExpandButtonClick} />
       </div>
     </div>
@@ -71,11 +97,9 @@ function Breadcrumb({ breadcrumb }: { breadcrumb: string[] }) {
 }
 
 function Content({
-  contentsRef,
   postToolbar,
   onClick,
 }: {
-  contentsRef: RefObject<Map<string, HTMLElement>>;
   postToolbar: PostToolbarProps;
   onClick: (heading: Heading) => void;
 }) {
@@ -96,11 +120,6 @@ function Content({
             {postToolbar.headings.map(heading => (
               <button
                 key={heading.id}
-                ref={content => {
-                  const contents = contentsRef.current;
-                  if (content) contents.set(heading.id, content);
-                  else contents.delete(heading.id);
-                }}
                 onClick={() => onClick(heading)}
                 className={clsx(
                   'truncate text-left transition-discrete|opacity duration-300 ease-in',

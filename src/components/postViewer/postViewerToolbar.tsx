@@ -3,11 +3,20 @@
 import Heading from '@/features/post/domain/model/heading';
 import usePostReader from '@/features/post/hooks/usePostReader';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
-import useScrollToContent from '@/features/postViewer/hooks/useScrollToContent';
-import useViewerToolbar from '@/features/postViewer/hooks/useViewerToolbar';
+import useDebounce from '@/hooks/useDebounce';
+import { canTouch } from '@/lib/browser';
+import { setCurrentHeading } from '@/lib/redux/post/postReaderSlice';
+import {
+  setIsMouseOnToolbar,
+  setIsToolbarExpanded,
+  setIsToolbarTouched,
+} from '@/lib/redux/post/postViewerSlice';
+import { AppDispatch } from '@/lib/redux/store';
+import { scrollIntoElement } from '@/lib/scroll';
 import clsx from 'clsx';
 import { ChevronDown } from 'lucide-react';
-import { RefObject, useRef } from 'react';
+import { RefObject, useCallback, useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux';
 
 export default function PostViewerToolbar({
   title,
@@ -17,19 +26,57 @@ export default function PostViewerToolbar({
   headings: Heading[];
 }) {
   const { areBarsVisible } = usePostViewer();
-  const { isExpanded, toggleIsExpanded, onContentClick, ...handlers } =
-    useViewerToolbar();
   const {
     postReader: { currentHeading },
   } = usePostReader();
-
+  const { isViewerMode } = usePostViewer();
   const contentsRef = useRef<Map<string, HTMLDivElement>>(new Map());
-  useScrollToContent(contentsRef);
+
+  const dispatch = useDispatch<AppDispatch>();
+  const debounce = useDebounce();
+  const { isToolbarExpanded: isExpanded } = usePostViewer();
+
+  const onMouseEnter = useCallback(() => {
+    if (canTouch) return;
+    dispatch(setIsMouseOnToolbar(true));
+  }, [dispatch]);
+
+  const onMouseLeave = useCallback(() => {
+    if (canTouch) return;
+    dispatch(setIsMouseOnToolbar(false));
+  }, [dispatch]);
+
+  const onContentClick = useCallback(
+    (heading: Heading) => {
+      if (isExpanded) dispatch(setCurrentHeading(heading));
+      dispatch(setIsToolbarExpanded(!isExpanded));
+
+      dispatch(setIsToolbarTouched(true));
+      debounce(() => dispatch(setIsToolbarTouched(false)), 2000);
+    },
+    [debounce, dispatch, isExpanded]
+  );
+
+  useEffect(() => {
+    if (!isViewerMode || !currentHeading) return;
+
+    const content = contentsRef.current.get(currentHeading.id);
+    if (!content) return;
+
+    const scrollToContent = () => {
+      scrollIntoElement(content, {
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    };
+    content.addEventListener('transitionend', scrollToContent);
+    return () => content.removeEventListener('transitionend', scrollToContent);
+  }, [currentHeading, isViewerMode]);
 
   return (
     <div
       className={clsx(
-        'absolute top-0 left-0 right-0 z-50',
+        'absolute top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md',
         'max-md:pb-[var(--gradient-padding-bottom)] max-md:from-black/50 max-md:to-transparent max-md:bg-gradient-to-b',
         'transition-opacity|discrete duration-300 ease-in-out',
         !areBarsVisible && 'opacity-0 pointer-events-none'
@@ -38,7 +85,11 @@ export default function PostViewerToolbar({
         '--gradient-padding-bottom': isExpanded ? '5rem' : '2.5rem',
       }}
     >
-      <div {...handlers} className='flex flex-col p-2 md:p-4 lg:p-6'>
+      <div
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        className='flex flex-col p-2 md:p-4 lg:p-6'
+      >
         <Title title={title} heading={currentHeading} />
 
         <div className='flex w-full items-start'>
@@ -50,10 +101,19 @@ export default function PostViewerToolbar({
             onContentClick={onContentClick}
           />
 
-          <ToggleExpandButton
-            isExpanded={isExpanded}
-            toggleIsExpanded={toggleIsExpanded}
-          />
+          <button
+            onClick={() => {
+              dispatch(setIsToolbarExpanded(!isExpanded));
+            }}
+            className='flex shrink-0 px-2 items-center justify-center cursor-pointer'
+          >
+            <ChevronDown
+              className={clsx(
+                'w-6 h-6 text-white md:text-gray-500 stroke-1 transition-transform duration-300 ease-in-out',
+                isExpanded && '-rotate-180'
+              )}
+            />
+          </button>
         </div>
       </div>
     </div>
@@ -116,27 +176,5 @@ function Content({
         ))}
       </div>
     </div>
-  );
-}
-
-function ToggleExpandButton({
-  isExpanded,
-  toggleIsExpanded,
-}: {
-  isExpanded: boolean;
-  toggleIsExpanded: () => void;
-}) {
-  return (
-    <button
-      onClick={toggleIsExpanded}
-      className='flex shrink-0 px-2 items-center justify-center cursor-pointer'
-    >
-      <ChevronDown
-        className={clsx(
-          'w-6 h-6 text-white md:text-gray-500 stroke-1 transition-transform duration-300 ease-in-out',
-          isExpanded && '-rotate-180'
-        )}
-      />
-    </button>
   );
 }
