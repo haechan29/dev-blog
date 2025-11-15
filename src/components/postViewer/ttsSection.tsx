@@ -4,8 +4,10 @@ import Tooltip from '@/components/tooltip';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import useTTSPlayer from '@/features/postViewer/hooks/useTTSPlayer';
 import useDebounce from '@/hooks/useDebounce';
-import { nextPage } from '@/lib/redux/post/postPositionSlice';
-import { setIsControlBarTouched } from '@/lib/redux/post/postViewerSlice';
+import {
+  nextPage,
+  setIsControlBarTouched,
+} from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { Pause, Play } from 'lucide-react';
@@ -25,14 +27,13 @@ export default function TTSSection() {
   });
 
   const onClick = useCallback(() => {
-    setIsPlaying(isPlaying => {
-      // if (isPlaying) startReading(elementIndex);
-      // else pauseReading();
-      return !isPlaying;
-    });
+    if (isPlaying) pauseReading();
+    else startReading(elementIndex);
+
+    setIsPlaying(prev => !prev);
     dispatch(setIsControlBarTouched(true));
     debounce(() => dispatch(setIsControlBarTouched(false)), 2000);
-  }, [debounce, dispatch]);
+  }, [debounce, dispatch, elementIndex, isPlaying, pauseReading, startReading]);
 
   useEffect(() => {
     if (isPlaying) startReading(elementIndex);
@@ -42,7 +43,7 @@ export default function TTSSection() {
   useEffect(() => {
     if (!isViewerMode) {
       stopReading();
-      setIsPlaying(prev => !prev);
+      setIsPlaying(false);
     }
   }, [isViewerMode, stopReading]);
 

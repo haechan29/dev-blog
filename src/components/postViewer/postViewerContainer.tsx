@@ -16,7 +16,7 @@ interface ViewerProps {
 
 export default function PostViewerContainer({ content }: { content: string }) {
   useViewerPagination();
-  const { page, caption } = usePostViewer();
+  const { page } = usePostViewer();
   const [viewer, setViewer] = useState<ViewerProps>();
   const navigationHandler = useClickTouchNavigationHandler();
   useKeyboardWheelNavigation();
@@ -40,13 +40,7 @@ export default function PostViewerContainer({ content }: { content: string }) {
   useEffect(() => {
     const updateViewer = async () => {
       if (!page) return;
-      const { startOffset, endOffset, heading, caption } = page;
-
-      if (heading) {
-        const { id, text, level } = heading;
-        // dispatch(setHeadingPageMapping(headingPageMapping));
-        // dispatch(setPagination({ current: 0, total: pages.length }));
-      }
+      const { startOffset, endOffset, caption } = page;
 
       await processMd({
         source: content.slice(startOffset, endOffset),
@@ -59,7 +53,7 @@ export default function PostViewerContainer({ content }: { content: string }) {
       });
     };
     updateViewer();
-  }, [content, pageNumber, pages]);
+  }, [content, page]);
 
   return (
     <div

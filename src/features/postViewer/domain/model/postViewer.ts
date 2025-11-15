@@ -12,5 +12,5 @@ export interface PostViewer {
   isControlBarTouched: boolean;
   isRotationFinished: boolean;
   pages: Page[];
-  currentPageIndex: number;
+  currentPageIndex: number | null;
 }

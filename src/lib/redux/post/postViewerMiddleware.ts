@@ -49,7 +49,7 @@ function handleNextPage({
   const current = store.getState().postViewer.currentPageIndex;
   const total = store.getState().postViewer.pages.length;
 
-  if (current >= total - 1) {
+  if (current !== null && current >= total - 1) {
     toast.success('마지막 페이지입니다.', {
       id: 'post-viewer',
       toasterId: 'post-viewer',
@@ -66,7 +66,7 @@ function handlePreviousPage({
   action,
 }: MiddlewareParams<ReturnType<typeof previousPage>>) {
   const current = store.getState().postViewer.currentPageIndex;
-  if (current <= 0) {
+  if (current !== null && current <= 0) {
     toast.success('첫 페이지입니다.', {
       id: 'post-viewer',
       toasterId: 'post-viewer',

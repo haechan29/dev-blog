@@ -1,19 +1,26 @@
 'use client';
 
+import { findHeadingByScroll } from '@/features/post/domain/lib/heading';
 import Heading from '@/features/post/domain/model/heading';
 import { Page } from '@/features/postViewer/domain/types/page';
 import useViewerContainerSize from '@/features/postViewer/hooks/useViewerContainerSize';
 import useThrottle from '@/hooks/useThrottle';
-import { setPages } from '@/lib/redux/post/postPositionSlice';
-import { AppDispatch } from '@/lib/redux/store';
+import {
+  setCurrentPageIndex,
+  setPages,
+} from '@/lib/redux/post/postViewerSlice';
+import { AppDispatch, RootState } from '@/lib/redux/store';
 import { Size } from '@/types/size';
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function useViewerPagination() {
   const dispatch = useDispatch<AppDispatch>();
   const throttle = useThrottle();
   const containerSize = useViewerContainerSize();
+  const { currentPageIndex } = useSelector((state: RootState) => {
+    return state.postViewer;
+  });
 
   useEffect(() => {
     const viewer = document.querySelector('[data-viewer-measurement]');
@@ -22,6 +29,18 @@ export default function useViewerPagination() {
     const pages = measure(containerSize);
     if (pages) {
       dispatch(setPages(pages));
+      if (currentPageIndex === null) {
+        const heading = findHeadingByScroll();
+        let pageIndex = 0;
+        for (let i = 0; i < pages.length; i++) {
+          const page = pages[i];
+          if (page.heading && heading && page.heading.id === heading.id) {
+            pageIndex = i;
+            break;
+          }
+        }
+        dispatch(setCurrentPageIndex(pageIndex));
+      }
     }
 
     const observer = new ResizeObserver(() => {
@@ -30,7 +49,7 @@ export default function useViewerPagination() {
     observer.observe(viewer);
 
     return () => observer.disconnect();
-  }, [containerSize, dispatch, throttle]);
+  }, [containerSize, currentPageIndex, dispatch, throttle]);
 }
 
 function measure(containerSize: Size) {

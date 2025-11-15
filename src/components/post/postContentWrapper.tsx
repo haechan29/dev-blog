@@ -24,7 +24,7 @@ export default function PostContentWrapper({
 
   useContentTracker();
   useScrollTracker();
-  useHeadingSync(post);
+  useHeadingSync();
 
   return (
     <>

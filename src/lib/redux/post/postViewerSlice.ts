@@ -14,7 +14,7 @@ const initialState: PostViewer = {
   isControlBarTouched: false,
   isRotationFinished: false,
   pages: [],
-  currentPageIndex: 0,
+  currentPageIndex: null,
 };
 
 const postViewerSlice = createSlice({
@@ -55,10 +55,12 @@ const postViewerSlice = createSlice({
       state.currentPageIndex = action.payload;
     },
     nextPage: state => {
-      state.currentPageIndex = state.currentPageIndex + 1;
+      state.currentPageIndex =
+        state.currentPageIndex === null ? null : state.currentPageIndex + 1;
     },
     previousPage: state => {
-      state.currentPageIndex = state.currentPageIndex - 1;
+      state.currentPageIndex =
+        state.currentPageIndex === null ? null : state.currentPageIndex - 1;
     },
     setPages: (state, action: PayloadAction<Page[]>) => {
       state.pages = action.payload;

@@ -1,10 +1,12 @@
 import { PostViewer } from '@/features/postViewer/domain/model/postViewer';
+import { Page } from '@/features/postViewer/domain/types/page';
 
 export default interface PostViewerProps {
   isButtonVisible: boolean;
   isViewerMode: boolean;
   areBarsVisible: boolean;
   isToolbarExpanded: boolean;
+  page: Page | null;
   pageNumber: number | null;
   totalPages: number | null;
 }
@@ -25,7 +27,14 @@ export function createProps({
       postViewer.isToolbarTouched ||
       postViewer.isControlBarTouched ||
       postViewer.isRotationFinished,
-    pageNumber: postViewer.currentPageIndex + 1,
+    page:
+      postViewer.currentPageIndex === null
+        ? null
+        : postViewer.pages[postViewer.currentPageIndex],
+    pageNumber:
+      postViewer.currentPageIndex === null
+        ? null
+        : postViewer.currentPageIndex + 1,
     totalPages: postViewer.pages.length + 1,
     ...postViewer,
   };
