@@ -4,5 +4,4 @@ import { ContentEditorStatus } from '@/features/write/domain/types/contentEditor
 export default interface WritePost {
   currentStepId: keyof typeof writePostSteps;
   contentEditorStatus: ContentEditorStatus;
-  activeVideoId?: string;
 }
