@@ -1,16 +1,11 @@
 'use client';
 
-import useYoutubePlayer from '@/hooks/useYoutubePlayer';
+import { YoutubePlayer } from '@/features/post/domain/types/youtubePlayer';
 import { canTouch } from '@/lib/browser';
 import { createRipple } from '@/lib/dom';
 import clsx from 'clsx';
 import { Loader2, Maximize, Minimize, Music, Pause, Play } from 'lucide-react';
-import { useEffect, useState } from 'react';
-
-export interface YoutubePlayerData {
-  videoId: string | null;
-  start: number | null;
-}
+import { useMemo, useState } from 'react';
 
 export default function Bgm({
   'data-youtube-url': youtubeUrl,
@@ -23,23 +18,22 @@ export default function Bgm({
   'data-start-offset': string;
   'data-end-offset': string;
 }) {
-  const [playerData, setPlayerData] = useState<YoutubePlayerData>({
-    videoId: null,
-    start: null,
-  });
-  const { isPlaying, isError, isWaiting, togglePlay } = useYoutubePlayer({
-    ...playerData,
-  });
+  const { isPlaying, isError, isWaiting } = {
+    isPlaying: true,
+    isError: true,
+    isWaiting: true,
+  };
   const [isVideoVisible, setIsVideoVisible] = useState(false);
+  const togglePlay = (youtubePlayer: YoutubePlayer) => {};
 
-  useEffect(() => {
+  const youtubePlayer = useMemo(() => {
     const { videoId, timeFromUrl } = parseYouTubeUrl(youtubeUrl);
     const finalStartTime =
       startTime != null ? parseTimeToSeconds(startTime) : timeFromUrl;
-    setPlayerData({
+    return {
       videoId,
       start: finalStartTime,
-    });
+    };
   }, [startTime, youtubeUrl]);
 
   return (
@@ -67,7 +61,7 @@ export default function Bgm({
                 className='p-2 w-fit h-fit cursor-pointer hover:bg-gray-200 rounded-md'
                 onClick={e => {
                   if (canTouch) createRipple(e);
-                  togglePlay();
+                  togglePlay(youtubePlayer);
                 }}
                 aria-label={isPlaying ? 'bgm 일시중지' : 'bgm 재생'}
               >
@@ -104,12 +98,6 @@ export default function Bgm({
             </button>
           </div>
         </div>
-
-        <div
-          data-bgm-player
-          data-bgm-video-id={playerData.videoId ?? ''}
-          className={clsx(!isVideoVisible && 'hidden')}
-        />
       </div>
     </div>
   );

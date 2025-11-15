@@ -1,4 +1,5 @@
 import Comments from '@/components/comment/comments';
+import BgmController from '@/components/post/bgmController';
 import LikeButtonItem from '@/components/post/likeButtonItem';
 import PostContentWrapper from '@/components/post/postContentWrapper';
 import PostHeader from '@/components/post/postHeader';
@@ -23,6 +24,7 @@ export default async function PostPage({
   return (
     <>
       <PostToolbar />
+      <BgmController />
       <div
         className={clsx(
           'max-lg:mt-10 px-10 xl:px-20 py-14',
