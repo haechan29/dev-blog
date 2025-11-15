@@ -14,29 +14,26 @@ import { useDispatch, useSelector } from 'react-redux';
 export default function BgmController() {
   const dispatch = useDispatch<AppDispatch>();
   const playerRef = useRef<any>(null);
-  const { videoId, start, isPlaying, isError, isWaiting, isReady } =
-    useSelector((state: RootState) => state.bgmController);
-
-  const onYoutubeAPIReady = useRef<(() => void)[]>([]);
+  const { isPlaying, isWaiting, isReady, action } = useSelector(
+    (state: RootState) => state.bgmController
+  );
+  const actionTypeRef = useRef<string | null>(null);
 
   const initPlayer = useCallback(
-    (videoId: string, start: number) => {
-      const bgmPlayers = document.querySelectorAll('[data-bgm-player]');
-      const container = Array.from(bgmPlayers).find(player => {
-        const videoIdAttr = (player as HTMLElement).getAttribute(
-          'data-bgm-video-id'
-        );
-        return videoId === videoIdAttr;
-      });
-      if (!container) return;
+    ({ videoId, start }: { videoId: string | null; start: number | null }) => {
+      if (videoId === null) return;
+      const newStart = start ?? 0;
+
+      const bgmController = document.querySelector('[data-bgm-controller]');
+      if (!bgmController) return;
 
       dispatch(setIsError(false));
       dispatch(setIsPlaying(false));
       dispatch(setIsWaiting(false));
       dispatch(setIsReady(false));
-      container.innerHTML = '';
+      bgmController.innerHTML = '';
       const bgmPlayer = document.createElement('div');
-      container.appendChild(bgmPlayer);
+      bgmController.appendChild(bgmPlayer);
 
       try {
         playerRef.current = new window.YT.Player(bgmPlayer, {
@@ -44,7 +41,7 @@ export default function BgmController() {
           playerVars: {
             loop: 1,
             playlist: videoId,
-            start,
+            start: newStart,
           },
           events: {
             onReady: () => {
@@ -67,28 +64,11 @@ export default function BgmController() {
     [dispatch]
   );
 
-  const togglePlay = useCallback(() => {
-    if (!playerRef.current) return;
-    const player = playerRef.current;
-
-    if (!isReady) {
-      dispatch(setIsWaiting(true));
-    } else if (isPlaying) {
-      player.pauseVideo();
-    } else {
-      player.playVideo();
-    }
-  }, [dispatch, isPlaying, isReady]);
-
   useEffect(() => {
     if (!window.YT) {
       const script = document.createElement('script');
       script.src = 'https://www.youtube.com/iframe_api';
       document.head.appendChild(script);
-      window.onYouTubeIframeAPIReady = () => {
-        onYoutubeAPIReady.current.forEach(callback => callback());
-        onYoutubeAPIReady.current.length = 0;
-      };
     }
 
     return () => {
@@ -98,15 +78,31 @@ export default function BgmController() {
   }, []);
 
   useEffect(() => {
-    if (videoId === null) return;
-    const newStart = start ?? 0;
+    if (!action || actionTypeRef.current === action.type) return;
+    actionTypeRef.current = action.type;
+    switch (action.type) {
+      case 'togglePlay': {
+        const prevVideoId = playerRef.current?.getVideoData?.().video_id;
+        if (prevVideoId === null || prevVideoId !== action.payload.videoId) {
+          if (window.YT?.Player) {
+            initPlayer(action.payload);
+          } else {
+            window.onYouTubeIframeAPIReady = () => initPlayer(action.payload);
+          }
+        }
 
-    if (window.YT?.Player) {
-      initPlayer(videoId, newStart);
-    } else {
-      onYoutubeAPIReady.current.push(() => initPlayer(videoId, newStart));
+        if (!isReady) {
+          dispatch(setIsWaiting(true));
+        } else if (isPlaying) {
+          playerRef.current?.pauseVideo?.();
+        } else {
+          playerRef.current?.playVideo?.();
+        }
+      }
+      case 'showVideo': {
+      }
     }
-  }, [initPlayer, start, videoId]);
+  }, [action, dispatch, initPlayer, isPlaying, isReady]);
 
   useEffect(() => {
     if (isReady && isWaiting) {
@@ -118,7 +114,7 @@ export default function BgmController() {
   return (
     <div
       data-bgm-controller
-      className='fixed top-0 left-0 bg-black w-40 h-40'
+      className='fixed top-0 left-0 right-0 mx-auto bg-black w-40 h-40'
     />
   );
 }

@@ -1,11 +1,13 @@
 'use client';
 
-import { YoutubePlayer } from '@/features/post/domain/types/youtubePlayer';
 import { canTouch } from '@/lib/browser';
 import { createRipple } from '@/lib/dom';
+import { setAction } from '@/lib/redux/bgmControllerSlice';
+import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { Loader2, Maximize, Minimize, Music, Pause, Play } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 export default function Bgm({
   'data-youtube-url': youtubeUrl,
@@ -18,23 +20,13 @@ export default function Bgm({
   'data-start-offset': string;
   'data-end-offset': string;
 }) {
+  const dispatch = useDispatch<AppDispatch>();
   const { isPlaying, isError, isWaiting } = {
-    isPlaying: true,
-    isError: true,
-    isWaiting: true,
+    isPlaying: false,
+    isError: false,
+    isWaiting: false,
   };
   const [isVideoVisible, setIsVideoVisible] = useState(false);
-  const togglePlay = (youtubePlayer: YoutubePlayer) => {};
-
-  const youtubePlayer = useMemo(() => {
-    const { videoId, timeFromUrl } = parseYouTubeUrl(youtubeUrl);
-    const finalStartTime =
-      startTime != null ? parseTimeToSeconds(startTime) : timeFromUrl;
-    return {
-      videoId,
-      start: finalStartTime,
-    };
-  }, [startTime, youtubeUrl]);
 
   return (
     <div data-start-offset={startOffset} data-end-offset={endOffset}>
@@ -61,7 +53,13 @@ export default function Bgm({
                 className='p-2 w-fit h-fit cursor-pointer hover:bg-gray-200 rounded-md'
                 onClick={e => {
                   if (canTouch) createRipple(e);
-                  togglePlay(youtubePlayer);
+                  const payload = parseYouTubeUrl(youtubeUrl, startTime);
+                  dispatch(
+                    setAction({
+                      type: 'togglePlay',
+                      payload,
+                    })
+                  );
                 }}
                 aria-label={isPlaying ? 'bgm 일시중지' : 'bgm 재생'}
               >
@@ -86,6 +84,7 @@ export default function Bgm({
               aria-label={isVideoVisible ? '영상 감추기' : '영상 보기'}
               onClick={e => {
                 if (canTouch) createRipple(e);
+                dispatch(setAction({ type: 'showVideo' }));
                 setIsVideoVisible(prev => !prev);
               }}
               className='p-2 w-fit h-fit cursor-pointer hover:bg-gray-200 rounded-md'
@@ -103,43 +102,41 @@ export default function Bgm({
   );
 }
 
-function parseYouTubeUrl(url: string) {
-  try {
-    const urlObj = new URL(url);
-    let videoId = null;
-    let timeFromUrl = null;
+function parseYouTubeUrl(url: string, startTime: string) {
+  const urlObj = new URL(url);
+  let videoId = null;
+  let start = null;
 
-    if (urlObj.hostname.includes('youtube.com')) {
-      videoId = urlObj.searchParams.get('v');
-    } else if (urlObj.hostname === 'youtu.be') {
-      videoId = urlObj.pathname.slice(1);
-    }
-
-    const t = urlObj.searchParams.get('t');
-    if (t) {
-      timeFromUrl = parseTimeToSeconds(t);
-    }
-
-    return { videoId, timeFromUrl };
-  } catch {
-    return { videoId: null, timeFromUrl: null };
+  if (urlObj.hostname.includes('youtube.com')) {
+    videoId = urlObj.searchParams.get('v');
+  } else if (urlObj.hostname === 'youtu.be') {
+    videoId = urlObj.pathname.slice(1);
   }
+
+  const t = urlObj.searchParams.get('t');
+  start = parseTimeToSeconds(startTime) ?? parseTimeToSeconds(t);
+  return { videoId, start };
 }
 
-function parseTimeToSeconds(timeStr: string): number {
-  let totalSeconds = 0;
+function parseTimeToSeconds(timeStr: string | null): number | null {
+  if (timeStr === null) return null;
+  try {
+    let totalSeconds = 0;
 
-  const hours = timeStr.match(/(\d+)h/);
-  const minutes = timeStr.match(/(\d+)m/);
-  const seconds = timeStr.match(/(\d+)s/);
+    const hours = timeStr.match(/(\d+)h/);
+    const minutes = timeStr.match(/(\d+)m/);
+    const seconds = timeStr.match(/(\d+)s/);
 
-  if (hours) totalSeconds += parseInt(hours[1]) * 3600;
-  if (minutes) totalSeconds += parseInt(minutes[1]) * 60;
-  if (seconds) totalSeconds += parseInt(seconds[1]);
+    if (hours) totalSeconds += parseInt(hours[1]) * 3600;
+    if (minutes) totalSeconds += parseInt(minutes[1]) * 60;
+    if (seconds) totalSeconds += parseInt(seconds[1]);
 
-  if (!hours && !minutes && !seconds) {
-    totalSeconds = parseInt(timeStr) || 0;
+    if (!hours && !minutes && !seconds) {
+      totalSeconds = parseInt(timeStr) || 0;
+    }
+
+    return totalSeconds;
+  } catch {
+    return null;
   }
-
-  return totalSeconds;
 }

@@ -2,24 +2,17 @@ import { BgmController } from '@/features/post/domain/model/bgmController';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: BgmController = {
-  videoId: null,
-  start: null,
   isPlaying: false,
   isError: false,
   isWaiting: false,
   isReady: false,
+  action: null,
 };
 
 const bgmControllerSlice = createSlice({
   name: 'bgmController',
   initialState,
   reducers: {
-    setVideoId: (state, action: PayloadAction<string>) => {
-      state.videoId = action.payload;
-    },
-    setStart: (state, action: PayloadAction<number>) => {
-      state.start = action.payload;
-    },
     setIsPlaying: (state, action: PayloadAction<boolean>) => {
       state.isPlaying = action.payload;
     },
@@ -32,15 +25,12 @@ const bgmControllerSlice = createSlice({
     setIsReady: (state, action: PayloadAction<boolean>) => {
       state.isReady = action.payload;
     },
+    setAction: (state, action: PayloadAction<BgmController['action']>) => {
+      state.action = action.payload;
+    },
   },
 });
 
 export default bgmControllerSlice.reducer;
-export const {
-  setVideoId,
-  setStart,
-  setIsPlaying,
-  setIsError,
-  setIsWaiting,
-  setIsReady,
-} = bgmControllerSlice.actions;
+export const { setIsPlaying, setIsError, setIsWaiting, setIsReady, setAction } =
+  bgmControllerSlice.actions;
