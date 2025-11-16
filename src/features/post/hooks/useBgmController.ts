@@ -2,6 +2,7 @@
 'use client';
 
 import {
+  clearController,
   clearRequestedBgm,
   hideVideo,
   setIsError,
@@ -21,7 +22,7 @@ export default function useBgmController() {
     isWaiting,
     isReady,
     isVideoVisible,
-    currentVideoId,
+    currentContainerId,
     requestedBgm,
   } = useSelector((state: RootState) => state.bgmController);
 
@@ -43,10 +44,7 @@ export default function useBgmController() {
       );
       if (!container) return;
 
-      dispatch(setIsError(false));
-      dispatch(setIsPlaying(false));
-      dispatch(setIsWaiting(false));
-      dispatch(setIsReady(false));
+      dispatch(clearController());
       playerRef.current?.destroy?.();
 
       container.innerHTML = '';
@@ -97,7 +95,10 @@ export default function useBgmController() {
 
   useEffect(() => {
     if (requestedBgm.videoId === null) return;
-    if (currentVideoId === null || currentVideoId !== requestedBgm.videoId) {
+    if (
+      currentContainerId === null ||
+      currentContainerId !== requestedBgm.containerId
+    ) {
       if (window.YT?.Player) {
         initPlayer(requestedBgm);
       } else {
@@ -105,7 +106,7 @@ export default function useBgmController() {
       }
     }
 
-    if (!(isReady && currentVideoId === requestedBgm.videoId)) {
+    if (!(isReady && currentContainerId === requestedBgm.containerId)) {
       dispatch(setIsWaiting(true));
     } else if (isPlaying) {
       playerRef.current?.pauseVideo?.();
@@ -113,7 +114,14 @@ export default function useBgmController() {
       playerRef.current?.playVideo?.();
     }
     dispatch(clearRequestedBgm());
-  }, [currentVideoId, dispatch, initPlayer, isPlaying, isReady, requestedBgm]);
+  }, [
+    currentContainerId,
+    dispatch,
+    initPlayer,
+    isPlaying,
+    isReady,
+    requestedBgm,
+  ]);
 
   useEffect(() => {
     if (isReady && isWaiting) {

@@ -30,7 +30,7 @@ export default function Bgm({
     isError,
     isWaiting,
     isReady,
-    currentVideoId,
+    currentContainerId,
     isVideoVisible,
   } = useSelector((state: RootState) => state.bgmController);
   const { videoId, start } = useMemo(() => {
@@ -39,7 +39,7 @@ export default function Bgm({
 
   return (
     <div data-start-offset={startOffset} data-end-offset={endOffset}>
-      {isError && currentVideoId === videoId && (
+      {isError && currentContainerId === containerId && (
         <div className='flex flex-col w-fit justify-center p-4 gap-2 rounded-xl bg-gray-200 text-gray-700 m-4'>
           <div>{`유효하지 않은 유튜브 링크입니다`}</div>
           <div className='text-sm'>{`(${youtubeUrl})`}</div>
@@ -51,7 +51,7 @@ export default function Bgm({
           data-bgm-player
           className={clsx(
             'flex w-fit gap-2 p-2 rounded-lg bg-gray-100 items-center',
-            isError && currentVideoId === videoId && 'hidden'
+            isError && currentContainerId === containerId && 'hidden'
           )}
         >
           <div className='p-2 w-fit h-fit bg-white rounded-md'>
@@ -66,19 +66,19 @@ export default function Bgm({
                   dispatch(setRequestedBgm({ videoId, start, containerId }));
                 }}
                 aria-label={
-                  isPlaying && currentVideoId === videoId
+                  isPlaying && currentContainerId === containerId
                     ? 'bgm 일시중지'
                     : 'bgm 재생'
                 }
               >
-                {isPlaying && currentVideoId === videoId ? (
+                {isPlaying && currentContainerId === containerId ? (
                   <Pause className='w-4 h-4 stroke-gray-900 fill-white' />
                 ) : (
                   <Play className='w-4 h-4 stroke-gray-900 fill-white' />
                 )}
               </button>
 
-              {isWaiting && currentVideoId === videoId && (
+              {isWaiting && currentContainerId === containerId && (
                 <div className='w-8 h-8 absolute inset-0 m-auto z-50 bg-gray-100/50 pointer-events-none'>
                   <Loader2
                     strokeWidth={2}
@@ -90,21 +90,21 @@ export default function Bgm({
 
             <button
               aria-label={
-                isVideoVisible && currentVideoId === videoId
+                isVideoVisible && currentContainerId === containerId
                   ? '영상 감추기'
                   : '영상 보기'
               }
-              aria-hidden={!(isReady && currentVideoId === videoId)}
+              aria-hidden={!(isReady && currentContainerId === containerId)}
               onClick={e => {
                 if (canTouch) createRipple(e);
                 dispatch(toggleIsVideoVisible());
               }}
               className={clsx(
                 'p-2 w-fit h-fit cursor-pointer hover:bg-gray-200 rounded-md',
-                !(isReady && currentVideoId === videoId) && 'hidden'
+                !(isReady && currentContainerId === containerId) && 'hidden'
               )}
             >
-              {isVideoVisible && currentVideoId === videoId ? (
+              {isVideoVisible && currentContainerId === containerId ? (
                 <Minimize className='w-4 h-4 hover:animate-pop hover:[--scale:0.8]' />
               ) : (
                 <Maximize className='w-4 h-4 hover:animate-pop' />

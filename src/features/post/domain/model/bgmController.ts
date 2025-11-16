@@ -8,6 +8,7 @@ export interface BgmController {
   isReady: boolean;
   isVideoVisible: boolean;
   currentVideoId: string | null;
+  currentContainerId: string | null;
   requestedBgm: {
     videoId: string | null;
     start: number | null;
