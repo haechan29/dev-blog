@@ -1,5 +1,7 @@
 'use client';
 
+import { BgmInner, VIEWER_BGM_CONTAINER_ID } from '@/components/md/bgm';
+import { Bgm } from '@/features/post/domain/types/bgm';
 import useClickTouchNavigationHandler from '@/features/postViewer/hooks/useClickTouchNavigationHandler';
 import useKeyboardWheelNavigation from '@/features/postViewer/hooks/useKeyboardWheelNavigation';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
@@ -11,6 +13,7 @@ import { JSX, useEffect, useLayoutEffect, useState } from 'react';
 
 interface ViewerProps {
   result: JSX.Element;
+  bgm: Bgm | null;
   caption?: string;
 }
 
@@ -40,7 +43,7 @@ export default function PostViewerContainer({ content }: { content: string }) {
   useEffect(() => {
     const updateViewer = async () => {
       if (!page) return;
-      const { startOffset, endOffset, caption } = page;
+      const { startOffset, endOffset, caption, bgm } = page;
 
       await processMd({
         source: content.slice(startOffset, endOffset),
@@ -49,6 +52,7 @@ export default function PostViewerContainer({ content }: { content: string }) {
         setViewer({
           result,
           caption,
+          bgm,
         });
       });
     };
@@ -69,8 +73,13 @@ export default function PostViewerContainer({ content }: { content: string }) {
       )}
     >
       {viewer?.result}
+      {viewer?.bgm && (
+        <div className='absolute top-4 right-4'>
+          <BgmInner {...viewer.bgm} containerId={VIEWER_BGM_CONTAINER_ID} />
+        </div>
+      )}
       {viewer?.caption && (
-        <div className='absolute bottom-0 inset-x-0 mx-auto'>
+        <div className='absolute bottom-4 inset-x-0 mx-auto'>
           <div className='bg-black/70 text-white text-center break-keep wrap-anywhere text-balance px-2 py-1'>
             {viewer.caption}
           </div>

@@ -10,33 +10,33 @@ import {
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { Loader2, Maximize, Minimize, Music, Pause, Play } from 'lucide-react';
-import { useId, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-export default function Bgm({
+export const VIEWER_BGM_CONTAINER_ID = 'viewer-bgm-container-id';
+
+export function Bgm({
   'data-youtube-url': youtubeUrl,
   'data-start-time': startTime,
   'data-start-offset': startOffset,
   'data-end-offset': endOffset,
+  'data-mode': mode,
 }: {
   'data-youtube-url': string;
   'data-start-time': string;
   'data-start-offset': string;
   'data-end-offset': string;
+  'data-mode': 'preview' | 'reader' | 'viewer';
 }) {
-  const dispatch = useDispatch<AppDispatch>();
-  const containerId = useId();
-  const {
-    isPlaying,
-    isError,
-    isWaiting,
-    isReady,
-    currentContainerId,
-    isVideoVisible,
-  } = useSelector((state: RootState) => state.bgmController);
   const { videoId, start } = useMemo(() => {
     return parseYouTubeUrl(youtubeUrl, startTime);
   }, [startTime, youtubeUrl]);
+
+  const containerId = useMemo(() => {
+    return mode === 'viewer'
+      ? VIEWER_BGM_CONTAINER_ID
+      : `${startOffset}-${youtubeUrl}`;
+  }, [mode, startOffset, youtubeUrl]);
 
   return (
     <div
@@ -46,18 +46,44 @@ export default function Bgm({
       data-start-offset={startOffset}
       data-end-offset={endOffset}
     >
+      <BgmInner videoId={videoId} start={start} containerId={containerId} />
+    </div>
+  );
+}
+
+export function BgmInner({
+  videoId,
+  start,
+  containerId,
+}: {
+  videoId: string | null;
+  start: number;
+  containerId: string;
+}) {
+  const dispatch = useDispatch<AppDispatch>();
+
+  const {
+    isPlaying,
+    isError,
+    isWaiting,
+    isReady,
+    currentContainerId,
+    isVideoVisible,
+  } = useSelector((state: RootState) => state.bgmController);
+
+  return (
+    <>
       {isError && currentContainerId === containerId && (
-        <div className='flex flex-col w-fit justify-center p-4 gap-2 rounded-xl bg-gray-200 text-gray-700 m-4'>
-          <div>{`유효하지 않은 유튜브 링크입니다`}</div>
-          <div className='text-sm'>{`(${youtubeUrl})`}</div>
+        <div className='w-fit justify-center p-4 rounded-xl bg-gray-200 text-gray-700 m-4'>
+          {`유효하지 않은 유튜브 링크입니다`}
         </div>
       )}
 
-      <div className='flex flex-col gap-4'>
+      <div className='flex flex-col items-end'>
         <div
           data-bgm-player
           className={clsx(
-            'flex w-fit gap-2 p-2 rounded-lg bg-gray-100 items-center',
+            'w-fit flex gap-2 p-2 rounded-lg bg-gray-100 items-center',
             isError && currentContainerId === containerId && 'hidden'
           )}
         >
@@ -120,11 +146,12 @@ export default function Bgm({
           </div>
         </div>
 
-        <div
-          data-bgm-container-id={containerId}
-          className={clsx(!isVideoVisible && 'hidden')}
-        />
+        <div className={clsx('relative', !isVideoVisible && 'hidden')}>
+          <div className='absolute z-50 top-4 right-0'>
+            <div data-bgm-container-id={containerId} />
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

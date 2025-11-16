@@ -26,6 +26,10 @@ export default function useBgmController() {
     requestedBgm,
   } = useSelector((state: RootState) => state.bgmController);
 
+  const { isViewerMode, currentPageIndex } = useSelector((state: RootState) => {
+    return state.postViewer;
+  });
+
   const initPlayer = useCallback(
     ({
       videoId,
@@ -143,4 +147,15 @@ export default function useBgmController() {
       window.removeEventListener('resize', hideOnMove);
     };
   }, [dispatch, isVideoVisible]);
+
+  useEffect(() => {
+    if (currentPageIndex === null) return;
+    dispatch(hideVideo());
+  }, [dispatch, currentPageIndex]);
+
+  useEffect(() => {
+    dispatch(clearController());
+    playerRef.current?.destroy?.();
+    playerRef.current = null;
+  }, [dispatch, isViewerMode]);
 }

@@ -1,4 +1,4 @@
-import Bgm from '@/components/md/bgm';
+import { Bgm } from '@/components/md/bgm';
 import ExternalLink from '@/components/md/externalLink';
 import ImageWithCaption from '@/components/md/imageWithCaption';
 import Spacer from '@/components/md/spacer';
