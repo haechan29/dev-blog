@@ -72,22 +72,21 @@ function measure(containerSize: Size) {
 
     const height = element.getBoundingClientRect().height;
 
-    if (
-      element.matches('[data-image-with-caption]') &&
-      currentPageElements.length > 0
-    ) {
+    if (element.matches('[data-image-with-caption]')) {
+      if (currentPageElements.length > 0) {
+        totalPages.push({
+          startOffset: Number(currentPageElements[0].dataset.startOffset),
+          endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
+          heading: pendingHeading,
+        });
+
+        currentPageElements = [];
+        currentHeight = 0;
+      }
+
       const dataCaption = element.dataset.caption;
       if (dataCaption === undefined) return;
       const captions: string[] = JSON.parse(dataCaption);
-
-      totalPages.push({
-        startOffset: Number(currentPageElements[0].dataset.startOffset),
-        endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
-        heading: pendingHeading,
-      });
-
-      currentPageElements = [];
-      currentHeight = 0;
 
       captions.forEach(caption => {
         totalPages.push({
