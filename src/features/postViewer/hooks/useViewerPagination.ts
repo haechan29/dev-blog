@@ -1,6 +1,8 @@
 'use client';
 
+import { parseYouTubeUrl } from '@/features/post/domain/lib/bgm';
 import Heading from '@/features/post/domain/model/heading';
+import { Bgm } from '@/features/post/domain/types/bgm';
 import { Page } from '@/features/postViewer/domain/types/page';
 import useViewerContainerSize from '@/features/postViewer/hooks/useViewerContainerSize';
 import useThrottle from '@/hooks/useThrottle';
@@ -47,6 +49,7 @@ function measure(containerSize: Size) {
   let currentPageElements: HTMLElement[] = [];
   let currentHeight = 0;
   let pendingHeading: Heading | null = null;
+  let pendingBgm: Bgm | null = null;
 
   elements.forEach(element => {
     if (currentPageElements.length === 0 && isEmptyContent(element)) return;
@@ -57,16 +60,39 @@ function measure(containerSize: Size) {
           startOffset: Number(currentPageElements[0].dataset.startOffset),
           endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
           heading: pendingHeading,
+          bgm: pendingBgm,
         });
       }
+
+      currentPageElements = [];
+      currentHeight = 0;
 
       pendingHeading = {
         id: element.id,
         text: element.textContent || '',
         level: parseInt(element.tagName.substring(1)),
       };
+      return;
+    }
+
+    if (element.matches('[data-bgm]')) {
+      if (currentPageElements.length > 0) {
+        totalPages.push({
+          startOffset: Number(currentPageElements[0].dataset.startOffset),
+          endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
+          heading: pendingHeading,
+          bgm: pendingBgm,
+        });
+      }
+
       currentPageElements = [];
       currentHeight = 0;
+
+      const youtubeUrl = element.dataset.youtubeUrl;
+      if (youtubeUrl === undefined) return;
+      const startTime = element.dataset.startTime ?? null;
+      const bgm = parseYouTubeUrl(youtubeUrl, startTime);
+      pendingBgm = bgm;
       return;
     }
 
@@ -78,6 +104,7 @@ function measure(containerSize: Size) {
           startOffset: Number(currentPageElements[0].dataset.startOffset),
           endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
           heading: pendingHeading,
+          bgm: pendingBgm,
         });
 
         currentPageElements = [];
@@ -94,8 +121,10 @@ function measure(containerSize: Size) {
           endOffset: Number(element.dataset.endOffset),
           heading: pendingHeading,
           caption,
+          bgm: pendingBgm,
         });
       });
+      return;
     }
 
     if (
@@ -106,6 +135,7 @@ function measure(containerSize: Size) {
         startOffset: Number(currentPageElements[0].dataset.startOffset),
         endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
         heading: pendingHeading,
+        bgm: pendingBgm,
       });
 
       currentPageElements = [element];
@@ -124,6 +154,7 @@ function measure(containerSize: Size) {
       startOffset: Number(currentPageElements[0].dataset.startOffset),
       endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
       heading: pendingHeading,
+      bgm: pendingBgm,
     });
   }
 

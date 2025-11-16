@@ -1,5 +1,6 @@
 'use client';
 
+import { parseYouTubeUrl } from '@/features/post/domain/lib/bgm';
 import { canTouch } from '@/lib/browser';
 import { createRipple } from '@/lib/dom';
 import {
@@ -38,7 +39,13 @@ export default function Bgm({
   }, [startTime, youtubeUrl]);
 
   return (
-    <div data-start-offset={startOffset} data-end-offset={endOffset}>
+    <div
+      data-bgm
+      data-youtube-url={youtubeUrl}
+      data-start-time={startTime}
+      data-start-offset={startOffset}
+      data-end-offset={endOffset}
+    >
       {isError && currentContainerId === containerId && (
         <div className='flex flex-col w-fit justify-center p-4 gap-2 rounded-xl bg-gray-200 text-gray-700 m-4'>
           <div>{`유효하지 않은 유튜브 링크입니다`}</div>
@@ -120,43 +127,4 @@ export default function Bgm({
       </div>
     </div>
   );
-}
-
-function parseYouTubeUrl(url: string, startTime: string) {
-  const urlObj = new URL(url);
-  let videoId = null;
-  let start = null;
-
-  if (urlObj.hostname.includes('youtube.com')) {
-    videoId = urlObj.searchParams.get('v');
-  } else if (urlObj.hostname === 'youtu.be') {
-    videoId = urlObj.pathname.slice(1);
-  }
-
-  const t = urlObj.searchParams.get('t');
-  start = parseTimeToSeconds(startTime) ?? parseTimeToSeconds(t);
-  return { videoId, start };
-}
-
-function parseTimeToSeconds(timeStr: string | null): number | null {
-  if (timeStr === null) return null;
-  try {
-    let totalSeconds = 0;
-
-    const hours = timeStr.match(/(\d+)h/);
-    const minutes = timeStr.match(/(\d+)m/);
-    const seconds = timeStr.match(/(\d+)s/);
-
-    if (hours) totalSeconds += parseInt(hours[1]) * 3600;
-    if (minutes) totalSeconds += parseInt(minutes[1]) * 60;
-    if (seconds) totalSeconds += parseInt(seconds[1]);
-
-    if (!hours && !minutes && !seconds) {
-      totalSeconds = parseInt(timeStr) || 0;
-    }
-
-    return totalSeconds;
-  } catch {
-    return null;
-  }
 }
