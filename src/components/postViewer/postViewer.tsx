@@ -6,20 +6,30 @@ import PostViewerToolbar from '@/components/postViewer/postViewerToolbar';
 import { PostProps } from '@/features/post/ui/postProps';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import useViewerFullscreen from '@/features/postViewer/hooks/useViewerFullscreen';
-import useViewerHandler from '@/features/postViewer/hooks/useViewerHandler';
+import useDebounce from '@/hooks/useDebounce';
 import useScrollLock from '@/hooks/useScrollLock';
+import useThrottle from '@/hooks/useThrottle';
+import { canTouch } from '@/lib/browser';
 import { processMd } from '@/lib/md/md';
-import { JSX, useEffect, useRef, useState } from 'react';
+import {
+  setIsMouseMoved,
+  setIsRotationFinished,
+} from '@/lib/redux/post/postViewerSlice';
+import { AppDispatch } from '@/lib/redux/store';
+import { JSX, TransitionEvent, useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
 
 export default function PostViewer({ post }: { post: PostProps }) {
-  const { isViewerMode } = usePostViewer();
-  const postViewerRef = useRef<HTMLDivElement | null>(null);
-  const handlers = useViewerHandler();
-  useViewerFullscreen(postViewerRef);
-  useScrollLock({ isLocked: isViewerMode });
+  const dispatch = useDispatch<AppDispatch>();
+  const throttle = useThrottle();
+  const debounce = useDebounce();
 
+  const { isViewerMode } = usePostViewer();
   const [result, setResult] = useState<JSX.Element | null>(null);
+
+  useViewerFullscreen();
+  useScrollLock({ isLocked: isViewerMode });
 
   useEffect(() => {
     const render = async () => {
@@ -33,8 +43,20 @@ export default function PostViewer({ post }: { post: PostProps }) {
   return (
     <>
       <div
-        ref={postViewerRef}
-        {...handlers}
+        data-post-viewer
+        onMouseMove={() => {
+          if (canTouch) return;
+          throttle(() => {
+            dispatch(setIsMouseMoved(true));
+            debounce(() => dispatch(setIsMouseMoved(false)), 2000);
+          }, 100);
+        }}
+        onTransitionEnd={(event: TransitionEvent<HTMLElement>) => {
+          if (event.propertyName === 'rotate') {
+            dispatch(setIsRotationFinished(true));
+            debounce(() => dispatch(setIsRotationFinished(false)), 2000);
+          }
+        }}
         className='w-screen h-dvh fixed inset-0 z-40 bg-white opacity-0 pointer-events-none'
       >
         <Toaster toasterId='post-viewer' />
