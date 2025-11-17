@@ -6,6 +6,7 @@ const initialState: BgmController = {
   isError: false,
   isWaiting: false,
   isReady: false,
+  isMenuVisible: false,
   isVideoVisible: false,
   currentVideoId: null,
   currentContainerId: null,
@@ -37,7 +38,14 @@ const bgmControllerSlice = createSlice({
       state.isError = false;
       state.isWaiting = false;
       state.isReady = false;
+      state.isMenuVisible = false;
       state.isVideoVisible = false;
+    },
+    toggleIsMenuVisible: state => {
+      state.isMenuVisible = !state.isMenuVisible;
+    },
+    hideMenu: state => {
+      state.isMenuVisible = false;
     },
     toggleIsVideoVisible: state => {
       state.isVideoVisible = !state.isVideoVisible;
@@ -70,6 +78,8 @@ export const {
   setIsWaiting,
   setIsReady,
   clearController,
+  toggleIsMenuVisible,
+  hideMenu,
   toggleIsVideoVisible,
   hideVideo,
   setRequestedBgm,

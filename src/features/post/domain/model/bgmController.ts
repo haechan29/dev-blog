@@ -6,6 +6,7 @@ export interface BgmController {
    */
   isWaiting: boolean;
   isReady: boolean;
+  isMenuVisible: boolean;
   isVideoVisible: boolean;
   currentVideoId: string | null;
   currentContainerId: string | null;
