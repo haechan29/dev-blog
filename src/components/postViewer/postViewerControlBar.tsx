@@ -28,6 +28,7 @@ export default function PostViewerControlBar() {
 
   return (
     <div
+      onClick={e => e.stopPropagation()}
       className={clsx(
         'absolute bottom-0 left-0 right-0 z-50',
         'max-md:from-black/50 max-md:to-transparent max-md:bg-gradient-to-t',

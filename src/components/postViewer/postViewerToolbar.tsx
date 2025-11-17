@@ -88,6 +88,7 @@ export default function PostViewerToolbar({
       style={{
         '--gradient-padding-bottom': isExpanded ? '5rem' : '2.5rem',
       }}
+      onClick={e => e.stopPropagation()}
     >
       <div
         onMouseEnter={onMouseEnter}

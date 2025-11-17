@@ -9,14 +9,25 @@ import useViewerFullscreen from '@/features/postViewer/hooks/useViewerFullscreen
 import useDebounce from '@/hooks/useDebounce';
 import useScrollLock from '@/hooks/useScrollLock';
 import useThrottle from '@/hooks/useThrottle';
-import { canTouch } from '@/lib/browser';
+import { canTouch, supportsFullscreen } from '@/lib/browser';
+import { createRipple } from '@/lib/dom';
 import { processMd } from '@/lib/md/md';
 import {
+  nextPage,
+  previousPage,
   setIsMouseMoved,
   setIsRotationFinished,
+  setIsTouched,
 } from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
-import { JSX, TransitionEvent, useEffect, useState } from 'react';
+import {
+  JSX,
+  MouseEvent,
+  TransitionEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 
@@ -27,6 +38,32 @@ export default function PostViewer({ post }: { post: PostProps }) {
 
   const { isViewerMode } = usePostViewer();
   const [result, setResult] = useState<JSX.Element | null>(null);
+
+  const handleNavigation = useCallback(
+    ({
+      clientX,
+      clientY,
+      currentTarget,
+    }: {
+      clientX: number;
+      clientY: number;
+      currentTarget: HTMLDivElement;
+    }) => {
+      if (typeof document === 'undefined') return;
+
+      const { width, height } = currentTarget.getBoundingClientRect();
+      const [isLeftSideClicked, isRightSideClicked] = supportsFullscreen
+        ? [clientX < width / 2, clientX > width / 2]
+        : [clientY < height / 2, clientY > height / 2];
+
+      if (isLeftSideClicked) {
+        dispatch(previousPage());
+      } else if (isRightSideClicked) {
+        dispatch(nextPage());
+      }
+    },
+    [dispatch]
+  );
 
   useViewerFullscreen();
   useScrollLock({ isLocked: isViewerMode });
@@ -44,6 +81,17 @@ export default function PostViewer({ post }: { post: PostProps }) {
     <>
       <div
         data-post-viewer
+        onClick={(event: MouseEvent<HTMLDivElement>) => {
+          if (canTouch) {
+            createRipple({
+              ...event,
+              rippleColor: 'rgba(0,0,0,0.1)',
+            });
+            dispatch(setIsTouched(true));
+            debounce(() => dispatch(setIsTouched(false)), 2000);
+          }
+          handleNavigation(event);
+        }}
         onMouseMove={() => {
           if (canTouch) return;
           throttle(() => {
