@@ -14,7 +14,8 @@ import { JSX, useEffect, useLayoutEffect, useState } from 'react';
 interface ViewerProps {
   result: JSX.Element;
   bgm: Bgm | null;
-  caption?: string;
+  scale: number;
+  caption: string;
 }
 
 export default function PostViewerContainer({ content }: { content: string }) {
@@ -43,7 +44,7 @@ export default function PostViewerContainer({ content }: { content: string }) {
   useEffect(() => {
     const updateViewer = async () => {
       if (!page) return;
-      const { startOffset, endOffset, caption, bgm } = page;
+      const { startOffset, endOffset, caption, bgm, scale } = page;
 
       await processMd({
         source: content.slice(startOffset, endOffset),
@@ -51,8 +52,9 @@ export default function PostViewerContainer({ content }: { content: string }) {
       }).then(result => {
         setViewer({
           result,
-          caption,
           bgm,
+          scale: scale ?? 1,
+          caption: caption ?? '',
         });
       });
     };
@@ -71,7 +73,11 @@ export default function PostViewerContainer({ content }: { content: string }) {
         !viewer && 'hidden'
       )}
     >
-      <div data-viewer-content className='w-full h-full'>
+      <div
+        data-viewer-content
+        className='w-full h-full scale-[var(--content-scale)]'
+        style={{ '--content-scale': `${viewer?.scale ?? 1}` }}
+      >
         {viewer?.result}
       </div>
       {viewer?.bgm && (
@@ -86,7 +92,7 @@ export default function PostViewerContainer({ content }: { content: string }) {
           />
         </div>
       )}
-      {viewer?.caption && (
+      {viewer?.caption.trim() && (
         <div className='absolute bottom-0 inset-x-0 mx-auto'>
           <div className='bg-black/70 text-white text-center break-keep wrap-anywhere text-balance px-2 py-1'>
             {viewer.caption}

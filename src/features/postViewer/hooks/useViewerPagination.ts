@@ -127,10 +127,28 @@ function measure(containerSize: Size) {
       return;
     }
 
-    if (
-      currentHeight + height > containerSize.height &&
-      currentPageElements.length > 0
-    ) {
+    if (height > containerSize.height) {
+      if (currentPageElements.length > 0) {
+        totalPages.push({
+          startOffset: Number(currentPageElements[0].dataset.startOffset),
+          endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
+          heading: pendingHeading,
+          bgm: pendingBgm,
+        });
+      }
+
+      currentPageElements = [];
+      currentHeight = 0;
+
+      const scale = containerSize.height / height;
+      totalPages.push({
+        startOffset: Number(element.dataset.startOffset),
+        endOffset: Number(element.dataset.endOffset),
+        heading: pendingHeading,
+        bgm: pendingBgm,
+        scale,
+      });
+    } else if (height > containerSize.height - currentHeight) {
       totalPages.push({
         startOffset: Number(currentPageElements[0].dataset.startOffset),
         endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),

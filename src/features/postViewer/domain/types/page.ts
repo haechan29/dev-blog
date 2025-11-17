@@ -6,5 +6,6 @@ export interface Page {
   endOffset: number;
   heading: Heading | null;
   bgm: Bgm | null;
+  scale?: number;
   caption?: string;
 }
