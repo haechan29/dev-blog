@@ -65,21 +65,22 @@ export default function PostViewerContainer({ content }: { content: string }) {
       {...navigationHandler}
       className={clsx(
         'prose absolute inset-0 m-auto',
-        'w-[calc(var(--fullscreen-width)/var(--container-scale))]',
-        'h-[calc(var(--fullscreen-height)/var(--container-scale))]',
-        'p-[calc(var(--container-padding)/var(--container-scale))]',
+        'w-[calc((var(--fullscreen-width)-var(--container-padding)*2)/var(--container-scale))]',
+        'h-[calc((var(--fullscreen-height)-var(--container-padding)*2)/var(--container-scale))]',
         'scale-[var(--container-scale)]',
         !viewer && 'hidden'
       )}
     >
-      {viewer?.result}
+      <div data-viewer-content className='w-full h-full'>
+        {viewer?.result}
+      </div>
       {viewer?.bgm && (
-        <div className='absolute top-4 right-4'>
+        <div className='absolute top-0 right-0'>
           <BgmInner {...viewer.bgm} containerId={VIEWER_BGM_CONTAINER_ID} />
         </div>
       )}
       {viewer?.caption && (
-        <div className='absolute bottom-4 inset-x-0 mx-auto'>
+        <div className='absolute bottom-0 inset-x-0 mx-auto'>
           <div className='bg-black/70 text-white text-center break-keep wrap-anywhere text-balance px-2 py-1'>
             {viewer.caption}
           </div>
