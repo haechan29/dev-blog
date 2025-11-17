@@ -49,7 +49,12 @@ export function Bgm({
       data-start-offset={startOffset}
       data-end-offset={endOffset}
     >
-      <BgmInner videoId={videoId} start={start} containerId={containerId} />
+      <BgmInner
+        videoId={videoId}
+        start={start}
+        containerId={containerId}
+        mode={mode}
+      />
     </div>
   );
 }
@@ -58,10 +63,12 @@ export function BgmInner({
   videoId,
   start,
   containerId,
+  mode,
 }: {
   videoId: string | null;
   start: number;
   containerId: string;
+  mode: 'preview' | 'reader' | 'viewer';
 }) {
   const dispatch = useDispatch<AppDispatch>();
   const debounce = useDebounce();
@@ -78,7 +85,7 @@ export function BgmInner({
 
   return (
     <>
-      {isError && currentContainerId === containerId && (
+      {mode === 'preview' && isError && currentContainerId === containerId && (
         <div className='w-fit justify-center p-4 rounded-xl bg-gray-200 text-gray-700 m-4'>
           {`유효하지 않은 유튜브 링크입니다`}
         </div>

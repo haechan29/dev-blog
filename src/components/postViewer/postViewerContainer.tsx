@@ -75,8 +75,15 @@ export default function PostViewerContainer({ content }: { content: string }) {
         {viewer?.result}
       </div>
       {viewer?.bgm && (
-        <div className='absolute top-0 right-0'>
-          <BgmInner {...viewer.bgm} containerId={VIEWER_BGM_CONTAINER_ID} />
+        <div
+          className='absolute top-0 right-0'
+          onClick={e => e.stopPropagation()}
+        >
+          <BgmInner
+            {...viewer.bgm}
+            containerId={VIEWER_BGM_CONTAINER_ID}
+            mode='viewer'
+          />
         </div>
       )}
       {viewer?.caption && (
