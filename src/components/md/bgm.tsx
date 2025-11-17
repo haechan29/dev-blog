@@ -101,7 +101,14 @@ export function BgmInner({
             className='p-2 w-fit h-fit bg-white rounded-md cursor-pointer group'
             aria-label={isMenuVisible ? '메뉴 닫기' : '메뉴 열기'}
           >
-            <Music className='w-4 h-4 group-hover:text-gray-400' />
+            <Music
+              className={clsx(
+                'w-4 h-4 group-hover:text-gray-400',
+                isPlaying &&
+                  currentContainerId === containerId &&
+                  'animate-scale-pulse'
+              )}
+            />
           </button>
 
           {isMenuVisible && (
@@ -162,7 +169,12 @@ export function BgmInner({
           )}
         </div>
 
-        <div className={clsx('relative', !isVideoVisible && 'hidden')}>
+        <div
+          className={clsx(
+            'relative',
+            !(isMenuVisible && isVideoVisible) && 'hidden'
+          )}
+        >
           <div className='absolute z-50 top-4 right-0'>
             <div data-bgm-container-id={containerId} />
           </div>

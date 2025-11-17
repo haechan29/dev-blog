@@ -38,8 +38,6 @@ const bgmControllerSlice = createSlice({
       state.isError = false;
       state.isWaiting = false;
       state.isReady = false;
-      state.isMenuVisible = false;
-      state.isVideoVisible = false;
     },
     toggleIsMenuVisible: state => {
       state.isMenuVisible = !state.isMenuVisible;

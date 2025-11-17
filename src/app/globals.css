@@ -352,6 +352,16 @@ body {
   }
 }
 
+@keyframes scale-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
 @utility animate-shake {
   animation: shake 0.3s ease-in-out;
 }
@@ -362,6 +372,10 @@ body {
 
 @utility animate-ripple {
   animation: ripple 0.3s ease-out;
+}
+
+@utility animate-scale-pulse {
+  animation: scale-pulse 2s infinite linear;
 }
 
 @custom-variant can-hover {
