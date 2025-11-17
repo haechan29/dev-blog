@@ -48,9 +48,9 @@ export default function ImageWithCaption({
       alt={alt}
       width={1000}
       height={1000}
+      objectFit='contain'
       onError={() => setIsError(true)}
       onLoad={() => setIsError(false)}
-      className='w-full h-full object-contain'
     />
   ) : (
     <div

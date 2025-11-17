@@ -46,7 +46,7 @@ export default function PostViewer({ post }: { post: PostProps }) {
 
       <div
         data-viewer-measurement
-        className='fixed z-1000 w-full left-[100%] top-0'
+        className='prose fixed z-1000 w-full left-[100%] top-0'
         aria-hidden='true'
       >
         {result}
