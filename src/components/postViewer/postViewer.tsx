@@ -10,6 +10,7 @@ import useDebounce from '@/hooks/useDebounce';
 import useScrollLock from '@/hooks/useScrollLock';
 import useThrottle from '@/hooks/useThrottle';
 import { canTouch, supportsFullscreen } from '@/lib/browser';
+import { cv } from '@/lib/cv';
 import { createRipple } from '@/lib/dom';
 import { processMd } from '@/lib/md/md';
 import {
@@ -20,6 +21,7 @@ import {
   setIsTouched,
 } from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
+import clsx from 'clsx';
 import {
   JSX,
   MouseEvent,
@@ -80,6 +82,8 @@ export default function PostViewer({ post }: { post: PostProps }) {
   return (
     <div
       data-post-viewer
+      data-supports-fullscreen='false'
+      data-is-fullscreen='false'
       onClick={(event: MouseEvent<HTMLDivElement>) => {
         if (canTouch) {
           createRipple({
@@ -104,7 +108,18 @@ export default function PostViewer({ post }: { post: PostProps }) {
           debounce(() => dispatch(setIsRotationFinished(false)), 2000);
         }
       }}
-      className='w-screen h-dvh fixed inset-0 z-40 bg-white opacity-0 pointer-events-none'
+      className={clsx(
+        'fixed inset-0 z-40 bg-white',
+        cv(
+          'data-[supports-fullscreen=false]',
+          'transition-transform|opacity duration-300 ease-in-out translate-x-[100dvw]'
+        ),
+        cv('data-[is-fullscreen=false]', 'opacity-0 pointer-events-none'),
+        cv(
+          'data-[supports-fullscreen=false]:data-[is-fullscreen=true]',
+          'w-dvh h-dvw rotate-90 origin-top-left'
+        )
+      )}
     >
       <Toaster toasterId='post-viewer' />
 
