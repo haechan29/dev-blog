@@ -38,12 +38,11 @@ export default function useViewerPagination() {
 }
 
 function measure() {
-  const viewerContainer = document.querySelector('[data-viewer-conatainer]');
+  const viewerContainer = document.querySelector('[data-viewer-container]');
   const viewerMeasure = document.querySelector('[data-viewer-measurement]');
   if (!viewerContainer || !viewerMeasure) return;
 
-  const { width: containerWidth, height: containerHeight } =
-    viewerContainer.getBoundingClientRect();
+  const containerHeight = viewerContainer.getBoundingClientRect().height;
   const containerScale = parseFloat(getCSSVariable('--container-scale'));
   const elements = Array.from(viewerMeasure.children) as HTMLElement[];
 
@@ -63,7 +62,6 @@ function measure() {
           endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
           heading: pendingHeading,
           bgm: pendingBgm,
-          scale: containerScale,
         });
       }
 
@@ -85,7 +83,6 @@ function measure() {
           endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
           heading: pendingHeading,
           bgm: pendingBgm,
-          scale: containerScale,
         });
       }
 
@@ -100,7 +97,7 @@ function measure() {
       return;
     }
 
-    const { width, height } = element.getBoundingClientRect();
+    const { height } = element.getBoundingClientRect();
 
     if (element.matches('[data-image-with-caption]')) {
       if (currentPageElements.length > 0) {
@@ -109,7 +106,6 @@ function measure() {
           endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
           heading: pendingHeading,
           bgm: pendingBgm,
-          scale: containerScale,
         });
 
         currentPageElements = [];
@@ -126,45 +122,37 @@ function measure() {
           endOffset: Number(element.dataset.endOffset),
           heading: pendingHeading,
           bgm: pendingBgm,
-          scale: Math.min(containerWidth / width, containerHeight / height),
           caption,
         });
       });
       return;
     }
 
-    if (width > containerWidth || height > containerHeight) {
+    if (height > containerHeight / containerScale) {
       if (currentPageElements.length > 0) {
         totalPages.push({
           startOffset: Number(currentPageElements[0].dataset.startOffset),
           endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
           heading: pendingHeading,
           bgm: pendingBgm,
-          scale: containerScale,
         });
       }
 
       currentPageElements = [];
       currentHeight = 0;
 
-      console.log(`width: ${width}, height: ${height}`);
-      console.log(
-        `cont width: ${containerWidth}, cont heigh: ${containerHeight}`
-      );
       totalPages.push({
         startOffset: Number(element.dataset.startOffset),
         endOffset: Number(element.dataset.endOffset),
         heading: pendingHeading,
         bgm: pendingBgm,
-        scale: Math.min(containerWidth / width, containerHeight / height),
       });
-    } else if (height > containerHeight - currentHeight) {
+    } else if (height > containerHeight / containerScale - currentHeight) {
       totalPages.push({
         startOffset: Number(currentPageElements[0].dataset.startOffset),
         endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
         heading: pendingHeading,
         bgm: pendingBgm,
-        scale: containerScale,
       });
 
       currentPageElements = [element];
@@ -184,7 +172,6 @@ function measure() {
       endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
       heading: pendingHeading,
       bgm: pendingBgm,
-      scale: containerScale,
     });
   }
 
