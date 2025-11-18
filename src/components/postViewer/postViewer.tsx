@@ -4,8 +4,6 @@ import PostViewerContainer from '@/components/postViewer/postViewerContainer';
 import PostViewerControlBar from '@/components/postViewer/postViewerControlBar';
 import PostViewerToolbar from '@/components/postViewer/postViewerToolbar';
 import { PostProps } from '@/features/post/ui/postProps';
-import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
-import useViewerFullscreen from '@/features/postViewer/hooks/useViewerFullscreen';
 import useDebounce from '@/hooks/useDebounce';
 import useScrollLock from '@/hooks/useScrollLock';
 import useThrottle from '@/hooks/useThrottle';
@@ -19,8 +17,9 @@ import {
   setIsMouseMoved,
   setIsRotationFinished,
   setIsTouched,
+  setIsViewerMode,
 } from '@/lib/redux/post/postViewerSlice';
-import { AppDispatch } from '@/lib/redux/store';
+import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
 import {
   JSX,
@@ -31,14 +30,16 @@ import {
   useState,
 } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostViewer({ post }: { post: PostProps }) {
   const dispatch = useDispatch<AppDispatch>();
+  const isViewerMode = useSelector((state: RootState) => {
+    return state.postViewer.isViewerMode;
+  });
   const throttle = useThrottle();
   const debounce = useDebounce();
 
-  const { isViewerMode } = usePostViewer();
   const [result, setResult] = useState<JSX.Element | null>(null);
 
   const handleNavigation = useCallback(
@@ -67,7 +68,6 @@ export default function PostViewer({ post }: { post: PostProps }) {
     [dispatch]
   );
 
-  useViewerFullscreen();
   useScrollLock({ isLocked: isViewerMode });
 
   useEffect(() => {
@@ -78,6 +78,37 @@ export default function PostViewer({ post }: { post: PostProps }) {
     };
     render();
   }, [post.content]);
+
+  useEffect(() => {
+    const viewer = document.querySelector('[data-post-viewer]') as HTMLElement;
+    if (!viewer) return;
+
+    if (isViewerMode) {
+      viewer.dataset.isFullscreen = `${true}`;
+      if (viewer.requestFullscreen) {
+        viewer.requestFullscreen();
+      } else {
+        viewer.dataset.supportsFullscreen = `${false}`;
+      }
+    } else {
+      viewer.dataset.isFullscreen = `${false}`;
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.();
+      }
+    }
+  }, [isViewerMode]);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement && isViewerMode) {
+        dispatch(setIsViewerMode(false));
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () =>
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, [dispatch, isViewerMode]);
 
   return (
     <div
