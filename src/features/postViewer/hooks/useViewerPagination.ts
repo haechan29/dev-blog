@@ -96,7 +96,11 @@ function measure(containerSize: Size) {
       return;
     }
 
-    const height = element.getBoundingClientRect().height;
+    const { width, height } = element.getBoundingClientRect();
+    const scale = Math.min(
+      (containerSize.width * 1.5) / width,
+      (containerSize.height * 1.5) / height
+    );
 
     if (element.matches('[data-image-with-caption]')) {
       if (currentPageElements.length > 0) {
@@ -120,8 +124,9 @@ function measure(containerSize: Size) {
           startOffset: Number(element.dataset.startOffset),
           endOffset: Number(element.dataset.endOffset),
           heading: pendingHeading,
-          caption,
           bgm: pendingBgm,
+          scale,
+          caption,
         });
       });
       return;
@@ -140,7 +145,6 @@ function measure(containerSize: Size) {
       currentPageElements = [];
       currentHeight = 0;
 
-      const scale = containerSize.height / height;
       totalPages.push({
         startOffset: Number(element.dataset.startOffset),
         endOffset: Number(element.dataset.endOffset),

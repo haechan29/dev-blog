@@ -78,49 +78,48 @@ export default function PostViewer({ post }: { post: PostProps }) {
   }, [post.content]);
 
   return (
-    <>
-      <div
-        data-post-viewer
-        onClick={(event: MouseEvent<HTMLDivElement>) => {
-          if (canTouch) {
-            createRipple({
-              ...event,
-              rippleColor: 'rgba(0,0,0,0.1)',
-            });
-            dispatch(setIsTouched(true));
-            debounce(() => dispatch(setIsTouched(false)), 2000);
-          }
-          handleNavigation(event);
-        }}
-        onMouseMove={() => {
-          if (canTouch) return;
-          throttle(() => {
-            dispatch(setIsMouseMoved(true));
-            debounce(() => dispatch(setIsMouseMoved(false)), 2000);
-          }, 100);
-        }}
-        onTransitionEnd={(event: TransitionEvent<HTMLElement>) => {
-          if (event.propertyName === 'rotate') {
-            dispatch(setIsRotationFinished(true));
-            debounce(() => dispatch(setIsRotationFinished(false)), 2000);
-          }
-        }}
-        className='w-screen h-dvh fixed inset-0 z-40 bg-white opacity-0 pointer-events-none'
-      >
-        <Toaster toasterId='post-viewer' />
+    <div
+      data-post-viewer
+      onClick={(event: MouseEvent<HTMLDivElement>) => {
+        if (canTouch) {
+          createRipple({
+            ...event,
+            rippleColor: 'rgba(0,0,0,0.1)',
+          });
+          dispatch(setIsTouched(true));
+          debounce(() => dispatch(setIsTouched(false)), 2000);
+        }
+        handleNavigation(event);
+      }}
+      onMouseMove={() => {
+        if (canTouch) return;
+        throttle(() => {
+          dispatch(setIsMouseMoved(true));
+          debounce(() => dispatch(setIsMouseMoved(false)), 2000);
+        }, 100);
+      }}
+      onTransitionEnd={(event: TransitionEvent<HTMLElement>) => {
+        if (event.propertyName === 'rotate') {
+          dispatch(setIsRotationFinished(true));
+          debounce(() => dispatch(setIsRotationFinished(false)), 2000);
+        }
+      }}
+      className='w-screen h-dvh fixed inset-0 z-40 bg-white opacity-0 pointer-events-none'
+    >
+      <Toaster toasterId='post-viewer' />
 
-        <PostViewerToolbar {...post} />
-        <PostViewerContainer {...post} />
-        <PostViewerControlBar />
-      </div>
+      <PostViewerToolbar {...post} />
+      <PostViewerContainer {...post} />
+      <PostViewerControlBar />
 
-      <div
-        data-viewer-measurement
-        className='prose fixed z-1000 w-full left-[100%] top-0'
-        aria-hidden='true'
-      >
-        {result}
+      <div className='w-full absolute left-[100%] top-0' aria-hidden='true'>
+        <div
+          data-viewer-measurement
+          className='prose absolute top-0 inset-x-[var(--container-padding)] mx-auto'
+        >
+          {result}
+        </div>
       </div>
-    </>
+    </div>
   );
 }

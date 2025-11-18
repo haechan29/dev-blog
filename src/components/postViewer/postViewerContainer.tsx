@@ -12,8 +12,8 @@ import { JSX, useEffect, useState } from 'react';
 interface ViewerProps {
   result: JSX.Element;
   bgm: Bgm | null;
-  scale: number;
-  caption: string;
+  scale?: number;
+  caption?: string;
 }
 
 export default function PostViewerContainer({ content }: { content: string }) {
@@ -34,8 +34,8 @@ export default function PostViewerContainer({ content }: { content: string }) {
         setViewer({
           result,
           bgm,
-          scale: scale ?? 1,
-          caption: caption ?? '',
+          scale,
+          caption,
         });
       });
     };
@@ -44,24 +44,35 @@ export default function PostViewerContainer({ content }: { content: string }) {
 
   return (
     viewer && (
-      <div className='prose absolute inset-[var(--container-inset)]'>
+      <div className='prose absolute inset-[var(--container-padding)] m-auto'>
         <div
           data-viewer-container
           className={clsx(
-            'w-[calc(100%/var(--container-scale))]',
-            'h-[calc(100%/var(--container-scale))]',
-            'absolute inset-0 m-auto scale-[var(--container-scale)] origin-center'
+            'w-[calc(100%/var(--page-scale))]',
+            'h-[calc(100%/var(--page-scale))]',
+            'absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 scale-[var(--page-scale)]'
           )}
+          style={{
+            '--page-scale': viewer.scale
+              ? `${viewer.scale}`
+              : 'var(--container-scale)',
+          }}
         >
           {viewer?.result}
-          {viewer?.caption.trim() && (
-            <div className='absolute bottom-0 inset-x-0 mx-auto'>
-              <div className='bg-black/70 text-white text-center break-keep wrap-anywhere text-balance px-2 py-1'>
-                {viewer.caption}
-              </div>
-            </div>
-          )}
         </div>
+
+        {viewer?.caption?.trim() && (
+          <div
+            className={clsx(
+              'absolute left-1/2 -translate-x-1/2 bottom-0 flex justify-center',
+              'w-[calc(100%/var(--container-scale))] scale-[var(--container-scale)]'
+            )}
+          >
+            <div className='w-fit bg-black/70 text-white text-center break-keep wrap-anywhere text-balance px-2 py-1'>
+              {viewer.caption}
+            </div>
+          </div>
+        )}
 
         {viewer?.bgm && (
           <div
