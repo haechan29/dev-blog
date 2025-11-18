@@ -4,46 +4,48 @@ import { parseYouTubeUrl } from '@/features/post/domain/lib/bgm';
 import Heading from '@/features/post/domain/model/heading';
 import { Bgm } from '@/features/post/domain/types/bgm';
 import { Page } from '@/features/postViewer/domain/types/page';
-import useViewerContainerSize from '@/features/postViewer/hooks/useViewerContainerSize';
-import useThrottle from '@/hooks/useThrottle';
+import useDebounce from '@/hooks/useDebounce';
+import { getCSSVariable } from '@/lib/css';
 import {
   setCurrentPageIndex,
   setPages,
 } from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
-import { Size } from '@/types/size';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function useViewerPagination() {
   const dispatch = useDispatch<AppDispatch>();
-  const throttle = useThrottle();
-  const containerSize = useViewerContainerSize();
+  const debounce = useDebounce();
 
   useEffect(() => {
-    const viewer = document.querySelector('[data-viewer-measurement]');
-    if (!viewer || !containerSize) return;
-
-    const pages = measure(containerSize);
-    if (pages && pages.length > 0) {
-      dispatch(setPages(pages));
-      dispatch(setCurrentPageIndex(0));
-    }
+    const viewer = document.querySelector('[data-viewer]');
+    if (!viewer) return;
 
     const observer = new ResizeObserver(() => {
-      throttle(() => measure(containerSize), 300);
+      debounce(() => {
+        const pages = measure();
+        if (pages && pages.length > 0) {
+          dispatch(setPages(pages));
+          dispatch(setCurrentPageIndex(0));
+        }
+      }, 100);
     });
     observer.observe(viewer);
 
     return () => observer.disconnect();
-  }, [containerSize, dispatch, throttle]);
+  }, [debounce, dispatch]);
 }
 
-function measure(containerSize: Size) {
-  const viewer = document.querySelector('[data-viewer-measurement]');
-  if (!viewer || !containerSize) return;
+function measure() {
+  const viewerContainer = document.querySelector('[data-viewer-conatainer]');
+  const viewerMeasure = document.querySelector('[data-viewer-measurement]');
+  if (!viewerContainer || !viewerMeasure) return;
 
-  const elements = Array.from(viewer.children) as HTMLElement[];
+  const { width: containerWidth, height: containerHeight } =
+    viewerContainer.getBoundingClientRect();
+  const containerScale = parseFloat(getCSSVariable('--container-scale'));
+  const elements = Array.from(viewerMeasure.children) as HTMLElement[];
 
   const totalPages: Page[] = [];
   let currentPageElements: HTMLElement[] = [];
@@ -61,6 +63,7 @@ function measure(containerSize: Size) {
           endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
           heading: pendingHeading,
           bgm: pendingBgm,
+          scale: containerScale,
         });
       }
 
@@ -82,6 +85,7 @@ function measure(containerSize: Size) {
           endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
           heading: pendingHeading,
           bgm: pendingBgm,
+          scale: containerScale,
         });
       }
 
@@ -97,10 +101,6 @@ function measure(containerSize: Size) {
     }
 
     const { width, height } = element.getBoundingClientRect();
-    const scale = Math.min(
-      (containerSize.width * 1.5) / width,
-      (containerSize.height * 1.5) / height
-    );
 
     if (element.matches('[data-image-with-caption]')) {
       if (currentPageElements.length > 0) {
@@ -109,6 +109,7 @@ function measure(containerSize: Size) {
           endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
           heading: pendingHeading,
           bgm: pendingBgm,
+          scale: containerScale,
         });
 
         currentPageElements = [];
@@ -125,39 +126,45 @@ function measure(containerSize: Size) {
           endOffset: Number(element.dataset.endOffset),
           heading: pendingHeading,
           bgm: pendingBgm,
-          scale,
+          scale: Math.min(containerWidth / width, containerHeight / height),
           caption,
         });
       });
       return;
     }
 
-    if (height > containerSize.height) {
+    if (width > containerWidth || height > containerHeight) {
       if (currentPageElements.length > 0) {
         totalPages.push({
           startOffset: Number(currentPageElements[0].dataset.startOffset),
           endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
           heading: pendingHeading,
           bgm: pendingBgm,
+          scale: containerScale,
         });
       }
 
       currentPageElements = [];
       currentHeight = 0;
 
+      console.log(`width: ${width}, height: ${height}`);
+      console.log(
+        `cont width: ${containerWidth}, cont heigh: ${containerHeight}`
+      );
       totalPages.push({
         startOffset: Number(element.dataset.startOffset),
         endOffset: Number(element.dataset.endOffset),
         heading: pendingHeading,
         bgm: pendingBgm,
-        scale,
+        scale: Math.min(containerWidth / width, containerHeight / height),
       });
-    } else if (height > containerSize.height - currentHeight) {
+    } else if (height > containerHeight - currentHeight) {
       totalPages.push({
         startOffset: Number(currentPageElements[0].dataset.startOffset),
         endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
         heading: pendingHeading,
         bgm: pendingBgm,
+        scale: containerScale,
       });
 
       currentPageElements = [element];
@@ -177,6 +184,7 @@ function measure(containerSize: Size) {
       endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
       heading: pendingHeading,
       bgm: pendingBgm,
+      scale: containerScale,
     });
   }
 

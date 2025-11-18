@@ -13,7 +13,7 @@ export default function useTTSPlayer({
   const isPaused = useRef<boolean | null>(null);
 
   const getElements = useCallback(() => {
-    const content = document.querySelector('[data-viewer-container]');
+    const content = document.querySelector('[data-viewer-content]');
     if (!content) return;
 
     return (Array.from(content.children) as HTMLElement[]).filter(

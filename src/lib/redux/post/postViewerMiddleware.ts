@@ -51,8 +51,8 @@ function handleNextPage({
 
   if (current !== null && current >= total - 1) {
     toast.success('마지막 페이지입니다.', {
-      id: 'post-viewer',
-      toasterId: 'post-viewer',
+      id: 'viewer',
+      toasterId: 'viewer',
     });
     return;
   }
@@ -68,8 +68,8 @@ function handlePreviousPage({
   const current = store.getState().postViewer.currentPageIndex;
   if (current !== null && current <= 0) {
     toast.success('첫 페이지입니다.', {
-      id: 'post-viewer',
-      toasterId: 'post-viewer',
+      id: 'viewer',
+      toasterId: 'viewer',
     });
     return;
   }

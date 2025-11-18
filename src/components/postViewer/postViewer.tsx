@@ -10,7 +10,6 @@ import useThrottle from '@/hooks/useThrottle';
 import { canTouch, supportsFullscreen } from '@/lib/browser';
 import { cv } from '@/lib/cv';
 import { createRipple } from '@/lib/dom';
-import { processMd } from '@/lib/md/md';
 import {
   nextPage,
   previousPage,
@@ -21,14 +20,7 @@ import {
 } from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
-import {
-  JSX,
-  MouseEvent,
-  TransitionEvent,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import { MouseEvent, TransitionEvent, useCallback, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -39,8 +31,6 @@ export default function PostViewer({ post }: { post: PostProps }) {
   });
   const throttle = useThrottle();
   const debounce = useDebounce();
-
-  const [result, setResult] = useState<JSX.Element | null>(null);
 
   const handleNavigation = useCallback(
     ({
@@ -71,16 +61,7 @@ export default function PostViewer({ post }: { post: PostProps }) {
   useScrollLock({ isLocked: isViewerMode });
 
   useEffect(() => {
-    const render = async () => {
-      await processMd({ source: post.content, mode: 'viewer' }).then(result => {
-        setResult(result);
-      });
-    };
-    render();
-  }, [post.content]);
-
-  useEffect(() => {
-    const viewer = document.querySelector('[data-post-viewer]') as HTMLElement;
+    const viewer = document.querySelector('[data-viewer]') as HTMLElement;
     if (!viewer) return;
 
     if (isViewerMode) {
@@ -112,7 +93,7 @@ export default function PostViewer({ post }: { post: PostProps }) {
 
   return (
     <div
-      data-post-viewer
+      data-viewer
       data-supports-fullscreen='false'
       data-is-fullscreen='false'
       onClick={(event: MouseEvent<HTMLDivElement>) => {
@@ -140,7 +121,7 @@ export default function PostViewer({ post }: { post: PostProps }) {
         }
       }}
       className={clsx(
-        'fixed inset-0 z-40 bg-white',
+        'fixed inset-0 z-40 p-[var(--container-padding)] bg-white',
         cv(
           'data-[supports-fullscreen=false]',
           'transition-transform|opacity duration-300 ease-in-out translate-x-[100dvw]'
@@ -152,20 +133,11 @@ export default function PostViewer({ post }: { post: PostProps }) {
         )
       )}
     >
-      <Toaster toasterId='post-viewer' />
+      <Toaster toasterId='viewer' />
 
       <PostViewerToolbar {...post} />
       <PostViewerContainer {...post} />
       <PostViewerControlBar />
-
-      <div className='w-full absolute left-[100%] top-0' aria-hidden='true'>
-        <div
-          data-viewer-measurement
-          className='prose absolute top-0 inset-x-[var(--container-padding)] mx-auto'
-        >
-          {result}
-        </div>
-      </div>
     </div>
   );
 }
