@@ -10,7 +10,7 @@ export default function PostsToolbar() {
   return (
     <div
       className={clsx(
-        'sticky top-0 z-40 w-full flex items-center',
+        'fixed top-0 z-40 w-full flex items-center',
         'p-2 gap-4 bg-white/80 backdrop-blur-md'
       )}
     >
