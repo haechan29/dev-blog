@@ -4,20 +4,16 @@ import PostSidebarFooter from '@/components/post/postSidebarFooter';
 import PostSidebarHeader from '@/components/post/postSidebarHeader';
 import PostSidebarNav from '@/components/post/postSidebarNav';
 import { PostProps } from '@/features/post/ui/postProps';
+import useScrollLock from '@/hooks/useScrollLock';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { cn } from '@/lib/utils';
+import clsx from 'clsx';
 import { usePathname } from 'next/navigation';
 import { useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-export default function PostSidebar({
-  posts,
-  className,
-}: {
-  posts: PostProps[];
-  className?: string;
-}) {
+export default function PostSidebar({ posts }: { posts: PostProps[] }) {
   const dispatch = useDispatch<AppDispatch>();
   const pathname = usePathname();
   const isVisible = useSelector((state: RootState) => {
@@ -47,8 +43,6 @@ export default function PostSidebar({
       const deltaY = currentY - start[1];
       scrollDirectionRef.current =
         Math.abs(deltaX) > Math.abs(deltaY) ? 'horizontal' : 'vertical';
-      e.preventDefault();
-      document.body.style.overflow = 'hidden';
     }
 
     if (scrollDirection === 'horizontal') {
@@ -78,28 +72,44 @@ export default function PostSidebar({
 
       sidebar.style.transition = '';
       sidebar.style.transform = '';
-      document.body.style.overflow = '';
       startRef.current = null;
       scrollDirectionRef.current = null;
     },
     [dispatch]
   );
 
+  useScrollLock({ isLocked: isVisible });
+
   return (
-    <div
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      className={cn(
-        'w-[var(--sidebar-width)] flex flex-col',
-        'transition-transform duration-300 ease-in-out',
-        !pathname.includes('/edit') && !isVisible && 'max-xl:-translate-x-full',
-        className
-      )}
-    >
-      <PostSidebarHeader />
-      <PostSidebarNav posts={posts} />
-      <PostSidebarFooter />
-    </div>
+    !pathname.includes('/edit') && (
+      <>
+        <div
+          onClick={() => {
+            dispatch(setIsVisible(false));
+          }}
+          className={clsx(
+            'fixed inset-0 z-40 bg-black/70 xl:hidden',
+            'transition-opacity duration-300 ease-in-out',
+            isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          )}
+        />
+        <div
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          className={cn(
+            'w-[var(--sidebar-width)] fixed z-50',
+            'left-0 top-0 xl:top-[var(--toolbar-height)] bottom-0',
+            'flex flex-col bg-white',
+            'transition-transform duration-300 ease-in-out',
+            !isVisible && 'max-xl:-translate-x-full'
+          )}
+        >
+          <PostSidebarHeader />
+          <PostSidebarNav posts={posts} />
+          <PostSidebarFooter />
+        </div>
+      </>
+    )
   );
 }

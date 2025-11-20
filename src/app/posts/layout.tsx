@@ -15,10 +15,7 @@ export default async function PostsLayout({
   return (
     <>
       <Toolbar />
-      <PostSidebar
-        posts={posts}
-        className='fixed z-50 left-0 top-[var(--toolbar-height)] bottom-0'
-      />
+      <PostSidebar posts={posts} />
       <div
         className={clsx(
           'mt-[var(--toolbar-height)] mb-20 px-10 xl:px-20',
