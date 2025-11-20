@@ -12,12 +12,13 @@ import {
 } from '@/lib/redux/post/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { scrollIntoElement } from '@/lib/scroll';
+import { cn } from '@/lib/utils';
 import clsx from 'clsx';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function PostToolbar() {
+export default function PostToolbar({ className }: { className?: string }) {
   const dispatch = useDispatch<AppDispatch>();
   const postToolbar = usePostToolbar();
   const lastScrollYRef = useRef(0);
@@ -79,11 +80,12 @@ export default function PostToolbar() {
 
   return (
     <div
-      className={clsx(
+      className={cn(
         'fixed top-0 z-40 w-full flex flex-col p-2 bg-white/80 backdrop-blur-md',
         'xl:ml-[var(--sidebar-width)] block xl:hidden',
         'transition-transform duration-300 ease-in-out',
-        postToolbar.isVisible ? 'translate-y-0' : '-translate-y-full'
+        postToolbar.isVisible ? 'translate-y-0' : '-translate-y-full',
+        className
       )}
     >
       <Breadcrumb breadcrumb={breadcrumb} />

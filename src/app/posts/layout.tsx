@@ -1,4 +1,5 @@
 import PostSidebar from '@/components/post/postSidebar';
+import Toolbar from '@/components/post/toolbar';
 import { fetchPosts } from '@/features/post/domain/service/postService';
 import { createProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
@@ -13,7 +14,7 @@ export default async function PostsLayout({
 
   return (
     <>
-      <div className='fixed top-0'></div>
+      <Toolbar />
       <PostSidebar posts={posts} />
       <div
         className={clsx(
