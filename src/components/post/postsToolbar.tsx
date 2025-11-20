@@ -17,7 +17,7 @@ export default function PostsToolbar({ className }: { className?: string }) {
     <div
       className={cn(
         'fixed top-0 z-40 w-full flex items-center',
-        'py-2 px-3 md:px-4 lg:px-5 gap-4 bg-white/80 backdrop-blur-md',
+        'py-2 md:py-3 px-4 md:px-6 gap-4 bg-white/80 backdrop-blur-md',
         className
       )}
     >

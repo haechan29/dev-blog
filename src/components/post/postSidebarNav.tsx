@@ -46,7 +46,7 @@ function NavCategory({ tag, count }: { tag: string; count: number }) {
     <Link
       href={categoryUrl}
       className={clsx(
-        'flex items-center w-full py-3 px-9 gap-2 hover:text-blue-500',
+        'flex items-center w-full p-3 gap-2 rounded-sm hover:text-blue-500',
         !currentPostId && isTagSelected
           ? 'bg-blue-50 font-semibold text-blue-500'
           : 'text-gray-900'
@@ -89,7 +89,7 @@ function NavPostList({ tag, posts }: { tag: string; posts: PostProps[] }) {
           href={postUrl}
           onClick={() => dispatch(setIsVisible(false))}
           className={clsx(
-            'flex w-full py-3 pl-12 pr-9 hover:text-blue-500',
+            'flex w-full py-3 pl-6 pr-3 rounded-sm hover:text-blue-500',
             isCurrentPost
               ? 'bg-blue-50 font-semibold text-blue-500'
               : 'text-gray-900'

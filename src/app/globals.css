@@ -405,7 +405,7 @@ body {
   :root {
     --container-padding: 4rem;
     --container-scale: 1.3;
-    --toolbar-height: 5rem;
+    --toolbar-height: 4.5rem;
   }
 }
 
@@ -413,6 +413,6 @@ body {
   :root {
     --container-padding: 6rem;
     --container-scale: 1.5;
-    --toolbar-height: 6rem;
+    --toolbar-height: 5rem;
   }
 }

@@ -81,7 +81,8 @@ export default function PostToolbar({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        'fixed top-0 z-40 w-full flex flex-col p-2 bg-white/80 backdrop-blur-md',
+        'fixed top-0 z-40 w-full flex flex-col bg-white/80 backdrop-blur-md',
+        'py-2 md:py-3 px-4 md:px-4',
         'xl:ml-[var(--sidebar-width)] block xl:hidden',
         'transition-transform duration-300 ease-in-out',
         postToolbar.isVisible ? 'translate-y-0' : '-translate-y-full',
@@ -90,12 +91,12 @@ export default function PostToolbar({ className }: { className?: string }) {
     >
       <Breadcrumb breadcrumb={breadcrumb} />
 
-      <div className='flex w-full items-start'>
+      <div className='flex gap-2 md:gap-3 w-full items-start'>
         <button
           onClick={() => {
             dispatch(setIsVisible(true));
           }}
-          className='xl:hidden shrink-0 px-2 items-center justify-center'
+          className='xl:hidden shrink-0 p-2 -m-2 items-center justify-center'
         >
           <Menu className='w-6 h-6 text-gray-500' />
         </button>
@@ -190,7 +191,7 @@ function ExpandButton({
   return (
     <button
       onClick={onClick}
-      className='shrink-0 px-2 items-center justify-center'
+      className='shrink-0 p-2 -m-2 items-center justify-center'
     >
       <ChevronDown
         className={clsx(

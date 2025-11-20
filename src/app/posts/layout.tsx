@@ -18,7 +18,7 @@ export default async function PostsLayout({
       <PostSidebar posts={posts} />
       <div
         className={clsx(
-          'mt-[var(--toolbar-height)] mb-20 px-10 xl:px-20',
+          'mt-[var(--toolbar-height)] mb-20 px-6 md:px-12 xl:px-18',
           'xl:ml-[var(--sidebar-width)]',
           'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
         )}
