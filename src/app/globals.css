@@ -6,7 +6,7 @@
   background: #ff0000 !important;
   height: 2px;
   box-shadow: none !important;
-  z-index: 2000;
+  z-index: 2000 !important;
 }
 
 #nprogress::before {
