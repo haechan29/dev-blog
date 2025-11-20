@@ -46,6 +46,7 @@ export default function ImageWithCaption({
       objectFit='contain'
       onError={() => setIsError(true)}
       onLoad={() => setIsError(false)}
+      className='h-full'
     />
   ) : (
     <div

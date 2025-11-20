@@ -94,7 +94,10 @@ export default function PostViewerContainer({ content }: { content: string }) {
 
       <div
         data-viewer-measurement
-        className='prose w-[calc(100%/var(--container-scale))] scale-[calc(1/var(--container-scale))] origin-top absolute top-0 left-[200%]'
+        className={clsx(
+          'prose w-[calc(100%/var(--container-scale))] h-[calc(100%/var(--container-scale))] scale-[calc(1/var(--container-scale))] origin-top',
+          'absolute top-0 left-[200%]'
+        )}
         aria-hidden='true'
       >
         {result}
