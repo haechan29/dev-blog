@@ -3,35 +3,98 @@
 import PostSidebarFooter from '@/components/post/postSidebarFooter';
 import PostSidebarHeader from '@/components/post/postSidebarHeader';
 import PostSidebarNav from '@/components/post/postSidebarNav';
-import useSidebarSwipe from '@/features/post/hooks/useSidebarSwipe';
 import { PostProps } from '@/features/post/ui/postProps';
-import useMediaQuery from '@/hooks/useMediaQuery';
-import { RootState } from '@/lib/redux/store';
-import clsx from 'clsx';
+import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
+import { AppDispatch, RootState } from '@/lib/redux/store';
+import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
-import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { useCallback, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-export default function PostSidebar({ posts }: { posts: PostProps[] }) {
+export default function PostSidebar({
+  posts,
+  className,
+}: {
+  posts: PostProps[];
+  className?: string;
+}) {
+  const dispatch = useDispatch<AppDispatch>();
   const pathname = usePathname();
-  const isEditing = useMemo(() => pathname.includes('/edit'), [pathname]);
-  const isLargerThanXl = useMediaQuery('(min-width: 1280px)');
-  const postSidebar = useSelector((state: RootState) => state.postSidebar);
-  const isVisible = useMemo(
-    () => !isEditing && (isLargerThanXl || postSidebar.isVisible),
-    [isEditing, isLargerThanXl, postSidebar.isVisible]
-  );
+  const isVisible = useSelector((state: RootState) => {
+    return state.postSidebar.isVisible;
+  });
+  const startRef = useRef<[number, number] | null>(null);
+  const scrollDirectionRef = useRef<'horizontal' | 'vertical' | null>(null);
 
-  const swipeHandlers = useSidebarSwipe();
+  const handleTouchStart = useCallback((e: React.TouchEvent<HTMLElement>) => {
+    const sidebar = e.currentTarget;
+    startRef.current = [e.touches[0].clientX, e.touches[0].clientY];
+    sidebar.style.transition = 'none';
+    scrollDirectionRef.current = null;
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent<HTMLElement>) => {
+    const sidebar = e.currentTarget;
+
+    const start = startRef.current;
+    const scrollDirection = scrollDirectionRef.current;
+    if (start === null) return;
+
+    const [currentX, currentY] = [e.touches[0].clientX, e.touches[0].clientY];
+
+    if (!scrollDirection) {
+      const deltaX = currentX - start[0];
+      const deltaY = currentY - start[1];
+      scrollDirectionRef.current =
+        Math.abs(deltaX) > Math.abs(deltaY) ? 'horizontal' : 'vertical';
+      e.preventDefault();
+      document.body.style.overflow = 'hidden';
+    }
+
+    if (scrollDirection === 'horizontal') {
+      const translateX = Math.min(currentX - start[0], 0);
+      sidebar.style.transform = `translateX(${translateX}px)`;
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent<HTMLElement>) => {
+      const sidebar = e.currentTarget;
+
+      const start = startRef.current;
+      if (start === null) return;
+
+      if (scrollDirectionRef.current === 'horizontal') {
+        const currentX = e.changedTouches[0].clientX;
+        const translateX = Math.min(currentX - start[0], 0);
+        const threshold = -sidebar.getBoundingClientRect().width * 0.3;
+
+        if (translateX > threshold) {
+          dispatch(setIsVisible(true));
+        } else {
+          dispatch(setIsVisible(false));
+        }
+      }
+
+      sidebar.style.transition = '';
+      sidebar.style.transform = '';
+      document.body.style.overflow = '';
+      startRef.current = null;
+      scrollDirectionRef.current = null;
+    },
+    [dispatch]
+  );
 
   return (
     <div
-      {...swipeHandlers}
-      className={clsx(
-        'fixed z-50 left-0 top-0 bottom-0 w-72 h-dvh flex flex-col',
-        'bg-[#fafbfc] border-r border-r-gray-50',
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      className={cn(
+        'w-[var(--sidebar-width)] flex flex-col',
         'transition-transform duration-300 ease-in-out',
-        !isVisible && '-translate-x-full'
+        !pathname.includes('/edit') && !isVisible && 'max-xl:-translate-x-full',
+        className
       )}
     >
       <PostSidebarHeader />
