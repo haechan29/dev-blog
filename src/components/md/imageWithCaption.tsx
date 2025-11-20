@@ -23,11 +23,6 @@ export default function ImageWithCaption({
   alt?: string;
 }) {
   const [isError, setIsError] = useState(false);
-  const [captions, setCaptions] = useState<string[]>([]);
-
-  useEffect(() => {
-    setCaptions(JSON.parse(caption));
-  }, [caption]);
 
   useEffect(() => setIsError(false), [src]);
 
@@ -73,10 +68,12 @@ export default function ImageWithCaption({
         )}
       />
 
-      <div className='flex flex-col'>
-        {captions.map((caption, index) => (
-          <div key={index}>{caption}</div>
-        ))}
+      <div className='whitespace-pre-wrap'>
+        {caption
+          .split(/(?<!\\)#/)
+          .map(s => s.replace(/\\#/g, '#'))
+          .filter(Boolean)
+          .join('')}
       </div>
     </div>
   );

@@ -121,15 +121,6 @@ export function remarkImg() {
         )
         .join('\n');
 
-      const newCaption = JSON.stringify(
-        caption
-          .replace(/\\#/g, '__ESCAPED_HASH__')
-          .replace(/#/g, '__SPLITTER__')
-          .replace(/__ESCAPED_HASH__/g, '#')
-          .split(/__SPLITTER__/)
-          .filter(Boolean)
-      );
-
       const newNode = {
         ...node,
         type: 'image',
@@ -139,7 +130,7 @@ export function remarkImg() {
           hProperties: {
             ...(node.data?.hProperties ?? {}),
             'data-size': size,
-            'data-caption': newCaption,
+            'data-caption': caption,
           },
         },
       };

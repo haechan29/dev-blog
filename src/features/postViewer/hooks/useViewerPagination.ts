@@ -114,17 +114,20 @@ function measure() {
 
       const dataCaption = element.dataset.caption;
       if (dataCaption === undefined) return;
-      const captions: string[] = JSON.parse(dataCaption);
 
-      captions.forEach(caption => {
-        totalPages.push({
-          startOffset: Number(element.dataset.startOffset),
-          endOffset: Number(element.dataset.endOffset),
-          heading: pendingHeading,
-          bgm: pendingBgm,
-          caption,
+      dataCaption
+        .split(/(?<!\\)#/)
+        .map(s => s.replace(/\\#/g, '#'))
+        .filter(Boolean)
+        .forEach(caption => {
+          totalPages.push({
+            startOffset: Number(element.dataset.startOffset),
+            endOffset: Number(element.dataset.endOffset),
+            heading: pendingHeading,
+            bgm: pendingBgm,
+            caption,
+          });
         });
-      });
       return;
     }
 

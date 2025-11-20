@@ -48,13 +48,15 @@ function EditPageWithValidation({ post }: { post: PostProps }) {
     dispatch(setContent({ value: post.content, isUserInput: false }));
     dispatch(setTitle({ value: post.title, isUserInput: false }));
     dispatch(setTags({ value: post.tags, isUserInput: false }));
-  }, [dispatch, post]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (draft && step === 'write') {
       setIsOpen(true);
     }
-  }, [draft, step]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
