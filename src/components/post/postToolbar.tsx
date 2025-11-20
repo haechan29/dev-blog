@@ -1,11 +1,11 @@
 'use client';
 
-import SidebarButton from '@/components/post/sidebarButton';
 import Heading from '@/features/post/domain/model/heading';
 import usePostToolbar from '@/features/post/hooks/usePostToolbar';
 import { PostToolbarProps } from '@/features/post/ui/postToolbarProps';
 import useThrottle from '@/hooks/useThrottle';
 import { setCurrentHeading } from '@/lib/redux/post/postReaderSlice';
+import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import {
   setIsExpanded,
   setIsScrollingDown,
@@ -14,7 +14,7 @@ import { AppDispatch } from '@/lib/redux/store';
 import { scrollIntoElement } from '@/lib/scroll';
 import { cn } from '@/lib/utils';
 import clsx from 'clsx';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, Menu } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -91,7 +91,14 @@ export default function PostToolbar({ className }: { className?: string }) {
       <Breadcrumb breadcrumb={breadcrumb} />
 
       <div className='flex w-full items-start'>
-        <SidebarButton />
+        <button
+          onClick={() => {
+            dispatch(setIsVisible(true));
+          }}
+          className='xl:hidden shrink-0 px-2 items-center justify-center'
+        >
+          <Menu className='w-6 h-6 text-gray-500' />
+        </button>
         <Content postToolbar={postToolbar} onClick={onContentClick} />
         <ExpandButton mode={postToolbar.mode} onClick={onExpandButtonClick} />
       </div>

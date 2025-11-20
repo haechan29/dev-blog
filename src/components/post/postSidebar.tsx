@@ -1,7 +1,5 @@
 'use client';
 
-import PostSidebarFooter from '@/components/post/postSidebarFooter';
-import PostSidebarHeader from '@/components/post/postSidebarHeader';
 import PostSidebarNav from '@/components/post/postSidebarNav';
 import { PostProps } from '@/features/post/ui/postProps';
 import useScrollLock from '@/hooks/useScrollLock';
@@ -105,9 +103,7 @@ export default function PostSidebar({ posts }: { posts: PostProps[] }) {
             !isVisible && 'max-xl:-translate-x-full'
           )}
         >
-          <PostSidebarHeader />
           <PostSidebarNav posts={posts} />
-          <PostSidebarFooter />
         </div>
       </>
     )
