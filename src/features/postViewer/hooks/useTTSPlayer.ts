@@ -2,24 +2,19 @@
 
 import { getUtterance } from '@/features/postViewer/domain/lib/tts';
 import { nextPage } from '@/lib/redux/post/postViewerSlice';
-import { AppDispatch } from '@/lib/redux/store';
+import { AppDispatch, RootState } from '@/lib/redux/store';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-export default function useTTSPlayer({
-  isPlaying,
-  pageNumber,
-  isViewerMode,
-}: {
-  isPlaying: boolean;
-  pageNumber: number | null;
-  isViewerMode: boolean;
-}) {
+export default function useTTSPlayer({ isPlaying }: { isPlaying: boolean }) {
   const dispatch = useDispatch<AppDispatch>();
+  const { currentPageIndex, isViewerMode } = useSelector((state: RootState) => {
+    return state.postViewer;
+  });
   const isSpeakingRef = useRef<boolean>(false);
   const isPausedRef = useRef<boolean>(false);
   const [elements, setElements] = useState<HTMLElement[]>([]);
-  const currentPageRef = useRef<number>(pageNumber);
+  const currentPageRef = useRef<number | null>(null);
   const [elementIndex, setElementIndex] = useState(0);
 
   const addHighlight = useCallback(
@@ -93,32 +88,26 @@ export default function useTTSPlayer({
   ]);
 
   useEffect(() => {
-    const container = document.querySelector('[data-viewer-container]');
-    if (!container) return;
-
-    const updateElements = () => {
-      const newElements = (
-        Array.from(container.children) as HTMLElement[]
-      ).filter(element => element.textContent.trim().length > 0);
-      setElements(newElements);
-    };
-    updateElements();
-
-    const observer = new ResizeObserver(updateElements);
-    observer.observe(container);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (currentPageRef.current !== pageNumber) {
+    if (currentPageRef.current !== currentPageIndex) {
       speechSynthesis.cancel();
       clearHighlight();
-      setElementIndex(0);
       isSpeakingRef.current = false;
       isPausedRef.current = false;
-      currentPageRef.current = pageNumber;
+      currentPageRef.current = currentPageIndex;
+
+      const timer = setTimeout(() => {
+        const container = document.querySelector('[data-viewer-container]');
+        if (!container) return;
+        const newElements = (
+          Array.from(container.children) as HTMLElement[]
+        ).filter(element => element.textContent.trim().length > 0);
+        setElements(newElements);
+        setElementIndex(0);
+      }, 100);
+
+      return () => clearTimeout(timer);
     }
-  }, [pageNumber, clearHighlight]);
+  }, [clearHighlight, currentPageIndex]);
 
   useEffect(() => {
     return () => {
