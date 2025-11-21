@@ -8,13 +8,11 @@ import { AppDispatch, RootState } from '@/lib/redux/store';
 import { cn } from '@/lib/utils';
 import clsx from 'clsx';
 import { Menu } from 'lucide-react';
-import { usePathname } from 'next/navigation';
 import { useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostSidebar({ posts }: { posts: PostProps[] }) {
   const dispatch = useDispatch<AppDispatch>();
-  const pathname = usePathname();
   const isVisible = useSelector((state: RootState) => {
     return state.postSidebar.isVisible;
   });
@@ -80,45 +78,44 @@ export default function PostSidebar({ posts }: { posts: PostProps[] }) {
   useScrollLock({ isLocked: isVisible });
 
   return (
-    !pathname.includes('/edit') && (
-      <>
-        <div
-          onClick={() => {
-            dispatch(setIsVisible(false));
-          }}
-          className={clsx(
-            'fixed inset-0 z-40 bg-black/70 xl:hidden',
-            'transition-opacity duration-300 ease-in-out',
-            isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          )}
-        />
-        <div
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          className={cn(
-            'w-[var(--sidebar-width)] fixed z-50',
-            'left-0 top-0 xl:top-[var(--toolbar-height)] bottom-0',
-            'flex flex-col bg-white',
-            'pb-2 md:pb-3 px-4 md:px-6',
-            'transition-transform duration-300 ease-in-out',
-            !isVisible && 'max-xl:-translate-x-full'
-          )}
-        >
-          <div className='xl:hidden flex items-center gap-2 md:gap-3 py-2 md:py-3'>
-            <button
-              onClick={() => {
-                dispatch(setIsVisible(false));
-              }}
-              className='shrink-0 p-2 -m-2 items-center justify-center'
-              aria-label='메뉴 열기'
-            >
-              <Menu className='w-6 h-6 text-gray-500' />
-            </button>
-          </div>
-          <PostSidebarNav posts={posts} />
+    <>
+      <div
+        onClick={() => {
+          dispatch(setIsVisible(false));
+        }}
+        className={clsx(
+          'fixed inset-0 z-40 bg-black/70 xl:hidden',
+          'transition-opacity duration-300 ease-in-out',
+          isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        )}
+      />
+
+      <div
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        className={cn(
+          'w-[var(--sidebar-width)] fixed z-50',
+          'left-0 top-0 xl:top-[var(--toolbar-height)] bottom-0',
+          'flex flex-col bg-white',
+          'pb-2 md:pb-3 px-4 md:px-6',
+          'transition-transform duration-300 ease-in-out',
+          !isVisible && 'max-xl:-translate-x-full'
+        )}
+      >
+        <div className='xl:hidden flex items-center gap-2 md:gap-3 py-2 md:py-3'>
+          <button
+            onClick={() => {
+              dispatch(setIsVisible(false));
+            }}
+            className='shrink-0 p-2 -m-2 items-center justify-center'
+            aria-label='메뉴 열기'
+          >
+            <Menu className='w-6 h-6 text-gray-500' />
+          </button>
         </div>
-      </>
-    )
+        <PostSidebarNav posts={posts} />
+      </div>
+    </>
   );
 }
