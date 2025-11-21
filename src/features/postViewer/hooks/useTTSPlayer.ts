@@ -1,16 +1,25 @@
 'use client';
 
 import { getUtterance } from '@/features/postViewer/domain/lib/tts';
-import { useCallback, useRef } from 'react';
+import { nextPage } from '@/lib/redux/post/postViewerSlice';
+import { AppDispatch } from '@/lib/redux/store';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 export default function useTTSPlayer({
-  onFinishElement,
-  onFinishPage,
+  isPlaying,
+  pageNumber,
+  isViewerMode,
 }: {
-  onFinishElement: (nextElementIndex: number) => void;
-  onFinishPage: () => void;
+  isPlaying: boolean;
+  pageNumber: number | null;
+  isViewerMode: boolean;
 }) {
-  const isPaused = useRef<boolean | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
+  const isSpeakingRef = useRef<boolean>(false);
+  const isPausedRef = useRef<boolean>(false);
+  const currentPageRef = useRef<number>(pageNumber);
+  const [elementIndex, setElementIndex] = useState(0);
 
   const getElements = useCallback(() => {
     const content = document.querySelector('[data-viewer-container]');
@@ -47,50 +56,82 @@ export default function useTTSPlayer({
     });
   }, [getElements]);
 
-  const startReading = useCallback(
-    (elementIndex: number) => {
-      const elements = getElements();
-      if (!elements) return;
+  useEffect(() => {
+    if (!isViewerMode) return;
 
+    const elements = getElements();
+    if (!elements) return;
+
+    if (isPlaying) {
       if (elementIndex >= elements.length) {
-        onFinishPage();
+        dispatch(nextPage());
         return;
       }
 
       addHighlight(elementIndex);
 
-      if (isPaused.current) {
+      if (isSpeakingRef.current && isPausedRef.current) {
         speechSynthesis.resume();
-        isPaused.current = false;
+        isPausedRef.current = false;
         return;
       }
 
       const element = elements[elementIndex];
       const utterance = getUtterance(element.textContent);
+
+      utterance.onstart = () => {
+        isSpeakingRef.current = true;
+        isPausedRef.current = false;
+      };
+
       utterance.onend = () => {
-        onFinishElement(elementIndex + 1);
+        isSpeakingRef.current = false;
+        setElementIndex(prev => prev + 1);
       };
 
       speechSynthesis.cancel();
       speechSynthesis.speak(utterance);
-      isPaused.current = false;
-    },
-    [addHighlight, getElements, onFinishElement, onFinishPage]
-  );
-
-  const pauseReading = useCallback(() => {
-    speechSynthesis.pause();
-    clearHighlight();
-
-    if (isPaused.current === false) {
-      isPaused.current = true;
+    } else {
+      if (isSpeakingRef.current) {
+        speechSynthesis.pause();
+        isPausedRef.current = true;
+      }
+      clearHighlight();
     }
+  }, [
+    addHighlight,
+    clearHighlight,
+    dispatch,
+    elementIndex,
+    getElements,
+    isPlaying,
+    isViewerMode,
+  ]);
+
+  useEffect(() => {
+    if (currentPageRef.current !== pageNumber) {
+      speechSynthesis.cancel();
+      clearHighlight();
+      setElementIndex(0);
+      isSpeakingRef.current = false;
+      isPausedRef.current = false;
+      currentPageRef.current = pageNumber;
+    }
+  }, [pageNumber, clearHighlight]);
+
+  useEffect(() => {
+    return () => {
+      speechSynthesis.cancel();
+      clearHighlight();
+    };
   }, [clearHighlight]);
 
-  const stopReading = useCallback(() => {
-    speechSynthesis.cancel();
-    clearHighlight();
-  }, [clearHighlight]);
-
-  return { startReading, pauseReading, stopReading } as const;
+  useEffect(() => {
+    if (!isViewerMode) {
+      speechSynthesis.cancel();
+      clearHighlight();
+      isSpeakingRef.current = false;
+      isPausedRef.current = false;
+    }
+  }, [isViewerMode, clearHighlight]);
 }

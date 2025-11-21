@@ -4,10 +4,7 @@ import Tooltip from '@/components/tooltip';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import useTTSPlayer from '@/features/postViewer/hooks/useTTSPlayer';
 import useDebounce from '@/hooks/useDebounce';
-import {
-  nextPage,
-  setIsControlBarTouched,
-} from '@/lib/redux/post/postViewerSlice';
+import { setIsControlBarTouched } from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { Pause, Play } from 'lucide-react';
@@ -16,40 +13,27 @@ import { useDispatch } from 'react-redux';
 
 export default function TTSSection() {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [elementIndex, setElementIndex] = useState(0);
   const debounce = useDebounce();
   const dispatch = useDispatch<AppDispatch>();
   const { pageNumber, isViewerMode } = usePostViewer();
 
-  const { startReading, pauseReading, stopReading } = useTTSPlayer({
-    onFinishElement: () => setElementIndex(prev => prev + 1),
-    onFinishPage: () => dispatch(nextPage()),
+  useTTSPlayer({
+    isPlaying,
+    pageNumber,
+    isViewerMode,
   });
 
   const onClick = useCallback(() => {
-    if (isPlaying) pauseReading();
-    else startReading(elementIndex);
-
     setIsPlaying(prev => !prev);
     dispatch(setIsControlBarTouched(true));
     debounce(() => dispatch(setIsControlBarTouched(false)), 2000);
-  }, [debounce, dispatch, elementIndex, isPlaying, pauseReading, startReading]);
-
-  useEffect(() => {
-    if (isPlaying) startReading(elementIndex);
-    else pauseReading();
-  }, [elementIndex, isPlaying, pauseReading, startReading]);
+  }, [debounce, dispatch]);
 
   useEffect(() => {
     if (!isViewerMode) {
-      stopReading();
       setIsPlaying(false);
     }
-  }, [isViewerMode, stopReading]);
-
-  useEffect(() => {
-    setElementIndex(0);
-  }, [pageNumber]);
+  }, [isViewerMode]);
 
   return (
     <Tooltip text='음성 재생'>
