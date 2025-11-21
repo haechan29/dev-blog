@@ -18,23 +18,12 @@ export default function useTTSPlayer({
   const dispatch = useDispatch<AppDispatch>();
   const isSpeakingRef = useRef<boolean>(false);
   const isPausedRef = useRef<boolean>(false);
+  const [elements, setElements] = useState<HTMLElement[]>([]);
   const currentPageRef = useRef<number>(pageNumber);
   const [elementIndex, setElementIndex] = useState(0);
 
-  const getElements = useCallback(() => {
-    const content = document.querySelector('[data-viewer-container]');
-    if (!content) return;
-
-    return (Array.from(content.children) as HTMLElement[]).filter(
-      element => element.textContent.trim().length > 0
-    );
-  }, []);
-
   const addHighlight = useCallback(
     (elementIndex: number) => {
-      const elements = getElements();
-      if (!elements) return;
-
       elements.forEach((element, index) => {
         element.classList.remove('tts-reading-active', 'tts-reading-inactive');
 
@@ -45,22 +34,17 @@ export default function useTTSPlayer({
         }
       });
     },
-    [getElements]
+    [elements]
   );
 
   const clearHighlight = useCallback(() => {
-    const elements = getElements();
-    if (!elements) return;
     elements.forEach(element => {
       element.classList.remove('tts-reading-active', 'tts-reading-inactive');
     });
-  }, [getElements]);
+  }, [elements]);
 
   useEffect(() => {
-    if (!isViewerMode) return;
-
-    const elements = getElements();
-    if (!elements) return;
+    if (!isViewerMode || elements.length === 0) return;
 
     if (isPlaying) {
       if (elementIndex >= elements.length) {
@@ -103,10 +87,27 @@ export default function useTTSPlayer({
     clearHighlight,
     dispatch,
     elementIndex,
-    getElements,
+    elements,
     isPlaying,
     isViewerMode,
   ]);
+
+  useEffect(() => {
+    const container = document.querySelector('[data-viewer-container]');
+    if (!container) return;
+
+    const updateElements = () => {
+      const newElements = (
+        Array.from(container.children) as HTMLElement[]
+      ).filter(element => element.textContent.trim().length > 0);
+      setElements(newElements);
+    };
+    updateElements();
+
+    const observer = new ResizeObserver(updateElements);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (currentPageRef.current !== pageNumber) {
