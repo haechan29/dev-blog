@@ -1,5 +1,4 @@
 import '@/app/globals.css';
-import RootLayoutClient from '@/components/rootLayoutClient';
 import Providers from '@/providers';
 import clsx from 'clsx';
 import type { Metadata } from 'next';
@@ -31,7 +30,6 @@ export default function RootLayout({
           'min-h-dvh bg-white antialiased overflow-y-auto'
         )}
       >
-        <RootLayoutClient />
         <Providers>{children}</Providers>
         <Toaster />
       </body>
