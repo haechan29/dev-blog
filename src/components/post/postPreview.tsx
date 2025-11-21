@@ -46,10 +46,13 @@ export default function PostPreview({
               <div
                 className={clsx(
                   'absolute inset-x-0 top-0',
-                  'h-18 line-clamp-3 group-hover:h-36 group-hover:line-clamp-[9999]',
+                  'h-18 line-clamp-3 group-hover:h-[var(--extended-height)] group-hover:line-clamp-[9999]',
                   'transition-discrete ease-in-out duration-300 group-hover:duration-[var(--scale-delay)]',
                   'delay-0 group-hover:delay-[var(--scale-delay)]'
                 )}
+                style={{
+                  '--extended-height': tags.length > 0 ? '9rem' : '7rem',
+                }}
               >
                 <div className='group-hover:hidden'>{plainText}</div>
                 <div
@@ -67,7 +70,7 @@ export default function PostPreview({
               </div>
             </div>
           ) : (
-            <div>{plainText}</div>
+            <div className='max-h-18 overflow-hidden'>{plainText}</div>
           )}
         </div>
 
