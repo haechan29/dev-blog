@@ -26,6 +26,16 @@ const postViewerSlice = createSlice({
     },
     setIsViewerMode: (state, action: PayloadAction<boolean>) => {
       state.isViewerMode = action.payload;
+      if (!action.payload) {
+        state.isMouseOnToolbar = false;
+        state.isMouseOnControlBar = false;
+        state.isMouseMoved = false;
+        state.isToolbarExpanded = false;
+        state.isTouched = false;
+        state.isToolbarTouched = false;
+        state.isControlBarTouched = false;
+        state.isRotationFinished = false;
+      }
     },
     setIsToolbarExpanded: (state, action: PayloadAction<boolean>) => {
       state.isToolbarExpanded = action.payload;

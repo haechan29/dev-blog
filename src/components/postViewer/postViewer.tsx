@@ -116,7 +116,7 @@ export default function PostViewer({ post }: { post: PostProps }) {
         }, 100);
       }}
       onTransitionEnd={(event: TransitionEvent<HTMLElement>) => {
-        if (event.propertyName === 'rotate') {
+        if (isViewerMode && event.propertyName === 'rotate') {
           dispatch(setIsRotationFinished(true));
           debounce(() => dispatch(setIsRotationFinished(false)), 2000);
         }
