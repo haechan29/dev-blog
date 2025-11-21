@@ -1,5 +1,6 @@
 'use client';
 
+import { EMPTY_TAG_NAME } from '@/features/post/constants/tagName';
 import { PostProps } from '@/features/post/ui/postProps';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { AppDispatch } from '@/lib/redux/store';
@@ -33,27 +34,25 @@ function NavCategory({ tag, count }: { tag: string; count: number }) {
   const params = useParams();
   const currentPostId = params.postId as string | undefined;
 
-  const isTagSelected = useMemo(() => currentTag === tag, [currentTag, tag]);
-
   const categoryUrl = useMemo(() => {
     let categoryUrl = '/posts';
     if (currentPostId) categoryUrl += `/${currentPostId}`;
-    if (currentPostId || !isTagSelected) categoryUrl += `?tag=${tag}`;
+    if (currentPostId || currentTag !== tag) categoryUrl += `?tag=${tag}`;
     return categoryUrl;
-  }, [currentPostId, isTagSelected, tag]);
+  }, [currentPostId, currentTag, tag]);
 
   return (
     <Link
       href={categoryUrl}
       className={clsx(
         'flex items-center w-full p-3 gap-2 rounded-sm hover:text-blue-500',
-        !currentPostId && isTagSelected
+        !currentPostId && currentTag === tag
           ? 'bg-blue-50 font-semibold text-blue-500'
           : 'text-gray-900'
       )}
     >
       <div className='flex-1 text-sm'>{tag}</div>
-      {!isTagSelected && (
+      {currentTag !== tag && (
         <div className='flex-shrink-0 text-xs text-gray-400'>{count}</div>
       )}
     </Link>
@@ -70,15 +69,16 @@ function NavPostList({ tag, posts }: { tag: string; posts: PostProps[] }) {
   const currentPostId = params.postId as string | undefined;
 
   const postsOfTag = useMemo(() => {
-    return currentTag
-      ? posts.filter(post => post.tags.includes(currentTag))
-      : [];
+    if (!currentTag) return [];
+    return posts.filter(post => {
+      return post.tags.length > 0
+        ? post.tags.includes(currentTag)
+        : currentTag === EMPTY_TAG_NAME;
+    });
   }, [posts, currentTag]);
 
-  const isTagSelected = useMemo(() => currentTag === tag, [currentTag, tag]);
-
   return (
-    isTagSelected &&
+    currentTag === tag &&
     postsOfTag.map(post => {
       const postUrl = getPostUrl(currentTag, post);
       const isCurrentPost = post.id === currentPostId;
@@ -103,12 +103,18 @@ function NavPostList({ tag, posts }: { tag: string; posts: PostProps[] }) {
 }
 
 function getTagCounts(posts: PostProps[]) {
-  const tagMap = posts
-    .flatMap(post => post.tags)
-    .reduce(
-      (acc, tag) => acc.set(tag, (acc.get(tag) ?? 0) + 1),
-      new Map<string, number>()
-    );
+  let emptyTagCount = 0;
+  const tagMap = posts.reduce((acc, post) => {
+    if (post.tags.length > 0) {
+      post.tags.forEach(tag => {
+        acc.set(tag, (acc.get(tag) ?? 0) + 1);
+      });
+    } else {
+      emptyTagCount++;
+    }
+    return acc;
+  }, new Map<string, number>());
+  tagMap.set(EMPTY_TAG_NAME, emptyTagCount);
   return [...tagMap.entries()];
 }
 

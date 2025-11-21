@@ -1,4 +1,5 @@
 import PostPreview from '@/components/post/postPreview';
+import { EMPTY_TAG_NAME } from '@/features/post/constants/tagName';
 import { fetchPosts } from '@/features/post/domain/service/postService';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
 
@@ -27,7 +28,11 @@ export default async function PostsPage({
 async function getPosts(tag: string | null): Promise<PostProps[]> {
   let posts = await fetchPosts();
   if (tag !== null) {
-    posts = posts.filter(post => post.tags.includes(tag));
+    posts = posts.filter(post => {
+      return post.tags.length > 0
+        ? post.tags.includes(tag)
+        : tag === EMPTY_TAG_NAME;
+    });
   }
   return posts.map(createProps);
 }

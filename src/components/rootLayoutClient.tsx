@@ -17,12 +17,13 @@ export default function RootLayoutClient() {
       const target = e.target as HTMLElement;
       const link = target.closest('a');
 
-      if (link && link.href && link.href.startsWith(window.location.origin)) {
+      if (
+        link &&
+        link.href &&
+        link.href.startsWith(window.location.origin) &&
+        link.pathname !== pathname
+      ) {
         nProgress.start();
-        const url = new URL(link.href);
-        if (url.pathname === pathname) {
-          setTimeout(() => nProgress.done(), 300);
-        }
       }
     };
 
