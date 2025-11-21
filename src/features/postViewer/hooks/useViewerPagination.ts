@@ -5,7 +5,6 @@ import Heading from '@/features/post/domain/model/heading';
 import { Bgm } from '@/features/post/domain/types/bgm';
 import { Page } from '@/features/postViewer/domain/types/page';
 import useDebounce from '@/hooks/useDebounce';
-import { getCSSVariable } from '@/lib/css';
 import {
   setCurrentPageIndex,
   setPages,
@@ -38,12 +37,10 @@ export default function useViewerPagination() {
 }
 
 function measure() {
-  const viewerContainer = document.querySelector('[data-viewer-container]');
   const viewerMeasure = document.querySelector('[data-viewer-measurement]');
-  if (!viewerContainer || !viewerMeasure) return;
+  if (!viewerMeasure) return;
 
-  const containerHeight = viewerContainer.getBoundingClientRect().height;
-  const containerScale = parseFloat(getCSSVariable('--container-scale'));
+  const containerHeight = (viewerMeasure as HTMLElement).offsetHeight;
   const elements = Array.from(viewerMeasure.children) as HTMLElement[];
 
   const totalPages: Page[] = [];
@@ -97,7 +94,11 @@ function measure() {
       return;
     }
 
-    const { height } = element.getBoundingClientRect();
+    const { marginTop, marginBottom } = window.getComputedStyle(element);
+    const height =
+      element.offsetHeight +
+      (parseFloat(marginTop) || 0) +
+      (parseFloat(marginBottom) || 0);
 
     if (element.matches('[data-image-with-caption]')) {
       if (currentPageElements.length > 0) {
@@ -131,7 +132,7 @@ function measure() {
       return;
     }
 
-    if (height > containerHeight / containerScale) {
+    if (height > containerHeight) {
       if (currentPageElements.length > 0) {
         totalPages.push({
           startOffset: Number(currentPageElements[0].dataset.startOffset),
@@ -150,7 +151,7 @@ function measure() {
         heading: pendingHeading,
         bgm: pendingBgm,
       });
-    } else if (height > containerHeight / containerScale - currentHeight) {
+    } else if (height > containerHeight - currentHeight) {
       totalPages.push({
         startOffset: Number(currentPageElements[0].dataset.startOffset),
         endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
