@@ -14,7 +14,7 @@ import { AppDispatch, RootState } from '@/lib/redux/store';
 import { scrollIntoElement } from '@/lib/scroll';
 import clsx from 'clsx';
 import { ChevronDown } from 'lucide-react';
-import { RefObject, useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostViewerToolbar({
@@ -26,7 +26,6 @@ export default function PostViewerToolbar({
 }) {
   const { areBarsVisible } = usePostViewer();
   const { page, isViewerMode } = usePostViewer();
-  const contentsRef = useRef<Map<string, HTMLDivElement>>(new Map());
   const pages = useSelector((state: RootState) => state.postViewer.pages);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -64,7 +63,9 @@ export default function PostViewerToolbar({
   useEffect(() => {
     if (!isViewerMode || !page?.heading) return;
 
-    const content = contentsRef.current.get(page.heading.id);
+    const content = document.querySelector(
+      `[data-heading-id='${page.heading.id}']`
+    );
     if (!content) return;
 
     const scrollToContent = () => {
@@ -99,7 +100,6 @@ export default function PostViewerToolbar({
 
         <div className='flex w-full items-start'>
           <Content
-            contentsRef={contentsRef}
             isExpanded={isExpanded}
             heading={page?.heading ?? null}
             headings={headings}
@@ -136,13 +136,11 @@ function Title({ title, heading }: { title: string; heading: Heading | null }) {
 }
 
 function Content({
-  contentsRef,
   isExpanded,
   heading,
   headings,
   onContentClick,
 }: {
-  contentsRef: RefObject<Map<string, HTMLElement>>;
   isExpanded: boolean;
   heading: Heading | null;
   headings: Heading[];
@@ -153,12 +151,8 @@ function Content({
       <div className='flex flex-col w-full'>
         {headings.map(item => (
           <button
+            data-heading-id={item.id}
             key={item.id}
-            ref={content => {
-              const contents = contentsRef.current;
-              if (content) contents.set(item.id, content);
-              else contents.delete(item.id);
-            }}
             onClick={() => onContentClick(item)}
             className={clsx(
               'w-full text-base md:text-lg lg:text-xl text-left text-white md:text-gray-900',
