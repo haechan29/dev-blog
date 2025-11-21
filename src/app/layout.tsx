@@ -3,14 +3,10 @@ import RootLayoutClient from '@/components/rootLayoutClient';
 import Providers from '@/providers';
 import clsx from 'clsx';
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist_Mono } from 'next/font/google';
 import 'nprogress/nprogress.css';
+import 'pretendard/dist/web/variable/pretendardvariable.css';
 import { Toaster } from 'react-hot-toast';
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
@@ -28,10 +24,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en'>
+    <html lang='ko'>
       <body
         className={clsx(
-          geistSans.variable,
           geistMono.variable,
           'min-h-dvh bg-white antialiased overflow-y-auto'
         )}
