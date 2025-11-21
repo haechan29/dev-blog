@@ -45,11 +45,17 @@ export default function Providers({ children }: { children: ReactNode }) {
     return () => document.removeEventListener('click', handleClick);
   }, [pathname]);
 
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      import('eruda').then(eruda => eruda.default.init());
+    }
+  }, []);
+
   return (
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         {children}
-        <ReactQueryDevtools initialIsOpen={false} />
+        {/* <ReactQueryDevtools initialIsOpen={false} /> */}
       </QueryClientProvider>
     </Provider>
   );
