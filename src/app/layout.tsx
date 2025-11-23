@@ -1,10 +1,12 @@
 import '@/app/globals.css';
+import LayoutClient from '@/components/layoutClient';
 import Providers from '@/providers';
 import clsx from 'clsx';
 import type { Metadata } from 'next';
 import { Geist_Mono } from 'next/font/google';
 import 'nprogress/nprogress.css';
 import 'pretendard/dist/web/variable/pretendardvariable.css';
+import { Suspense } from 'react';
 import { Toaster } from 'react-hot-toast';
 
 const geistMono = Geist_Mono({
@@ -30,6 +32,9 @@ export default function RootLayout({
           'min-h-dvh bg-white antialiased overflow-y-auto'
         )}
       >
+        <Suspense>
+          <LayoutClient />
+        </Suspense>
         <Providers>{children}</Providers>
         <Toaster />
       </body>
