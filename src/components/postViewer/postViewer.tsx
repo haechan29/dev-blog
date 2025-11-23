@@ -63,7 +63,10 @@ export default function PostViewer({ post }: { post: PostProps }) {
     [dispatch, supportsFullscreen]
   );
 
-  useScrollLock({ isLocked: isViewerMode });
+  useScrollLock({
+    isLocked: isViewerMode,
+    allowedSelectors: ['[data-viewer-toolbar-content]'],
+  });
 
   useEffect(() => {
     const viewer = document.querySelector('[data-viewer]') as HTMLElement;

@@ -147,7 +147,10 @@ function Content({
   onContentClick: (heading: Heading) => void;
 }) {
   return (
-    <div className='flex flex-1 min-w-0 px-2 max-h-40 md:max-h-60 lg:max-h-80 overflow-y-auto scrollbar-hide'>
+    <div
+      data-viewer-toolbar-content
+      className='flex flex-1 min-w-0 px-2 max-h-40 md:max-h-60 lg:max-h-80 overflow-y-auto scrollbar-hide'
+    >
       <div className='flex flex-col w-full'>
         {headings.map(item => (
           <button
