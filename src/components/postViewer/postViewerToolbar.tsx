@@ -82,7 +82,7 @@ export default function PostViewerToolbar({
     <div
       className={clsx(
         'w-full absolute top-0 left-0 z-50',
-        'max-md:pb-[var(--gradient-padding-bottom)] max-md:from-black/50 max-md:to-transparent max-md:bg-gradient-to-b',
+        'max-md:pb-(--gradient-padding-bottom) max-md:from-black/50 max-md:to-transparent max-md:bg-linear-to-b',
         'transition-opacity|discrete duration-300 ease-in-out',
         !areBarsVisible && 'opacity-0 pointer-events-none'
       )}
@@ -167,7 +167,7 @@ function Content({
                 ? 'text-gray-900 font-bold'
                 : 'text-gray-400',
               isExpanded && 'my-1 md:my-2',
-              'pl-[var(--padding-left)]'
+              'pl-(--padding-left)'
             )}
             style={{
               '--padding-left': isExpanded ? `${item.level - 1}rem` : '0px',

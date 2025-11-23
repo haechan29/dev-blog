@@ -26,8 +26,8 @@ export default function PostsLayoutContainer({
       <PostSidebar posts={posts} />
       <div
         className={clsx(
-          'mt-[var(--toolbar-height)] mb-20 px-6 md:px-12 xl:px-18',
-          'xl:ml-[var(--sidebar-width)]',
+          'mt-(--toolbar-height) mb-20 px-6 md:px-12 xl:px-18',
+          'xl:ml-(--sidebar-width)',
           'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
         )}
       >

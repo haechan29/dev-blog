@@ -103,8 +103,8 @@ function TooltipContent({
     <div
       className={clsx(
         'fixed z-9999',
-        'top-[var(--tooltip-top)] left-[var(--tooltip-left)]',
-        'translate-x-[var(--tooltip-translate-x)] translate-y-[var(--tooltip-translate-y)]',
+        'top-(--tooltip-top) left-(--tooltip-left)',
+        'translate-x-(--tooltip-translate-x) translate-y-(--tooltip-translate-y)',
         '[display:var(--tooltip-display)]'
       )}
       style={{

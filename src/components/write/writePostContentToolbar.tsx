@@ -35,9 +35,9 @@ export default function WritePostContentToolbar() {
       className={clsx(
         'w-full flex px-2 py-1 gap-1 overflow-x-auto scrollbar-hide border-gray-200',
         'transition-transform duration-300 ease-in-out',
-        'translate-y-[var(--toolbar-translate-y)]',
+        'translate-y-(--toolbar-translate-y)',
         shouldAttachToolbarToBottom
-          ? 'fixed inset-x-0 z-50 w-screen top-[100%] bg-white/80 backdrop-blur-md touch-pan-x'
+          ? 'fixed inset-x-0 z-50 w-screen top-full bg-white/80 backdrop-blur-md touch-pan-x'
           : 'rounded-t-lg border-t border-x'
       )}
       style={{

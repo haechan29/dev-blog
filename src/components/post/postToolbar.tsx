@@ -83,7 +83,7 @@ export default function PostToolbar({ className }: { className?: string }) {
       className={cn(
         'fixed top-0 z-40 w-full flex flex-col bg-white/80 backdrop-blur-md',
         'py-2 md:py-3 px-4 md:px-4',
-        'xl:ml-[var(--sidebar-width)] block xl:hidden',
+        'xl:ml-(--sidebar-width) block xl:hidden',
         'transition-transform duration-300 ease-in-out',
         postToolbar.isVisible ? 'translate-y-0' : '-translate-y-full',
         className
@@ -162,7 +162,7 @@ function Content({
                     ? 'text-gray-900 font-semibold'
                     : 'text-gray-400',
                   postToolbar.mode === 'expanded' && 'my-1 md:my-2',
-                  'pl-[var(--padding-left)]'
+                  'pl-(--padding-left)'
                 )}
                 style={{
                   '--padding-left':

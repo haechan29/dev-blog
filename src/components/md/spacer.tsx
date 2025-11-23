@@ -12,7 +12,7 @@ export default function Spacer({
     <div
       data-start-offset={startOffset}
       data-end-offset={endOffset}
-      className={`h-[var(--spacer-height)]`}
+      className={`h-(--spacer-height)`}
       style={{ '--spacer-height': `${lines * 28}px` }}
       aria-hidden='true'
     />

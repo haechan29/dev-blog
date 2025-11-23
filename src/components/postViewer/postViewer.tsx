@@ -125,7 +125,7 @@ export default function PostViewer({ post }: { post: PostProps }) {
         }
       }}
       className={clsx(
-        'fixed inset-0 z-40 p-[var(--container-padding)] bg-white',
+        'fixed inset-0 z-40 p-(--container-padding) bg-white',
         !supportsFullscreen &&
           'transition-transform|opacity duration-300 ease-in-out translate-x-[100dvw]',
         !isViewerMode && 'opacity-0 pointer-events-none',

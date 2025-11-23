@@ -95,8 +95,8 @@ export default function PostSidebar({ posts }: { posts: PostProps[] }) {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
         className={cn(
-          'w-[var(--sidebar-width)] fixed z-50',
-          'left-0 top-0 xl:top-[var(--toolbar-height)] bottom-0',
+          'w-(--sidebar-width) fixed z-50',
+          'left-0 top-0 xl:top-(--toolbar-height) bottom-0',
           'flex flex-col bg-white',
           'pb-2 md:pb-3 px-4 md:px-6',
           'transition-transform duration-300 ease-in-out',

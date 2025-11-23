@@ -46,9 +46,9 @@ export default function PostPreview({
               <div
                 className={clsx(
                   'absolute inset-x-0 top-0',
-                  'h-18 line-clamp-3 group-hover:h-[var(--extended-height)] group-hover:line-clamp-[9999]',
-                  'transition-discrete ease-in-out duration-300 group-hover:duration-[var(--scale-delay)]',
-                  'delay-0 group-hover:delay-[var(--scale-delay)]'
+                  'h-18 line-clamp-3 group-hover:h-(--extended-height) group-hover:line-clamp-9999',
+                  'transition-discrete ease-in-out duration-300 group-hover:duration-(--scale-delay)',
+                  'delay-0 group-hover:delay-(--scale-delay)'
                 )}
                 style={{
                   '--extended-height': tags.length > 0 ? '9rem' : '7rem',
@@ -58,8 +58,8 @@ export default function PostPreview({
                 <div
                   className={clsx(
                     'text-transparent group-hover:text-gray-900 absolute inset-x-0 top-0',
-                    'transition-transform ease-linear duration-[0] group-hover:duration-[var(--scroll-duration)]',
-                    'delay-0 group-hover:delay-[var(--scroll-delay)] group-hover:translate-y-[calc(-100%+9rem)]'
+                    'transition-transform ease-linear duration-[0] group-hover:duration-(--scroll-duration)',
+                    'delay-0 group-hover:delay-(--scroll-delay) group-hover:translate-y-[calc(-100%+9rem)]'
                   )}
                   style={{
                     '--scroll-duration': `${plainText.length / 50}s`,
@@ -78,7 +78,7 @@ export default function PostPreview({
           className={clsx(
             'flex flex-col gap-4',
             isScrollAnimationEnabled &&
-              'transition-opacity duration-300 ease-in-out delay-0 group-hover:delay-[var(--scale-delay)] group-hover:opacity-0'
+              'transition-opacity duration-300 ease-in-out delay-0 group-hover:delay-(--scale-delay) group-hover:opacity-0'
           )}
         >
           {tags.length > 0 && (
