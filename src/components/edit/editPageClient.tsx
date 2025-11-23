@@ -16,18 +16,20 @@ import {
 } from '@/lib/redux/write/writePostFormSlice';
 import { setCurrentStepId } from '@/lib/redux/write/writePostSlice';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function EditPageClient({ post }: { post: PostProps }) {
   return (
-    <QueryParamsValidator
-      queryKey='step'
-      isValidValue={value => value !== null && value in writePostSteps}
-      fallbackOption={{ type: 'defaultValue', value: 'write' }}
-    >
-      <EditPageWithValidation post={post} />
-    </QueryParamsValidator>
+    <Suspense>
+      <QueryParamsValidator
+        queryKey='step'
+        isValidValue={value => value !== null && value in writePostSteps}
+        fallbackOption={{ type: 'defaultValue', value: 'write' }}
+      >
+        <EditPageWithValidation post={post} />
+      </QueryParamsValidator>
+    </Suspense>
   );
 }
 

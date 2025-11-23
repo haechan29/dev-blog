@@ -10,18 +10,20 @@ import useWritePost from '@/features/write/hooks/useWritePost';
 import { AppDispatch } from '@/lib/redux/store';
 import { setCurrentStepId } from '@/lib/redux/write/writePostSlice';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function WritePage() {
   return (
-    <QueryParamsValidator
-      queryKey='step'
-      isValidValue={value => value !== null && value in writePostSteps}
-      fallbackOption={{ type: 'defaultValue', value: 'write' }}
-    >
-      <WritePageWithValidation />
-    </QueryParamsValidator>
+    <Suspense>
+      <QueryParamsValidator
+        queryKey='step'
+        isValidValue={value => value !== null && value in writePostSteps}
+        fallbackOption={{ type: 'defaultValue', value: 'write' }}
+      >
+        <WritePageWithValidation />
+      </QueryParamsValidator>
+    </Suspense>
   );
 }
 

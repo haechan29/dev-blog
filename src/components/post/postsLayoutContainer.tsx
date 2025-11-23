@@ -6,7 +6,7 @@ import PostToolbar from '@/components/post/postToolbar';
 import { PostProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
 import { usePathname } from 'next/navigation';
-import { ReactNode } from 'react';
+import { ReactNode, Suspense } from 'react';
 
 export default function PostsLayoutContainer({
   posts,
@@ -22,8 +22,11 @@ export default function PostsLayoutContainer({
 
   return (
     <>
-      <ToolbarContainer />
-      <PostSidebar posts={posts} />
+      <Suspense>
+        <ToolbarContainer />
+        <PostSidebar posts={posts} />
+      </Suspense>
+
       <div
         className={clsx(
           'mt-(--toolbar-height) mb-20 px-6 md:px-12 xl:px-18',
