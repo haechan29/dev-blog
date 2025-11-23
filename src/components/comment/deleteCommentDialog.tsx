@@ -42,7 +42,7 @@ export default function DeleteCommentDialog({
         onError: error => toast.error(error.message),
       });
     },
-    [deleteCommentMutation]
+    [deleteCommentMutation, setIsOpen]
   );
 
   const handleDelete = () => {

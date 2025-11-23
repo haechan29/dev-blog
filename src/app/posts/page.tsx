@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import PostPreview from '@/components/post/postPreview';
 import { EMPTY_TAG_NAME } from '@/features/post/constants/tagName';
 import { fetchPosts } from '@/features/post/domain/service/postService';
@@ -16,9 +18,7 @@ export default async function PostsPage({
       {posts.map((post, index) => (
         <div key={post.id} className='mb-8'>
           <PostPreview tag={tag} post={post} />
-          {index !== posts.length - 1 && (
-            <div className='h-[1px] bg-gray-200' />
-          )}
+          {index !== posts.length - 1 && <div className='h-px bg-gray-200' />}
         </div>
       ))}
     </div>

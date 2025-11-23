@@ -53,7 +53,7 @@ function NavCategory({ tag, count }: { tag: string; count: number }) {
     >
       <div className='flex-1 text-sm'>{tag}</div>
       {currentTag !== tag && (
-        <div className='flex-shrink-0 text-xs text-gray-400'>{count}</div>
+        <div className='shrink-0 text-xs text-gray-400'>{count}</div>
       )}
     </Link>
   );

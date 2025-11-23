@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import Comments from '@/components/comment/comments';
 import LikeButtonItem from '@/components/post/likeButtonItem';
 import PostContentWrapper from '@/components/post/postContentWrapper';
@@ -25,7 +27,7 @@ export default async function PostPage({
       <EnterFullscreenButton />
 
       <PostHeader post={post} />
-      <div className='w-full h-[1px] bg-gray-200 mb-10' />
+      <div className='w-full h-px bg-gray-200 mb-10' />
 
       <PostContentWrapper
         post={post}
