@@ -10,6 +10,8 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  console.error(error);
+
   return (
     <div className='min-h-screen flex flex-col items-center justify-center text-center px-4'>
       <div className='text-2xl font-bold'>문제가 발생했습니다</div>

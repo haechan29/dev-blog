@@ -1,4 +1,3 @@
-import { PostRequestDto } from '@/features/post/data/dto/postRequestDto';
 import { PostResponseDto } from '@/features/post/data/dto/postResponseDto';
 import Post from '@/features/post/domain/model/post';
 
@@ -13,13 +12,4 @@ export function toDomain(dto: PostResponseDto): Post {
     dto.tags,
     dto.authorId
   );
-}
-
-export function toData(params: {
-  title: string;
-  content: string;
-  tags: string[];
-  password: string;
-}): PostRequestDto {
-  return params;
 }

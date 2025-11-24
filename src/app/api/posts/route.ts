@@ -1,24 +1,19 @@
+import { getPostsFromDB } from '@/features/post/data/queries/postQueries';
 import { supabase } from '@/lib/supabase';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    const { data, error } = await supabase
-      .from('posts')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
+    const data = await getPostsFromDB();
     return NextResponse.json({ data });
-  } catch {
-    return NextResponse.json(
-      { error: '게시글 목록 조회 요청이 실패했습니다.' },
-      { status: 500 }
-    );
+  } catch (error) {
+    console.error('게시글 목록 조회 실패:', error);
+    const message =
+      process.env.NODE_ENV === 'development'
+        ? (error as Error).message
+        : '게시글 목록 조회 요청이 실패했습니다.';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 

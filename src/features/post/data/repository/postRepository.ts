@@ -1,61 +1,38 @@
 import { PostResponseDto } from '@/features/post/data/dto/postResponseDto';
-import { toData } from '@/features/post/domain/mapper/postMapper';
+import { toData } from '@/features/post/data/mapper/postMapper';
+import { getPostsFromDB } from '@/features/post/data/queries/postQueries';
 import { api } from '@/lib/api';
 import { Post } from '@/types/env';
+import { isServer } from '@tanstack/react-query';
 
 export async function fetchPosts(): Promise<PostResponseDto[]> {
-  const response = await api.get(`/api/posts`);
-  const posts = response.data as Post[];
+  let posts: Post[];
 
-  return posts.map((post: Post) => {
-    return {
-      id: post.id,
-      authorName: post.author_name,
-      title: post.title,
-      tags: post.tags,
-      content: post.content,
-      createdAt: post.created_at,
-      updatedAt: post.updated_at,
-      authorId: post.author_id,
-    };
-  });
+  if (isServer) {
+    posts = await getPostsFromDB();
+  } else {
+    const response = await api.get(`/api/posts`);
+    posts = response.data;
+  }
+
+  return posts.map(toData);
 }
 
 export async function fetchPost(postId: string): Promise<PostResponseDto> {
   const response = await api.get(`/api/posts/${postId}`);
   const post = response.data as Post;
-
-  return {
-    id: post.id,
-    authorName: post.author_name,
-    title: post.title,
-    tags: post.tags,
-    content: post.content,
-    createdAt: post.created_at,
-    updatedAt: post.updated_at,
-    authorId: post.author_id,
-  };
+  return toData(post);
 }
 
-export async function createPost(params: {
+export async function createPost(requestDto: {
   title: string;
   content: string;
   tags: string[];
   password: string;
 }): Promise<PostResponseDto> {
-  const dto = toData(params);
-  const response = await api.post(`/api/posts`, dto);
+  const response = await api.post(`/api/posts`, requestDto);
   const post: Post = response.data;
-  return {
-    id: post.id,
-    authorName: post.author_name,
-    title: post.title,
-    tags: post.tags,
-    content: post.content,
-    createdAt: post.created_at,
-    updatedAt: post.updated_at,
-    authorId: post.author_id,
-  };
+  return toData(post);
 }
 
 export async function updatePost({
@@ -70,16 +47,7 @@ export async function updatePost({
 }): Promise<PostResponseDto> {
   const response = await api.patch(`/api/posts/${postId}`, requestBody);
   const post: Post = response.data;
-  return {
-    id: post.id,
-    authorName: post.author_name,
-    title: post.title,
-    tags: post.tags,
-    content: post.content,
-    createdAt: post.created_at,
-    updatedAt: post.updated_at,
-    authorId: post.author_id,
-  };
+  return toData(post);
 }
 
 export async function deletePost(
