@@ -1,12 +1,15 @@
 import '@/app/globals.css';
 import LayoutClient from '@/components/layoutClient';
+import LayoutContainer from '@/components/layoutContainer';
+import { fetchPosts } from '@/features/post/domain/service/postServerService';
+import { createProps } from '@/features/post/ui/postProps';
 import Providers from '@/providers';
 import clsx from 'clsx';
 import type { Metadata } from 'next';
 import { Geist_Mono } from 'next/font/google';
 import 'nprogress/nprogress.css';
 import 'pretendard/dist/web/variable/pretendardvariable.css';
-import { Suspense } from 'react';
+import { ReactNode, Suspense } from 'react';
 import { Toaster } from 'react-hot-toast';
 
 const geistMono = Geist_Mono({
@@ -19,11 +22,13 @@ export const metadata: Metadata = {
   description: '개발자 임해찬의 블로그',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
+  const posts = await fetchPosts().then(posts => posts.map(createProps));
+
   return (
     <html lang='ko'>
       <body
@@ -35,7 +40,11 @@ export default function RootLayout({
         <Suspense>
           <LayoutClient />
         </Suspense>
-        <Providers>{children}</Providers>
+
+        <Providers>
+          <LayoutContainer posts={posts}>{children}</LayoutContainer>
+        </Providers>
+
         <Toaster />
       </body>
     </html>

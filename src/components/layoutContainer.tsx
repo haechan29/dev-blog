@@ -8,7 +8,7 @@ import clsx from 'clsx';
 import { usePathname } from 'next/navigation';
 import { ReactNode, Suspense } from 'react';
 
-export default function PostsLayoutContainer({
+export default function LayoutContainer({
   posts,
   children,
 }: {
@@ -43,11 +43,9 @@ export default function PostsLayoutContainer({
 function ToolbarContainer() {
   const pathname = usePathname();
 
-  if (pathname.includes('/edit')) {
-    return null;
-  } else if (pathname === '/posts') {
+  if (pathname === '/') {
     return <PostsToolbar />;
-  } else if (pathname.match(/^\/posts\/[^/]+$/)) {
+  } else if (pathname.match(/^\/read\/[^/]+$/)) {
     return (
       <>
         <PostsToolbar className='max-xl:hidden' />
