@@ -22,6 +22,22 @@ export const schema: Options = {
   },
 };
 
+export function rehypeStyle() {
+  return (tree: Root) => {
+    visit(tree, 'element', (element: Element) => {
+      if (
+        element.properties?.style &&
+        typeof element.properties.style === 'string'
+      ) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (element.properties as any).style = parseStyleString(
+          element.properties.style
+        );
+      }
+    });
+  };
+}
+
 export function rehypeOffset() {
   return (tree: Root) => {
     visit(tree, (node: Node, index?: number, parent?: Parent) => {
@@ -70,4 +86,20 @@ export function rehypeTagName() {
       }
     });
   };
+}
+
+function parseStyleString(styleString: string): Record<string, string> {
+  const styles: Record<string, string> = {};
+
+  styleString.split(';').forEach(rule => {
+    const [property, value] = rule.split(':').map(s => s.trim());
+    if (property && value) {
+      const camelProperty = property.replace(/-([a-z])/g, (_, letter) =>
+        letter.toUpperCase()
+      );
+      styles[camelProperty] = value;
+    }
+  });
+
+  return styles;
 }

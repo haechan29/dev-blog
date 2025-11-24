@@ -5,6 +5,7 @@ import Spacer from '@/components/md/spacer';
 import {
   rehypeMode,
   rehypeOffset,
+  rehypeStyle,
   rehypeTagName,
   schema,
 } from '@/lib/md/rehype';
@@ -37,6 +38,7 @@ const processor = unified()
   .use(remarkRehype) // convert markdown AST to HTML AST
   .use(rehypeSanitize, schema) // remove unsafe HTML tags and attributes
   .use(rehypePrettyCode) // add syntax highlighting to code blocks
+  .use(rehypeStyle) // convert inline style strings to style objects for React
   .use(rehypeSlug) // add id attributes to headings
   .use(rehypeOffset) // add offset attribute to element
   .use(rehypeMode) // add mode attribute to element
