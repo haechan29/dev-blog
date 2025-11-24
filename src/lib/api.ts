@@ -38,12 +38,15 @@ async function fetchWithErrorHandling(url: string, options?: RequestInit) {
       ? `https://${process.env.VERCEL_URL}`
       : 'http://localhost:3000'
     : '';
-
+  console.log('Fetching:', baseUrl + url);
   if (baseUrl === undefined) {
     throw new Error('base url을 읽어오지 못했습니다.');
   }
 
   const response = await fetch(baseUrl + url, options);
+  console.log('Response status:', response.status);
+  console.log('Content-Type:', response.headers.get('content-type'));
+  console.log(response);
 
   if (!response.ok) {
     const errorData = await response.json();
