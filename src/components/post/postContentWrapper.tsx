@@ -3,14 +3,13 @@
 import TableOfContentsItem from '@/components/post/tableOfContentsItem';
 import PostViewer from '@/components/postViewer/postViewer';
 import Heading from '@/features/post/domain/model/heading';
-import usePostReader from '@/features/post/hooks/usePostReader';
 import { PostProps } from '@/features/post/ui/postProps';
 import useThrottle from '@/hooks/useThrottle';
 import { setCurrentHeading } from '@/lib/redux/post/postReaderSlice';
 import { setIsContentVisible } from '@/lib/redux/post/postToolbarSlice';
-import { AppDispatch } from '@/lib/redux/store';
+import { AppDispatch, RootState } from '@/lib/redux/store';
 import { ReactNode, useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostContentWrapper({
   post,
@@ -24,9 +23,7 @@ export default function PostContentWrapper({
   const dispatch = useDispatch<AppDispatch>();
   const isInitialMount = useRef(true);
   const throttle = useThrottle();
-  const {
-    postReader: { mode, isTableVisible },
-  } = usePostReader();
+  const { mode } = useSelector((state: RootState) => state.postReader);
 
   useEffect(() => {
     const postContent = document.querySelector('[data-post-content]');
@@ -64,7 +61,7 @@ export default function PostContentWrapper({
 
   return (
     <>
-      {isTableVisible && post.headings.length > 0 && (
+      {mode === 'parsed' && post.headings.length > 0 && (
         <div className='mb-10 xl:mb-0'>
           <div className='block xl:hidden text-xl xl:text-2xl font-bold text-gray-900 mt-4 mb-2 leading-tight'>
             목차

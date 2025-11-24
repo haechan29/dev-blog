@@ -8,16 +8,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import PostReader from '@/features/post/domain/model/postReader';
-import usePostReader from '@/features/post/hooks/usePostReader';
 import { PostProps } from '@/features/post/ui/postProps';
 import useDebounce from '@/hooks/useDebounce';
 import { createRipple } from '@/lib/dom';
 import { setMode } from '@/lib/redux/post/postReaderSlice';
-import { AppDispatch } from '@/lib/redux/store';
+import { AppDispatch, RootState } from '@/lib/redux/store';
 import { Code2, Edit2, FileText, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { MouseEvent, useCallback, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostSettingsDropdown({
   children,
@@ -26,13 +25,12 @@ export default function PostSettingsDropdown({
   children: React.ReactNode;
   post: PostProps;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
   const debounce = useDebounce();
   const router = useRouter();
-  const {
-    postReader: { mode },
-  } = usePostReader();
-  const dispatch = useDispatch<AppDispatch>();
+
+  const { mode } = useSelector((state: RootState) => state.postReader);
+  const [isOpen, setIsOpen] = useState(false);
   const [debouncedMode, setDebouncedMode] =
     useState<PostReader['mode']>('parsed');
 
