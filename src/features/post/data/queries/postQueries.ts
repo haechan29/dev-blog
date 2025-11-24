@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import 'server-only';
 
 export async function getPostsFromDB() {
   const { data, error } = await supabase

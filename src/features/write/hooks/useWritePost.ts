@@ -1,6 +1,6 @@
 'use client';
 
-import * as PostService from '@/features/post/domain/service/postService';
+import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { createProps as createPostProps } from '@/features/post/ui/postProps';
 import { writePostSteps } from '@/features/write/constants/writePostStep';
 import { validate } from '@/features/write/domain/model/writePostForm';
@@ -25,7 +25,7 @@ export default function useWritePost() {
 
   const createPost = useCallback(async () => {
     const { title, content, tags, password } = writePostForm;
-    const post = await PostService.createPost({
+    const post = await PostClientService.createPost({
       title: title.value,
       content: content.value,
       tags: tags.value,
@@ -37,7 +37,7 @@ export default function useWritePost() {
   const updatePost = useCallback(
     async (postId: string) => {
       const { title, content, tags, password } = writePostForm;
-      const post = await PostService.updatePost({
+      const post = await PostClientService.updatePost({
         postId,
         title: title.value,
         content: content.value,

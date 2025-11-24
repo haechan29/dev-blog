@@ -1,16 +1,6 @@
-import * as PostRepository from '@/features/post/data/repository/postRepository';
+import * as PostClientRepository from '@/features/post/data/repository/postClientRepository';
 import { toDomain } from '@/features/post/domain/mapper/postMapper';
 import Post from '@/features/post/domain/model/post';
-
-export async function fetchPosts() {
-  const dtos = await PostRepository.fetchPosts();
-  return dtos.map(toDomain);
-}
-
-export async function fetchPost(postId: string): Promise<Post> {
-  const dto = await PostRepository.fetchPost(postId);
-  return toDomain(dto);
-}
 
 export async function createPost(params: {
   title: string;
@@ -18,7 +8,7 @@ export async function createPost(params: {
   tags: string[];
   password: string;
 }): Promise<Post> {
-  const dto = await PostRepository.createPost(params);
+  const dto = await PostClientRepository.createPost(params);
   return toDomain(dto);
 }
 
@@ -29,7 +19,7 @@ export async function updatePost(params: {
   tags?: string[];
   password?: string;
 }): Promise<Post> {
-  const post = await PostRepository.updatePost(params);
+  const post = await PostClientRepository.updatePost(params);
   return toDomain(post);
 }
 
@@ -37,5 +27,5 @@ export async function deletePost(
   postId: string,
   password: string
 ): Promise<void> {
-  await PostRepository.deletePost(postId, password);
+  await PostClientRepository.deletePost(postId, password);
 }

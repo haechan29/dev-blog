@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import PostPreview from '@/components/post/postPreview';
 import { EMPTY_TAG_NAME } from '@/features/post/constants/tagName';
-import { fetchPosts } from '@/features/post/domain/service/postService';
+import { fetchPosts } from '@/features/post/domain/service/postServerService';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
 
 export default async function PostsPage({

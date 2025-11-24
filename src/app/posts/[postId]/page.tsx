@@ -8,7 +8,7 @@ import PostPageClient from '@/components/post/postPageClient';
 import PostParsedContent from '@/components/post/postParsedContent';
 import PostRawContent from '@/components/post/postRawContent';
 import EnterFullscreenButton from '@/components/postViewer/enterFullscreenButton';
-import { fetchPost } from '@/features/post/domain/service/postService';
+import { fetchPost } from '@/features/post/domain/service/postServerService';
 import { createProps } from '@/features/post/ui/postProps';
 import { Suspense } from 'react';
 

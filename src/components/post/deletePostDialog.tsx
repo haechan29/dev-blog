@@ -7,7 +7,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
-import * as PostService from '@/features/post/domain/service/postService';
+import * as PostClientService from '@/features/post/domain/service/postClientService';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -37,7 +37,7 @@ export default function DeletePostDialog({
 
       setIsLoading(true);
       try {
-        await PostService.deletePost(postId, password);
+        await PostClientService.deletePost(postId, password);
         setIsOpen(false);
         router.push('/posts');
         toast.success('게시글이 삭제되었습니다');
