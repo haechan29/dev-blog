@@ -1,48 +1,37 @@
 'use client';
 
-import TooltipItem from '@/components/tooltipItem';
-import { isReadable } from '@/features/postViewer/domain/lib/tts';
-import { Page } from '@/features/postViewer/domain/types/page';
-import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
+import Tooltip from '@/components/tooltip';
 import useTTSPlayer from '@/features/postViewer/hooks/useTTSPlayer';
-import useTTSState from '@/features/postViewer/hooks/useTTSState';
-import { nextPage } from '@/lib/redux/postPositionSlice';
-import { AppDispatch } from '@/lib/redux/store';
+import useDebounce from '@/hooks/useDebounce';
+import { setIsControlBarTouched } from '@/lib/redux/post/postViewerSlice';
+import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { Pause, Play } from 'lucide-react';
-import { useCallback, useEffect, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-export default function TTSSection({ page }: { page: Page | null }) {
+export default function TTSSection() {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const debounce = useDebounce();
   const dispatch = useDispatch<AppDispatch>();
-
-  const { isViewerMode } = usePostViewer();
-
-  const readablePage = useMemo(() => page?.filter(isReadable) ?? [], [page]);
-
-  const { ttsProps, onPlayButtonClick, increaseElementIndex } = useTTSState();
-
-  const onFinishPage = useCallback(() => dispatch(nextPage()), [dispatch]);
-
-  const { startReading, pauseReading, stopReading } = useTTSPlayer({
-    readablePage,
-    onFinishElement: increaseElementIndex,
-    onFinishPage,
+  const isViewerMode = useSelector((state: RootState) => {
+    return state.postViewer.isViewerMode;
   });
 
   useEffect(() => {
-    if (ttsProps.isPlaying) startReading(ttsProps.elementIndex);
-    else pauseReading();
-  }, [pauseReading, startReading, stopReading, ttsProps]);
+    if (!isViewerMode) setIsPlaying(false);
+  }, [isViewerMode]);
 
-  useEffect(() => {
-    if (!isViewerMode) stopReading();
-  }, [isViewerMode, stopReading]);
+  useTTSPlayer({ isPlaying });
 
   return (
-    <TooltipItem text='음성 재생'>
+    <Tooltip text='음성 재생'>
       <button
-        onClick={onPlayButtonClick}
+        onClick={() => {
+          setIsPlaying(prev => !prev);
+          dispatch(setIsControlBarTouched(true));
+          debounce(() => dispatch(setIsControlBarTouched(false)), 2000);
+        }}
         className={clsx(
           'w-10 h-10 p-2 relative cursor-pointer',
           'transition-opacity|discrete duration-300 ease-in-out'
@@ -52,17 +41,17 @@ export default function TTSSection({ page }: { page: Page | null }) {
         <Play
           className={clsx(
             'w-6 h-6 absolute inset-0 m-auto stroke-1 text-white md:text-gray-900 transition-opacity duration-300 ease-in-out',
-            ttsProps.isPlaying && 'opacity-0 pointer-events-none'
+            isPlaying && 'opacity-0 pointer-events-none'
           )}
         />
 
         <Pause
           className={clsx(
             'w-6 h-6 absolute inset-0 m-auto stroke-1 text-white md:text-gray-900 transition-opacity duration-300 ease-in-out',
-            !ttsProps.isPlaying && 'opacity-0 pointer-events-none'
+            !isPlaying && 'opacity-0 pointer-events-none'
           )}
         />
       </button>
-    </TooltipItem>
+    </Tooltip>
   );
 }

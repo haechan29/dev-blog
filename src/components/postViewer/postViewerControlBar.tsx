@@ -4,16 +4,15 @@ import ProgressSection from '@/components/postViewer//progressSection';
 import ExitFullscreenButton from '@/components/postViewer/exitFullscreenButton';
 import PageIndicatorSection from '@/components/postViewer/pageIndicatorSection';
 import TTSSection from '@/components/postViewer/ttsSection';
-import { Page } from '@/features/postViewer/domain/types/page';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import { canTouch } from '@/lib/browser';
-import { setIsMouseOnControlBar } from '@/lib/redux/postViewerSlice';
+import { setIsMouseOnControlBar } from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function PostViewerControlBar({ page }: { page: Page | null }) {
+export default function PostViewerControlBar() {
   const dispatch = useDispatch<AppDispatch>();
   const { areBarsVisible } = usePostViewer();
 
@@ -29,6 +28,7 @@ export default function PostViewerControlBar({ page }: { page: Page | null }) {
 
   return (
     <div
+      onClick={e => e.stopPropagation()}
       className={clsx(
         'absolute bottom-0 left-0 right-0 z-50',
         'max-md:from-black/50 max-md:to-transparent max-md:bg-gradient-to-t',
@@ -45,7 +45,7 @@ export default function PostViewerControlBar({ page }: { page: Page | null }) {
 
         <div className='flex w-full mb-3 justify-between items-center'>
           <div className='flex items-center'>
-            <TTSSection page={page} />
+            <TTSSection />
             <PageIndicatorSection />
           </div>
 

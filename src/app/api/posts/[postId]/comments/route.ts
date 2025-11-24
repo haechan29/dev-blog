@@ -67,7 +67,7 @@ export async function POST(
   } catch {
     return NextResponse.json(
       { error: '댓글 생성 요청이 실패했습니다.' },
-      { status: 400 }
+      { status: 500 }
     );
   }
 }

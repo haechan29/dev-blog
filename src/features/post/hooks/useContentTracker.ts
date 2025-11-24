@@ -1,20 +1,18 @@
 'use client';
 
-import { setIsContentVisible } from '@/lib/redux/postToolbarSlice';
+import { setIsContentVisible } from '@/lib/redux/post/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
-import { RefObject, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function useContentTracker(
-  postContentRef: RefObject<HTMLElement | null>
-) {
+export default function useContentTracker() {
   const dispatch = useDispatch<AppDispatch>();
   const isInitialMount = useRef(true);
 
   useEffect(() => {
-    if (!postContentRef.current) return;
+    const postContent = document.querySelector('[data-post-content]');
+    if (!postContent) return;
 
-    const postContent = postContentRef.current;
     const postContentObserver = new IntersectionObserver(
       entries => {
         if (isInitialMount.current) {
@@ -29,5 +27,5 @@ export default function useContentTracker(
     );
     postContentObserver.observe(postContent);
     return () => postContentObserver.disconnect();
-  }, [dispatch, postContentRef]);
+  }, [dispatch]);
 }

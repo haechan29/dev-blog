@@ -20,6 +20,14 @@ export const api = {
       ...options,
     }),
 
+  patch: (url: string, body: unknown, options?: RequestInit) =>
+    fetchWithErrorHandling(url, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      ...options,
+    }),
+
   delete: (url: string, options?: RequestInit) =>
     fetchWithErrorHandling(url, { method: 'DELETE', ...options }),
 };

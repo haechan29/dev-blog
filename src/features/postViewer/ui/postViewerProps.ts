@@ -1,6 +1,5 @@
-import Heading from '@/features/post/domain/model/heading';
-import PostPosition from '@/features/post/domain/model/postPosition';
 import { PostViewer } from '@/features/postViewer/domain/model/postViewer';
+import { Page } from '@/features/postViewer/domain/types/page';
 
 export default interface PostViewerProps {
   isButtonVisible: boolean;
@@ -9,19 +8,16 @@ export default interface PostViewerProps {
   isToolbarExpanded: boolean;
   pageNumber: number | null;
   totalPages: number | null;
-  currentHeading: Heading | null;
+  page?: Page;
 }
 
 export function createProps({
   postViewer,
-  postPosition,
 }: {
   postViewer: PostViewer;
-  postPosition: PostPosition;
 }): PostViewerProps {
   return {
-    isButtonVisible:
-      !postViewer.isCommentSectionVisible && !postViewer.isViewerMode,
+    isButtonVisible: !postViewer.areCommentsVisible && !postViewer.isViewerMode,
     areBarsVisible:
       postViewer.isMouseOnToolbar ||
       postViewer.isMouseOnControlBar ||
@@ -32,14 +28,13 @@ export function createProps({
       postViewer.isControlBarTouched ||
       postViewer.isRotationFinished,
     pageNumber:
-      postPosition.pagination !== null
-        ? postPosition.pagination.current + 1
-        : null,
-    totalPages:
-      postPosition.pagination !== null
-        ? postPosition.pagination.total + 1
-        : null,
-    currentHeading: postPosition.currentHeading,
+      postViewer.currentPageIndex === null
+        ? null
+        : postViewer.currentPageIndex + 1,
+    totalPages: postViewer.pages.length + 1,
+    ...(postViewer.currentPageIndex !== null && {
+      page: postViewer.pages[postViewer.currentPageIndex],
+    }),
     ...postViewer,
   };
 }

@@ -1,0 +1,97 @@
+'use client';
+
+import useWritePostForm from '@/features/write/hooks/useWritePostForm';
+import { AppDispatch } from '@/lib/redux/store';
+import {
+  setInvalidField,
+  setPassword,
+} from '@/lib/redux/write/writePostFormSlice';
+import clsx from 'clsx';
+import { Eye, EyeOff } from 'lucide-react';
+import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch } from 'react-redux';
+
+export default function WritePostPassword() {
+  const {
+    writePostForm: {
+      password: { maxLength, isValid },
+    },
+  } = useWritePostForm();
+  const [passwordInner, setPasswordInner] = useState('');
+  const dispatch = useDispatch<AppDispatch>();
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const isPasswordTooLong = useMemo(
+    () => passwordInner.length > maxLength,
+    [maxLength, passwordInner.length]
+  );
+
+  const onFocus = useCallback(() => setIsFocused(true), []);
+  const onBlur = useCallback(() => setIsFocused(false), []);
+  const onChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      dispatch(setInvalidField(null));
+      setPasswordInner(e.currentTarget.value);
+    },
+    [dispatch]
+  );
+
+  useEffect(() => {
+    if (!isFocused) {
+      const newPassword = passwordInner.slice(0, maxLength);
+      setPasswordInner(newPassword);
+      dispatch(setPassword(newPassword));
+    }
+  }, [dispatch, isFocused, maxLength, passwordInner]);
+
+  useEffect(() => {
+    dispatch(setPassword(passwordInner));
+  }, [dispatch, passwordInner]);
+
+  return (
+    <div
+      className={clsx(
+        'flex border rounded-lg gap-3 p-3',
+        !isPasswordVisible && !passwordInner && 'bg-gray-50',
+        !isValid || isPasswordTooLong
+          ? 'border-red-400 animate-shake'
+          : isFocused
+          ? 'border-blue-500'
+          : 'border-gray-200 hover:border-blue-500'
+      )}
+    >
+      <input
+        type={isPasswordVisible ? 'text' : 'password'}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        value={passwordInner}
+        onChange={onChange}
+        placeholder='비밀번호'
+        className='flex-1 min-w-0 text-sm outline-none'
+      />
+
+      <div
+        className={clsx(
+          'flex text-sm gap-0.5 items-center',
+          (!isFocused || passwordInner.length < maxLength * 0.95) && 'hidden',
+          isPasswordTooLong && 'text-red-500'
+        )}
+      >
+        <div>{passwordInner.length}</div>
+        <div>/</div>
+        <div>{maxLength}</div>
+      </div>
+
+      <button
+        onClick={() => setIsPasswordVisible(prev => !prev)}
+        className='flex shrink-0 p-2 -m-2 justify-center items-center'
+      >
+        {isPasswordVisible ? (
+          <EyeOff className='w-5 h-5 text-gray-700' />
+        ) : (
+          <Eye className='w-5 h-5 text-gray-700' />
+        )}
+      </button>
+    </div>
+  );
+}

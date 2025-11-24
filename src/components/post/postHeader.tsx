@@ -1,68 +1,44 @@
 'use client';
 
+import PostInfo from '@/components/post/postInfo';
+import PostSettingsDropdown from '@/components/post/postSettingsDropdown';
 import useHeaderTracker from '@/features/post/hooks/useHeaderTracker';
 import { PostProps } from '@/features/post/ui/postProps';
-import { fetchPostStat } from '@/features/postStat/domain/service/postStatService';
-import { useQuery } from '@tanstack/react-query';
-import { Heart } from 'lucide-react';
-import Link from 'next/link';
+import clsx from 'clsx';
+import { MoreVertical } from 'lucide-react';
 import { useRef } from 'react';
 
 export default function PostHeader({ post }: { post: PostProps }) {
-  const { data: stat } = useQuery({
-    queryKey: ['posts', post.slug, 'stats'],
-    queryFn: () => fetchPostStat(post.slug).then(stat => stat.toProps()),
-  });
-
-  const headerRef = useRef(null);
+  const { title, tags } = post;
+  const headerRef = useRef<HTMLDivElement | null>(null);
   useHeaderTracker(headerRef);
 
   return (
-    <div ref={headerRef} className='mb-10'>
-      <Title {...post} />
-      <Tags {...post} />
-      <Info {...post} {...stat} />
-    </div>
-  );
-}
+    <div className='flex flex-col gap-6 mb-10'>
+      <div className='text-3xl font-bold line-clamp-2'>{title}</div>
 
-function Title({ title }: { title: string }) {
-  return <div className='text-3xl font-bold mb-6'>{title}</div>;
-}
+      {tags.length > 0 && (
+        <div className='w-full flex overflow-x-auto scrollbar-hide gap-3'>
+          {tags.map((tag, index) => (
+            <div
+              key={tag}
+              className={clsx(
+                'text-xs px-2 py-1 border border-gray-300 rounded-full whitespace-nowrap',
+                index >= 3 && 'max-w-20 text-ellipsis overflow-clip'
+              )}
+            >
+              {tag}
+            </div>
+          ))}
+        </div>
+      )}
 
-function Tags({ tags }: { tags: string[] }) {
-  return (
-    <div className='flex flex-wrap gap-3 mb-6'>
-      {tags.map(tag => (
-        <Link
-          key={tag}
-          href={`/posts?tag=${tag}`}
-          className='text-xs px-2 py-1 border border-gray-300 rounded-full hover:text-blue-500 hover:border-blue-200'
-        >
-          {tag}
-        </Link>
-      ))}
-    </div>
-  );
-}
-
-function Info({
-  date,
-  likeCount = 0,
-  viewCount = 0,
-}: {
-  date: string;
-  likeCount?: number;
-  viewCount?: number;
-}) {
-  return (
-    <div className='flex gap-4 items-center text-xs text-gray-500'>
-      <div>{date}</div>
-      <div className='flex items-center gap-1'>
-        <Heart className='w-3 h-3 fill-gray-500' />
-        <span>{likeCount}</span>
+      <div className='flex justify-between items-center'>
+        <PostInfo {...post} />
+        <PostSettingsDropdown post={post}>
+          <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2' />
+        </PostSettingsDropdown>
       </div>
-      <div>{`조회 ${viewCount}`}</div>
     </div>
   );
 }

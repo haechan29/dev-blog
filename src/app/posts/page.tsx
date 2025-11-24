@@ -1,47 +1,38 @@
+export const dynamic = 'force-dynamic';
+
 import PostPreview from '@/components/post/postPreview';
-import PostsPageClient from '@/components/post/postsPageClient';
-import { fetchAllPosts } from '@/features/post/domain/service/postService';
+import { EMPTY_TAG_NAME } from '@/features/post/constants/tagName';
+import { fetchPosts } from '@/features/post/domain/service/postService';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
-import { fetchPostStat } from '@/features/postStat/domain/service/postStatService';
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from '@tanstack/react-query';
 
 export default async function PostsPage({
   searchParams,
 }: {
   searchParams: Promise<{ tag?: string }>;
 }) {
-  const queryClient = new QueryClient();
-
   const tag = await searchParams.then(param => param.tag ?? null);
-  const posts = await fetchAllPosts();
-  const filteredPosts = tag
-    ? posts.filter(post => post.tags?.includes(tag))
-    : posts;
-  const postProps = filteredPosts.map(createProps);
-
-  const prefetchStat = (post: PostProps) =>
-    queryClient.prefetchQuery({
-      queryKey: ['posts', post.slug, 'stats'],
-      queryFn: () => fetchPostStat(post.slug).then(stat => stat.toProps()),
-    });
-
-  await Promise.allSettled(postProps.map(prefetchStat));
+  const posts = await getPosts(tag);
 
   return (
-    <>
-      <PostsPageClient />
-
-      <HydrationBoundary state={dehydrate(queryClient)}>
-        <div className='px-10 xl:px-20 py-8 flex flex-col'>
-          {postProps.map(post => (
-            <PostPreview key={post.slug} tag={tag} post={post} />
-          ))}
+    <div className='flex flex-col mt-8 mb-20'>
+      {posts.map((post, index) => (
+        <div key={post.id} className='mb-8'>
+          <PostPreview tag={tag} post={post} />
+          {index !== posts.length - 1 && <div className='h-px bg-gray-200' />}
         </div>
-      </HydrationBoundary>
-    </>
+      ))}
+    </div>
   );
+}
+
+async function getPosts(tag: string | null): Promise<PostProps[]> {
+  let posts = await fetchPosts();
+  if (tag !== null) {
+    posts = posts.filter(post => {
+      return post.tags.length > 0
+        ? post.tags.includes(tag)
+        : tag === EMPTY_TAG_NAME;
+    });
+  }
+  return posts.map(createProps);
 }

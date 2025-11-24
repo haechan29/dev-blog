@@ -1,14 +1,10 @@
 import Heading from '@/features/post/domain/model/heading';
+import PostReader from '@/features/post/domain/model/postReader';
 import PostToolbar from '@/features/post/domain/model/postToolbar';
 
 export type EmptyToolbarProps = {
   isVisible: boolean;
   mode: 'empty';
-};
-export type MinimalToolbarProps = {
-  isVisible: boolean;
-  mode: 'minimal';
-  title: string | null;
 };
 export type BasicToolbarProps = {
   isVisible: boolean;
@@ -33,17 +29,16 @@ export type ExpandedToolbarProps = {
 
 export type PostToolbarProps =
   | EmptyToolbarProps
-  | MinimalToolbarProps
   | BasicToolbarProps
   | CollapsedToolbarProps
   | ExpandedToolbarProps;
 
 export function createProps({
   postToolbar,
-  currentHeading,
+  postReader,
 }: {
   postToolbar: PostToolbar;
-  currentHeading: Heading | null;
+  postReader: PostReader;
 }): PostToolbarProps {
   const mode = getMode(postToolbar);
   switch (mode) {
@@ -51,12 +46,6 @@ export function createProps({
       return {
         isVisible: !postToolbar.isScrollingDown,
         mode,
-      };
-    case 'minimal':
-      return {
-        isVisible: !postToolbar.isScrollingDown,
-        mode,
-        title: postToolbar.tag,
       };
     case 'basic':
       return {
@@ -69,7 +58,7 @@ export function createProps({
       const items = [
         postToolbar.tag,
         postToolbar.title!,
-        currentHeading?.text,
+        postReader.currentHeading?.text,
       ].filter(item => item != null);
       const lastItem = items.pop()!;
       return {
@@ -87,15 +76,14 @@ export function createProps({
         breadcrumb: postToolbar.tag
           ? [postToolbar.tag, postToolbar.title!]
           : [postToolbar.title!],
-        title: currentHeading!.text,
+        title: postReader.currentHeading!.text,
         headings: postToolbar.headings,
       };
   }
 }
 
 function getMode(postToolbar: PostToolbar): PostToolbarProps['mode'] {
-  if (postToolbar.isInPostsPage) return 'minimal';
-  else if (postToolbar.isHeaderVisible) return 'empty';
+  if (postToolbar.isHeaderVisible) return 'empty';
   else if (postToolbar.isContentVisible && postToolbar.isExpanded)
     return 'expanded';
   else if (postToolbar.isContentVisible && !postToolbar.isExpanded)

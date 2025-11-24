@@ -7,14 +7,6 @@ export async function fetchPostStat(postId: string): Promise<PostStat> {
   return toDomain(dto);
 }
 
-export async function createPostStat(postId: string): Promise<void> {
-  await PostStatRepository.createPostStat(postId);
-}
-
-export async function deletePostStat(postId: string): Promise<void> {
-  await PostStatRepository.deletePostStat(postId);
-}
-
 export async function incrementLikeCount(postId: string): Promise<PostStat> {
   const dto = await PostStatRepository.incrementLikeCount(postId);
   return toDomain(dto);

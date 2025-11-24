@@ -1,10 +1,10 @@
 'use client';
 
 import Heading from '@/features/post/domain/model/heading';
-import useViewerToolbar from '@/features/postViewer/hooks/useViewerToolbar';
-import { setCurrentHeading } from '@/lib/redux/postPositionSlice';
+import usePostReader from '@/features/post/hooks/usePostReader';
+import { setCurrentHeading } from '@/lib/redux/post/postReaderSlice';
 import { AppDispatch } from '@/lib/redux/store';
-import { scrollToElement } from '@/lib/scroll';
+import { scrollIntoElement } from '@/lib/scroll';
 import clsx from 'clsx';
 import { useDispatch } from 'react-redux';
 
@@ -14,12 +14,15 @@ export default function TableOfContentsItem({
   headings: Heading[];
 }) {
   const dispatch = useDispatch<AppDispatch>();
-  const { currentHeading } = useViewerToolbar();
+  const {
+    postReader: { currentHeading },
+  } = usePostReader();
 
   const handleClick = (heading: Heading) => {
-    const element = document.getElementById(heading.id);
+    const postContent = document.querySelector('[data-post-content]');
+    const element = postContent?.querySelector(`#${heading.id}`);
     if (element) {
-      scrollToElement(
+      scrollIntoElement(
         element,
         {
           behavior: 'smooth',
@@ -33,8 +36,8 @@ export default function TableOfContentsItem({
   return (
     <div
       className={clsx(
-        'p-4 border border-gray-200',
-        'w-full xl:fixed xl:right-8 xl:top-1/2 xl:transform xl:-translate-y-1/2 xl:w-64'
+        'w-full  xl:w-(--toc-width) p-4 xl:m-(--toc-margin) border border-gray-200',
+        'xl:fixed xl:right-0 xl:top-1/2 xl:transform xl:-translate-y-1/2'
       )}
     >
       <ul className='space-y-2'>

@@ -2,15 +2,27 @@
 
 import Heading from '@/features/post/domain/model/heading';
 import usePostToolbar from '@/features/post/hooks/usePostToolbar';
-import usePostToolbarHandler from '@/features/post/hooks/usePostToolbarHandler';
 import { PostToolbarProps } from '@/features/post/ui/postToolbarProps';
-import useScrollToContent from '@/features/postViewer/hooks/useScrollToContent';
+import useThrottle from '@/hooks/useThrottle';
+import { setCurrentHeading } from '@/lib/redux/post/postReaderSlice';
+import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
+import {
+  setIsExpanded,
+  setIsScrollingDown,
+} from '@/lib/redux/post/postToolbarSlice';
+import { AppDispatch } from '@/lib/redux/store';
+import { scrollIntoElement } from '@/lib/scroll';
+import { cn } from '@/lib/utils';
 import clsx from 'clsx';
 import { ChevronDown, ChevronRight, Menu } from 'lucide-react';
-import { RefObject, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useDispatch } from 'react-redux';
 
-export default function PostToolbar() {
+export default function PostToolbar({ className }: { className?: string }) {
+  const dispatch = useDispatch<AppDispatch>();
   const postToolbar = usePostToolbar();
+  const lastScrollYRef = useRef(0);
+  const throttle = useThrottle();
 
   const breadcrumb = useMemo(() => {
     return postToolbar.mode === 'basic' ||
@@ -20,37 +32,76 @@ export default function PostToolbar() {
       : [];
   }, [postToolbar]);
 
-  const { onSidebarButtonClick, onContentClick, onExpandButtonClick } =
-    usePostToolbarHandler();
+  const onContentClick = useCallback(
+    (heading: Heading) => {
+      if (postToolbar.mode === 'collapsed') {
+        dispatch(setIsExpanded(true));
+      }
+      if (postToolbar.mode === 'expanded') {
+        const postContent = document.querySelector('[data-post-content]');
+        const element = postContent?.querySelector(`#${heading.id}`);
+        if (element) {
+          scrollIntoElement(
+            element,
+            {
+              behavior: 'smooth',
+              block: 'start',
+            },
+            () => {
+              dispatch(setCurrentHeading(heading));
+              dispatch(setIsExpanded(false));
+            }
+          );
+        }
+      }
+    },
+    [dispatch, postToolbar.mode]
+  );
 
-  const contentsRef = useRef<Map<string, HTMLDivElement>>(new Map());
-  useScrollToContent(contentsRef);
+  const onExpandButtonClick = useCallback(() => {
+    dispatch(setIsExpanded(postToolbar.mode !== 'expanded'));
+  }, [dispatch, postToolbar.mode]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      throttle(() => {
+        const currentScrollY = window.scrollY;
+        const lastScrollY = lastScrollYRef.current;
+        dispatch(setIsScrollingDown(currentScrollY > lastScrollY));
+        lastScrollYRef.current = currentScrollY;
+
+        dispatch(setIsExpanded(false));
+      }, 100);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [dispatch, postToolbar.mode, throttle]);
 
   return (
-    <div className='block xl:hidden mb-4'>
-      <div
-        className={clsx(
-          'fixed top-0 left-0 right-0 backdrop-blur-md bg-white/80',
-          'transition-transform duration-300 ease-in-out',
-          postToolbar.isVisible ? 'translate-y-0' : '-translate-y-full'
-        )}
-      >
-        <div className='flex flex-col w-full min-w-0 py-2'>
-          <Breadcrumb breadcrumb={breadcrumb} />
+    <div
+      className={cn(
+        'fixed top-0 z-40 w-full flex flex-col bg-white/80 backdrop-blur-md',
+        'py-2 md:py-3 px-4 md:px-4',
+        'xl:ml-(--sidebar-width) block xl:hidden',
+        'transition-transform duration-300 ease-in-out',
+        postToolbar.isVisible ? 'translate-y-0' : '-translate-y-full',
+        className
+      )}
+    >
+      <Breadcrumb breadcrumb={breadcrumb} />
 
-          <div className='flex w-full min-w-0 items-start'>
-            <SidebarButton onClick={onSidebarButtonClick} />
-            <Content
-              contentsRef={contentsRef}
-              postToolbar={postToolbar}
-              onClick={onContentClick}
-            />
-            <ExpandButton
-              mode={postToolbar.mode}
-              onClick={onExpandButtonClick}
-            />
-          </div>
-        </div>
+      <div className='flex gap-2 md:gap-3 w-full items-start'>
+        <button
+          onClick={() => {
+            dispatch(setIsVisible(true));
+          }}
+          className='xl:hidden shrink-0 p-2 -m-2 items-center justify-center'
+        >
+          <Menu className='w-6 h-6 text-gray-500' />
+        </button>
+        <Content postToolbar={postToolbar} onClick={onContentClick} />
+        <ExpandButton mode={postToolbar.mode} onClick={onExpandButtonClick} />
       </div>
     </div>
   );
@@ -76,23 +127,10 @@ function Breadcrumb({ breadcrumb }: { breadcrumb: string[] }) {
   );
 }
 
-function SidebarButton({ onClick }: { onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className='flex shrink-0 px-2 items-center justify-center'
-    >
-      <Menu className='w-6 h-6 text-gray-500' />
-    </button>
-  );
-}
-
 function Content({
-  contentsRef,
   postToolbar,
   onClick,
 }: {
-  contentsRef: RefObject<Map<string, HTMLElement>>;
   postToolbar: PostToolbarProps;
   onClick: (heading: Heading) => void;
 }) {
@@ -104,8 +142,7 @@ function Content({
           postToolbar.mode === 'empty' ? 'opacity-0' : 'opacity-100'
         )}
       >
-        {((postToolbar.mode === 'minimal' && postToolbar.title !== null) ||
-          postToolbar.mode === 'basic') && (
+        {postToolbar.mode === 'basic' && (
           <div className='font-semibold h-6 truncate'>{postToolbar.title}</div>
         )}
         {(postToolbar.mode === 'collapsed' ||
@@ -114,11 +151,6 @@ function Content({
             {postToolbar.headings.map(heading => (
               <button
                 key={heading.id}
-                ref={content => {
-                  const contents = contentsRef.current;
-                  if (content) contents.set(heading.id, content);
-                  else contents.delete(heading.id);
-                }}
                 onClick={() => onClick(heading)}
                 className={clsx(
                   'truncate text-left transition-discrete|opacity duration-300 ease-in',
@@ -130,7 +162,7 @@ function Content({
                     ? 'text-gray-900 font-semibold'
                     : 'text-gray-400',
                   postToolbar.mode === 'expanded' && 'my-1 md:my-2',
-                  'pl-[var(--padding-left)]'
+                  'pl-(--padding-left)'
                 )}
                 style={{
                   '--padding-left':
@@ -159,7 +191,7 @@ function ExpandButton({
   return (
     <button
       onClick={onClick}
-      className='flex shrink-0 px-2 items-center justify-center'
+      className='shrink-0 p-2 -m-2 items-center justify-center'
     >
       <ChevronDown
         className={clsx(

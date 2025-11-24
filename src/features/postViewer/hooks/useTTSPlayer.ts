@@ -1,25 +1,25 @@
 'use client';
 
 import { getUtterance } from '@/features/postViewer/domain/lib/tts';
-import { Page } from '@/features/postViewer/domain/types/page';
-import { useCallback, useRef } from 'react';
+import { nextPage } from '@/lib/redux/post/postViewerSlice';
+import { AppDispatch, RootState } from '@/lib/redux/store';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-export default function useTTSPlayer({
-  readablePage,
-  onFinishElement,
-  onFinishPage,
-}: {
-  readablePage: Page | null;
-  onFinishElement: (nextElementIndex: number) => void;
-  onFinishPage: () => void;
-}) {
-  const isPaused = useRef<boolean | null>(null);
+export default function useTTSPlayer({ isPlaying }: { isPlaying: boolean }) {
+  const dispatch = useDispatch<AppDispatch>();
+  const { currentPageIndex, isViewerMode } = useSelector((state: RootState) => {
+    return state.postViewer;
+  });
+  const isSpeakingRef = useRef<boolean>(false);
+  const isPausedRef = useRef<boolean>(false);
+  const [elements, setElements] = useState<HTMLElement[]>([]);
+  const currentPageRef = useRef<number | null>(null);
+  const [elementIndex, setElementIndex] = useState(0);
 
   const addHighlight = useCallback(
     (elementIndex: number) => {
-      if (!readablePage) return;
-
-      readablePage.forEach((element, index) => {
+      elements.forEach((element, index) => {
         element.classList.remove('tts-reading-active', 'tts-reading-inactive');
 
         if (index === elementIndex) {
@@ -29,58 +29,99 @@ export default function useTTSPlayer({
         }
       });
     },
-    [readablePage]
+    [elements]
   );
 
   const clearHighlight = useCallback(() => {
-    if (readablePage) {
-      readablePage.forEach(element => {
-        element.classList.remove('tts-reading-active', 'tts-reading-inactive');
-      });
-    }
-  }, [readablePage]);
+    elements.forEach(element => {
+      element.classList.remove('tts-reading-active', 'tts-reading-inactive');
+    });
+  }, [elements]);
 
-  const startReading = useCallback(
-    (elementIndex: number) => {
-      if (!readablePage) return;
+  useEffect(() => {
+    if (!isViewerMode || elements.length === 0) return;
 
-      if (elementIndex >= readablePage.length) {
-        onFinishPage();
+    if (isPlaying) {
+      if (elementIndex >= elements.length) {
+        dispatch(nextPage());
         return;
       }
 
       addHighlight(elementIndex);
 
-      if (isPaused.current) {
+      if (isSpeakingRef.current && isPausedRef.current) {
         speechSynthesis.resume();
-        isPaused.current = false;
+        isPausedRef.current = false;
         return;
       }
 
-      const element = readablePage[elementIndex];
+      const element = elements[elementIndex];
       const utterance = getUtterance(element.textContent);
-      utterance.onend = () => onFinishElement(elementIndex + 1);
+
+      utterance.onstart = () => {
+        isSpeakingRef.current = true;
+        isPausedRef.current = false;
+      };
+
+      utterance.onend = () => {
+        isSpeakingRef.current = false;
+        setElementIndex(prev => prev + 1);
+      };
 
       speechSynthesis.cancel();
       speechSynthesis.speak(utterance);
-      isPaused.current = false;
-    },
-    [addHighlight, onFinishElement, onFinishPage, readablePage]
-  );
-
-  const pauseReading = useCallback(() => {
-    speechSynthesis.pause();
-    clearHighlight();
-
-    if (isPaused.current === false) {
-      isPaused.current = true;
+    } else {
+      if (isSpeakingRef.current) {
+        speechSynthesis.pause();
+        isPausedRef.current = true;
+      }
+      clearHighlight();
     }
+  }, [
+    addHighlight,
+    clearHighlight,
+    dispatch,
+    elementIndex,
+    elements,
+    isPlaying,
+    isViewerMode,
+  ]);
+
+  useEffect(() => {
+    if (currentPageRef.current !== currentPageIndex) {
+      speechSynthesis.cancel();
+      clearHighlight();
+      isSpeakingRef.current = false;
+      isPausedRef.current = false;
+      currentPageRef.current = currentPageIndex;
+
+      const timer = setTimeout(() => {
+        const container = document.querySelector('[data-viewer-container]');
+        if (!container) return;
+        const newElements = (
+          Array.from(container.children) as HTMLElement[]
+        ).filter(element => element.textContent.trim().length > 0);
+        setElements(newElements);
+        setElementIndex(0);
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [clearHighlight, currentPageIndex]);
+
+  useEffect(() => {
+    return () => {
+      speechSynthesis.cancel();
+      clearHighlight();
+    };
   }, [clearHighlight]);
 
-  const stopReading = useCallback(() => {
-    speechSynthesis.cancel();
-    clearHighlight();
-  }, [clearHighlight]);
-
-  return { startReading, pauseReading, stopReading } as const;
+  useEffect(() => {
+    if (!isViewerMode) {
+      speechSynthesis.cancel();
+      clearHighlight();
+      isSpeakingRef.current = false;
+      isPausedRef.current = false;
+    }
+  }, [isViewerMode, clearHighlight]);
 }

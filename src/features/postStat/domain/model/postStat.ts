@@ -5,19 +5,13 @@ export default class PostStat {
     public readonly id: string,
     public readonly postId: string,
     public readonly likeCount: number,
-    public readonly viewCount: number,
-    public readonly createdAt: string,
-    public readonly updatedAt: string
+    public readonly viewCount: number
   ) {}
 
   toProps(): PostStatItemProps {
     return {
-      id: this.id,
-      postId: this.postId,
       likeCount: this.likeCount,
       viewCount: this.viewCount,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
     };
   }
 }

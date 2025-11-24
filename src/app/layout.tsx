@@ -1,13 +1,13 @@
+import '@/app/globals.css';
+import LayoutClient from '@/components/layoutClient';
 import Providers from '@/providers';
+import clsx from 'clsx';
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist_Mono } from 'next/font/google';
+import 'nprogress/nprogress.css';
+import 'pretendard/dist/web/variable/pretendardvariable.css';
+import { Suspense } from 'react';
 import { Toaster } from 'react-hot-toast';
-import './globals.css';
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
@@ -25,10 +25,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en'>
+    <html lang='ko'>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-y-scroll`}
+        className={clsx(
+          geistMono.variable,
+          'min-h-dvh bg-white antialiased overflow-y-auto'
+        )}
       >
+        <Suspense>
+          <LayoutClient />
+        </Suspense>
         <Providers>{children}</Providers>
         <Toaster />
       </body>

@@ -4,23 +4,29 @@ import Heading from '@/features/post/domain/model/heading';
 import Post from '@/features/post/domain/model/post';
 
 export type PostProps = {
-  slug: string;
+  id: string;
+  authorName: string;
   title: string;
-  date: string;
+  createdAt: string;
+  updatedAt: string;
   tags: string[];
   content: string;
   headings: Heading[];
   plainText: string;
+  authorId?: string;
 };
 
 export function createProps(post: Post): PostProps {
   return {
-    slug: post.slug,
+    id: post.id,
+    authorName: post.authorName,
     title: post.title,
-    date: formatDate(post.date),
-    tags: post.tags ?? [],
+    createdAt: formatDate(post.createdAt),
+    updatedAt: formatDate(post.updatedAt),
+    tags: post.tags,
     content: post.content,
     headings: post.headings,
     plainText: extractPlainText(post.content),
+    authorId: post.authorId,
   };
 }

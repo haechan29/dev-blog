@@ -1,49 +1,94 @@
-import { PostDto } from '@/features/post/data/dto/postDto';
-import { readdir, readFile } from 'fs/promises';
-import matter from 'gray-matter';
-import path from 'path';
+import { PostResponseDto } from '@/features/post/data/dto/postResponseDto';
+import { toData } from '@/features/post/domain/mapper/postMapper';
+import { api } from '@/lib/api';
+import { Post } from '@/types/env';
 
-const postsDirectory = path.join(process.cwd(), 'src/posts');
+export async function fetchPosts(): Promise<PostResponseDto[]> {
+  const response = await api.get(`/api/posts`);
+  const posts = response.data as Post[];
 
-async function fetchPostBySlugInner(slug: string): Promise<PostDto> {
-  const fullPath = path.join(postsDirectory, `${slug}.mdx`);
-  const fileContents = await readFile(fullPath, 'utf8');
-  const { data, content } = matter(fileContents);
+  return posts.map((post: Post) => {
+    return {
+      id: post.id,
+      authorName: post.author_name,
+      title: post.title,
+      tags: post.tags,
+      content: post.content,
+      createdAt: post.created_at,
+      updatedAt: post.updated_at,
+      authorId: post.author_id,
+    };
+  });
+}
+
+export async function fetchPost(postId: string): Promise<PostResponseDto> {
+  const response = await api.get(`/api/posts/${postId}`);
+  const post = response.data as Post;
 
   return {
-    slug: slug,
-    title: data.title,
-    date: data.date,
-    content: content,
-    tags: data.tags,
+    id: post.id,
+    authorName: post.author_name,
+    title: post.title,
+    tags: post.tags,
+    content: post.content,
+    createdAt: post.created_at,
+    updatedAt: post.updated_at,
+    authorId: post.author_id,
   };
 }
 
-export async function fetchAllPosts(): Promise<PostDto[]> {
-  const files = await readdir(postsDirectory);
-
-  const posts = await Promise.all(
-    files
-      .filter(file => file.endsWith('.mdx'))
-      .map(async file => {
-        try {
-          const slug = file.replace(/\.mdx$/, '');
-          return await fetchPostBySlugInner(slug);
-        } catch (e) {
-          console.error(`${file} 파싱 실패: `, e);
-          return null;
-        }
-      })
-  );
-
-  return posts.filter(post => post !== null);
+export async function createPost(params: {
+  title: string;
+  content: string;
+  tags: string[];
+  password: string;
+}): Promise<PostResponseDto> {
+  const dto = toData(params);
+  const response = await api.post(`/api/posts`, dto);
+  const post: Post = response.data;
+  return {
+    id: post.id,
+    authorName: post.author_name,
+    title: post.title,
+    tags: post.tags,
+    content: post.content,
+    createdAt: post.created_at,
+    updatedAt: post.updated_at,
+    authorId: post.author_id,
+  };
 }
 
-export async function fetchPostBySlug(slug: string): Promise<PostDto> {
-  const posts = await fetchAllPosts();
-  const post = posts.find(post => post.slug === slug);
+export async function updatePost({
+  postId,
+  ...requestBody
+}: {
+  postId: string;
+  title?: string;
+  content?: string;
+  tags?: string[];
+  password?: string;
+}): Promise<PostResponseDto> {
+  const response = await api.patch(`/api/posts/${postId}`, requestBody);
+  const post: Post = response.data;
+  return {
+    id: post.id,
+    authorName: post.author_name,
+    title: post.title,
+    tags: post.tags,
+    content: post.content,
+    createdAt: post.created_at,
+    updatedAt: post.updated_at,
+    authorId: post.author_id,
+  };
+}
 
-  if (!post) throw new Error(`Post를 찾을 수 없습니다: ${slug}`);
-
-  return post;
+export async function deletePost(
+  postId: string,
+  password: string
+): Promise<void> {
+  await api.delete(`/api/posts/${postId}`, {
+    headers: {
+      'X-Post-Password': password,
+    },
+  });
 }

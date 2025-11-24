@@ -1,8 +1,8 @@
 'use client';
 
-import Post from '@/features/post/domain/model/post';
+import { EMPTY_TAG_NAME } from '@/features/post/constants/tagName';
 import { PostProps } from '@/features/post/ui/postProps';
-import { setIsVisible } from '@/lib/redux/postSidebarSlice';
+import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import Link from 'next/link';
@@ -32,30 +32,28 @@ function NavCategory({ tag, count }: { tag: string; count: number }) {
   const currentTag = searchParams.get('tag') ?? null;
 
   const params = useParams();
-  const currentSlug = params.slug as string | undefined;
-
-  const isTagSelected = useMemo(() => currentTag === tag, [currentTag, tag]);
+  const currentPostId = params.postId as string | undefined;
 
   const categoryUrl = useMemo(() => {
     let categoryUrl = '/posts';
-    if (currentSlug) categoryUrl += `/${currentSlug}`;
-    if (currentSlug || !isTagSelected) categoryUrl += `?tag=${tag}`;
+    if (currentPostId) categoryUrl += `/${currentPostId}`;
+    if (currentPostId || currentTag !== tag) categoryUrl += `?tag=${tag}`;
     return categoryUrl;
-  }, [currentSlug, isTagSelected, tag]);
+  }, [currentPostId, currentTag, tag]);
 
   return (
     <Link
       href={categoryUrl}
       className={clsx(
-        'flex items-center w-full py-3 px-9 gap-2 hover:text-blue-500',
-        !currentSlug && isTagSelected
+        'flex items-center w-full p-3 gap-2 rounded-sm hover:text-blue-500',
+        !currentPostId && currentTag === tag
           ? 'bg-blue-50 font-semibold text-blue-500'
           : 'text-gray-900'
       )}
     >
       <div className='flex-1 text-sm'>{tag}</div>
-      {!isTagSelected && (
-        <div className='flex-shrink-0 text-xs text-gray-400'>{count}</div>
+      {currentTag !== tag && (
+        <div className='shrink-0 text-xs text-gray-400'>{count}</div>
       )}
     </Link>
   );
@@ -68,30 +66,31 @@ function NavPostList({ tag, posts }: { tag: string; posts: PostProps[] }) {
   const currentTag = searchParams.get('tag') ?? null;
 
   const params = useParams();
-  const currentSlug = params.slug as string | undefined;
+  const currentPostId = params.postId as string | undefined;
 
   const postsOfTag = useMemo(() => {
-    return currentTag
-      ? posts.filter(post => post.tags.includes(currentTag))
-      : [];
+    if (!currentTag) return [];
+    return posts.filter(post => {
+      return post.tags.length > 0
+        ? post.tags.includes(currentTag)
+        : currentTag === EMPTY_TAG_NAME;
+    });
   }, [posts, currentTag]);
 
-  const isTagSelected = useMemo(() => currentTag === tag, [currentTag, tag]);
-
   return (
-    isTagSelected &&
+    currentTag === tag &&
     postsOfTag.map(post => {
       const postUrl = getPostUrl(currentTag, post);
-      const isSlugSelected = post.slug === currentSlug;
+      const isCurrentPost = post.id === currentPostId;
 
       return (
         <Link
-          key={`${tag}-${post.slug} `}
+          key={`${tag}-${post.id} `}
           href={postUrl}
           onClick={() => dispatch(setIsVisible(false))}
           className={clsx(
-            'flex w-full py-3 pl-12 pr-9 hover:text-blue-500',
-            isSlugSelected
+            'flex w-full py-3 pl-6 pr-3 rounded-sm hover:text-blue-500',
+            isCurrentPost
               ? 'bg-blue-50 font-semibold text-blue-500'
               : 'text-gray-900'
           )}
@@ -104,17 +103,23 @@ function NavPostList({ tag, posts }: { tag: string; posts: PostProps[] }) {
 }
 
 function getTagCounts(posts: PostProps[]) {
-  const tagMap = posts
-    .flatMap(post => post.tags)
-    .reduce(
-      (acc, tag) => acc.set(tag, (acc.get(tag) ?? 0) + 1),
-      new Map<string, number>()
-    );
+  let emptyTagCount = 0;
+  const tagMap = posts.reduce((acc, post) => {
+    if (post.tags.length > 0) {
+      post.tags.forEach(tag => {
+        acc.set(tag, (acc.get(tag) ?? 0) + 1);
+      });
+    } else {
+      emptyTagCount++;
+    }
+    return acc;
+  }, new Map<string, number>());
+  tagMap.set(EMPTY_TAG_NAME, emptyTagCount);
   return [...tagMap.entries()];
 }
 
-function getPostUrl(tag: string | null, post: Post) {
-  let postUrl = `/posts/${post.slug}`;
+function getPostUrl(tag: string | null, post: PostProps) {
+  let postUrl = `/posts/${post.id}`;
   if (tag) postUrl += `?tag=${tag}`;
   return postUrl;
 }

@@ -1,11 +1,11 @@
-'use client';
-
+import PostInfo from '@/components/post/postInfo';
 import { PostProps } from '@/features/post/ui/postProps';
-import { fetchPostStat } from '@/features/postStat/domain/service/postStatService';
-import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { Heart } from 'lucide-react';
 import Link from 'next/link';
+
+const SCALE_ANIMATION_DELAY = 0.5;
+const SCROLL_ANIMATION_DELAY = 1;
+const MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION = 200;
 
 export default function PostPreview({
   tag,
@@ -14,94 +14,92 @@ export default function PostPreview({
   tag: string | null;
   post: PostProps;
 }) {
-  const { data: stat } = useQuery({
-    queryKey: ['posts', post.slug, 'stats'],
-    queryFn: () => fetchPostStat(post.slug).then(stat => stat.toProps()),
-  });
+  const { id, title, plainText, tags } = post;
+  const isScrollAnimationEnabled =
+    plainText.length >= MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION;
 
   return (
-    <div className='w-full py-8 border-b border-b-gray-200 text-gray-900 group'>
-      <Link
-        href={`/posts/${post.slug}${tag ? `?tag=${tag}` : ''}`}
-        className='text-gray-900'
-      >
-        <Title {...post} />
-        <Content {...post} />
-      </Link>
-
-      <Tags {...post} />
-      <Info {...post} {...stat} />
-    </div>
-  );
-}
-
-function Title({ title }: { title: string }) {
-  return (
-    <div className='text-2xl font-semibold mb-4 line-clamp-2'>{title}</div>
-  );
-}
-
-function Content({ plainText }: { plainText: string }) {
-  return (
-    <div className='relative mb-4 h-18'>
+    <div
+      className='relative flex flex-col group mb-8'
+      style={{
+        '--scale-delay': `${SCALE_ANIMATION_DELAY}s`,
+        '--scroll-delay': `${SCROLL_ANIMATION_DELAY}s`,
+      }}
+    >
       <div
         className={clsx(
-          'absolute left-0 top-0 leading-6',
-          'transition-transform|discrete duration-300 ease-in-out',
-          'scale-[1] w-[calc(100%)] group-hover:scale-[1.2] group-hover:w-[calc(100%/1.2)] origin-top-left',
-          'h-18 line-clamp-3 group-hover:h-30 group-hover:line-clamp-5'
+          'absolute -inset-x-6 -inset-y-4 -z-50 rounded-xl bg-gray-100/50',
+          'transition-opacity|transform duration-300 ease-in-out',
+          'scale-90 group-hover:scale-100 origin-center',
+          'opacity-0 group-hover:opacity-100'
         )}
+      />
+
+      <Link
+        href={`/posts/${id}${tag ? `?tag=${tag}` : ''}`}
+        className='w-full flex flex-col gap-4 text-gray-900'
       >
-        {plainText}
-      </div>
-    </div>
-  );
-}
+        <div className='text-2xl font-semibold line-clamp-2'>{title}</div>
+        <div className='whitespace-pre-wrap break-keep wrap-anywhere'>
+          {isScrollAnimationEnabled ? (
+            <div className='relative h-18'>
+              <div
+                className={clsx(
+                  'absolute inset-x-0 top-0',
+                  'h-18 line-clamp-3 group-hover:h-(--extended-height) group-hover:line-clamp-9999',
+                  'transition-discrete ease-in-out duration-300 group-hover:duration-(--scale-delay)',
+                  'delay-0 group-hover:delay-(--scale-delay)'
+                )}
+                style={{
+                  '--extended-height': tags.length > 0 ? '9rem' : '7rem',
+                }}
+              >
+                <div className='group-hover:hidden'>{plainText}</div>
+                <div
+                  className={clsx(
+                    'text-transparent group-hover:text-gray-900 absolute inset-x-0 top-0',
+                    'transition-transform ease-linear duration-[0] group-hover:duration-(--scroll-duration)',
+                    'delay-0 group-hover:delay-(--scroll-delay) group-hover:translate-y-[calc(-100%+9rem)]'
+                  )}
+                  style={{
+                    '--scroll-duration': `${plainText.length / 50}s`,
+                  }}
+                >
+                  {plainText}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className='max-h-18 overflow-hidden'>{plainText}</div>
+          )}
+        </div>
 
-function Tags({ tags }: { tags: string[] }) {
-  return (
-    <div
-      className={clsx(
-        'flex flex-wrap gap-2 mb-4',
-        'transition-opacity duration-300 ease-in-out',
-        'group-hover:opacity-0 group-hover:pointer-events-none'
-      )}
-    >
-      {tags.map(tag => (
-        <Link
-          href={`/posts?tag=${tag}`}
-          key={tag}
-          className='text-xs px-2 py-1 flex-shrink-0 border border-gray-300 rounded-full hover:text-blue-500 hover:border-blue-200'
+        <div
+          className={clsx(
+            'flex flex-col gap-4',
+            isScrollAnimationEnabled &&
+              'transition-opacity duration-300 ease-in-out delay-0 group-hover:delay-(--scale-delay) group-hover:opacity-0'
+          )}
         >
-          {tag}
-        </Link>
-      ))}
-    </div>
-  );
-}
+          {tags.length > 0 && (
+            <div className='w-full flex overflow-x-auto scrollbar-hide gap-2'>
+              {tags.map((tag, index) => (
+                <div
+                  key={tag}
+                  className={clsx(
+                    'text-xs px-2 py-1 border border-gray-300 rounded-full whitespace-nowrap',
+                    index >= 3 && 'max-w-20 text-ellipsis overflow-clip'
+                  )}
+                >
+                  {tag}
+                </div>
+              ))}
+            </div>
+          )}
 
-function Info({
-  date,
-  likeCount = 0,
-  viewCount = 0,
-}: {
-  date: string;
-  likeCount?: number;
-  viewCount?: number;
-}) {
-  return (
-    <div
-      className={clsx(
-        'flex gap-4 items-center text-xs text-gray-500',
-        'group-hover:opacity-0 transition-opacity duration-300 ease-in-out'
-      )}
-    >
-      <div>{date}</div>
-      <div className='flex items-center gap-1'>
-        <Heart className='w-3 h-3 fill-gray-500' />
-        <span>{likeCount}</span>
-      </div>
-      <div>{`조회 ${viewCount}`}</div>
+          <PostInfo {...post} />
+        </div>
+      </Link>
     </div>
   );
 }

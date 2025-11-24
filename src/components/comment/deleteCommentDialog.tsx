@@ -6,25 +6,24 @@ import {
   DialogContent,
   DialogDescription,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
-import * as CommentService from '@/features/comment/domain/service/commentService';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import useComments from '@/features/comment/hooks/useComments';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
-import { ReactNode, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
 export default function DeleteCommentDialog({
   postId,
   commentId,
-  children,
+  isOpen,
+  setIsOpen,
 }: {
   postId: string;
   commentId: number;
-  children: ReactNode;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
   const [password, setPassword] = useState('');
   const [isPasswordValid, setIsPasswordValid] = useState(true);
 
@@ -35,27 +34,16 @@ export default function DeleteCommentDialog({
     }
   }, [isOpen]);
 
-  const queryClient = useQueryClient();
-
-  const deleteComment = useMutation({
-    mutationKey: ['posts', postId, 'comments', commentId],
-    mutationFn: ({
-      postId,
-      commentId,
-      password,
-    }: {
-      postId: string;
-      commentId: number;
-      password: string;
-    }) => CommentService.deleteComment(postId, commentId, password),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['posts', postId, 'comments'],
+  const { deleteCommentMutation } = useComments({ postId });
+  const deleteComment = useCallback(
+    (params: { postId: string; commentId: number; password: string }) => {
+      deleteCommentMutation.mutate(params, {
+        onSuccess: () => setIsOpen(false),
+        onError: error => toast.error(error.message),
       });
-      setIsOpen(false);
     },
-    onError: error => toast.error(error.message),
-  });
+    [deleteCommentMutation, setIsOpen]
+  );
 
   const handleDelete = () => {
     if (!password.trim()) {
@@ -63,12 +51,11 @@ export default function DeleteCommentDialog({
       return;
     }
 
-    deleteComment.mutate({ postId, commentId, password: password.trim() });
+    deleteComment({ postId, commentId, password });
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent showCloseButton={false} className='gap-0 rounded-sm'>
         <DialogTitle className='sr-only'>{'댓글 삭제 다이어로그'}</DialogTitle>
         <DialogDescription className='sr-only'>
@@ -98,11 +85,11 @@ export default function DeleteCommentDialog({
           <button
             className={clsx(
               'flex justify-center items-center px-6 h-10 rounded-sm font-bold text-white hover:bg-red-400',
-              deleteComment.isPending ? 'bg-red-400' : 'bg-red-600'
+              deleteCommentMutation.isPending ? 'bg-red-400' : 'bg-red-600'
             )}
             onClick={handleDelete}
           >
-            {deleteComment.isPending ? (
+            {deleteCommentMutation.isPending ? (
               <Loader2 size={18} strokeWidth={3} className='animate-spin' />
             ) : (
               '삭제'

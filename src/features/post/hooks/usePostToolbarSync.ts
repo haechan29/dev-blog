@@ -1,7 +1,11 @@
 'use client';
 
 import { PostProps } from '@/features/post/ui/postProps';
-import { setHeadings, setTag, setTitle } from '@/lib/redux/postToolbarSlice';
+import {
+  setHeadings,
+  setTag,
+  setTitle,
+} from '@/lib/redux/post/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
