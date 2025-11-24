@@ -1,5 +1,3 @@
-import { isServer } from '@tanstack/react-query';
-
 export const api = {
   get: (url: string, options?: RequestInit) =>
     fetchWithErrorHandling(url, options),
@@ -33,17 +31,7 @@ export const api = {
 };
 
 async function fetchWithErrorHandling(url: string, options?: RequestInit) {
-  const baseUrl = isServer
-    ? process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3000'
-    : '';
-
-  if (baseUrl === undefined) {
-    throw new Error('base url을 읽어오지 못했습니다.');
-  }
-
-  const response = await fetch(baseUrl + url, options);
+  const response = await fetch(url, options);
 
   if (!response.ok) {
     const errorData = await response.json();

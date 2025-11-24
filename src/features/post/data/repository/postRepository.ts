@@ -1,26 +1,25 @@
 import { PostResponseDto } from '@/features/post/data/dto/postResponseDto';
 import { toData } from '@/features/post/data/mapper/postMapper';
-import { getPostsFromDB } from '@/features/post/data/queries/postQueries';
+import {
+  getPostFromDB,
+  getPostsFromDB,
+} from '@/features/post/data/queries/postQueries';
 import { api } from '@/lib/api';
 import { Post } from '@/types/env';
 import { isServer } from '@tanstack/react-query';
 
 export async function fetchPosts(): Promise<PostResponseDto[]> {
-  let posts: Post[];
-
-  if (isServer) {
-    posts = await getPostsFromDB();
-  } else {
-    const response = await api.get(`/api/posts`);
-    posts = response.data;
-  }
-
+  const posts: Post[] = isServer
+    ? await getPostsFromDB()
+    : await api.get(`/api/posts`).then(response => response.data);
   return posts.map(toData);
 }
 
 export async function fetchPost(postId: string): Promise<PostResponseDto> {
-  const response = await api.get(`/api/posts/${postId}`);
-  const post = response.data as Post;
+  const post = isServer
+    ? await getPostFromDB(postId)
+    : await api.get(`/api/posts/${postId}`).then(response => response.data);
+
   return toData(post);
 }
 

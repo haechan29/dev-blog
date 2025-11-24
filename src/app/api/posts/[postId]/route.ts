@@ -1,3 +1,7 @@
+import {
+  getPostFromDB,
+  PostNotFoundError,
+} from '@/features/post/data/queries/postQueries';
 import { supabase } from '@/lib/supabase';
 import { Post } from '@/types/env';
 import bcrypt from 'bcryptjs';
@@ -9,26 +13,15 @@ export async function GET(
 ) {
   try {
     const { postId } = await params;
-
-    const { data, error } = await supabase
-      .from('posts')
-      .select('*')
-      .eq('id', postId)
-      .maybeSingle();
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    if (!data) {
-      return NextResponse.json(
-        { error: `게시글이 존재하지 않습니다. postId: ${postId}` },
-        { status: 404 }
-      );
-    }
-
+    const data = await getPostFromDB(postId);
     return NextResponse.json({ data });
-  } catch {
+  } catch (error) {
+    console.error('게시글 조회 실패:', error);
+
+    if (error instanceof PostNotFoundError) {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
+
     return NextResponse.json(
       { error: '게시글 조회 요청이 실패했습니다.' },
       { status: 500 }
