@@ -13,20 +13,23 @@ import { Middleware } from '@reduxjs/toolkit';
 
 const middlewares: Middleware[] = [postViewerMiddleware];
 
-export const store = configureStore({
-  reducer: {
-    postReader: postReaderReducer,
-    postToolbar: postToolbarReducer,
-    postSidebar: postSidebarReducer,
-    postViewer: postViewerReducer,
-    writePost: writePostReducer,
-    writePostForm: writePostFormReducer,
-    contentToolbar: contentToolbarReducer,
-    bgmController: bgmControllerReducer,
-  },
-  middleware: getDefaultMiddleware =>
-    getDefaultMiddleware().concat(middlewares),
-});
+export const makeStore = () => {
+  return configureStore({
+    reducer: {
+      postReader: postReaderReducer,
+      postToolbar: postToolbarReducer,
+      postSidebar: postSidebarReducer,
+      postViewer: postViewerReducer,
+      writePost: writePostReducer,
+      writePostForm: writePostFormReducer,
+      contentToolbar: contentToolbarReducer,
+      bgmController: bgmControllerReducer,
+    },
+    middleware: getDefaultMiddleware =>
+      getDefaultMiddleware().concat(middlewares),
+  });
+};
 
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
+export type AppStore = ReturnType<typeof makeStore>;
+export type RootState = ReturnType<AppStore['getState']>;
+export type AppDispatch = AppStore['dispatch'];
