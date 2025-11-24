@@ -1,30 +1,26 @@
 import { Content } from '@/features/write/domain/types/content';
-import useWritePost from '@/features/write/hooks/useWritePost';
 import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import useDebounce from '@/hooks/useDebounce';
 import { processMd } from '@/lib/md/md';
-import { AppDispatch } from '@/lib/redux/store';
+import { AppDispatch, RootState } from '@/lib/redux/store';
 import { setIsParseError } from '@/lib/redux/write/writePostFormSlice';
 import clsx from 'clsx';
 import { useCallback, useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function WritePostContentPreview() {
   const dispatch = useDispatch<AppDispatch>();
   const debounce = useDebounce();
+  const {
+    contentEditorStatus: { cursorPosition, cursorOffset },
+  } = useSelector((state: RootState) => state.writePost);
 
   const {
     writePostForm: {
       content: { value: content },
     },
   } = useWritePostForm();
-
-  const {
-    writePost: {
-      contentEditorStatus: { cursorPosition, cursorOffset },
-    },
-  } = useWritePost();
 
   const [parsedContent, setParsedContent] = useState<Content>({
     status: 'idle',

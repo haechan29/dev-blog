@@ -1,14 +1,16 @@
 'use client';
 
 import { PostProps } from '@/features/post/ui/postProps';
-import useWritePost from '@/features/write/hooks/useWritePost';
+import { writePostSteps } from '@/features/write/constants/writePostStep';
+import { validate } from '@/features/write/domain/model/writePostForm';
 import useWritePostToolbar from '@/features/write/hooks/useWritePostToolbar';
-import { AppDispatch } from '@/lib/redux/store';
+import { AppDispatch, RootState } from '@/lib/redux/store';
 import { setInvalidField } from '@/lib/redux/write/writePostFormSlice';
 import clsx from 'clsx';
 import { ChevronRight } from 'lucide-react';
-import { Fragment, useCallback } from 'react';
-import { useDispatch } from 'react-redux';
+import { useRouter } from 'next/navigation';
+import { Fragment, useCallback, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function WritePostToolbar({
   publishPost,
@@ -18,7 +20,27 @@ export default function WritePostToolbar({
   removeDraft: () => void;
 }) {
   const dispatch = useDispatch<AppDispatch>();
-  const { getInvalidField } = useWritePost();
+  const router = useRouter();
+  const { currentStepId } = useSelector((state: RootState) => state.writePost);
+  const writePost = useSelector((state: RootState) => state.writePost);
+  const writePostForm = useSelector((state: RootState) => state.writePostForm);
+
+  const getInvalidField = useCallback(() => {
+    const currentStep = writePostSteps[currentStepId];
+    return (
+      currentStep.fields.find(field => !validate(writePostForm, field)) ?? null
+    );
+  }, [currentStepId, writePostForm]);
+
+  useEffect(() => {
+    for (const step of Object.values(writePostSteps)) {
+      if (writePost.currentStepId === step.id) break;
+      const isValid = validate(writePostForm, ...step.fields);
+      if (!isValid) {
+        router.push(`/write?step=${step.id}`);
+      }
+    }
+  }, [router, writePost.currentStepId, writePostForm]);
 
   const {
     writePostToolbar: { toolbarTexts, actionButtonText },
