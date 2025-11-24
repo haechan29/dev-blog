@@ -3,17 +3,29 @@
 import CommentFormItem from '@/components/comment/commentFormItem';
 import CommentItem from '@/components/comment/commentItem';
 import useComments from '@/features/comment/hooks/useComments';
-import useCommentsTracker from '@/features/comment/hooks/useCommentsTracker';
+import { setAreCommentsVisible } from '@/lib/redux/post/postViewerSlice';
+import { AppDispatch } from '@/lib/redux/store';
 import { MessageCircle } from 'lucide-react';
-import { useRef } from 'react';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 
 export default function CommentsClient({ postId }: { postId: string }) {
+  const dispatch = useDispatch<AppDispatch>();
   const { comments } = useComments({ postId });
-  const commentsRef = useRef<HTMLDivElement | null>(null);
-  useCommentsTracker({ commentsRef });
+
+  useEffect(() => {
+    const commentsObserver = new IntersectionObserver(entries =>
+      dispatch(setAreCommentsVisible(entries[0].isIntersecting))
+    );
+    const comments = document.querySelector('[data-post-comments]');
+    if (comments) {
+      commentsObserver.observe(comments);
+    }
+    return () => commentsObserver.disconnect();
+  }, [dispatch]);
 
   return (
-    <div ref={commentsRef}>
+    <div data-post-comments>
       <div className='text-xl font-bold text-gray-900 mb-8'>
         {`댓글 ${comments.length}개`}
       </div>

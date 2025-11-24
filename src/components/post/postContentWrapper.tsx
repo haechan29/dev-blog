@@ -3,13 +3,13 @@
 import TableOfContentsItem from '@/components/post/tableOfContentsItem';
 import PostViewer from '@/components/postViewer/postViewer';
 import Heading from '@/features/post/domain/model/heading';
-import useContentTracker from '@/features/post/hooks/useContentTracker';
 import usePostReader from '@/features/post/hooks/usePostReader';
 import { PostProps } from '@/features/post/ui/postProps';
 import useThrottle from '@/hooks/useThrottle';
 import { setCurrentHeading } from '@/lib/redux/post/postReaderSlice';
+import { setIsContentVisible } from '@/lib/redux/post/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function PostContentWrapper({
@@ -22,12 +22,31 @@ export default function PostContentWrapper({
   raw: ReactNode;
 }) {
   const dispatch = useDispatch<AppDispatch>();
+  const isInitialMount = useRef(true);
   const throttle = useThrottle();
   const {
     postReader: { mode, isTableVisible },
   } = usePostReader();
 
-  useContentTracker();
+  useEffect(() => {
+    const postContent = document.querySelector('[data-post-content]');
+    if (!postContent) return;
+
+    const postContentObserver = new IntersectionObserver(
+      entries => {
+        if (isInitialMount.current) {
+          isInitialMount.current = false;
+          return;
+        }
+        dispatch(setIsContentVisible(entries[0].isIntersecting));
+      },
+      {
+        rootMargin: '10% 0px -90% 0px',
+      }
+    );
+    postContentObserver.observe(postContent);
+    return () => postContentObserver.disconnect();
+  }, [dispatch]);
 
   useEffect(() => {
     const updateHeading = () => {
