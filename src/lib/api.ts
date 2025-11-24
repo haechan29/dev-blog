@@ -33,7 +33,11 @@ export const api = {
 };
 
 async function fetchWithErrorHandling(url: string, options?: RequestInit) {
-  const baseUrl = isServer ? process.env.NEXT_PUBLIC_URL : '';
+  const baseUrl = isServer
+    ? process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : 'http://localhost:3000'
+    : '';
 
   if (baseUrl === undefined) {
     throw new Error('base url을 읽어오지 못했습니다.');
