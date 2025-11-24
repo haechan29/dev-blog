@@ -36,7 +36,7 @@ export default function useWritePostToolbar({
         try {
           nProgress.start();
           const post = await publishPost();
-          navigate({ pathname: `/posts/${post.id}` });
+          navigate({ pathname: `/read/${post.id}` });
           removeDraft();
         } catch (error) {
           const errorMessage =

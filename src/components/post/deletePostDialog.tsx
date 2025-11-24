@@ -39,7 +39,7 @@ export default function DeletePostDialog({
       try {
         await PostClientService.deletePost(postId, password);
         setIsOpen(false);
-        router.push('/posts');
+        router.push('/');
         toast.success('게시글이 삭제되었습니다');
       } catch (error) {
         const errorMessage =

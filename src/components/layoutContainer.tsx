@@ -16,9 +16,9 @@ export default function LayoutContainer({
   children: ReactNode;
 }) {
   const pathname = usePathname();
-  const isEditPage = pathname.includes('/edit');
-
-  if (isEditPage) return children;
+  if (pathname.includes('/write') || pathname.includes('/edit')) {
+    return children;
+  }
 
   return (
     <>
