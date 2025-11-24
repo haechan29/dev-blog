@@ -15,7 +15,7 @@ import { scrollIntoElement } from '@/lib/scroll';
 import { cn } from '@/lib/utils';
 import clsx from 'clsx';
 import { ChevronDown, ChevronRight, Menu } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function PostToolbar({ className }: { className?: string }) {
@@ -23,6 +23,7 @@ export default function PostToolbar({ className }: { className?: string }) {
   const postToolbar = usePostToolbar();
   const lastScrollYRef = useRef(0);
   const throttle = useThrottle();
+  const [isMounted, setIsMounted] = useState(false);
 
   const breadcrumb = useMemo(() => {
     return postToolbar.mode === 'basic' ||
@@ -78,32 +79,36 @@ export default function PostToolbar({ className }: { className?: string }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [dispatch, postToolbar.mode, throttle]);
 
-  return (
-    <div
-      className={cn(
-        'fixed top-0 z-40 w-full flex flex-col bg-white/80 backdrop-blur-md',
-        'py-2 md:py-3 px-4 md:px-4',
-        'xl:ml-(--sidebar-width) block xl:hidden',
-        'transition-transform duration-300 ease-in-out',
-        postToolbar.isVisible ? 'translate-y-0' : '-translate-y-full',
-        className
-      )}
-    >
-      <Breadcrumb breadcrumb={breadcrumb} />
+  useEffect(() => setIsMounted(true), []);
 
-      <div className='flex gap-2 md:gap-3 w-full items-start'>
-        <button
-          onClick={() => {
-            dispatch(setIsVisible(true));
-          }}
-          className='xl:hidden shrink-0 p-2 -m-2 items-center justify-center'
-        >
-          <Menu className='w-6 h-6 text-gray-500' />
-        </button>
-        <Content postToolbar={postToolbar} onClick={onContentClick} />
-        <ExpandButton mode={postToolbar.mode} onClick={onExpandButtonClick} />
+  return (
+    isMounted && (
+      <div
+        className={cn(
+          'fixed top-0 z-40 w-full flex flex-col bg-white/80 backdrop-blur-md',
+          'py-2 md:py-3 px-4 md:px-4',
+          'xl:ml-(--sidebar-width) block xl:hidden',
+          'transition-transform duration-300 ease-in-out',
+          postToolbar.isVisible ? 'translate-y-0' : '-translate-y-full',
+          className
+        )}
+      >
+        <Breadcrumb breadcrumb={breadcrumb} />
+
+        <div className='flex gap-2 md:gap-3 w-full items-start'>
+          <button
+            onClick={() => {
+              dispatch(setIsVisible(true));
+            }}
+            className='xl:hidden shrink-0 p-2 -m-2 items-center justify-center'
+          >
+            <Menu className='w-6 h-6 text-gray-500' />
+          </button>
+          <Content postToolbar={postToolbar} onClick={onContentClick} />
+          <ExpandButton mode={postToolbar.mode} onClick={onExpandButtonClick} />
+        </div>
       </div>
-    </div>
+    )
   );
 }
 
