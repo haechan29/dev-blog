@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import { Heart } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 
-export default function LikeButtonItem({ postId }: { postId: string }) {
+export default function LikeButton({ postId }: { postId: string }) {
   const [heartFilled, setHeartFilled] = useState(false);
   const throttle = useThrottle();
 

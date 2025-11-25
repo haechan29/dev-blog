@@ -1,7 +1,7 @@
 'use client';
 
-import * as CommentService from '@/features/comment/domain/service/commentService';
-import { getComments } from '@/features/comment/domain/service/commentService';
+import * as CommentClientService from '@/features/comment/domain/service/commentClientService';
+import { getComments } from '@/features/comment/domain/service/commentClientService';
 import {
   useMutation,
   useQueryClient,
@@ -25,7 +25,7 @@ export default function useComments({ postId }: { postId: string }) {
       authorName: string;
       content: string;
       password: string;
-    }) => CommentService.createComment(params),
+    }) => CommentClientService.createComment(params),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['posts', postId, 'comments'],
@@ -42,7 +42,7 @@ export default function useComments({ postId }: { postId: string }) {
       postId: string;
       commentId: number;
       password: string;
-    }) => CommentService.deleteComment(postId, commentId, password),
+    }) => CommentClientService.deleteComment(postId, commentId, password),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['posts', postId, 'comments'],

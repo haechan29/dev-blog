@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import Comments from '@/components/comment/comments';
-import LikeButtonItem from '@/components/post/likeButtonItem';
+import LikeButton from '@/components/post/likeButton';
 import PostContentWrapper from '@/components/post/postContentWrapper';
 import PostHeader from '@/components/post/postHeader';
 import PostPageClient from '@/components/post/postPageClient';
@@ -36,7 +36,7 @@ export default async function PostPage({
       />
 
       <Suspense>
-        <LikeButtonItem postId={post.id} />
+        <LikeButton postId={post.id} />
         <Comments {...post} />
       </Suspense>
     </>

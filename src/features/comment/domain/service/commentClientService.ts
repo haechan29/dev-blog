@@ -1,9 +1,9 @@
-import * as CommentRepository from '@/features/comment/data/repository/commentRepository';
+import * as CommentClientRepository from '@/features/comment/data/repository/commentClientRepository';
 import { toDomain } from '@/features/comment/domain/mapper/commentMapper';
 import { Comment } from '@/features/comment/domain/model/comment';
 
 export async function getComments(postId: string): Promise<Comment[]> {
-  const comments = await CommentRepository.getComments(postId);
+  const comments = await CommentClientRepository.getComments(postId);
   return comments
     .map(comment => toDomain(comment))
     .sort((a: Comment, b: Comment) => {
@@ -19,7 +19,7 @@ export async function createComment(params: {
   content: string;
   password: string;
 }): Promise<Comment> {
-  const comment = await CommentRepository.createComment(params);
+  const comment = await CommentClientRepository.createComment(params);
   return toDomain(comment);
 }
 
@@ -29,7 +29,7 @@ export async function updateComment(params: {
   content: string;
   password: string;
 }): Promise<Comment> {
-  const comment = await CommentRepository.updateComment(params);
+  const comment = await CommentClientRepository.updateComment(params);
   return toDomain(comment);
 }
 
@@ -38,14 +38,17 @@ export async function deleteComment(
   commentId: number,
   password: string
 ): Promise<void> {
-  await CommentRepository.deleteComment(postId, commentId, password);
+  await CommentClientRepository.deleteComment(postId, commentId, password);
 }
 
 export async function incrementLikeCount(
   postId: string,
   commentId: number
 ): Promise<Comment> {
-  const dto = await CommentRepository.incrementLikeCount(postId, commentId);
+  const dto = await CommentClientRepository.incrementLikeCount(
+    postId,
+    commentId
+  );
   return toDomain(dto);
 }
 
@@ -53,6 +56,9 @@ export async function decrementLikeCount(
   postId: string,
   commentId: number
 ): Promise<Comment> {
-  const dto = await CommentRepository.decrementLikeCount(postId, commentId);
+  const dto = await CommentClientRepository.decrementLikeCount(
+    postId,
+    commentId
+  );
   return toDomain(dto);
 }
