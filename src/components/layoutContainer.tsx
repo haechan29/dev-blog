@@ -16,14 +16,21 @@ export default function LayoutContainer({
   children: ReactNode;
 }) {
   const pathname = usePathname();
-  if (pathname.includes('/write') || pathname.includes('/edit')) {
-    return children;
-  }
+  const isPostsPage = pathname === '/';
+  const isPostPage = pathname.match(/^\/read\/[^/]+$/);
+
+  if (!isPostsPage && !isPostPage) return children;
 
   return (
     <>
       <Suspense>
-        <ToolbarContainer />
+        {isPostsPage && <PostsToolbar />}
+        {isPostPage && (
+          <>
+            <PostsToolbar className='max-xl:hidden' />
+            <PostToolbar className='xl:hidden' />
+          </>
+        )}
         <PostSidebar posts={posts} />
       </Suspense>
 
@@ -38,21 +45,4 @@ export default function LayoutContainer({
       </div>
     </>
   );
-}
-
-function ToolbarContainer() {
-  const pathname = usePathname();
-
-  if (pathname === '/') {
-    return <PostsToolbar />;
-  } else if (pathname.match(/^\/read\/[^/]+$/)) {
-    return (
-      <>
-        <PostsToolbar className='max-xl:hidden' />
-        <PostToolbar className='xl:hidden' />
-      </>
-    );
-  } else {
-    return null;
-  }
 }
