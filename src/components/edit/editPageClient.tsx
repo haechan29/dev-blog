@@ -4,10 +4,9 @@ import QueryParamsValidator from '@/components/queryParamsValidator';
 import RestoreDraftDialog from '@/components/write/restoreDraftDialog';
 import WritePostForm from '@/components/write/writePostForm';
 import WritePostToolbar from '@/components/write/writePostToolbar';
-import { PostProps } from '@/features/post/ui/postProps';
+import { createProps, PostProps } from '@/features/post/ui/postProps';
 import { writePostSteps } from '@/features/write/constants/writePostStep';
 import useAutoSave from '@/features/write/hooks/useAutoSave';
-import useWritePost from '@/features/write/hooks/useWritePost';
 import { AppDispatch } from '@/lib/redux/store';
 import {
   setContent,
@@ -18,6 +17,11 @@ import { setCurrentStepId } from '@/lib/redux/write/writePostSlice';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
+
+import * as PostClientService from '@/features/post/domain/service/postClientService';
+import { RootState } from '@/lib/redux/store';
+import { useCallback } from 'react';
+import { useSelector } from 'react-redux';
 
 export default function EditPageClient({ post }: { post: PostProps }) {
   return (
@@ -37,9 +41,24 @@ function EditPageWithValidation({ post }: { post: PostProps }) {
   const searchParams = useSearchParams();
   const step = searchParams.get('step') as keyof typeof writePostSteps;
   const dispatch = useDispatch<AppDispatch>();
-  const { updatePost } = useWritePost();
+  const writePostForm = useSelector((state: RootState) => state.writePostForm);
   const { draft, removeDraft } = useAutoSave(post.id);
   const [isOpen, setIsOpen] = useState(false);
+
+  const updatePost = useCallback(
+    async (postId: string) => {
+      const { title, content, tags, password } = writePostForm;
+      const post = await PostClientService.updatePost({
+        postId,
+        title: title.value,
+        content: content.value,
+        tags: tags.value,
+        password: password.value,
+      });
+      return createProps(post);
+    },
+    [writePostForm]
+  );
 
   useEffect(() => {
     dispatch(setCurrentStepId(step));

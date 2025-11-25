@@ -1,7 +1,7 @@
 'use client';
 
 import CommentLikeButton from '@/components/comment/commentLikeButton';
-import { updateComment } from '@/features/comment/domain/service/commentService';
+import { updateComment } from '@/features/comment/domain/service/commentClientService';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';

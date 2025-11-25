@@ -1,12 +1,11 @@
 'use client';
 
 import Heading from '@/features/post/domain/model/heading';
-import usePostReader from '@/features/post/hooks/usePostReader';
 import { setCurrentHeading } from '@/lib/redux/post/postReaderSlice';
-import { AppDispatch } from '@/lib/redux/store';
+import { AppDispatch, RootState } from '@/lib/redux/store';
 import { scrollIntoElement } from '@/lib/scroll';
 import clsx from 'clsx';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function TableOfContentsItem({
   headings,
@@ -14,9 +13,9 @@ export default function TableOfContentsItem({
   headings: Heading[];
 }) {
   const dispatch = useDispatch<AppDispatch>();
-  const {
-    postReader: { currentHeading },
-  } = usePostReader();
+  const { currentHeading } = useSelector(
+    (state: RootState) => state.postReader
+  );
 
   const handleClick = (heading: Heading) => {
     const postContent = document.querySelector('[data-post-content]');

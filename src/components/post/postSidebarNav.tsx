@@ -35,7 +35,7 @@ function NavCategory({ tag, count }: { tag: string; count: number }) {
   const currentPostId = params.postId as string | undefined;
 
   const categoryUrl = useMemo(() => {
-    let categoryUrl = '/posts';
+    let categoryUrl = '/read';
     if (currentPostId) categoryUrl += `/${currentPostId}`;
     if (currentPostId || currentTag !== tag) categoryUrl += `?tag=${tag}`;
     return categoryUrl;
@@ -119,7 +119,7 @@ function getTagCounts(posts: PostProps[]) {
 }
 
 function getPostUrl(tag: string | null, post: PostProps) {
-  let postUrl = `/posts/${post.id}`;
+  let postUrl = `/read/${post.id}`;
   if (tag) postUrl += `?tag=${tag}`;
   return postUrl;
 }

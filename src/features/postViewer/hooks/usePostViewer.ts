@@ -1,8 +1,7 @@
 'use client';
 
-import PostViewerProps, {
-  createProps,
-} from '@/features/postViewer/ui/postViewerProps';
+import { PostViewer } from '@/features/postViewer/domain/model/postViewer';
+import PostViewerProps from '@/features/postViewer/ui/postViewerProps';
 import { RootState } from '@/lib/redux/store';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -19,4 +18,32 @@ export default function usePostViewer() {
   }, [postViewer]);
 
   return postViewerProps;
+}
+
+function createProps({
+  postViewer,
+}: {
+  postViewer: PostViewer;
+}): PostViewerProps {
+  return {
+    isButtonVisible: !postViewer.areCommentsVisible && !postViewer.isViewerMode,
+    areBarsVisible:
+      postViewer.isMouseOnToolbar ||
+      postViewer.isMouseOnControlBar ||
+      postViewer.isMouseMoved ||
+      postViewer.isToolbarExpanded ||
+      postViewer.isTouched ||
+      postViewer.isToolbarTouched ||
+      postViewer.isControlBarTouched ||
+      postViewer.isRotationFinished,
+    pageNumber:
+      postViewer.currentPageIndex === null
+        ? null
+        : postViewer.currentPageIndex + 1,
+    totalPages: postViewer.pages.length + 1,
+    ...(postViewer.currentPageIndex !== null && {
+      page: postViewer.pages[postViewer.currentPageIndex],
+    }),
+    ...postViewer,
+  };
 }

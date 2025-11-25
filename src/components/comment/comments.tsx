@@ -1,5 +1,5 @@
 import CommentsClient from '@/components/comment/commentsClient';
-import { getComments } from '@/features/comment/domain/service/commentService';
+import * as CommentServerService from '@/features/comment/domain/service/commentServerService';
 import {
   dehydrate,
   HydrationBoundary,
@@ -14,7 +14,7 @@ export default async function Comments({ id: postId }: { id: string }) {
   await queryClient.prefetchQuery({
     queryKey: ['posts', postId, 'comments'],
     queryFn: async () => {
-      const comments = await getComments(postId);
+      const comments = await CommentServerService.getComments(postId);
       return comments.map(comment => comment.toProps());
     },
   });

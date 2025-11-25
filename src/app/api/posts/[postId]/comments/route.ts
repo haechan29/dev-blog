@@ -1,3 +1,5 @@
+import { getCommentsFromDB } from '@/features/comment/data/queries/commentQueries';
+import { PostNotFoundError } from '@/features/post/data/queries/postQueries';
 import { supabase } from '@/lib/supabase';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
@@ -6,28 +8,22 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ postId: string }> }
 ) {
-  const { postId } = await params;
+  try {
+    const { postId } = await params;
+    const data = getCommentsFromDB(postId);
+    return NextResponse.json({ data });
+  } catch (error) {
+    console.error('게시글 조회 실패:', error);
 
-  if (!postId) {
+    if (error instanceof PostNotFoundError) {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
+
     return NextResponse.json(
-      { error: 'post_id가 없어서 게시글 조회에 실패했습니다.' },
-      { status: 400 }
+      { error: '댓글 조회 요청이 실패했습니다.' },
+      { status: 500 }
     );
   }
-
-  const { data, error } = await supabase
-    .from('comments')
-    .select(
-      'id, post_id, author_name, content, created_at, updated_at, like_count'
-    )
-    .eq('post_id', postId)
-    .order('created_at', { ascending: true });
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  return NextResponse.json({ data });
 }
 
 export async function POST(

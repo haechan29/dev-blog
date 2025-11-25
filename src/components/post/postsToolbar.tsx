@@ -24,7 +24,7 @@ export default function PostsToolbar({ className }: { className?: string }) {
       <Link
         onClick={() => dispatch(setIsVisible(false))}
         className='p-2 -m-2'
-        href='/posts'
+        href='/'
       >
         <div className='text-2xl font-bold tracking-tight text-blue-500'>
           Haechan

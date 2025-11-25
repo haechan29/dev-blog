@@ -2,19 +2,35 @@
 
 import PostInfo from '@/components/post/postInfo';
 import PostSettingsDropdown from '@/components/post/postSettingsDropdown';
-import useHeaderTracker from '@/features/post/hooks/useHeaderTracker';
 import { PostProps } from '@/features/post/ui/postProps';
+import { setIsHeaderVisible } from '@/lib/redux/post/postToolbarSlice';
+import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { MoreVertical } from 'lucide-react';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux';
 
 export default function PostHeader({ post }: { post: PostProps }) {
+  const dispatch = useDispatch<AppDispatch>();
   const { title, tags } = post;
   const headerRef = useRef<HTMLDivElement | null>(null);
-  useHeaderTracker(headerRef);
+
+  useEffect(() => {
+    const headerObserver = new IntersectionObserver(
+      entries => dispatch(setIsHeaderVisible(entries[0].isIntersecting)),
+      {
+        rootMargin: '0px 0px -50% 0px',
+      }
+    );
+    const header = document.querySelector('[data-post-header]');
+    if (header) {
+      headerObserver.observe(header);
+    }
+    return () => headerObserver.disconnect();
+  }, [dispatch, headerRef]);
 
   return (
-    <div className='flex flex-col gap-6 mb-10'>
+    <div data-post-header className='flex flex-col gap-6 mb-10'>
       <div className='text-3xl font-bold line-clamp-2'>{title}</div>
 
       {tags.length > 0 && (

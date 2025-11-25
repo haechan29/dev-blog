@@ -36,7 +36,7 @@ export default function PostPreview({
       />
 
       <Link
-        href={`/posts/${id}${tag ? `?tag=${tag}` : ''}`}
+        href={`/read/${id}${tag ? `?tag=${tag}` : ''}`}
         className='w-full flex flex-col gap-4 text-gray-900'
       >
         <div className='text-2xl font-semibold line-clamp-2'>{title}</div>
