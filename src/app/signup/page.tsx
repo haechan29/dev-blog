@@ -4,9 +4,16 @@ import clsx from 'clsx';
 import Link from 'next/link';
 import { useState } from 'react';
 
+type NicknameError = 'length' | 'format' | 'duplicate' | null;
+const nicknameErrorMessages = {
+  length: '닉네임은 2-20자여야 합니다',
+  format: '한글, 영문, 숫자만 사용 가능합니다',
+  duplicate: '이미 사용 중인 닉네임입니다',
+} as const;
+
 export default function SignupPage() {
   const [nickname, setNickname] = useState('');
-  const [isNicknameValid, setIsNicknameValid] = useState(true);
+  const [nicknameError, setNicknameError] = useState<NicknameError>(null);
   const [isTermsValid, setIsTermsValid] = useState(true);
   const [isPrivacyValid, setIsPrivacyValid] = useState(true);
   const [termsAgreed, setTermsAgreed] = useState(false);
@@ -14,22 +21,35 @@ export default function SignupPage() {
 
   const handleSubmit = () => {
     if (nickname.trim().length < 2 || nickname.trim().length > 20) {
-      setIsNicknameValid(false);
+      setNicknameError('length');
+      setIsTermsValid(true);
+      setIsPrivacyValid(true);
+      return;
+    }
+
+    if (!/^[가-힣a-zA-Z0-9]+$/.test(nickname.trim())) {
+      setNicknameError('format');
+      setIsTermsValid(true);
+      setIsPrivacyValid(true);
+      return;
+    }
+
+    if (true) {
+      setNicknameError('duplicate');
       setIsTermsValid(true);
       setIsPrivacyValid(true);
       return;
     }
 
     if (!termsAgreed) {
-      setIsNicknameValid(true);
+      setNicknameError(null);
       setIsTermsValid(false);
       setIsPrivacyValid(true);
       return;
     }
 
-    // 3. 개인정보 처리방침 검사
     if (!privacyAgreed) {
-      setIsNicknameValid(true);
+      setNicknameError(null);
       setIsTermsValid(true);
       setIsPrivacyValid(false);
       return;
@@ -51,22 +71,28 @@ export default function SignupPage() {
             type='text'
             value={nickname}
             onChange={e => {
-              setIsNicknameValid(true);
+              setNicknameError(null);
               setNickname(e.target.value);
             }}
             placeholder='닉네임을 입력하세요'
             className={clsx(
               'w-full p-3 outline-none border rounded-lg',
-              isNicknameValid
-                ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
-                : 'border-red-400 animate-shake',
+              nicknameError
+                ? 'border-red-400 animate-shake'
+                : 'border-gray-200 hover:border-blue-500 focus:border-blue-500',
               nickname ? 'bg-white' : 'bg-gray-50'
             )}
             maxLength={20}
           />
-          <div className='text-sm text-gray-500 mt-1'>
-            2-20자, 한글/영문/숫자 사용 가능
-          </div>
+          {nicknameError ? (
+            <div className='text-sm text-red-500 mt-1'>
+              {nicknameErrorMessages[nicknameError]}
+            </div>
+          ) : (
+            <div className='text-sm text-gray-500 mt-1'>
+              2-20자, 한글/영문/숫자 사용 가능
+            </div>
+          )}
         </div>
 
         <div className='flex flex-col gap-3 mb-6'>
