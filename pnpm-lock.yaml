@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@auth/supabase-adapter':
+        specifier: ^1.11.1
+        version: 1.11.1(@supabase/supabase-js@2.84.0)
       '@radix-ui/react-dialog':
         specifier: ^1.1.15
         version: 1.1.15(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -209,6 +212,25 @@ packages:
         optional: true
       nodemailer:
         optional: true
+
+  '@auth/core@0.41.1':
+    resolution: {integrity: sha512-t9cJ2zNYAdWMacGRMT6+r4xr1uybIdmYa49calBPeTqwgAFPV/88ac9TEvCR85pvATiSPt8VaNf+Gt24JIT/uw==}
+    peerDependencies:
+      '@simplewebauthn/browser': ^9.0.1
+      '@simplewebauthn/server': ^9.0.2
+      nodemailer: ^7.0.7
+    peerDependenciesMeta:
+      '@simplewebauthn/browser':
+        optional: true
+      '@simplewebauthn/server':
+        optional: true
+      nodemailer:
+        optional: true
+
+  '@auth/supabase-adapter@1.11.1':
+    resolution: {integrity: sha512-Flsvg8TI4nNoqEWDqLqdO+xixY4jlzLPL3qqkjCxOMu/9AYGbDh409XFP9JdMy5Syu40iW1BcIWQ7DDJQiDgvQ==}
+    peerDependencies:
+      '@supabase/supabase-js': ^2.43.1
 
   '@babel/runtime@7.28.4':
     resolution: {integrity: sha512-Q/N6JNWvIvPnLDvjlE1OUBLPQHH6l3CltCEsHIujp45zQUSSh8K+gHnaEX45yAT1nyngnINhvWtzN+Nb9D8RAQ==}
@@ -3014,6 +3036,23 @@ snapshots:
       oauth4webapi: 3.8.3
       preact: 10.24.3
       preact-render-to-string: 6.5.11(preact@10.24.3)
+
+  '@auth/core@0.41.1':
+    dependencies:
+      '@panva/hkdf': 1.2.1
+      jose: 6.1.2
+      oauth4webapi: 3.8.3
+      preact: 10.24.3
+      preact-render-to-string: 6.5.11(preact@10.24.3)
+
+  '@auth/supabase-adapter@1.11.1(@supabase/supabase-js@2.84.0)':
+    dependencies:
+      '@auth/core': 0.41.1
+      '@supabase/supabase-js': 2.84.0
+    transitivePeerDependencies:
+      - '@simplewebauthn/browser'
+      - '@simplewebauthn/server'
+      - nodemailer
 
   '@babel/runtime@7.28.4': {}
 
