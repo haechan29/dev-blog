@@ -1,4 +1,4 @@
-import { PostNotFoundError } from '@/features/post/data/queries/postQueries';
+import { PostNotFoundError } from '@/features/post/data/errors/postNotFoundError';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 

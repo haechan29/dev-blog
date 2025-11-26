@@ -1,7 +1,5 @@
-import {
-  getPostFromDB,
-  PostNotFoundError,
-} from '@/features/post/data/queries/postQueries';
+import { PostNotFoundError } from '@/features/post/data/errors/postNotFoundError';
+import { getPostFromDB } from '@/features/post/data/queries/postQueries';
 import { Post } from '@/features/post/domain/types/post';
 import { supabase } from '@/lib/supabase';
 import bcrypt from 'bcryptjs';
