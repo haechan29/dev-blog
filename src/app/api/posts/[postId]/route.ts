@@ -1,5 +1,5 @@
 import { PostNotFoundError } from '@/features/post/data/errors/postNotFoundError';
-import { getPostFromDB } from '@/features/post/data/queries/postQueries';
+import { fetchPost } from '@/features/post/data/queries/postQueries';
 import { Post } from '@/features/post/domain/types/post';
 import { supabase } from '@/lib/supabase';
 import bcrypt from 'bcryptjs';
@@ -11,7 +11,7 @@ export async function GET(
 ) {
   try {
     const { postId } = await params;
-    const data = await getPostFromDB(postId);
+    const data = await fetchPost(postId);
     return NextResponse.json({ data });
   } catch (error) {
     console.error('게시글 조회 실패:', error);
