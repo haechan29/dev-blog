@@ -6,11 +6,18 @@ import { AppDispatch } from '@/lib/redux/store';
 import { cn } from '@/lib/utils';
 import clsx from 'clsx';
 import { Search } from 'lucide-react';
+import { Session } from 'next-auth';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function PostsToolbar({ className }: { className?: string }) {
+export default function PostsToolbar({
+  session,
+  className,
+}: {
+  session: Session | null;
+  className?: string;
+}) {
   const dispatch = useDispatch<AppDispatch>();
   const [query, setQuery] = useState('');
 
@@ -71,7 +78,7 @@ export default function PostsToolbar({ className }: { className?: string }) {
           <Search className='w-5 h-5' />
         </button>
 
-        <ProfileIcon />
+        <ProfileIcon session={session} />
       </div>
     </div>
   );
