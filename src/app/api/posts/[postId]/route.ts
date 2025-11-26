@@ -2,8 +2,8 @@ import {
   getPostFromDB,
   PostNotFoundError,
 } from '@/features/post/data/queries/postQueries';
+import { Post } from '@/features/post/domain/types/post';
 import { supabase } from '@/lib/supabase';
-import { Post } from '@/types/env';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 

@@ -1,6 +1,6 @@
 import { CommentResponseDto } from '@/features/comment/data/dto/commentResponseDto';
+import { Comment } from '@/features/comment/domain/types/comment';
 import { api } from '@/lib/api';
-import { Comment } from '@/types/env';
 
 export async function getComments(
   postId: string

@@ -4,7 +4,7 @@ import {
   getPostFromDB,
   getPostsFromDB,
 } from '@/features/post/data/queries/postQueries';
-import { Post } from '@/types/env';
+import { Post } from '@/features/post/domain/types/post';
 import 'server-only';
 
 export async function fetchPosts(): Promise<PostResponseDto[]> {

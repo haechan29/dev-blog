@@ -1,5 +1,5 @@
 import { CommentResponseDto } from '@/features/comment/data/dto/commentResponseDto';
-import { Comment } from '@/types/env';
+import { Comment } from '@/features/comment/domain/types/comment';
 
 export function toData(comment: Comment): CommentResponseDto {
   return {

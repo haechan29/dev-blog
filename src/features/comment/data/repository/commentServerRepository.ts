@@ -1,7 +1,7 @@
 import { CommentResponseDto } from '@/features/comment/data/dto/commentResponseDto';
 import { toData } from '@/features/comment/data/mapper/commentMapper';
 import { getCommentsFromDB } from '@/features/comment/data/queries/commentQueries';
-import { Comment } from '@/types/env';
+import { Comment } from '@/features/comment/domain/types/comment';
 import 'server-only';
 
 export async function getComments(

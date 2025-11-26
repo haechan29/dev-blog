@@ -1,7 +1,7 @@
 import { PostResponseDto } from '@/features/post/data/dto/postResponseDto';
 import { toData } from '@/features/post/data/mapper/postMapper';
+import { Post } from '@/features/post/domain/types/post';
 import { api } from '@/lib/api';
-import { Post } from '@/types/env';
 
 export async function createPost(requestDto: {
   title: string;

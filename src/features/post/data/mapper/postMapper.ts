@@ -1,5 +1,5 @@
 import { PostResponseDto } from '@/features/post/data/dto/postResponseDto';
-import { Post } from '@/types/env';
+import { Post } from '@/features/post/domain/types/post';
 
 export function toData(post: Post): PostResponseDto {
   return {
