@@ -1,8 +1,13 @@
 'use client';
 
+import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
+import * as UserClientService from '@/features/user/domain/service/userClientService';
 import clsx from 'clsx';
+import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 type NicknameError = 'length' | 'format' | 'duplicate' | null;
 const nicknameErrorMessages = {
@@ -12,14 +17,16 @@ const nicknameErrorMessages = {
 } as const;
 
 export default function SignupPage() {
+  const router = useRouter();
   const [nickname, setNickname] = useState('');
   const [nicknameError, setNicknameError] = useState<NicknameError>(null);
   const [isTermsValid, setIsTermsValid] = useState(true);
   const [isPrivacyValid, setIsPrivacyValid] = useState(true);
   const [termsAgreed, setTermsAgreed] = useState(false);
   const [privacyAgreed, setPrivacyAgreed] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (nickname.trim().length < 2 || nickname.trim().length > 20) {
       setNicknameError('length');
       setIsTermsValid(true);
@@ -29,13 +36,6 @@ export default function SignupPage() {
 
     if (!/^[가-힣a-zA-Z0-9]+$/.test(nickname.trim())) {
       setNicknameError('format');
-      setIsTermsValid(true);
-      setIsPrivacyValid(true);
-      return;
-    }
-
-    if (true) {
-      setNicknameError('duplicate');
       setIsTermsValid(true);
       setIsPrivacyValid(true);
       return;
@@ -55,8 +55,21 @@ export default function SignupPage() {
       return;
     }
 
-    // TODO: 회원가입 처리
-    console.log('회원가입:', { nickname, termsAgreed, privacyAgreed });
+    setIsSubmitting(true);
+    try {
+      await UserClientService.createUser({ nickname: nickname.trim() });
+      router.push('/');
+    } catch (error) {
+      if (error instanceof DuplicateNicknameError) {
+        setNicknameError('duplicate');
+        setIsTermsValid(true);
+        setIsPrivacyValid(true);
+      } else {
+        toast.error('회원가입에 실패했습니다');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -159,9 +172,14 @@ export default function SignupPage() {
 
         <button
           onClick={handleSubmit}
-          className='w-full h-12 font-bold text-white rounded-lg cursor-pointer bg-blue-600 hover:bg-blue-500'
+          disabled={isSubmitting}
+          className='w-full h-12 flex justify-center items-center font-bold text-white rounded-lg cursor-pointer bg-blue-600 hover:bg-blue-500'
         >
-          시작하기
+          {isSubmitting ? (
+            <Loader2 size={18} strokeWidth={3} className='animate-spin' />
+          ) : (
+            <div>시작하기</div>
+          )}
         </button>
       </div>
     </div>
