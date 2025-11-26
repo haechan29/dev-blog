@@ -1,5 +1,6 @@
 'use client';
 
+import ProfileIcon from '@/components/profile/profileIcon';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { cn } from '@/lib/utils';
@@ -56,7 +57,7 @@ export default function PostsToolbar({ className }: { className?: string }) {
           href={`/write?step=write`}
           className={clsx(
             'text-sm font-semibold py-2 px-4 rounded-full',
-            'bg-gray-200 hover:bg-gray-300'
+            'bg-gray-100 hover:bg-gray-200'
           )}
         >
           {'글 쓰기'}
@@ -69,6 +70,8 @@ export default function PostsToolbar({ className }: { className?: string }) {
         >
           <Search className='w-5 h-5' />
         </button>
+
+        <ProfileIcon />
       </div>
     </div>
   );
