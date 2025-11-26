@@ -1,22 +1,35 @@
 'use client';
 
+import ProfileDropdown from '@/components/profile/profileDropdown';
+import clsx from 'clsx';
 import { Session } from 'next-auth';
 
 export default function ProfileIcon({ session }: { session: Session | null }) {
-  if (!session?.user) {
-    return (
-      <div className='w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center'>
-        <span className='text-sm font-semibold text-gray-600'>G</span>
-      </div>
-    );
-  }
-
-  const name = session.user.name || 'User';
+  const user = session?.user;
+  const name = user?.name || 'Guest';
   const initial = name.charAt(0).toUpperCase();
 
   return (
-    <div className='w-8 h-8 rounded-full bg-blue-400 flex items-center justify-center'>
-      <span className='text-sm font-semibold text-white'>{initial}</span>
-    </div>
+    <ProfileDropdown session={session}>
+      <button
+        aria-label='프로필 메뉴'
+        data-is-user={user !== null}
+        className={clsx(
+          'w-8 h-8 rounded-full flex items-center justify-center cursor-pointer',
+          user
+            ? 'bg-blue-400 hover:bg-blue-500'
+            : 'bg-gray-300 hover:bg-gray-400'
+        )}
+      >
+        <span
+          className={clsx(
+            'text-sm font-semibold',
+            user ? 'text-white' : 'text-gray-600'
+          )}
+        >
+          {initial}
+        </span>
+      </button>
+    </ProfileDropdown>
   );
 }
