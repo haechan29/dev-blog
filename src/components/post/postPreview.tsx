@@ -97,7 +97,7 @@ export default function PostPreview({
             </div>
           )}
 
-          <PostInfo {...post} />
+          <PostInfo post={post} />
         </div>
       </Link>
     </div>

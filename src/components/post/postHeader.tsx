@@ -50,7 +50,7 @@ export default function PostHeader({ post }: { post: PostProps }) {
       )}
 
       <div className='flex justify-between items-center'>
-        <PostInfo {...post} />
+        <PostInfo post={post} isAuthorNameVisible={false} />
         <PostSettingsDropdown post={post}>
           <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2' />
         </PostSettingsDropdown>

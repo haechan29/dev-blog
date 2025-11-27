@@ -1,15 +1,14 @@
 'use client';
 
+import { PostProps } from '@/features/post/ui/postProps';
 import usePostStat from '@/features/postStat/hooks/usePostStat';
 
 export default function PostInfo({
-  id: postId,
-  authorName,
-  createdAt,
+  post: { id: postId, authorName, isGuest, createdAt },
+  isAuthorNameVisible = true,
 }: {
-  id: string;
-  authorName: string;
-  createdAt: string;
+  post: PostProps;
+  isAuthorNameVisible?: boolean;
 }) {
   const {
     stat: { viewCount },
@@ -17,8 +16,12 @@ export default function PostInfo({
 
   return (
     <div className='flex gap-2 items-center text-xs text-gray-500'>
-      <div>{authorName}</div>
-      <Divider />
+      {isAuthorNameVisible && (
+        <>
+          <div>{authorName}</div>
+          <Divider />
+        </>
+      )}
       <div>{createdAt}</div>
       <Divider />
       <div>{`조회 ${viewCount}`}</div>
