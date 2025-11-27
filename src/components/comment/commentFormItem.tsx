@@ -1,6 +1,7 @@
 'use client';
 
 import useComments from '@/features/comment/hooks/useComments';
+import { ApiError } from '@/lib/api';
 import clsx from 'clsx';
 import { Loader2, Send } from 'lucide-react';
 import { useCallback, useState } from 'react';
@@ -28,8 +29,12 @@ export default function CommentFormItem({ postId }: { postId: string }) {
           setContent('');
           setPassword('');
         },
-        onError: () => {
-          toast.error('댓글 등록 실패');
+        onError: error => {
+          const message =
+            error instanceof ApiError
+              ? error.message
+              : '댓글 생성에 실패했습니다';
+          toast.error(message);
         },
       });
     },

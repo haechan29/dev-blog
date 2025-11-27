@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import useComments from '@/features/comment/hooks/useComments';
+import { ApiError } from '@/lib/api';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
@@ -38,8 +39,16 @@ export default function DeleteCommentDialog({
   const deleteComment = useCallback(
     (params: { postId: string; commentId: number; password: string }) => {
       deleteCommentMutation.mutate(params, {
-        onSuccess: () => setIsOpen(false),
-        onError: error => toast.error(error.message),
+        onSuccess: () => {
+          setIsOpen(false);
+        },
+        onError: error => {
+          const message =
+            error instanceof ApiError
+              ? error.message
+              : '댓글 삭제에 실패했습니다';
+          toast.error(message);
+        },
       });
     },
     [deleteCommentMutation, setIsOpen]

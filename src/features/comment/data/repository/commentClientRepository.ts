@@ -7,17 +7,8 @@ export async function getComments(
   postId: string
 ): Promise<CommentResponseDto[]> {
   const response = await api.get(`/api/posts/${postId}/comments`);
-  const data = response.data;
-
-  return data.map((comment: Comment) => ({
-    id: comment.id,
-    postId: comment.post_id,
-    authorName: comment.author_name,
-    content: comment.content,
-    createdAt: comment.created_at,
-    updatedAt: comment.updated_at,
-    likeCount: comment.like_count,
-  }));
+  const comments: Comment[] = response.data;
+  return comments.map(toData);
 }
 
 export async function createComment({

@@ -1,8 +1,5 @@
 import { auth } from '@/auth';
-import {
-  createComments,
-  fetchComments,
-} from '@/features/comment/data/queries/commentQueries';
+import * as CommentQueries from '@/features/comment/data/queries/commentQueries';
 import { PostNotFoundError } from '@/features/post/data/errors/postErrors';
 import { ValidationError } from '@/features/user/data/errors/userErrors';
 import { ApiError } from '@/lib/api';
@@ -15,7 +12,7 @@ export async function GET(
 ) {
   try {
     const { postId } = await params;
-    const data = fetchComments(postId);
+    const data = await CommentQueries.fetchComments(postId);
     return NextResponse.json({ data });
   } catch (error) {
     console.error('게시글 조회 실패:', error);
@@ -61,7 +58,7 @@ export async function POST(
 
     const passwordHash = session ? null : await bcrypt.hash(password, 10);
 
-    const data = await createComments(
+    const data = await CommentQueries.createComments(
       postId,
       content,
       passwordHash,

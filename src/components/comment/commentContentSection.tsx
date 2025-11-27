@@ -3,6 +3,7 @@
 import CommentLikeButton from '@/components/comment/commentLikeButton';
 import { updateComment } from '@/features/comment/domain/service/commentClientService';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import { ApiError } from '@/lib/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
@@ -48,7 +49,11 @@ export default function CommentContentSection({
       });
       setIsEditing(false);
     },
-    onError: error => toast.error(error.message),
+    onError: error => {
+      const message =
+        error instanceof ApiError ? error.message : '댓글 수정에 실패했습니다';
+      toast.error(message);
+    },
   });
 
   const handleEdit = () => {

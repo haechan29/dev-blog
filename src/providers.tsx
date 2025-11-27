@@ -26,10 +26,7 @@ export default function Providers({ children }: { children: ReactNode }) {
 
   return (
     <Provider store={storeRef.current}>
-      <QueryClientProvider client={queryClient}>
-        {children}
-        {/* <ReactQueryDevtools initialIsOpen={false} /> */}
-      </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </Provider>
   );
 }
