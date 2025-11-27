@@ -1,60 +1,39 @@
 import { auth } from '@/auth';
-import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
+import {
+  UnauthorizedError,
+  ValidationError,
+} from '@/features/user/data/errors/userErrors';
 import { createUser } from '@/features/user/data/queries/userQueries';
-import { ErrorCode } from '@/types/errorCode';
+import { ApiError } from '@/lib/api';
 import { NextRequest, NextResponse } from 'next/server';
 import 'server-only';
 
 export async function POST(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json(
-      { error: '인증되지 않은 요청입니다', code: ErrorCode.UNAUTHORIZED },
-      { status: 401 }
-    );
-  }
-
-  const { nickname } = await request.json();
-
-  if (!nickname) {
-    return NextResponse.json(
-      {
-        error: '회원가입 요청에 필요한 필드가 누락되었습니다',
-        code: ErrorCode.VALIDATION_ERROR,
-      },
-      { status: 400 }
-    );
-  }
-
-  if (nickname.length < 2 || nickname.length > 20) {
-    return NextResponse.json(
-      { error: '닉네임은 2-20자여야 합니다', code: ErrorCode.VALIDATION_ERROR },
-      { status: 400 }
-    );
-  }
-
-  if (!/^[가-힣a-zA-Z0-9]+$/.test(nickname)) {
-    return NextResponse.json(
-      {
-        error: '한글, 영문, 숫자만 사용 가능합니다',
-        code: ErrorCode.VALIDATION_ERROR,
-      },
-      { status: 400 }
-    );
-  }
-
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      throw new UnauthorizedError('인증되지 않은 요청입니다');
+    }
+
+    const { nickname } = await request.json();
+
+    if (!nickname) {
+      throw new ValidationError('닉네임을 찾을 수 없습니다');
+    }
+
+    if (nickname.length < 2 || nickname.length > 20) {
+      throw new ValidationError('닉네임은 2-20자여야 합니다');
+    }
+
+    if (!/^[가-힣a-zA-Z0-9]+$/.test(nickname)) {
+      throw new ValidationError('한글, 영문, 숫자만 사용 가능합니다');
+    }
+
     await createUser(session.user.id, nickname);
     return NextResponse.json({ data: null });
   } catch (error) {
-    if (error instanceof DuplicateNicknameError) {
-      return NextResponse.json(
-        {
-          error: '이미 사용 중인 닉네임입니다',
-          code: ErrorCode.DUPLICATE_NICKNAME,
-        },
-        { status: 409 }
-      );
+    if (error instanceof ApiError) {
+      return error.toResponse();
     }
 
     return NextResponse.json(

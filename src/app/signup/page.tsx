@@ -2,6 +2,7 @@
 
 import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
 import * as UserClientService from '@/features/user/domain/service/userClientService';
+import { ApiError } from '@/lib/api';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
@@ -65,7 +66,9 @@ export default function SignupPage() {
         setIsTermsValid(true);
         setIsPrivacyValid(true);
       } else {
-        toast.error('회원가입에 실패했습니다');
+        const message =
+          error instanceof ApiError ? error.message : '회원가입에 실패했습니다';
+        toast.error(message);
       }
     } finally {
       setIsSubmitting(false);

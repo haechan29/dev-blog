@@ -1,5 +1,3 @@
-import 'server-only';
-
 export const ErrorCode = {
   DUPLICATE_NICKNAME: 'DUPLICATE_NICKNAME',
   UNAUTHORIZED: 'UNAUTHORIZED',
