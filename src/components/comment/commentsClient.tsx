@@ -1,6 +1,6 @@
 'use client';
 
-import CommentFormItem from '@/components/comment/commentFormItem';
+import CommentForm from '@/components/comment/commentForm';
 import CommentItem from '@/components/comment/commentItem';
 import useComments from '@/features/comment/hooks/useComments';
 import { setAreCommentsVisible } from '@/lib/redux/post/postViewerSlice';
@@ -29,7 +29,7 @@ export default function CommentsClient({ postId }: { postId: string }) {
       <div className='text-xl font-bold text-gray-900 mb-8'>
         {`댓글 ${comments.length}개`}
       </div>
-      <CommentFormItem postId={postId} />
+      <CommentForm postId={postId} />
       <div className='space-y-6'>
         {comments.length === 0 ? (
           <div className='text-center py-12'>
