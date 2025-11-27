@@ -25,7 +25,6 @@ export async function createComment({
   ...requestBody
 }: {
   postId: string;
-  authorName: string;
   content: string;
   password: string;
 }): Promise<CommentResponseDto> {

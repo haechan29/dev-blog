@@ -15,7 +15,6 @@ export async function getComments(postId: string): Promise<Comment[]> {
 
 export async function createComment(params: {
   postId: string;
-  authorName: string;
   content: string;
   password: string;
 }): Promise<Comment> {
