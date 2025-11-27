@@ -1,4 +1,4 @@
-import { PostNotFoundError } from '@/features/post/data/errors/postNotFoundError';
+import { PostNotFoundError } from '@/features/post/data/errors/postErrors';
 import { fetchPost } from '@/features/post/data/queries/postQueries';
 import { Post } from '@/features/post/domain/types/post';
 import { supabase } from '@/lib/supabase';

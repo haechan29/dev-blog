@@ -1,10 +1,11 @@
 export interface Post {
   id: string;
-  author_name: string;
   title: string;
   tags: string[];
   content: string;
   created_at: string;
   updated_at: string;
-  author_id?: string;
+  user_id: string | null;
+  guest_id: string | null;
+  author_name: string;
 }

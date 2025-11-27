@@ -1,5 +1,5 @@
 import { getCommentsFromDB } from '@/features/comment/data/queries/commentQueries';
-import { PostNotFoundError } from '@/features/post/data/errors/postNotFoundError';
+import { PostNotFoundError } from '@/features/post/data/errors/postErrors';
 import { supabase } from '@/lib/supabase';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';

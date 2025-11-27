@@ -1,4 +1,4 @@
-import { PostNotFoundError } from '@/features/post/data/errors/postNotFoundError';
+import { PostNotFoundError } from '@/features/post/data/errors/postErrors';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
@@ -27,7 +27,7 @@ export async function fetchPost(postId: string) {
   }
 
   if (!data) {
-    throw new PostNotFoundError(postId);
+    throw new PostNotFoundError(postId, '게시물을 찾을 수 없습니다');
   }
 
   return data;
