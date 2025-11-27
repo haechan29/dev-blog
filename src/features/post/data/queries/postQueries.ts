@@ -5,20 +5,35 @@ import 'server-only';
 export async function fetchPosts() {
   const { data, error } = await supabase
     .from('posts')
-    .select('*')
+    .select(
+      `
+      *,
+      users:user_id (nickname)
+    `
+    )
     .order('created_at', { ascending: false });
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return data;
+  return data.map(post => ({
+    ...post,
+    author_name: post.users?.nickname || post.guest_id || '익명',
+    is_deleted: !!post.user_id && !post.users,
+    is_guest: !post.user_id,
+  }));
 }
 
 export async function fetchPost(postId: string) {
   const { data, error } = await supabase
     .from('posts')
-    .select('*')
+    .select(
+      `
+      *,
+      users:user_id (nickname)
+    `
+    )
     .eq('id', postId)
     .maybeSingle();
 
@@ -30,7 +45,12 @@ export async function fetchPost(postId: string) {
     throw new PostNotFoundError(postId, '게시물을 찾을 수 없습니다');
   }
 
-  return data;
+  return {
+    ...data,
+    author_name: data.users?.nickname || data.guest_id || '익명',
+    is_deleted: !!data.user_id && !data.users,
+    is_guest: !data.user_id,
+  };
 }
 
 export async function createPost({
@@ -58,7 +78,9 @@ export async function createPost({
       user_id: userId,
       guest_id: guestId,
     })
-    .select('id, title, content, tags, created_at, updated_at')
+    .select(
+      'id, title, content, tags, created_at, updated_at, user_id, guest_id'
+    )
     .single();
 
   if (error) {

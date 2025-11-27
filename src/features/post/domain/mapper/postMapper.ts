@@ -11,6 +11,8 @@ export function toDomain(dto: PostResponseDto): Post {
     dto.tags,
     dto.userId,
     dto.guestId,
-    dto.authorName
+    dto.authorName,
+    dto.isDeleted,
+    dto.isGuest
   );
 }

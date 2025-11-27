@@ -8,4 +8,6 @@ export interface Post {
   user_id: string | null;
   guest_id: string | null;
   author_name: string;
+  is_deleted: boolean;
+  is_guest: boolean;
 }

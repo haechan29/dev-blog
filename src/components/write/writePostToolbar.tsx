@@ -4,6 +4,7 @@ import { PostProps } from '@/features/post/ui/postProps';
 import { writePostSteps } from '@/features/write/constants/writePostStep';
 import { validate } from '@/features/write/domain/model/writePostForm';
 import useNavigationWithParams from '@/hooks/useNavigationWithParams';
+import { ApiError } from '@/lib/api';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { setInvalidField } from '@/lib/redux/write/writePostFormSlice';
 import clsx from 'clsx';
@@ -59,7 +60,7 @@ export default function WritePostToolbar({
           removeDraft();
         } catch (error) {
           const errorMessage =
-            error instanceof Error
+            error instanceof ApiError
               ? error.message
               : '게시글 생성에 실패했습니다';
           toast.error(errorMessage);

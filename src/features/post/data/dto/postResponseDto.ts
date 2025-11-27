@@ -8,4 +8,6 @@ export interface PostResponseDto {
   userId: string | null;
   guestId: string | null;
   authorName: string;
+  isDeleted: boolean;
+  isGuest: boolean;
 }

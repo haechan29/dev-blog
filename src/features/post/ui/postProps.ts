@@ -15,6 +15,8 @@ export type PostProps = {
   userId: string | null;
   guestId: string | null;
   authorName: string;
+  isDeleted: boolean;
+  isGuest: boolean;
 };
 
 export function createProps(post: Post): PostProps {
@@ -30,5 +32,7 @@ export function createProps(post: Post): PostProps {
     userId: post.userId,
     guestId: post.guestId,
     authorName: post.authorName,
+    isDeleted: post.isDeleted,
+    isGuest: post.isGuest,
   };
 }

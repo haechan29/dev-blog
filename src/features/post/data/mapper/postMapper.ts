@@ -12,5 +12,7 @@ export function toData(post: Post): PostResponseDto {
     userId: post.user_id,
     guestId: post.guest_id,
     authorName: post.author_name,
+    isDeleted: post.is_deleted,
+    isGuest: post.is_guest,
   };
 }

@@ -13,7 +13,9 @@ export default class Post {
     public readonly tags: string[],
     public readonly userId: string | null,
     public readonly guestId: string | null,
-    public readonly authorName: string
+    public readonly authorName: string,
+    public readonly isDeleted: boolean,
+    public readonly isGuest: boolean
   ) {
     this.headings = extractHeadings(content);
   }
