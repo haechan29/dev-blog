@@ -6,7 +6,7 @@ import {
 } from '@/features/post/data/queries/postQueries';
 import { PostStatCreationError } from '@/features/postStat/data/errors/postStatErrors';
 import { createPostStat } from '@/features/postStat/data/queries/postStatQueries';
-import { ErrorCode } from '@/types/api';
+import { ErrorCode } from '@/types/errorCode';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -32,50 +32,24 @@ export async function POST(request: NextRequest) {
     const userId = session?.user?.id ?? null;
     const guestId = request.cookies.get('guestId')?.value ?? null;
 
-    if (!title || !content) {
+    let invalidField: string | null = null;
+    if (!title) invalidField = '타이틀';
+    if (!content) invalidField = '내용';
+    if (session && !userId) invalidField = '아이디';
+    if (!session && !password) invalidField = '비밀번호';
+    if (!session && !guestId) invalidField = '게스트 아이디';
+
+    if (invalidField) {
       return NextResponse.json(
         {
-          error: '게시글 생성 요청에 필요한 필드가 누락되었습니다',
+          error: `필드가 누락되었습니다 (${invalidField})`,
           code: ErrorCode.VALIDATION_ERROR,
         },
         { status: 400 }
       );
     }
 
-    if (session) {
-      if (!userId) {
-        return NextResponse.json(
-          {
-            error: '유저 아이디가 존재하지 않습니다',
-            code: ErrorCode.MISSING_USER_ID,
-          },
-          { status: 400 }
-        );
-      }
-    } else {
-      if (!password) {
-        return NextResponse.json(
-          {
-            error: '비회원 게시글 생성 요청에 비밀번호가 누락되었습니다',
-            code: ErrorCode.MISSING_PASSWORD,
-          },
-          { status: 400 }
-        );
-      }
-
-      if (!guestId) {
-        return NextResponse.json(
-          {
-            error: '비회원 게시글 생성 요청에 게스트 아이디가 누락되었습니다',
-            code: ErrorCode.MISSING_GUEST_ID,
-          },
-          { status: 400 }
-        );
-      }
-    }
-
     const passwordHash = session ? null : await bcrypt.hash(password, 10);
-
     const post = await createPost({
       title,
       content,

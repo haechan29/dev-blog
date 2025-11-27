@@ -1,7 +1,7 @@
 import { auth } from '@/auth';
 import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
 import { createUser } from '@/features/user/data/queries/userQueries';
-import { ErrorCode } from '@/types/api';
+import { ErrorCode } from '@/types/errorCode';
 import { NextRequest, NextResponse } from 'next/server';
 import 'server-only';
 

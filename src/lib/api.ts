@@ -1,4 +1,4 @@
-import { ErrorCode } from '@/types/api';
+import { ErrorCode } from '@/types/errorCode';
 
 export const api = {
   get: (url: string, options?: RequestInit) =>

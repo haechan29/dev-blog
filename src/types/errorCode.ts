@@ -1,10 +1,9 @@
+import 'server-only';
+
 export const ErrorCode = {
   DUPLICATE_NICKNAME: 'DUPLICATE_NICKNAME',
   UNAUTHORIZED: 'UNAUTHORIZED',
   VALIDATION_ERROR: 'VALIDATION_ERROR',
-  MISSING_PASSWORD: 'MISSING_PASSWORD',
-  MISSING_USER_ID: 'MISSING_USER_ID',
-  MISSING_GUEST_ID: 'MISSING_GUEST_ID',
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
