@@ -1,4 +1,5 @@
 import { CommentResponseDto } from '@/features/comment/data/dto/commentResponseDto';
+import { toData } from '@/features/comment/data/mapper/commentMapper';
 import { Comment } from '@/features/comment/domain/types/comment';
 import { api } from '@/lib/api';
 
@@ -30,15 +31,7 @@ export async function createComment({
 }): Promise<CommentResponseDto> {
   const response = await api.post(`/api/posts/${postId}/comments`, requestBody);
   const comment: Comment = response.data;
-  return {
-    id: comment.id,
-    postId: comment.post_id,
-    authorName: comment.author_name,
-    content: comment.content,
-    createdAt: comment.created_at,
-    updatedAt: comment.updated_at,
-    likeCount: comment.like_count,
-  };
+  return toData(comment);
 }
 
 export async function updateComment({
@@ -56,15 +49,7 @@ export async function updateComment({
     requestBody
   );
   const comment: Comment = response.data;
-  return {
-    id: comment.id,
-    postId: comment.post_id,
-    authorName: comment.author_name,
-    content: comment.content,
-    createdAt: comment.created_at,
-    updatedAt: comment.updated_at,
-    likeCount: comment.like_count,
-  };
+  return toData(comment);
 }
 
 export async function deleteComment(
@@ -87,16 +72,7 @@ export async function incrementLikeCount(
     `/api/posts/${postId}/comments/${commentId}/likeCount/increment`
   );
   const comment = response.data;
-
-  return {
-    id: comment.id,
-    postId: comment.post_id,
-    authorName: comment.author_name,
-    content: comment.content,
-    createdAt: comment.created_at,
-    updatedAt: comment.updated_at,
-    likeCount: comment.like_count,
-  };
+  return toData(comment);
 }
 
 export async function decrementLikeCount(
@@ -107,14 +83,5 @@ export async function decrementLikeCount(
     `/api/posts/${postId}/comments/${commentId}/likeCount/decrement`
   );
   const comment = response.data;
-
-  return {
-    id: comment.id,
-    postId: comment.post_id,
-    authorName: comment.author_name,
-    content: comment.content,
-    createdAt: comment.created_at,
-    updatedAt: comment.updated_at,
-    likeCount: comment.like_count,
-  };
+  return toData(comment);
 }

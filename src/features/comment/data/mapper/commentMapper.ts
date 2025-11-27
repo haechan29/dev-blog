@@ -10,5 +10,9 @@ export function toData(comment: Comment): CommentResponseDto {
     createdAt: comment.created_at,
     updatedAt: comment.updated_at,
     likeCount: comment.like_count,
+    userId: comment.user_id,
+    guestId: comment.guest_id,
+    isDeleted: comment.is_deleted,
+    isGuest: comment.is_guest,
   };
 }

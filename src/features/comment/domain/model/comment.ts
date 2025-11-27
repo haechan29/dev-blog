@@ -8,7 +8,11 @@ export class Comment {
     public readonly content: string,
     public readonly createdAt: string,
     public readonly updatedAt: string,
-    public readonly likeCount: number
+    public readonly likeCount: number,
+    public readonly userId: string | null,
+    public readonly guestId: string | null,
+    public readonly isDeleted: boolean,
+    public readonly isGuest: boolean
   ) {}
 
   toProps(): CommentItemProps {
@@ -20,6 +24,10 @@ export class Comment {
       createdAt: formatTime(this.createdAt),
       isUpdated: this.createdAt !== this.updatedAt,
       likeCount: this.likeCount,
+      userId: this.userId,
+      guestId: this.guestId,
+      isDeleted: this.isDeleted,
+      isGuest: this.isGuest,
     };
   }
 }
