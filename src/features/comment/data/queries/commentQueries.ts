@@ -43,7 +43,10 @@ export async function fetchComments(postId: string) {
 
   return data.map(comment => ({
     ...comment,
-    author_name: comment.users?.nickname || comment.guest_id || '익명',
+    author_name:
+      comment.users?.nickname ||
+      `게스트#${comment.guest_id?.slice(0, 4) ?? '0000'}` ||
+      '익명',
     is_deleted: !!comment.user_id && !comment.users,
     is_guest: !comment.user_id,
   }));
@@ -79,7 +82,10 @@ export async function createComments(
 
   return {
     ...data,
-    author_name: data.users?.nickname || data.guest_id || '익명',
+    author_name:
+      data.users?.nickname ||
+      `게스트#${data.guest_id?.slice(0, 4) ?? '0000'}` ||
+      '익명',
     is_deleted: !!data.user_id && !data.users,
     is_guest: !data.user_id,
   };
@@ -105,7 +111,10 @@ export async function updateComment(commentId: number, content: string) {
 
   return {
     ...data,
-    author_name: data.users?.nickname || data.guest_id || '익명',
+    author_name:
+      data.users?.nickname ||
+      `게스트#${data.guest_id?.slice(0, 4) ?? '0000'}` ||
+      '익명',
     is_deleted: !!data.user_id && !data.users,
     is_guest: !data.user_id,
   };

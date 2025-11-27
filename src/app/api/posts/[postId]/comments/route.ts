@@ -66,14 +66,7 @@ export async function POST(
       session ? null : guestId
     );
 
-    return NextResponse.json({
-      data: {
-        ...data,
-        author_name: data.user_id ? '회원' : guestId,
-        is_deleted: false,
-        is_guest: !data.user_id,
-      },
-    });
+    return NextResponse.json({ data });
   } catch (error) {
     console.error('댓글 생성 요청이 실패했습니다');
 

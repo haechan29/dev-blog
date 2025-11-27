@@ -19,7 +19,10 @@ export async function fetchPosts() {
 
   return data.map(post => ({
     ...post,
-    author_name: post.users?.nickname || post.guest_id || '익명',
+    author_name:
+      post.users?.nickname ||
+      `게스트#${post.guest_id?.slice(0, 4) ?? '0000'}` ||
+      '익명',
     is_deleted: !!post.user_id && !post.users,
     is_guest: !post.user_id,
   }));
@@ -47,7 +50,10 @@ export async function fetchPost(postId: string) {
 
   return {
     ...data,
-    author_name: data.users?.nickname || data.guest_id || '익명',
+    author_name:
+      data.users?.nickname ||
+      `게스트#${data.guest_id?.slice(0, 4) ?? '0000'}` ||
+      '익명',
     is_deleted: !!data.user_id && !data.users,
     is_guest: !data.user_id,
   };
