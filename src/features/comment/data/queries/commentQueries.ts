@@ -1,6 +1,25 @@
+import { CommentNotFoundError } from '@/features/comment/data/errors/commentErrors';
 import { PostNotFoundError } from '@/features/post/data/errors/postErrors';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
+
+export async function fetchComment(commentId: number) {
+  const { data, error } = await supabase
+    .from('comments')
+    .select('user_id, guest_id, password_hash')
+    .eq('id', commentId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (!data) {
+    throw new CommentNotFoundError('댓글을 찾을 수 없습니다');
+  }
+
+  return data;
+}
 
 export async function fetchComments(postId: string) {
   const { data, error } = await supabase
@@ -19,7 +38,7 @@ export async function fetchComments(postId: string) {
   }
 
   if (!data) {
-    throw new PostNotFoundError(postId, '게시물을 찾을 수 없습니다');
+    throw new PostNotFoundError(`게시물을 찾을 수 없습니다 (${postId})`);
   }
 
   return data.map(comment => ({
@@ -64,4 +83,39 @@ export async function createComments(
     is_deleted: !!data.user_id && !data.users,
     is_guest: !data.user_id,
   };
+}
+
+export async function updateComment(commentId: number, content: string) {
+  const { data, error } = await supabase
+    .from('comments')
+    .update({
+      content,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', commentId)
+    .select(
+      `
+      *,
+      users:user_id (nickname)
+    `
+    )
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  return {
+    ...data,
+    author_name: data.users?.nickname || data.guest_id || '익명',
+    is_deleted: !!data.user_id && !data.users,
+    is_guest: !data.user_id,
+  };
+}
+
+export async function deleteComment(commentId: number) {
+  const { error } = await supabase
+    .from('comments')
+    .delete()
+    .eq('id', commentId);
+
+  if (error) throw new Error(error.message);
 }

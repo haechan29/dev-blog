@@ -42,7 +42,7 @@ export async function fetchPost(postId: string) {
   }
 
   if (!data) {
-    throw new PostNotFoundError(postId, '게시물을 찾을 수 없습니다');
+    throw new PostNotFoundError(`게시물을 찾을 수 없습니다 (${postId})`);
   }
 
   return {

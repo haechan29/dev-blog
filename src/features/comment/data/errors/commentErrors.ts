@@ -1,8 +1,8 @@
 import { ApiError } from '@/lib/api';
 import { ErrorCode } from '@/types/errorCode';
 
-export class PostNotFoundError extends ApiError {
+export class CommentNotFoundError extends ApiError {
   constructor(message: string) {
-    super(message, ErrorCode.POST_NOT_FOUND, 404);
+    super(message, ErrorCode.COMMENT_NOT_FOUND, 404);
   }
 }

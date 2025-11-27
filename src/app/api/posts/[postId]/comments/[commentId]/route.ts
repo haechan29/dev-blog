@@ -1,4 +1,10 @@
-import { supabase } from '@/lib/supabase';
+import { auth } from '@/auth';
+import * as CommentQueries from '@/features/comment/data/queries/commentQueries';
+import {
+  UnauthorizedError,
+  ValidationError,
+} from '@/features/user/data/errors/userErrors';
+import { ApiError } from '@/lib/api';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -10,51 +16,44 @@ export async function PATCH(
     const { commentId } = await params;
     const { content, password } = await request.json();
 
-    if (!commentId || !content || !password) {
-      return NextResponse.json(
-        { error: '댓글 수정 요청에 필요한 필드가 누락되었습니다.' },
-        { status: 400 }
-      );
+    const session = await auth();
+    const userId = session?.user?.id ?? null;
+
+    if (!content) {
+      throw new ValidationError('내용을 찾을 수 없습니다');
+    }
+    if (session && !userId) {
+      throw new ValidationError('사용자 아이디를 찾을 수 없습니다');
+    }
+    if (!session && !password) {
+      throw new ValidationError('비밀번호를 찾을 수 없습니다');
     }
 
-    const { isCommentExist, isValidPassword } = await checkPassword(
-      commentId,
-      password
-    );
-    if (!isCommentExist) {
-      return NextResponse.json(
-        { error: `댓글을 찾을 수 없습니다.` },
-        { status: 404 }
-      );
-    } else if (!isValidPassword) {
-      return NextResponse.json(
-        { error: '비밀번호가 일치하지 않습니다.' },
-        { status: 401 }
-      );
+    const comment = await CommentQueries.fetchComment(commentId);
+
+    if (comment.user_id) {
+      if (userId !== comment.user_id) {
+        throw new UnauthorizedError('인증되지 않은 요청입니다');
+      }
+    } else {
+      const isValid = await bcrypt.compare(password, comment.password_hash);
+      if (!isValid) {
+        throw new UnauthorizedError('비밀번호가 일치하지 않습니다');
+      }
     }
 
-    const { data, error } = await supabase
-      .from('comments')
-      .update({
-        content,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', commentId)
-      .select(
-        'id, post_id, author_name, content, created_at, updated_at, like_count'
-      );
+    const updated = await CommentQueries.updateComment(commentId, content);
 
-    if (error) {
-      return NextResponse.json(
-        { error: '댓글 수정에 실패했습니다.' },
-        { status: 500 }
-      );
+    return NextResponse.json({ data: updated });
+  } catch (error) {
+    console.log('댓글 수정 요청이 실패했습니다');
+
+    if (error instanceof ApiError) {
+      return error.toResponse();
     }
 
-    return NextResponse.json({ data: data[0] });
-  } catch {
     return NextResponse.json(
-      { error: '댓글 수정 요청이 실패했습니다.' },
+      { error: '댓글 수정 요청이 실패했습니다' },
       { status: 500 }
     );
   }
@@ -67,66 +66,43 @@ export async function DELETE(
   try {
     const { commentId } = await params;
     const password = request.headers.get('X-Comment-Password');
+    const session = await auth();
+    const userId = session?.user?.id ?? null;
 
-    if (!commentId || !password) {
-      return NextResponse.json(
-        { error: '댓글 삭제 요청에 필요한 필드가 누락되었습니다.' },
-        { status: 400 }
-      );
+    if (session && !userId) {
+      throw new ValidationError('사용자 아이디를 찾을 수 없습니다');
+    }
+    if (!session && !password) {
+      throw new ValidationError('비밀번호를 찾을 수 없습니다');
     }
 
-    const { isCommentExist, isValidPassword } = await checkPassword(
-      commentId,
-      password
-    );
-    if (!isCommentExist) {
-      return NextResponse.json(
-        { error: `댓글을 찾을 수 없습니다.` },
-        { status: 404 }
-      );
-    } else if (!isValidPassword) {
-      return NextResponse.json(
-        { error: '비밀번호가 일치하지 않습니다.' },
-        { status: 401 }
-      );
+    const comment = await CommentQueries.fetchComment(commentId);
+
+    if (comment.user_id) {
+      if (userId !== comment.user_id) {
+        throw new UnauthorizedError('인증되지 않은 요청입니다');
+      }
+    } else {
+      const isValid =
+        password && (await bcrypt.compare(password, comment.password_hash));
+      if (!isValid) {
+        throw new UnauthorizedError('비밀번호가 일치하지 않습니다');
+      }
     }
 
-    const { error } = await supabase
-      .from('comments')
-      .delete()
-      .eq('id', commentId);
-
-    if (error) {
-      return NextResponse.json(
-        { error: '댓글 삭제에 실패했습니다.' },
-        { status: 500 }
-      );
-    }
+    await CommentQueries.deleteComment(commentId);
 
     return NextResponse.json({ data: null });
-  } catch {
+  } catch (error) {
+    console.log('댓글 삭제 요청이 실패했습니다');
+
+    if (error instanceof ApiError) {
+      return error.toResponse();
+    }
+
     return NextResponse.json(
       { error: '댓글 삭제 요청이 실패했습니다.' },
       { status: 500 }
     );
   }
-}
-
-async function checkPassword(commentId: number, password: string) {
-  const { data, error } = await supabase
-    .from('comments')
-    .select('id, password_hash')
-    .eq('id', commentId)
-    .maybeSingle();
-
-  if (error || !data) {
-    return { isCommentExist: false, isValidPassword: false };
-  }
-
-  const isValidPassword = await bcrypt.compare(password, data.password_hash);
-  if (!isValidPassword) {
-    return { isCommentExist: true, isValidPassword: false };
-  }
-
-  return { isCommentExist: true, isValidPassword: true };
 }
