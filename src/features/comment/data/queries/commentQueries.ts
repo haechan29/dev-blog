@@ -27,7 +27,7 @@ export async function fetchComments(postId: string) {
   const { data, error } = await supabase
     .from('comments')
     .select(
-      'id, post_id, content, created_at, updated_at, like_count, user_id, guest_id, users:user_id(nickname)'
+      'id, post_id, content, created_at, updated_at, like_count, user_id, guest_id, users:user_id(nickname, deleted_at)'
     )
     .eq('post_id', postId)
     .order('created_at', { ascending: true });
@@ -60,7 +60,7 @@ export async function createComments(
       guest_id: guestId,
     })
     .select(
-      'id, post_id, content, created_at, updated_at, like_count, user_id, guest_id, users:user_id(nickname)'
+      'id, post_id, content, created_at, updated_at, like_count, user_id, guest_id, users:user_id(nickname, deleted_at)'
     )
     .single();
 
@@ -80,7 +80,7 @@ export async function updateComment(commentId: number, content: string) {
     })
     .eq('id', commentId)
     .select(
-      'id, post_id, content, created_at, updated_at, like_count, user_id, guest_id, users:user_id(nickname)'
+      'id, post_id, content, created_at, updated_at, like_count, user_id, guest_id, users:user_id(nickname, deleted_at)'
     )
     .single();
 

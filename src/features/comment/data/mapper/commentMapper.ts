@@ -15,7 +15,7 @@ export function toDto(comment: CommentEntity): CommentResponseDto {
     likeCount: comment.like_count,
     userId: comment.user_id,
     guestId: comment.guest_id,
-    isDeleted: !!comment.user_id && !comment.users,
+    isDeleted: !!comment.user_id && !!comment.users?.deleted_at,
     isGuest: !comment.user_id,
   };
 }
