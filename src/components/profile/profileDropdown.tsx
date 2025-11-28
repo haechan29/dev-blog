@@ -10,6 +10,7 @@ import { createRipple } from '@/lib/dom';
 import { LogIn, LogOut } from 'lucide-react';
 import { Session } from 'next-auth';
 import { signIn, signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { MouseEvent, ReactNode, useCallback } from 'react';
 
 export default function ProfileDropdown({
@@ -19,19 +20,26 @@ export default function ProfileDropdown({
   session: Session | null;
   children: ReactNode;
 }) {
-  const handleAction = useCallback((e: MouseEvent<HTMLElement>) => {
-    const actionAttribute = e.currentTarget.getAttribute('data-action');
-    switch (actionAttribute) {
-      case 'login': {
-        signIn();
-        break;
+  const router = useRouter();
+
+  const handleAction = useCallback(
+    async (e: MouseEvent<HTMLElement>) => {
+      const actionAttribute = e.currentTarget.getAttribute('data-action');
+      switch (actionAttribute) {
+        case 'login': {
+          await signIn();
+          router.refresh();
+          break;
+        }
+        case 'logout': {
+          await signOut();
+          router.refresh();
+          break;
+        }
       }
-      case 'logout': {
-        signOut();
-        break;
-      }
-    }
-  }, []);
+    },
+    [router]
+  );
 
   return (
     <DropdownMenu>

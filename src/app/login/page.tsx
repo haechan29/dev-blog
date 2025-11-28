@@ -1,16 +1,25 @@
 'use client';
 
 import { signIn } from 'next-auth/react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function LoginPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/';
+
   return (
     <div className='min-h-screen flex items-center justify-center bg-gray-50 px-4'>
       <div className='w-full max-w-md bg-white p-8 rounded-lg border border-gray-200'>
         <div className='text-2xl font-bold mb-8'>로그인</div>
 
         <button
-          onClick={() => signIn('google', { callbackUrl: '/' })}
+          onClick={() => {
+            signIn('google', { callbackUrl });
+            router.refresh();
+          }}
           className='w-full h-12 flex items-center justify-center gap-3 border border-gray-300 rounded-lg hover:bg-gray-50'
+          aria-label='구글 로그인'
         >
           <svg className='w-5 h-5' viewBox='0 0 24 24'>
             <path
