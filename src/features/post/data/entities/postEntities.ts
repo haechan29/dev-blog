@@ -1,13 +1,12 @@
-export interface Post {
+export interface PostEntity {
   id: string;
   title: string;
   tags: string[];
   content: string;
   created_at: string;
-  updated_at: string;
+  updated_at: string | null;
   user_id: string | null;
   guest_id: string | null;
-  author_name: string;
-  is_deleted: boolean;
-  is_guest: boolean;
+  users?: { nickname: string } | null;
+  password_hash?: string | null;
 }

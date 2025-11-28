@@ -1,5 +1,6 @@
+import { PostEntity } from '@/features/post/data/entities/postEntities';
 import { PostNotFoundError } from '@/features/post/data/errors/postErrors';
-import { Post } from '@/features/post/domain/types/post';
+import { toDto } from '@/features/post/data/mapper/postMapper';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
@@ -7,10 +8,7 @@ export async function fetchPosts() {
   const { data, error } = await supabase
     .from('posts')
     .select(
-      `
-      *,
-      users:user_id (nickname)
-    `
+      'id, title, tags, content, created_at, updated_at, user_id, guest_id, users:user_id(nickname)'
     )
     .order('created_at', { ascending: false });
 
@@ -18,25 +16,14 @@ export async function fetchPosts() {
     throw new Error(error.message);
   }
 
-  return data.map(post => ({
-    ...post,
-    author_name:
-      post.users?.nickname ||
-      `게스트#${post.guest_id?.slice(0, 4) ?? '0000'}` ||
-      '익명',
-    is_deleted: !!post.user_id && !post.users,
-    is_guest: !post.user_id,
-  }));
+  return (data as unknown as PostEntity[]).map(toDto);
 }
 
 export async function fetchPost(postId: string) {
   const { data, error } = await supabase
     .from('posts')
     .select(
-      `
-      *,
-      users:user_id (nickname)
-    `
+      'id, title, tags, content, created_at, updated_at, user_id, guest_id, password_hash, users:user_id(nickname)'
     )
     .eq('id', postId)
     .maybeSingle();
@@ -49,15 +36,7 @@ export async function fetchPost(postId: string) {
     throw new PostNotFoundError(`게시물을 찾을 수 없습니다 (${postId})`);
   }
 
-  return {
-    ...data,
-    author_name:
-      data.users?.nickname ||
-      `게스트#${data.guest_id?.slice(0, 4) ?? '0000'}` ||
-      '익명',
-    is_deleted: !!data.user_id && !data.users,
-    is_guest: !data.user_id,
-  };
+  return toDto(data as unknown as PostEntity);
 }
 
 export async function createPost({
@@ -86,7 +65,7 @@ export async function createPost({
       guest_id: guestId,
     })
     .select(
-      'id, title, content, tags, created_at, updated_at, user_id, guest_id'
+      'id, title, content, tags, created_at, updated_at, user_id, guest_id, users:user_id(nickname)'
     )
     .single();
 
@@ -94,7 +73,7 @@ export async function createPost({
     throw new Error(error.message);
   }
 
-  return data;
+  return toDto(data as unknown as PostEntity);
 }
 
 export async function updatePost(
@@ -109,7 +88,7 @@ export async function updatePost(
     tags?: string[];
   }
 ) {
-  const updates: Partial<Post> = {
+  const updates: Partial<PostEntity> = {
     updated_at: new Date().toISOString(),
     ...(title !== undefined && { title }),
     ...(content !== undefined && { content }),
@@ -120,14 +99,16 @@ export async function updatePost(
     .from('posts')
     .update(updates)
     .eq('id', postId)
-    .select('id, title, content, tags, created_at, updated_at')
+    .select(
+      'id, title, content, tags, created_at, updated_at, user_id, guest_id, users:user_id(nickname)'
+    )
     .single();
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return data;
+  return toDto(data as unknown as PostEntity);
 }
 
 export async function deletePost(postId: string) {
