@@ -15,15 +15,17 @@ import { setMode } from '@/lib/redux/post/postReaderSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { Code2, Edit2, FileText, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { MouseEvent, useCallback, useEffect, useState } from 'react';
+import { MouseEvent, ReactNode, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostSettingsDropdown({
-  children,
+  userId,
   post: { id: postId },
+  children,
 }: {
-  children: React.ReactNode;
+  userId: string | null;
   post: PostProps;
+  children: ReactNode;
 }) {
   const dispatch = useDispatch<AppDispatch>();
   const debounce = useDebounce();
@@ -64,7 +66,12 @@ export default function PostSettingsDropdown({
 
   return (
     <>
-      <DeletePostDialog postId={postId} isOpen={isOpen} setIsOpen={setIsOpen} />
+      <DeletePostDialog
+        userId={userId}
+        postId={postId}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+      />
       <DropdownMenu>
         <DropdownMenuTrigger
           onTouchStart={e => {

@@ -15,10 +15,12 @@ import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
 export default function DeletePostDialog({
+  userId,
   postId,
   isOpen,
   setIsOpen,
 }: {
+  userId: string | null;
   postId: string;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
@@ -30,7 +32,7 @@ export default function DeletePostDialog({
 
   const deletePost = useCallback(
     async (postId: string, password: string) => {
-      if (!password) {
+      if (!userId && !password) {
         setIsPasswordValid(false);
         return;
       }
@@ -48,7 +50,7 @@ export default function DeletePostDialog({
       }
       setIsLoading(false);
     },
-    [router, setIsOpen]
+    [router, setIsOpen, userId]
   );
 
   useEffect(() => {
@@ -69,22 +71,26 @@ export default function DeletePostDialog({
         <div className='text-sm text-gray-500 mb-6'>
           정말로 게시글을 삭제할까요?
         </div>
-        <input
-          className={clsx(
-            'w-full border p-3 mb-8 rounded-sm outline-none',
-            isPasswordValid
-              ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
-              : 'border-red-400 animate-shake',
-            password ? 'bg-white' : 'bg-gray-50'
-          )}
-          type='password'
-          value={password}
-          onChange={e => {
-            setPassword(e.target.value);
-            setIsPasswordValid(true);
-          }}
-          placeholder='비밀번호를 입력하세요'
-        />
+
+        {!userId && (
+          <input
+            className={clsx(
+              'w-full border p-3 mb-8 rounded-sm outline-none',
+              isPasswordValid
+                ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
+                : 'border-red-400 animate-shake',
+              password ? 'bg-white' : 'bg-gray-50'
+            )}
+            type='password'
+            value={password}
+            onChange={e => {
+              setPassword(e.target.value);
+              setIsPasswordValid(true);
+            }}
+            placeholder='비밀번호를 입력하세요'
+          />
+        )}
+
         <div className='flex justify-between items-center'>
           <button
             className={clsx(

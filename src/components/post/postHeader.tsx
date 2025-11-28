@@ -10,7 +10,13 @@ import { MoreVertical } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function PostHeader({ post }: { post: PostProps }) {
+export default function PostHeader({
+  userId,
+  post,
+}: {
+  userId: string | null;
+  post: PostProps;
+}) {
   const dispatch = useDispatch<AppDispatch>();
   const { title, tags } = post;
   const headerRef = useRef<HTMLDivElement | null>(null);
@@ -51,9 +57,12 @@ export default function PostHeader({ post }: { post: PostProps }) {
 
       <div className='flex justify-between items-center'>
         <PostInfo post={post} isAuthorNameVisible={false} />
-        <PostSettingsDropdown post={post}>
-          <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2' />
-        </PostSettingsDropdown>
+
+        {((!post.userId && !userId) || post.userId === userId) && (
+          <PostSettingsDropdown userId={userId} post={post}>
+            <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2' />
+          </PostSettingsDropdown>
+        )}
       </div>
     </div>
   );
