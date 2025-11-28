@@ -7,8 +7,10 @@ import { MoreVertical } from 'lucide-react';
 import { useState } from 'react';
 
 export default function CommentItem({
+  userId,
   comment,
 }: {
+  userId: string | null;
   comment: CommentItemProps;
 }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -33,16 +35,19 @@ export default function CommentItem({
           </div>
         </div>
 
-        <CommentSettingsDropdown
-          comment={comment}
-          onEdit={() => setIsEditing(prev => !prev)}
-        >
-          <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2' />
-        </CommentSettingsDropdown>
+        {((!comment.userId && !userId) || comment.userId === userId) && (
+          <CommentSettingsDropdown
+            comment={comment}
+            onEdit={() => setIsEditing(prev => !prev)}
+          >
+            <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2' />
+          </CommentSettingsDropdown>
+        )}
       </section>
 
       <CommentContentSection
         comment={comment}
+        userId={userId}
         isEditing={isEditing}
         setIsEditing={setIsEditing}
       />

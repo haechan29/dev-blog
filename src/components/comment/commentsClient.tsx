@@ -45,7 +45,7 @@ export default function CommentsClient({
           </div>
         ) : (
           comments.map(comment => (
-            <CommentItem key={comment.id} comment={comment} />
+            <CommentItem key={comment.id} userId={userId} comment={comment} />
           ))
         )}
       </div>
