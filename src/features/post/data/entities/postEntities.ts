@@ -7,6 +7,6 @@ export interface PostEntity {
   updated_at: string | null;
   user_id: string | null;
   guest_id: string | null;
-  users?: { nickname: string } | null;
+  users?: { nickname: string; deleted_at: string | null } | null;
   password_hash?: string | null;
 }

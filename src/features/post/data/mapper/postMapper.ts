@@ -15,7 +15,7 @@ export function toDto(post: PostEntity): PostResponseDto {
       post.users?.nickname ||
       `게스트#${post.guest_id?.slice(0, 4) ?? '0000'}` ||
       '익명',
-    isDeleted: !!post.user_id && !post.users,
+    isDeleted: !!post.user_id && !!post.users?.deleted_at,
     isGuest: !post.user_id,
   };
 }

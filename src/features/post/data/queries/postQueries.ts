@@ -8,7 +8,7 @@ export async function fetchPosts() {
   const { data, error } = await supabase
     .from('posts')
     .select(
-      'id, title, tags, content, created_at, updated_at, user_id, guest_id, users:user_id(nickname)'
+      'id, title, content, tags, created_at, updated_at, user_id, guest_id, users:user_id(nickname, deleted_at)'
     )
     .order('created_at', { ascending: false });
 
@@ -23,7 +23,7 @@ export async function fetchPost(postId: string) {
   const { data, error } = await supabase
     .from('posts')
     .select(
-      'id, title, tags, content, created_at, updated_at, user_id, guest_id, password_hash, users:user_id(nickname)'
+      'id, title, content, tags, created_at, updated_at, user_id, guest_id, users:user_id(nickname, deleted_at)'
     )
     .eq('id', postId)
     .maybeSingle();
@@ -83,7 +83,7 @@ export async function createPost({
       guest_id: guestId,
     })
     .select(
-      'id, title, content, tags, created_at, updated_at, user_id, guest_id, users:user_id(nickname)'
+      'id, title, content, tags, created_at, updated_at, user_id, guest_id, users:user_id(nickname, deleted_at)'
     )
     .single();
 
@@ -118,7 +118,7 @@ export async function updatePost(
     .update(updates)
     .eq('id', postId)
     .select(
-      'id, title, content, tags, created_at, updated_at, user_id, guest_id, users:user_id(nickname)'
+      'id, title, content, tags, created_at, updated_at, user_id, guest_id, users:user_id(nickname, deleted_at)'
     )
     .single();
 
