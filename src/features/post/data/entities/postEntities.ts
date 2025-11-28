@@ -1,3 +1,5 @@
+import { UserEntity } from '@/features/user/data/entities/userEntities';
+
 export interface PostEntity {
   id: string;
   title: string;
@@ -7,6 +9,6 @@ export interface PostEntity {
   updated_at: string | null;
   user_id: string | null;
   guest_id: string | null;
-  users?: { nickname: string; deleted_at: string | null } | null;
+  users?: Pick<UserEntity, 'nickname' | 'deleted_at'> | null;
   password_hash?: string | null;
 }

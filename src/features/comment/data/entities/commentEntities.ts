@@ -1,3 +1,5 @@
+import { UserEntity } from '@/features/user/data/entities/userEntities';
+
 export interface CommentEntity {
   id: number;
   post_id: string;
@@ -7,6 +9,6 @@ export interface CommentEntity {
   like_count: number;
   user_id: string | null;
   guest_id: string | null;
-  users?: { nickname: string; deleted_at: string | null } | null;
+  users?: Pick<UserEntity, 'nickname' | 'deleted_at'> | null;
   password_hash?: string | null;
 }

@@ -1,11 +1,13 @@
+import { UserEntity } from '@/features/user/data/entities/userEntities';
 import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
+import { toDto } from '@/features/user/data/mapper/userMapper';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
 export async function getUserById(userId: string) {
   const { data, error } = await supabase
     .from('users')
-    .select('id, nickname, created_at')
+    .select('id, nickname, created_at, updated_at, deleted_at')
     .eq('id', userId)
     .maybeSingle();
 
@@ -13,11 +15,11 @@ export async function getUserById(userId: string) {
     throw error;
   }
 
-  return data;
+  return data ? toDto(data as unknown as UserEntity) : null;
 }
 
 export async function createUser(userId: string, nickname: string) {
-  const { data, error } = await supabase.from('users').insert({
+  const { error } = await supabase.from('users').insert({
     id: userId,
     nickname,
   });
@@ -29,8 +31,6 @@ export async function createUser(userId: string, nickname: string) {
 
     throw new Error(error.message);
   }
-
-  return data;
 }
 
 export async function deleteUser(userId: string) {
