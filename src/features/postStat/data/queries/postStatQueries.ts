@@ -13,3 +13,14 @@ export async function createPostStat(postId: string) {
     throw new PostStatCreationError('게시글 통계 생성 실패', postId);
   }
 }
+
+export async function deletePostStat(postId: string) {
+  const { error } = await supabase
+    .from('post_stats')
+    .delete()
+    .eq('post_id', postId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}

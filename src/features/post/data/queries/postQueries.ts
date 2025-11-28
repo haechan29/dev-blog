@@ -1,4 +1,5 @@
 import { PostNotFoundError } from '@/features/post/data/errors/postErrors';
+import { Post } from '@/features/post/domain/types/post';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
@@ -87,6 +88,39 @@ export async function createPost({
     .select(
       'id, title, content, tags, created_at, updated_at, user_id, guest_id'
     )
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+export async function updatePost(
+  postId: string,
+  {
+    title,
+    content,
+    tags,
+  }: {
+    title?: string;
+    content?: string;
+    tags?: string[];
+  }
+) {
+  const updates: Partial<Post> = {
+    updated_at: new Date().toISOString(),
+    ...(title !== undefined && { title }),
+    ...(content !== undefined && { content }),
+    ...(tags !== undefined && { tags }),
+  };
+
+  const { data, error } = await supabase
+    .from('posts')
+    .update(updates)
+    .eq('id', postId)
+    .select('id, title, content, tags, created_at, updated_at')
     .single();
 
   if (error) {
