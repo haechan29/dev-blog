@@ -9,6 +9,10 @@ export function toDomain(dto: CommentResponseDto): Comment {
     dto.content,
     dto.createdAt,
     dto.updatedAt,
-    dto.likeCount
+    dto.likeCount,
+    dto.userId,
+    dto.guestId,
+    dto.isDeleted,
+    dto.isGuest
   );
 }
