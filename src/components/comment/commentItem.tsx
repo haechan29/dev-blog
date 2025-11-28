@@ -37,6 +37,7 @@ export default function CommentItem({
 
         {((!comment.userId && !userId) || comment.userId === userId) && (
           <CommentSettingsDropdown
+            userId={userId}
             comment={comment}
             onEdit={() => setIsEditing(prev => !prev)}
           >

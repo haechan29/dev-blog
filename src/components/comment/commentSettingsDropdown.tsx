@@ -13,10 +13,12 @@ import { Edit2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 export default function CommentSettingsDropdown({
+  userId,
   comment: { postId, id: commentId },
   onEdit,
   children,
 }: {
+  userId: string | null;
   comment: CommentItemProps;
   onEdit: () => void;
   children: React.ReactNode;
@@ -26,6 +28,7 @@ export default function CommentSettingsDropdown({
   return (
     <>
       <DeleteCommentDialog
+        userId={userId}
         postId={postId}
         commentId={commentId}
         isOpen={isOpen}
