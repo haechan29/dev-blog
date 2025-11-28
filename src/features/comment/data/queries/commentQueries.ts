@@ -1,4 +1,6 @@
+import { CommentEntity } from '@/features/comment/data/entities/commentEntities';
 import { CommentNotFoundError } from '@/features/comment/data/errors/commentErrors';
+import { toDto } from '@/features/comment/data/mapper/commentMapper';
 import { PostNotFoundError } from '@/features/post/data/errors/postErrors';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
@@ -18,17 +20,14 @@ export async function fetchComment(commentId: number) {
     throw new CommentNotFoundError('댓글을 찾을 수 없습니다');
   }
 
-  return data;
+  return data as Pick<CommentEntity, 'user_id' | 'guest_id' | 'password_hash'>;
 }
 
 export async function fetchComments(postId: string) {
   const { data, error } = await supabase
     .from('comments')
     .select(
-      `
-        *,
-        users:user_id (nickname)
-      `
+      'id, post_id, content, created_at, updated_at, like_count, user_id, guest_id, users:user_id(nickname)'
     )
     .eq('post_id', postId)
     .order('created_at', { ascending: true });
@@ -41,15 +40,7 @@ export async function fetchComments(postId: string) {
     throw new PostNotFoundError(`게시물을 찾을 수 없습니다 (${postId})`);
   }
 
-  return data.map(comment => ({
-    ...comment,
-    author_name:
-      comment.users?.nickname ||
-      `게스트#${comment.guest_id?.slice(0, 4) ?? '0000'}` ||
-      '익명',
-    is_deleted: !!comment.user_id && !comment.users,
-    is_guest: !comment.user_id,
-  }));
+  return (data as unknown as CommentEntity[]).map(toDto);
 }
 
 export async function createComments(
@@ -69,10 +60,7 @@ export async function createComments(
       guest_id: guestId,
     })
     .select(
-      `
-      *,
-      users:user_id (nickname)
-    `
+      'id, post_id, content, created_at, updated_at, like_count, user_id, guest_id, users:user_id(nickname)'
     )
     .single();
 
@@ -80,15 +68,7 @@ export async function createComments(
     throw new Error(error.message);
   }
 
-  return {
-    ...data,
-    author_name:
-      data.users?.nickname ||
-      `게스트#${data.guest_id?.slice(0, 4) ?? '0000'}` ||
-      '익명',
-    is_deleted: !!data.user_id && !data.users,
-    is_guest: !data.user_id,
-  };
+  return toDto(data as unknown as CommentEntity);
 }
 
 export async function updateComment(commentId: number, content: string) {
@@ -100,24 +80,13 @@ export async function updateComment(commentId: number, content: string) {
     })
     .eq('id', commentId)
     .select(
-      `
-      *,
-      users:user_id (nickname)
-    `
+      'id, post_id, content, created_at, updated_at, like_count, user_id, guest_id, users:user_id(nickname)'
     )
     .single();
 
   if (error) throw new Error(error.message);
 
-  return {
-    ...data,
-    author_name:
-      data.users?.nickname ||
-      `게스트#${data.guest_id?.slice(0, 4) ?? '0000'}` ||
-      '익명',
-    is_deleted: !!data.user_id && !data.users,
-    is_guest: !data.user_id,
-  };
+  return toDto(data as unknown as CommentEntity);
 }
 
 export async function deleteComment(commentId: number) {

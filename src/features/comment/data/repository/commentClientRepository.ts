@@ -1,14 +1,11 @@
 import { CommentResponseDto } from '@/features/comment/data/dto/commentResponseDto';
-import { toData } from '@/features/comment/data/mapper/commentMapper';
-import { Comment } from '@/features/comment/domain/types/comment';
 import { api } from '@/lib/api';
 
 export async function getComments(
   postId: string
 ): Promise<CommentResponseDto[]> {
   const response = await api.get(`/api/posts/${postId}/comments`);
-  const comments: Comment[] = response.data;
-  return comments.map(toData);
+  return response.data;
 }
 
 export async function createComment({
@@ -20,8 +17,7 @@ export async function createComment({
   password: string;
 }): Promise<CommentResponseDto> {
   const response = await api.post(`/api/posts/${postId}/comments`, requestBody);
-  const comment: Comment = response.data;
-  return toData(comment);
+  return response.data;
 }
 
 export async function updateComment({
@@ -38,8 +34,7 @@ export async function updateComment({
     `/api/posts/${postId}/comments/${commentId}`,
     requestBody
   );
-  const comment: Comment = response.data;
-  return toData(comment);
+  return response.data;
 }
 
 export async function deleteComment(
@@ -61,8 +56,7 @@ export async function incrementLikeCount(
   const response = await api.post(
     `/api/posts/${postId}/comments/${commentId}/likeCount/increment`
   );
-  const comment = response.data;
-  return toData(comment);
+  return response.data;
 }
 
 export async function decrementLikeCount(
@@ -72,6 +66,5 @@ export async function decrementLikeCount(
   const response = await api.post(
     `/api/posts/${postId}/comments/${commentId}/likeCount/decrement`
   );
-  const comment = response.data;
-  return toData(comment);
+  return response.data;
 }

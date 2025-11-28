@@ -1,4 +1,4 @@
-export interface Comment {
+export interface CommentEntity {
   id: number;
   post_id: string;
   content: string;
@@ -7,7 +7,6 @@ export interface Comment {
   like_count: number;
   user_id: string | null;
   guest_id: string | null;
-  author_name: string;
-  is_deleted: boolean;
-  is_guest: boolean;
+  users?: { nickname: string } | null;
+  password_hash?: string | null;
 }
