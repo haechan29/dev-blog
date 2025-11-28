@@ -7,7 +7,7 @@ import WritePostTitle from '@/components/write/writePostTitle';
 import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import clsx from 'clsx';
 
-export default function WritePostForm() {
+export default function WritePostForm({ userId }: { userId: string | null }) {
   const {
     writePostForm: { currentStepId },
   } = useWritePostForm();
@@ -27,7 +27,7 @@ export default function WritePostForm() {
         <div className='w-screen h-full flex flex-col gap-4 px-4 md:px-40 lg:56 xl:px-72'>
           <WritePostTitle />
           <WritePostTag />
-          <WritePostPassword />
+          {!userId && <WritePostPassword />}
         </div>
       </div>
     </div>
