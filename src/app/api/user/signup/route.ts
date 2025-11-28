@@ -3,7 +3,7 @@ import {
   UnauthorizedError,
   ValidationError,
 } from '@/features/user/data/errors/userErrors';
-import { createUser } from '@/features/user/data/queries/userQueries';
+import * as UserQueries from '@/features/user/data/queries/userQueries';
 import { ApiError } from '@/lib/api';
 import { NextRequest, NextResponse } from 'next/server';
 import 'server-only';
@@ -29,15 +29,46 @@ export async function POST(request: NextRequest) {
       throw new ValidationError('한글, 영문, 숫자만 사용 가능합니다');
     }
 
-    await createUser(session.user.id, nickname);
+    await UserQueries.createUser(session.user.id, nickname);
     return NextResponse.json({ data: null });
   } catch (error) {
+    console.error('회원가입 요청이 실패했습니다', error);
+
     if (error instanceof ApiError) {
       return error.toResponse();
     }
 
     return NextResponse.json(
       { error: '회원가입 요청이 실패했습니다' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE() {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      throw new UnauthorizedError('인증되지 않은 요청입니다');
+    }
+
+    const userId = session.user.id;
+
+    await Promise.all([
+      UserQueries.deleteUser(userId),
+      UserQueries.hardDeleteAuthUser(userId),
+    ]);
+
+    return NextResponse.json({ data: null });
+  } catch (error) {
+    console.error('회원가입 탈퇴 요청이 실패했습니다', error);
+
+    if (error instanceof ApiError) {
+      return error.toResponse();
+    }
+
+    return NextResponse.json(
+      { error: '회원 탈퇴 요청이 실패했습니다' },
       { status: 500 }
     );
   }

@@ -32,3 +32,25 @@ export async function createUser(userId: string, nickname: string) {
 
   return data;
 }
+
+export async function deleteUser(userId: string) {
+  const { error } = await supabase
+    .from('users')
+    .update({ deleted_at: new Date().toISOString() })
+    .eq('id', userId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function hardDeleteAuthUser(userId: string) {
+  const { error } = await supabase
+    .from('next_auth.users')
+    .delete()
+    .eq('id', userId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
