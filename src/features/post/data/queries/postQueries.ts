@@ -39,6 +39,24 @@ export async function fetchPost(postId: string) {
   return toDto(data as unknown as PostEntity);
 }
 
+export async function fetchPostForAuth(postId: string) {
+  const { data, error } = await supabase
+    .from('posts')
+    .select('user_id, guest_id, password_hash')
+    .eq('id', postId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (!data) {
+    throw new PostNotFoundError(`게시물을 찾을 수 없습니다 (${postId})`);
+  }
+
+  return data as Pick<PostEntity, 'user_id' | 'guest_id' | 'password_hash'>;
+}
+
 export async function createPost({
   title,
   content,

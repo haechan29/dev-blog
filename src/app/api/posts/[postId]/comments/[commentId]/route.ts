@@ -36,7 +36,9 @@ export async function PATCH(
         throw new UnauthorizedError('인증되지 않은 요청입니다');
       }
     } else {
-      const isValid = await bcrypt.compare(password, comment.password_hash);
+      const isValid =
+        comment.password_hash &&
+        (await bcrypt.compare(password, comment.password_hash));
       if (!isValid) {
         throw new UnauthorizedError('비밀번호가 일치하지 않습니다');
       }
@@ -84,7 +86,9 @@ export async function DELETE(
       }
     } else {
       const isValid =
-        password && (await bcrypt.compare(password, comment.password_hash));
+        password &&
+        comment.password_hash &&
+        (await bcrypt.compare(password, comment.password_hash));
       if (!isValid) {
         throw new UnauthorizedError('비밀번호가 일치하지 않습니다');
       }

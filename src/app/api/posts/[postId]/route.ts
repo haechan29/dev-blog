@@ -50,14 +50,16 @@ export async function PATCH(
       throw new ValidationError('비밀번호를 찾을 수 없습니다');
     }
 
-    const post = await PostQueries.fetchPost(postId);
+    const post = await PostQueries.fetchPostForAuth(postId);
 
     if (post.user_id) {
       if (userId !== post.user_id) {
         throw new UnauthorizedError('인증되지 않은 요청입니다');
       }
     } else {
-      const isValid = await bcrypt.compare(password, post.password_hash);
+      const isValid =
+        post.password_hash &&
+        (await bcrypt.compare(password, post.password_hash));
       if (!isValid) {
         throw new UnauthorizedError('비밀번호가 일치하지 않습니다');
       }
@@ -71,7 +73,7 @@ export async function PATCH(
 
     return NextResponse.json({ data: updated });
   } catch (error) {
-    console.error('게시글 수정 요청이 실패했습니다');
+    console.error('게시글 수정 요청이 실패했습니다', error);
 
     if (error instanceof ApiError) {
       return error.toResponse();
@@ -102,7 +104,7 @@ export async function DELETE(
       throw new ValidationError('비밀번호를 찾을 수 없습니다');
     }
 
-    const post = await PostQueries.fetchPost(postId);
+    const post = await PostQueries.fetchPostForAuth(postId);
 
     if (post.user_id) {
       if (userId !== post.user_id) {
@@ -110,7 +112,9 @@ export async function DELETE(
       }
     } else {
       const isValid =
-        password && (await bcrypt.compare(password, post.password_hash));
+        password &&
+        post.password_hash &&
+        (await bcrypt.compare(password, post.password_hash));
       if (!isValid) {
         throw new UnauthorizedError('비밀번호가 일치하지 않습니다');
       }
