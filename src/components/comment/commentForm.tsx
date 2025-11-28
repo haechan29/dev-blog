@@ -7,7 +7,13 @@ import { Loader2, Send } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
 
-export default function CommentForm({ postId }: { postId: string }) {
+export default function CommentForm({
+  postId,
+  userId,
+}: {
+  postId: string;
+  userId: string | null;
+}) {
   const [password, setPassword] = useState('');
   const [content, setContent] = useState('');
   const [isPasswordValid, setIsPasswordValid] = useState(true);
@@ -34,7 +40,7 @@ export default function CommentForm({ postId }: { postId: string }) {
   );
 
   const handleSubmit = () => {
-    if (!password.trim()) {
+    if (!userId && !password.trim()) {
       setIsPasswordValid(false);
       setIsContentValid(true);
       return;
@@ -51,22 +57,24 @@ export default function CommentForm({ postId }: { postId: string }) {
 
   return (
     <div className='mb-12'>
-      <input
-        type='password'
-        value={password}
-        onChange={e => {
-          setIsPasswordValid(true);
-          setPassword(e.target.value);
-        }}
-        placeholder='비밀번호'
-        className={clsx(
-          'w-full p-3 mb-4 outline-none border rounded-lg',
-          isPasswordValid
-            ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
-            : 'border-red-400 animate-shake',
-          password ? 'bg-white' : 'bg-gray-50'
-        )}
-      />
+      {!userId && (
+        <input
+          type='password'
+          value={password}
+          onChange={e => {
+            setIsPasswordValid(true);
+            setPassword(e.target.value);
+          }}
+          placeholder='비밀번호'
+          className={clsx(
+            'w-full p-3 mb-4 outline-none border rounded-lg',
+            isPasswordValid
+              ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
+              : 'border-red-400 animate-shake',
+            password ? 'bg-white' : 'bg-gray-50'
+          )}
+        />
+      )}
       <textarea
         value={content}
         onChange={e => {

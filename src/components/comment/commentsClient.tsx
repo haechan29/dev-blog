@@ -9,7 +9,13 @@ import { MessageCircle } from 'lucide-react';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function CommentsClient({ postId }: { postId: string }) {
+export default function CommentsClient({
+  postId,
+  userId,
+}: {
+  postId: string;
+  userId: string | null;
+}) {
   const dispatch = useDispatch<AppDispatch>();
   const { comments } = useComments({ postId });
 
@@ -29,7 +35,7 @@ export default function CommentsClient({ postId }: { postId: string }) {
       <div className='text-xl font-bold text-gray-900 mb-8'>
         {`댓글 ${comments.length}개`}
       </div>
-      <CommentForm postId={postId} />
+      <CommentForm postId={postId} userId={userId} />
       <div className='space-y-6'>
         {comments.length === 0 ? (
           <div className='text-center py-12'>
