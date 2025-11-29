@@ -1,6 +1,6 @@
 'use client';
 
-import ProfileDropdown from '@/components/profile/profileDropdown';
+import ProfileDropdown from '@/components/user/profileDropdown';
 import clsx from 'clsx';
 import { Session } from 'next-auth';
 

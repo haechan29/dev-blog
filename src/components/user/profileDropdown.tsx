@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { createRipple } from '@/lib/dom';
-import { LogIn, LogOut } from 'lucide-react';
+import { LogIn, LogOut, UserX } from 'lucide-react';
 import { Session } from 'next-auth';
 import { signIn, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -36,6 +36,10 @@ export default function ProfileDropdown({
           router.refresh();
           break;
         }
+        case 'delete-account': {
+          // 모달 열기
+          break;
+        }
       }
     },
     [router]
@@ -59,14 +63,24 @@ export default function ProfileDropdown({
 
       <DropdownMenuContent align='end'>
         {session?.user ? (
-          <DropdownMenuItem
-            data-action='logout'
-            onClick={handleAction}
-            className='w-full flex items-center gap-2 cursor-pointer'
-          >
-            <LogOut className='w-4 h-4 text-gray-500' />
-            <div className='whitespace-nowrap text-gray-900'>로그아웃</div>
-          </DropdownMenuItem>
+          <>
+            <DropdownMenuItem
+              data-action='logout'
+              onClick={handleAction}
+              className='w-full flex items-center gap-2 cursor-pointer'
+            >
+              <LogOut className='w-4 h-4 text-gray-500' />
+              <div className='whitespace-nowrap text-gray-900'>로그아웃</div>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              data-action='delete-account'
+              onClick={handleAction}
+              className='w-full flex items-center gap-2 cursor-pointer'
+            >
+              <UserX className='w-4 h-4 text-red-500' />
+              <div className='whitespace-nowrap text-red-600'>회원 탈퇴</div>
+            </DropdownMenuItem>
+          </>
         ) : (
           <DropdownMenuItem
             data-action='login'

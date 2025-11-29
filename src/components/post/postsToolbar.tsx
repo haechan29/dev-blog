@@ -1,6 +1,6 @@
 'use client';
 
-import ProfileIcon from '@/components/profile/profileIcon';
+import ProfileIcon from '@/components/user/profileIcon';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { cn } from '@/lib/utils';
