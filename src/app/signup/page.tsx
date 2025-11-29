@@ -111,6 +111,14 @@ export default function SignupPage() {
           )}
         </div>
 
+        <div className='text-xs text-gray-500 bg-gray-50 p-3 rounded mb-6'>
+          <div className='font-semibold mb-1'>수집되는 계정 정보</div>
+          <ul className='list-disc list-inside space-y-0.5'>
+            <li>닉네임</li>
+            <li>이메일 주소</li>
+          </ul>
+        </div>
+
         <div className='flex flex-col gap-3 mb-6'>
           <label
             className={clsx(

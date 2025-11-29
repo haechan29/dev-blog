@@ -60,7 +60,6 @@ export default function DeleteAccountDialog({
           <ul className='list-disc list-inside space-y-0.5'>
             <li>닉네임</li>
             <li>이메일 주소</li>
-            <li>로그인 정보</li>
           </ul>
         </div>
 
