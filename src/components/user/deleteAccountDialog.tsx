@@ -12,6 +12,7 @@ import { ApiError } from '@/lib/api';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
 import { signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
@@ -22,6 +23,7 @@ export default function DeleteAccountDialog({
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }) {
+  const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
@@ -34,7 +36,8 @@ export default function DeleteAccountDialog({
     setIsDeleting(true);
     try {
       await UserClientService.deleteUser();
-      await signOut({ redirect: false });
+      await signOut();
+      router.refresh();
       setIsOpen(false);
     } catch (error) {
       const message =
@@ -42,7 +45,7 @@ export default function DeleteAccountDialog({
       toast.error(message);
       setIsDeleting(false);
     }
-  }, [setIsOpen]);
+  }, [router, setIsOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

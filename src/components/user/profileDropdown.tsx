@@ -30,7 +30,6 @@ export default function ProfileDropdown({
       switch (actionAttribute) {
         case 'login': {
           await signIn();
-          router.refresh();
           break;
         }
         case 'logout': {

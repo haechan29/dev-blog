@@ -1,10 +1,9 @@
 'use client';
 
 import { signIn } from 'next-auth/react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 export default function LoginPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
 
@@ -17,7 +16,6 @@ export default function LoginPage() {
           <button
             onClick={() => {
               signIn('google', { callbackUrl });
-              router.refresh();
             }}
             className='w-full h-12 flex items-center justify-center gap-3 border border-gray-300 rounded-lg hover:bg-gray-50'
             aria-label='구글 로그인'
@@ -46,7 +44,6 @@ export default function LoginPage() {
           <button
             onClick={() => {
               signIn('kakao', { callbackUrl });
-              router.refresh();
             }}
             className='w-full h-12 flex items-center justify-center gap-3 bg-[#FEE500] rounded-lg hover:bg-[#FDD835]'
             aria-label='카카오 로그인'
