@@ -7,3 +7,7 @@ export async function createUser({
 }): Promise<void> {
   await UserClientRepository.createUser({ nickname });
 }
+
+export async function deleteUser(): Promise<void> {
+  await UserClientRepository.deleteUser();
+}

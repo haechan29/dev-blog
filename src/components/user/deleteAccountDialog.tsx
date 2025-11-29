@@ -7,6 +7,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
+import * as UserClientService from '@/features/user/domain/service/userClientService';
 import { ApiError } from '@/lib/api';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
@@ -32,9 +33,7 @@ export default function DeleteAccountDialog({
   const handleDelete = useCallback(async () => {
     setIsDeleting(true);
     try {
-      const response = await fetch('/api/user', { method: 'DELETE' });
-      if (!response.ok) throw new Error();
-
+      await UserClientService.deleteUser();
       await signOut({ redirect: false });
       setIsOpen(false);
     } catch (error) {

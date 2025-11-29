@@ -15,3 +15,7 @@ export async function createUser({
     throw error;
   }
 }
+
+export async function deleteUser(): Promise<void> {
+  await api.delete('/api/user');
+}
