@@ -7,13 +7,13 @@ import {
   DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
-import * as UserClientService from '@/features/user/domain/service/userClientService';
+import useUser from '@/features/user/domain/hooks/useUser';
 import { ApiError } from '@/lib/api';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
 
 export default function DeleteAccountDialog({
@@ -24,28 +24,30 @@ export default function DeleteAccountDialog({
   setIsOpen: (isOpen: boolean) => void;
 }) {
   const router = useRouter();
-  const [isDeleting, setIsDeleting] = useState(false);
+  const { deleteUserMutation } = useUser();
 
   useEffect(() => {
     if (!isOpen) {
-      setIsDeleting(false);
+      deleteUserMutation.reset();
     }
-  }, [isOpen]);
+  }, [deleteUserMutation, isOpen]);
 
   const handleDelete = useCallback(async () => {
-    setIsDeleting(true);
-    try {
-      await UserClientService.deleteUser();
-      await signOut();
-      router.refresh();
-      setIsOpen(false);
-    } catch (error) {
-      const message =
-        error instanceof ApiError ? error.message : '회원 탈퇴에 실패했습니다';
-      toast.error(message);
-      setIsDeleting(false);
-    }
-  }, [router, setIsOpen]);
+    deleteUserMutation.mutate(undefined, {
+      onSuccess: async () => {
+        await signOut();
+        router.refresh();
+        setIsOpen(false);
+      },
+      onError: error => {
+        const message =
+          error instanceof ApiError
+            ? error.message
+            : '회원 탈퇴에 실패했습니다';
+        toast.error(message);
+      },
+    });
+  }, [deleteUserMutation, router, setIsOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -70,12 +72,12 @@ export default function DeleteAccountDialog({
           <button
             className={clsx(
               'flex justify-center items-center px-6 h-10 rounded-sm font-bold text-white hover:bg-red-400',
-              isDeleting ? 'bg-red-400' : 'bg-red-600'
+              deleteUserMutation.isPending ? 'bg-red-400' : 'bg-red-600'
             )}
             onClick={handleDelete}
-            disabled={isDeleting}
+            disabled={deleteUserMutation.isPending}
           >
-            {isDeleting ? (
+            {deleteUserMutation.isPending ? (
               <Loader2 size={18} strokeWidth={3} className='animate-spin' />
             ) : (
               '탈퇴하기'
