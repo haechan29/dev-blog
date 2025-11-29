@@ -13,7 +13,7 @@ export function toDto(post: PostEntity): PostResponseDto {
     guestId: post.guest_id,
     authorName:
       post.users?.nickname ||
-      `게스트#${post.guest_id?.slice(0, 4) ?? '0000'}` ||
+      `Guest#${post.guest_id?.slice(0, 4) ?? '0000'}` ||
       '익명',
     isDeleted: !!post.user_id && !!post.users?.deleted_at,
     isGuest: !post.user_id,

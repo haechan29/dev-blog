@@ -1,35 +1,33 @@
 'use client';
 
-import ProfileDropdown from '@/components/user/profileDropdown';
-import useUser from '@/features/user/domain/hooks/useUser';
 import clsx from 'clsx';
 
-export default function ProfileIcon() {
-  const { user } = useUser();
-  const name = user?.nickname || 'Guest';
-  const initial = name.charAt(0).toUpperCase();
+export default function ProfileIcon({
+  isGuest,
+  nickname,
+}: {
+  isGuest: boolean;
+  nickname?: string | null;
+}) {
+  const initial = (nickname ?? 'Guest').charAt(0).toUpperCase();
 
   return (
-    <ProfileDropdown>
-      <button
-        aria-label='프로필 메뉴'
-        data-is-user={user !== null}
+    <div
+      className={clsx(
+        'w-8 h-8 rounded-full flex items-center justify-center cursor-pointer',
+        isGuest
+          ? 'bg-gray-300 hover:bg-gray-400'
+          : 'bg-blue-400 hover:bg-blue-500'
+      )}
+    >
+      <span
         className={clsx(
-          'w-8 h-8 rounded-full flex items-center justify-center cursor-pointer',
-          user
-            ? 'bg-blue-400 hover:bg-blue-500'
-            : 'bg-gray-300 hover:bg-gray-400'
+          'text-sm font-semibold',
+          isGuest ? 'text-gray-600' : 'text-white'
         )}
       >
-        <span
-          className={clsx(
-            'text-sm font-semibold',
-            user ? 'text-white' : 'text-gray-600'
-          )}
-        >
-          {initial}
-        </span>
-      </button>
-    </ProfileDropdown>
+        {initial}
+      </span>
+    </div>
   );
 }

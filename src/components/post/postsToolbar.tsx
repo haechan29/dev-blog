@@ -1,6 +1,6 @@
 'use client';
 
-import ProfileIcon from '@/components/user/profileIcon';
+import ToolbarProfileIcon from '@/components/post/toolbarProfileIcon';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { cn } from '@/lib/utils';
@@ -71,7 +71,7 @@ export default function PostsToolbar({ className }: { className?: string }) {
           <Search className='w-5 h-5' />
         </button>
 
-        <ProfileIcon />
+        <ToolbarProfileIcon />
       </div>
     </div>
   );

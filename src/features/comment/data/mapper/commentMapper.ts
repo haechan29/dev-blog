@@ -7,7 +7,7 @@ export function toDto(comment: CommentEntity): CommentResponseDto {
     postId: comment.post_id,
     authorName:
       comment.users?.nickname ||
-      `게스트#${comment.guest_id?.slice(0, 4) ?? '0000'}` ||
+      `Guest#${comment.guest_id?.slice(0, 4) ?? '0000'}` ||
       '익명',
     content: comment.content,
     createdAt: comment.created_at,
