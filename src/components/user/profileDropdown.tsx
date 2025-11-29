@@ -7,21 +7,16 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import DeleteAccountDialog from '@/components/user/deleteAccountDialog';
+import useUser from '@/features/user/domain/hooks/useUser';
 import { createRipple } from '@/lib/dom';
 import { LogIn, LogOut, UserX } from 'lucide-react';
-import { Session } from 'next-auth';
 import { signIn, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { MouseEvent, ReactNode, useCallback, useState } from 'react';
 
-export default function ProfileDropdown({
-  session,
-  children,
-}: {
-  session: Session | null;
-  children: ReactNode;
-}) {
+export default function ProfileDropdown({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const { user } = useUser();
   const [isDeleteDialogVisible, setIsDeleteDialogVisible] = useState(false);
 
   const handleAction = useCallback(
@@ -68,7 +63,7 @@ export default function ProfileDropdown({
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align='end'>
-          {session?.user ? (
+          {user ? (
             <>
               <DropdownMenuItem
                 data-action='logout'

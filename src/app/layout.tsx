@@ -1,5 +1,4 @@
 import '@/app/globals.css';
-import { auth } from '@/auth';
 import LayoutClient from '@/components/layoutClient';
 import LayoutContainer from '@/components/layoutContainer';
 import { fetchPosts } from '@/features/post/domain/service/postServerService';
@@ -28,10 +27,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const [posts, session] = await Promise.all([
-    fetchPosts().then(posts => posts.map(createProps)),
-    auth(),
-  ]);
+  const posts = await fetchPosts().then(posts => posts.map(createProps));
 
   return (
     <html lang='ko'>
@@ -46,9 +42,7 @@ export default async function RootLayout({
         </Suspense>
 
         <Providers>
-          <LayoutContainer posts={posts} session={session}>
-            {children}
-          </LayoutContainer>
+          <LayoutContainer posts={posts}>{children}</LayoutContainer>
         </Providers>
 
         <Toaster />

@@ -5,17 +5,14 @@ import PostsToolbar from '@/components/post/postsToolbar';
 import PostToolbar from '@/components/post/postToolbar';
 import { PostProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
-import { Session } from 'next-auth';
 import { usePathname } from 'next/navigation';
 import { ReactNode, Suspense } from 'react';
 
 export default function LayoutContainer({
   posts,
-  session,
   children,
 }: {
   posts: PostProps[];
-  session: Session | null;
   children: ReactNode;
 }) {
   const pathname = usePathname();
@@ -27,10 +24,10 @@ export default function LayoutContainer({
   return (
     <>
       <Suspense>
-        {isPostsPage && <PostsToolbar session={session} />}
+        {isPostsPage && <PostsToolbar />}
         {isPostPage && (
           <>
-            <PostsToolbar session={session} className='max-xl:hidden' />
+            <PostsToolbar className='max-xl:hidden' />
             <PostToolbar className='xl:hidden' />
           </>
         )}

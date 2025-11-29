@@ -1,16 +1,16 @@
 'use client';
 
 import ProfileDropdown from '@/components/user/profileDropdown';
+import useUser from '@/features/user/domain/hooks/useUser';
 import clsx from 'clsx';
-import { Session } from 'next-auth';
 
-export default function ProfileIcon({ session }: { session: Session | null }) {
-  const user = session?.user;
-  const name = user?.name || 'Guest';
+export default function ProfileIcon() {
+  const { user } = useUser();
+  const name = user?.nickname || 'Guest';
   const initial = name.charAt(0).toUpperCase();
 
   return (
-    <ProfileDropdown session={session}>
+    <ProfileDropdown>
       <button
         aria-label='프로필 메뉴'
         data-is-user={user !== null}

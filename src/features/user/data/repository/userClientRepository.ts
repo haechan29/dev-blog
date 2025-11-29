@@ -3,7 +3,8 @@ import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
 import { api, ApiError } from '@/lib/api';
 
 export async function fetchUser(): Promise<UserResponseDto | null> {
-  return await api.get('/api/user');
+  const response = await api.get('/api/user');
+  return response.data;
 }
 
 export async function createUser({
