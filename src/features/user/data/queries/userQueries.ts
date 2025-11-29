@@ -1,7 +1,7 @@
 import { UserEntity } from '@/features/user/data/entities/userEntities';
 import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
 import { toDto } from '@/features/user/data/mapper/userMapper';
-import { supabase } from '@/lib/supabase';
+import { supabase, supabaseNextAuth } from '@/lib/supabase';
 import 'server-only';
 
 export async function getUserById(userId: string) {
@@ -45,8 +45,8 @@ export async function deleteUser(userId: string) {
 }
 
 export async function hardDeleteAuthUser(userId: string) {
-  const { error } = await supabase
-    .from('next_auth.users')
+  const { error } = await supabaseNextAuth
+    .from('users')
     .delete()
     .eq('id', userId);
 

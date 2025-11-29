@@ -61,7 +61,7 @@ export async function DELETE() {
 
     return NextResponse.json({ data: null });
   } catch (error) {
-    console.error('회원가입 탈퇴 요청이 실패했습니다', error);
+    console.error('회원 탈퇴 요청이 실패했습니다', error);
 
     if (error instanceof ApiError) {
       return error.toResponse();
