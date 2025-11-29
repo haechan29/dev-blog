@@ -14,12 +14,8 @@ export default function PrivacyPage() {
         <div className='mb-6'>
           <h3 className='text-lg font-semibold mb-2'>필수 정보</h3>
           <ul className='list-disc list-inside mb-4 space-y-1'>
-            <li>소셜 로그인 제공자 ID</li>
-            <li>이메일</li>
-            <li>이름</li>
-            <li>프로필 이미지</li>
             <li>닉네임</li>
-            <li>OAuth 인증 토큰 (access token, refresh token 등)</li>
+            <li>이메일</li>
           </ul>
 
           <h3 className='text-lg font-semibold mb-2'>자동 수집 정보</h3>

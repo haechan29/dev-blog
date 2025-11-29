@@ -36,7 +36,7 @@ export async function createUser(userId: string, nickname: string) {
 export async function deleteUser(userId: string) {
   const { error } = await supabase
     .from('users')
-    .update({ deleted_at: new Date().toISOString() })
+    .update({ deleted_at: new Date().toISOString(), nickname: null })
     .eq('id', userId);
 
   if (error) {
