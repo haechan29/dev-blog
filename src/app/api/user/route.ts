@@ -8,6 +8,30 @@ import { ApiError } from '@/lib/api';
 import { NextRequest, NextResponse } from 'next/server';
 import 'server-only';
 
+export async function GET(request: NextRequest) {
+  try {
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) {
+      return NextResponse.json({ data: null });
+    }
+
+    const data = await UserQueries.getUserById(userId);
+    return NextResponse.json({ data });
+  } catch (error) {
+    console.error('유저 조회에 실패했습니다', error);
+
+    if (error instanceof ApiError) {
+      return error.toResponse();
+    }
+
+    return NextResponse.json(
+      { error: '유저 조회에 실패했습니다' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();

@@ -1,5 +1,10 @@
+import { UserResponseDto } from '@/features/user/data/dto/userResponseDto';
 import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
 import { api, ApiError } from '@/lib/api';
+
+export async function fetchUser(): Promise<UserResponseDto | null> {
+  return await api.get('/api/user');
+}
 
 export async function createUser({
   nickname,
