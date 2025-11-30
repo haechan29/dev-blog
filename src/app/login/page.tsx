@@ -1,5 +1,7 @@
 'use client';
 
+import { canTouch } from '@/lib/browser';
+import { createRipple } from '@/lib/dom';
 import { signIn } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -25,11 +27,12 @@ export default function LoginPage() {
           {providers.map(provider => (
             <button
               key={provider}
-              onClick={() => {
+              onClick={e => {
+                if (canTouch) createRipple(e);
                 localStorage.setItem(LAST_LOGIN_PROVIDER_KEY, provider);
                 signIn(provider, { callbackUrl });
               }}
-              className='w-full relative'
+              className='w-full relative cursor-pointer'
               aria-label={`${provider} 로그인`}
             >
               <ProviderButton provider={provider} />
