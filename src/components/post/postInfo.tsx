@@ -4,7 +4,7 @@ import { PostProps } from '@/features/post/ui/postProps';
 import usePostStat from '@/features/postStat/hooks/usePostStat';
 
 export default function PostInfo({
-  post: { id: postId, authorName, isGuest, createdAt },
+  post: { id: postId, authorName, createdAt },
   isAuthorNameVisible = true,
 }: {
   post: PostProps;

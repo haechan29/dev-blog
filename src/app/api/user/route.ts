@@ -8,7 +8,7 @@ import { ApiError } from '@/lib/api';
 import { NextRequest, NextResponse } from 'next/server';
 import 'server-only';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await auth();
     const userId = session?.user?.id;
