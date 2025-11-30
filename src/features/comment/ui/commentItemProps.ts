@@ -6,4 +6,8 @@ export type CommentItemProps = {
   createdAt: string;
   isUpdated: boolean;
   likeCount: number;
+  userId: string | null;
+  guestId: string | null;
+  isDeleted: boolean;
+  isGuest: boolean;
 };

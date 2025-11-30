@@ -1,3 +1,6 @@
+import { ErrorCode } from '@/types/errorCode';
+import { NextResponse } from 'next/server';
+
 export const api = {
   get: (url: string, options?: RequestInit) =>
     fetchWithErrorHandling(url, options),
@@ -34,9 +37,30 @@ async function fetchWithErrorHandling(url: string, options?: RequestInit) {
   const response = await fetch(url, options);
 
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error);
+    const { error, code } = await response.json();
+    throw new ApiError(error, code);
   }
 
   return response.json();
+}
+
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public readonly code: ErrorCode,
+    public readonly statusCode: number = 500
+  ) {
+    super(message);
+    this.name = this.constructor.name;
+  }
+
+  toResponse() {
+    return NextResponse.json(
+      {
+        error: this.message,
+        code: this.code,
+      },
+      { status: this.statusCode }
+    );
+  }
 }

@@ -1,10 +1,13 @@
 export interface PostResponseDto {
   id: string;
-  authorName: string;
   title: string;
   tags: string[];
   content: string;
   createdAt: string;
   updatedAt: string;
-  authorId?: string;
+  userId: string | null;
+  guestId: string | null;
+  authorName: string;
+  isDeleted: boolean;
+  isGuest: boolean;
 }

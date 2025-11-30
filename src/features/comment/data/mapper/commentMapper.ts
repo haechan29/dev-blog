@@ -1,14 +1,21 @@
 import { CommentResponseDto } from '@/features/comment/data/dto/commentResponseDto';
-import { Comment } from '@/types/env';
+import { CommentEntity } from '@/features/comment/data/entities/commentEntities';
 
-export function toData(comment: Comment): CommentResponseDto {
+export function toDto(comment: CommentEntity): CommentResponseDto {
   return {
     id: comment.id,
     postId: comment.post_id,
-    authorName: comment.author_name,
+    authorName:
+      comment.users?.nickname ||
+      `Guest#${comment.guest_id?.slice(0, 4) ?? '0000'}` ||
+      '익명',
     content: comment.content,
     createdAt: comment.created_at,
     updatedAt: comment.updated_at,
     likeCount: comment.like_count,
+    userId: comment.user_id,
+    guestId: comment.guest_id,
+    isDeleted: !!comment.user_id && !!comment.users?.deleted_at,
+    isGuest: !comment.user_id,
   };
 }

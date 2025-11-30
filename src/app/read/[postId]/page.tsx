@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 
+import { auth } from '@/auth';
 import Comments from '@/components/comment/comments';
 import LikeButton from '@/components/post/likeButton';
 import PostContentWrapper from '@/components/post/postContentWrapper';
@@ -17,6 +18,9 @@ export default async function PostPage({
 }: {
   params: Promise<{ postId: string }>;
 }) {
+  const session = await auth();
+  const userId = session?.user?.id ?? null;
+
   const { postId } = await params;
   const post = await fetchPost(postId).then(createProps);
 
@@ -26,7 +30,7 @@ export default async function PostPage({
 
       <EnterFullscreenButton />
 
-      <PostHeader post={post} />
+      <PostHeader userId={userId} post={post} />
       <div className='w-full h-px bg-gray-200 mb-10' />
 
       <PostContentWrapper

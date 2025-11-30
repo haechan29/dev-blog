@@ -8,17 +8,20 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import useComments from '@/features/comment/hooks/useComments';
+import { ApiError } from '@/lib/api';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
 export default function DeleteCommentDialog({
+  userId,
   postId,
   commentId,
   isOpen,
   setIsOpen,
 }: {
+  userId: string | null;
   postId: string;
   commentId: number;
   isOpen: boolean;
@@ -38,15 +41,23 @@ export default function DeleteCommentDialog({
   const deleteComment = useCallback(
     (params: { postId: string; commentId: number; password: string }) => {
       deleteCommentMutation.mutate(params, {
-        onSuccess: () => setIsOpen(false),
-        onError: error => toast.error(error.message),
+        onSuccess: () => {
+          setIsOpen(false);
+        },
+        onError: error => {
+          const message =
+            error instanceof ApiError
+              ? error.message
+              : '댓글 삭제에 실패했습니다';
+          toast.error(message);
+        },
       });
     },
     [deleteCommentMutation, setIsOpen]
   );
 
   const handleDelete = () => {
-    if (!password.trim()) {
+    if (!userId && !password.trim()) {
       setIsPasswordValid(false);
       return;
     }
@@ -65,22 +76,26 @@ export default function DeleteCommentDialog({
         <div className='text-sm text-gray-500 mb-6'>
           정말로 댓글을 삭제할까요?
         </div>
-        <input
-          className={clsx(
-            'w-full border p-3 mb-8 rounded-sm outline-none',
-            isPasswordValid
-              ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
-              : 'border-red-400 animate-shake',
-            password ? 'bg-white' : 'bg-gray-50'
-          )}
-          type='password'
-          value={password}
-          onChange={e => {
-            setPassword(e.target.value);
-            setIsPasswordValid(true);
-          }}
-          placeholder='비밀번호를 입력하세요'
-        />
+
+        {!userId && (
+          <input
+            className={clsx(
+              'w-full border p-3 mb-8 rounded-sm outline-none',
+              isPasswordValid
+                ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
+                : 'border-red-400 animate-shake',
+              password ? 'bg-white' : 'bg-gray-50'
+            )}
+            type='password'
+            value={password}
+            onChange={e => {
+              setPassword(e.target.value);
+              setIsPasswordValid(true);
+            }}
+            placeholder='비밀번호를 입력하세요'
+          />
+        )}
+
         <div className='flex justify-between items-center'>
           <button
             className={clsx(

@@ -1,3 +1,4 @@
+import { auth } from '@/auth';
 import CommentsClient from '@/components/comment/commentsClient';
 import * as CommentServerService from '@/features/comment/domain/service/commentServerService';
 import {
@@ -9,6 +10,8 @@ import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
 export default async function Comments({ id: postId }: { id: string }) {
+  const session = await auth();
+  const userId = session?.user?.id ?? null;
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({
@@ -23,7 +26,7 @@ export default async function Comments({ id: postId }: { id: string }) {
     <HydrationBoundary state={dehydrate(queryClient)}>
       <ErrorBoundary fallback={<div></div>}>
         <Suspense>
-          <CommentsClient postId={postId} />
+          <CommentsClient postId={postId} userId={userId} />
         </Suspense>
       </ErrorBoundary>
     </HydrationBoundary>

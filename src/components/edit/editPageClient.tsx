@@ -15,7 +15,7 @@ import {
 } from '@/lib/redux/write/writePostFormSlice';
 import { setCurrentStepId } from '@/lib/redux/write/writePostSlice';
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import * as PostClientService from '@/features/post/domain/service/postClientService';
@@ -23,21 +23,13 @@ import { RootState } from '@/lib/redux/store';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 
-export default function EditPageClient({ post }: { post: PostProps }) {
-  return (
-    <Suspense>
-      <QueryParamsValidator
-        queryKey='step'
-        isValidValue={value => value !== null && value in writePostSteps}
-        fallbackOption={{ type: 'defaultValue', value: 'write' }}
-      >
-        <EditPageWithValidation post={post} />
-      </QueryParamsValidator>
-    </Suspense>
-  );
-}
-
-function EditPageWithValidation({ post }: { post: PostProps }) {
+export default function EditPageClient({
+  userId,
+  post,
+}: {
+  userId: string | null;
+  post: PostProps;
+}) {
   const searchParams = useSearchParams();
   const step = searchParams.get('step') as keyof typeof writePostSteps;
   const dispatch = useDispatch<AppDispatch>();
@@ -80,17 +72,22 @@ function EditPageWithValidation({ post }: { post: PostProps }) {
   }, []);
 
   return (
-    <>
+    <QueryParamsValidator
+      queryKey='step'
+      isValidValue={value => value !== null && value in writePostSteps}
+      fallbackOption={{ type: 'defaultValue', value: 'write' }}
+    >
       <RestoreDraftDialog draft={draft} isOpen={isOpen} setIsOpen={setIsOpen} />
       <div className='w-screen h-dvh flex flex-col'>
         <WritePostToolbar
+          userId={userId}
           publishPost={async () => updatePost(post.id)}
           removeDraft={removeDraft}
         />
         <div className='flex-1 min-h-0'>
-          <WritePostForm />
+          <WritePostForm userId={userId} />
         </div>
       </div>
-    </>
+    </QueryParamsValidator>
   );
 }

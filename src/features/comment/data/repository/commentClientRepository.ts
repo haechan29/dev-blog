@@ -1,22 +1,11 @@
 import { CommentResponseDto } from '@/features/comment/data/dto/commentResponseDto';
 import { api } from '@/lib/api';
-import { Comment } from '@/types/env';
 
 export async function getComments(
   postId: string
 ): Promise<CommentResponseDto[]> {
   const response = await api.get(`/api/posts/${postId}/comments`);
-  const data = response.data;
-
-  return data.map((comment: Comment) => ({
-    id: comment.id,
-    postId: comment.post_id,
-    authorName: comment.author_name,
-    content: comment.content,
-    createdAt: comment.created_at,
-    updatedAt: comment.updated_at,
-    likeCount: comment.like_count,
-  }));
+  return response.data;
 }
 
 export async function createComment({
@@ -24,21 +13,11 @@ export async function createComment({
   ...requestBody
 }: {
   postId: string;
-  authorName: string;
   content: string;
   password: string;
 }): Promise<CommentResponseDto> {
   const response = await api.post(`/api/posts/${postId}/comments`, requestBody);
-  const comment: Comment = response.data;
-  return {
-    id: comment.id,
-    postId: comment.post_id,
-    authorName: comment.author_name,
-    content: comment.content,
-    createdAt: comment.created_at,
-    updatedAt: comment.updated_at,
-    likeCount: comment.like_count,
-  };
+  return response.data;
 }
 
 export async function updateComment({
@@ -55,16 +34,7 @@ export async function updateComment({
     `/api/posts/${postId}/comments/${commentId}`,
     requestBody
   );
-  const comment: Comment = response.data;
-  return {
-    id: comment.id,
-    postId: comment.post_id,
-    authorName: comment.author_name,
-    content: comment.content,
-    createdAt: comment.created_at,
-    updatedAt: comment.updated_at,
-    likeCount: comment.like_count,
-  };
+  return response.data;
 }
 
 export async function deleteComment(
@@ -86,17 +56,7 @@ export async function incrementLikeCount(
   const response = await api.post(
     `/api/posts/${postId}/comments/${commentId}/likeCount/increment`
   );
-  const comment = response.data;
-
-  return {
-    id: comment.id,
-    postId: comment.post_id,
-    authorName: comment.author_name,
-    content: comment.content,
-    createdAt: comment.created_at,
-    updatedAt: comment.updated_at,
-    likeCount: comment.like_count,
-  };
+  return response.data;
 }
 
 export async function decrementLikeCount(
@@ -106,15 +66,5 @@ export async function decrementLikeCount(
   const response = await api.post(
     `/api/posts/${postId}/comments/${commentId}/likeCount/decrement`
   );
-  const comment = response.data;
-
-  return {
-    id: comment.id,
-    postId: comment.post_id,
-    authorName: comment.author_name,
-    content: comment.content,
-    createdAt: comment.created_at,
-    updatedAt: comment.updated_at,
-    likeCount: comment.like_count,
-  };
+  return response.data;
 }

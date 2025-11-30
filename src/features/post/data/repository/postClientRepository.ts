@@ -1,7 +1,5 @@
 import { PostResponseDto } from '@/features/post/data/dto/postResponseDto';
-import { toData } from '@/features/post/data/mapper/postMapper';
 import { api } from '@/lib/api';
-import { Post } from '@/types/env';
 
 export async function createPost(requestDto: {
   title: string;
@@ -10,8 +8,7 @@ export async function createPost(requestDto: {
   password: string;
 }): Promise<PostResponseDto> {
   const response = await api.post(`/api/posts`, requestDto);
-  const post: Post = response.data;
-  return toData(post);
+  return response.data;
 }
 
 export async function updatePost({
@@ -25,8 +22,7 @@ export async function updatePost({
   password?: string;
 }): Promise<PostResponseDto> {
   const response = await api.patch(`/api/posts/${postId}`, requestBody);
-  const post: Post = response.data;
-  return toData(post);
+  return response.data;
 }
 
 export async function deletePost(

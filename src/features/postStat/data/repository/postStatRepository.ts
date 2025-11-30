@@ -1,18 +1,14 @@
 import { PostStatResponseDto } from '@/features/postStat/data/dto/postStatResponseDto';
+import { toData } from '@/features/postStat/data/mapper/postStatMapper';
+import { PostStat } from '@/features/postStat/domain/types/postStat';
 import { api } from '@/lib/api';
 
 export async function fetchPostStat(
   postId: string
 ): Promise<PostStatResponseDto> {
   const response = await api.get(`/api/posts/${postId}/stats`);
-  const postStat = response.data;
-
-  return {
-    id: postStat.id,
-    postId: postStat.post_id,
-    likeCount: postStat.like_count,
-    viewCount: postStat.view_count,
-  };
+  const postStat: PostStat = response.data;
+  return toData(postStat);
 }
 
 export async function incrementLikeCount(
@@ -22,13 +18,7 @@ export async function incrementLikeCount(
     `/api/posts/${postId}/stats/likeCount/increment`
   );
   const postStat = response.data;
-
-  return {
-    id: postStat.id,
-    postId: postStat.post_id,
-    likeCount: postStat.like_count,
-    viewCount: postStat.view_count,
-  };
+  return toData(postStat);
 }
 
 export async function incrementViewCount(
@@ -38,11 +28,5 @@ export async function incrementViewCount(
     `/api/posts/${postId}/stats/viewCount/increment`
   );
   const postStat = response.data;
-
-  return {
-    id: postStat.id,
-    postId: postStat.post_id,
-    likeCount: postStat.like_count,
-    viewCount: postStat.view_count,
-  };
+  return toData(postStat);
 }

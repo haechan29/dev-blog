@@ -28,7 +28,11 @@ export interface WritePostForm {
   };
 }
 
-export function validate(form: WritePostForm, ...fields: string[]) {
+export function validate(
+  userId: string | null,
+  form: WritePostForm,
+  ...fields: string[]
+) {
   return fields.every(field => {
     switch (field) {
       case 'title': {
@@ -44,6 +48,7 @@ export function validate(form: WritePostForm, ...fields: string[]) {
         );
       }
       case 'password': {
+        if (userId) return true;
         const { value, isEmptyAllowed, maxLength } = form[field];
         return (
           (isEmptyAllowed || value.length > 0) && value.length <= maxLength

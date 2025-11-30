@@ -3,6 +3,7 @@
 import CommentLikeButton from '@/components/comment/commentLikeButton';
 import { updateComment } from '@/features/comment/domain/service/commentClientService';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import { ApiError } from '@/lib/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
@@ -11,10 +12,12 @@ import toast from 'react-hot-toast';
 
 export default function CommentContentSection({
   comment,
+  userId,
   isEditing,
   setIsEditing,
 }: {
   comment: CommentItemProps;
+  userId: string | null;
   isEditing: boolean;
   setIsEditing: (isEditing: boolean) => void;
 }) {
@@ -48,11 +51,15 @@ export default function CommentContentSection({
       });
       setIsEditing(false);
     },
-    onError: error => toast.error(error.message),
+    onError: error => {
+      const message =
+        error instanceof ApiError ? error.message : '댓글 수정에 실패했습니다';
+      toast.error(message);
+    },
   });
 
   const handleEdit = () => {
-    if (!password.trim()) {
+    if (!userId && !password.trim()) {
       setIsPasswordValid(false);
       setIsContentValid(true);
       return;
@@ -76,22 +83,24 @@ export default function CommentContentSection({
     <div className='mb-2'>
       {isEditing ? (
         <div className='space-y-3'>
-          <input
-            type='password'
-            value={password}
-            onChange={e => {
-              setIsPasswordValid(true);
-              setPassword(e.target.value);
-            }}
-            placeholder='비밀번호'
-            className={clsx(
-              'w-full p-3 outline-none border rounded-lg',
-              isPasswordValid
-                ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
-                : 'border-red-400 animate-shake',
-              password ? 'bg-white' : 'bg-gray-50'
-            )}
-          />
+          {!userId && (
+            <input
+              type='password'
+              value={password}
+              onChange={e => {
+                setIsPasswordValid(true);
+                setPassword(e.target.value);
+              }}
+              placeholder='비밀번호'
+              className={clsx(
+                'w-full p-3 outline-none border rounded-lg',
+                isPasswordValid
+                  ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
+                  : 'border-red-400 animate-shake',
+                password ? 'bg-white' : 'bg-gray-50'
+              )}
+            />
+          )}
           <textarea
             value={content}
             onChange={e => setContent(e.target.value)}

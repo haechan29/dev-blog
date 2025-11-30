@@ -1,35 +1,38 @@
 'use client';
 
 import useComments from '@/features/comment/hooks/useComments';
+import { ApiError } from '@/lib/api';
 import clsx from 'clsx';
 import { Loader2, Send } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
 
-export default function CommentFormItem({ postId }: { postId: string }) {
-  const [authorName, setAuthorName] = useState('익명');
+export default function CommentForm({
+  postId,
+  userId,
+}: {
+  postId: string;
+  userId: string | null;
+}) {
   const [password, setPassword] = useState('');
   const [content, setContent] = useState('');
-  const [isAuthorNameValid, setIsAuthorNameValid] = useState(true);
   const [isPasswordValid, setIsPasswordValid] = useState(true);
   const [isContentValid, setIsContentValid] = useState(true);
 
   const { createCommentMutation } = useComments({ postId });
   const createComment = useCallback(
-    (params: {
-      postId: string;
-      authorName: string;
-      content: string;
-      password: string;
-    }) => {
+    (params: { postId: string; content: string; password: string }) => {
       createCommentMutation.mutate(params, {
         onSuccess: () => {
-          setAuthorName('익명');
           setContent('');
           setPassword('');
         },
-        onError: () => {
-          toast.error('댓글 등록 실패');
+        onError: error => {
+          const message =
+            error instanceof ApiError
+              ? error.message
+              : '댓글 생성에 실패했습니다';
+          toast.error(message);
         },
       });
     },
@@ -37,49 +40,24 @@ export default function CommentFormItem({ postId }: { postId: string }) {
   );
 
   const handleSubmit = () => {
-    if (!authorName.trim()) {
-      setIsAuthorNameValid(false);
-      setIsPasswordValid(true);
-      setIsContentValid(true);
-      return;
-    }
-
-    if (!password.trim()) {
-      setIsAuthorNameValid(true);
+    if (!userId && !password.trim()) {
       setIsPasswordValid(false);
       setIsContentValid(true);
       return;
     }
 
     if (!content.trim()) {
-      setIsAuthorNameValid(true);
       setIsPasswordValid(true);
       setIsContentValid(false);
       return;
     }
 
-    createComment({ postId, authorName, content, password });
+    createComment({ postId, content, password });
   };
 
   return (
     <div className='mb-12'>
-      <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4'>
-        <input
-          type='text'
-          value={authorName}
-          onChange={e => {
-            setIsAuthorNameValid(true);
-            setAuthorName(e.target.value);
-          }}
-          placeholder='이름'
-          className={clsx(
-            'p-3 outline-none border rounded-lg',
-            isAuthorNameValid
-              ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
-              : 'border-red-400 animate-shake',
-            authorName ? 'bg-white' : 'bg-gray-50'
-          )}
-        />
+      {!userId && (
         <input
           type='password'
           value={password}
@@ -89,14 +67,14 @@ export default function CommentFormItem({ postId }: { postId: string }) {
           }}
           placeholder='비밀번호'
           className={clsx(
-            'p-3 outline-none border rounded-lg',
+            'w-full p-3 mb-4 outline-none border rounded-lg',
             isPasswordValid
               ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
               : 'border-red-400 animate-shake',
             password ? 'bg-white' : 'bg-gray-50'
           )}
         />
-      </div>
+      )}
       <textarea
         value={content}
         onChange={e => {

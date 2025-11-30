@@ -22,7 +22,6 @@ export default function useComments({ postId }: { postId: string }) {
   const createCommentMutation = useMutation({
     mutationFn: (params: {
       postId: string;
-      authorName: string;
       content: string;
       password: string;
     }) => CommentClientService.createComment(params),

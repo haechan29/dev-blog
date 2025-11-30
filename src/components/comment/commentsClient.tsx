@@ -1,6 +1,6 @@
 'use client';
 
-import CommentFormItem from '@/components/comment/commentFormItem';
+import CommentForm from '@/components/comment/commentForm';
 import CommentItem from '@/components/comment/commentItem';
 import useComments from '@/features/comment/hooks/useComments';
 import { setAreCommentsVisible } from '@/lib/redux/post/postViewerSlice';
@@ -9,7 +9,13 @@ import { MessageCircle } from 'lucide-react';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function CommentsClient({ postId }: { postId: string }) {
+export default function CommentsClient({
+  postId,
+  userId,
+}: {
+  postId: string;
+  userId: string | null;
+}) {
   const dispatch = useDispatch<AppDispatch>();
   const { comments } = useComments({ postId });
 
@@ -29,7 +35,7 @@ export default function CommentsClient({ postId }: { postId: string }) {
       <div className='text-xl font-bold text-gray-900 mb-8'>
         {`댓글 ${comments.length}개`}
       </div>
-      <CommentFormItem postId={postId} />
+      <CommentForm postId={postId} userId={userId} />
       <div className='space-y-6'>
         {comments.length === 0 ? (
           <div className='text-center py-12'>
@@ -39,7 +45,7 @@ export default function CommentsClient({ postId }: { postId: string }) {
           </div>
         ) : (
           comments.map(comment => (
-            <CommentItem key={comment.id} comment={comment} />
+            <CommentItem key={comment.id} userId={userId} comment={comment} />
           ))
         )}
       </div>

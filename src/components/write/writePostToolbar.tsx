@@ -4,6 +4,7 @@ import { PostProps } from '@/features/post/ui/postProps';
 import { writePostSteps } from '@/features/write/constants/writePostStep';
 import { validate } from '@/features/write/domain/model/writePostForm';
 import useNavigationWithParams from '@/hooks/useNavigationWithParams';
+import { ApiError } from '@/lib/api';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { setInvalidField } from '@/lib/redux/write/writePostFormSlice';
 import clsx from 'clsx';
@@ -15,9 +16,11 @@ import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function WritePostToolbar({
+  userId,
   publishPost,
   removeDraft,
 }: {
+  userId: string | null;
   publishPost: () => Promise<PostProps>;
   removeDraft: () => void;
 }) {
@@ -40,9 +43,11 @@ export default function WritePostToolbar({
   const getInvalidField = useCallback(() => {
     const currentStep = writePostSteps[currentStepId];
     return (
-      currentStep.fields.find(field => !validate(writePostForm, field)) ?? null
+      currentStep.fields.find(
+        field => !validate(userId, writePostForm, field)
+      ) ?? null
     );
-  }, [currentStepId, writePostForm]);
+  }, [currentStepId, userId, writePostForm]);
 
   const onAction = useCallback(async () => {
     const currentStep = writePostSteps[currentStepId];
@@ -59,7 +64,7 @@ export default function WritePostToolbar({
           removeDraft();
         } catch (error) {
           const errorMessage =
-            error instanceof Error
+            error instanceof ApiError
               ? error.message
               : '게시글 생성에 실패했습니다';
           toast.error(errorMessage);
@@ -83,12 +88,12 @@ export default function WritePostToolbar({
   useEffect(() => {
     for (const step of Object.values(writePostSteps)) {
       if (currentStepId === step.id) break;
-      const isValid = validate(writePostForm, ...step.fields);
+      const isValid = validate(userId, writePostForm, ...step.fields);
       if (!isValid) {
         router.push(`/write?step=${step.id}`);
       }
     }
-  }, [currentStepId, router, writePostForm]);
+  }, [currentStepId, router, userId, writePostForm]);
 
   return (
     <div

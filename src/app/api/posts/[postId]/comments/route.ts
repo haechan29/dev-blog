@@ -1,6 +1,8 @@
-import { getCommentsFromDB } from '@/features/comment/data/queries/commentQueries';
-import { PostNotFoundError } from '@/features/post/data/queries/postQueries';
-import { supabase } from '@/lib/supabase';
+import { auth } from '@/auth';
+import * as CommentQueries from '@/features/comment/data/queries/commentQueries';
+import { PostNotFoundError } from '@/features/post/data/errors/postErrors';
+import { ValidationError } from '@/features/user/data/errors/userErrors';
+import { ApiError } from '@/lib/api';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -10,7 +12,7 @@ export async function GET(
 ) {
   try {
     const { postId } = await params;
-    const data = getCommentsFromDB(postId);
+    const data = await CommentQueries.fetchComments(postId);
     return NextResponse.json({ data });
   } catch (error) {
     console.error('게시글 조회 실패:', error);
@@ -32,37 +34,48 @@ export async function POST(
 ) {
   try {
     const { postId } = await params;
-    const { authorName, content, password } = await request.json();
+    const { content, password } = await request.json();
 
-    if (!postId || !content || !password) {
-      return NextResponse.json(
-        { error: '댓글 생성 요청에 필요한 필드가 누락되었습니다.' },
-        { status: 400 }
-      );
+    const session = await auth();
+    const userId = session?.user?.id ?? null;
+    const guestId = request.cookies.get('guestId')?.value ?? null;
+
+    if (!content) {
+      throw new ValidationError('내용을 찾을 수 없습니다');
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    const { data, error } = await supabase
-      .from('comments')
-      .insert({
-        post_id: postId,
-        author_name: authorName,
-        content,
-        password_hash: passwordHash,
-      })
-      .select(
-        'id, post_id, author_name, content, created_at, updated_at, like_count'
-      );
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (session && !userId) {
+      throw new ValidationError('사용자 아이디를 찾을 수 없습니다');
     }
 
-    return NextResponse.json({ data: data[0] });
-  } catch {
+    if (!session && !password) {
+      throw new ValidationError('비밀번호를 찾을 수 없습니다');
+    }
+
+    if (!session && !guestId) {
+      throw new ValidationError('게스트 아이디를 찾을 수 없습니다');
+    }
+
+    const passwordHash = session ? null : await bcrypt.hash(password, 10);
+
+    const data = await CommentQueries.createComments(
+      postId,
+      content,
+      passwordHash,
+      userId,
+      session ? null : guestId
+    );
+
+    return NextResponse.json({ data });
+  } catch (error) {
+    console.error('댓글 생성 요청이 실패했습니다');
+
+    if (error instanceof ApiError) {
+      return error.toResponse();
+    }
+
     return NextResponse.json(
-      { error: '댓글 생성 요청이 실패했습니다.' },
+      { error: '댓글 생성 요청이 실패했습니다' },
       { status: 500 }
     );
   }
