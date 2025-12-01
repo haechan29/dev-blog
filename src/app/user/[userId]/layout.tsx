@@ -6,7 +6,7 @@ export default function UserLayout({ children }: { children: ReactNode }) {
     <>
       <UserToolbar />
 
-      <div className='mt-(--toolbar-height) mb-20 px-6 md:px-12'>
+      <div className='pt-(--toolbar-height) pb-20 px-6 md:px-12'>
         {children}
       </div>
     </>
