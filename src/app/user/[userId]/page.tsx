@@ -1,4 +1,6 @@
+import PostPreview from '@/components/post/postPreview';
 import ProfileIcon from '@/components/user/profileIcon';
+import UserNavTabs from '@/components/user/userTabs';
 import * as PostServerService from '@/features/post/domain/service/postServerService';
 import { createProps } from '@/features/post/ui/postProps';
 import * as UserServerService from '@/features/user/domain/service/userServerService';
@@ -24,6 +26,7 @@ export default async function UserPage({
 
   return (
     <div className='flex flex-col gap-8'>
+      {/* 추후에 유저 정보 추가 + 구독 구현할때 변경 */}
       <div className='flex items-center space-x-3 mb-8'>
         <ProfileIcon isGuest={false} nickname={user.nickname} />
         <div>
@@ -36,16 +39,22 @@ export default async function UserPage({
         </div>
       </div>
 
-      {/* TODO: 탭 (글/시리즈) */}
+      <UserNavTabs userId={userId} />
 
-      {/* 글 목록 */}
       {posts.length === 0 ? (
         <div className='text-center py-20 text-gray-500'>
           작성한 글이 없습니다.
         </div>
       ) : (
-        <div className='text-center py-20 text-gray-500'>
-          작성한 글이 없습니다.
+        <div className='flex flex-col'>
+          {posts.map((post, index) => (
+            <div key={post.id} className='mb-8'>
+              <PostPreview tag={null} post={post} />
+              {index !== posts.length - 1 && (
+                <div className='h-px bg-gray-200' />
+              )}
+            </div>
+          ))}
         </div>
       )}
     </div>
