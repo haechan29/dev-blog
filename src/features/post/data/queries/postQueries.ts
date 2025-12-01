@@ -39,6 +39,22 @@ export async function fetchPost(postId: string) {
   return toDto(data as unknown as PostEntity);
 }
 
+export async function fetchPostsByUserId(userId: string) {
+  const { data, error } = await supabase
+    .from('posts')
+    .select(
+      'id, title, content, tags, created_at, updated_at, user_id, guest_id, users:user_id(nickname, deleted_at)'
+    )
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data as unknown as PostEntity[]).map(toDto);
+}
+
 export async function fetchPostForAuth(postId: string) {
   const { data, error } = await supabase
     .from('posts')
