@@ -82,7 +82,6 @@ export default function PostSettingsDropdown({
               currentTarget: e.currentTarget,
             });
           }}
-          asChild
         >
           {children}
         </DropdownMenuTrigger>

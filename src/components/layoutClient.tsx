@@ -20,6 +20,9 @@ export default function LayoutClient() {
       if (
         link &&
         link.href &&
+        e.button === 0 &&
+        !e.ctrlKey &&
+        !e.metaKey &&
         link.href.startsWith(window.location.origin) &&
         link.pathname !== pathname
       ) {

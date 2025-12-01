@@ -1,8 +1,8 @@
+import { auth } from '@/auth';
 import PostInfo from '@/components/post/postInfo';
-import PostSettingsDropdown from '@/components/post/postSettingsDropdown';
+import PostSettingsMenu from '@/components/post/postSettingsMenu';
 import { PostProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
-import { MoreVertical } from 'lucide-react';
 import Link from 'next/link';
 
 const SCALE_ANIMATION_DELAY = 0.5;
@@ -16,6 +16,8 @@ export default async function PostPreview({
   tag: string | null;
   post: PostProps;
 }) {
+  const session = await auth();
+  const userId = session?.user?.id ?? null;
   const { id, title, plainText, tags } = post;
   const isScrollAnimationEnabled =
     plainText.length >= MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION;
@@ -47,11 +49,7 @@ export default async function PostPreview({
           </div>
 
           {userId && post.userId === userId && (
-            <div className='shrink-0'>
-              <PostSettingsDropdown userId={userId} post={post}>
-                <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 bg-white rounded-full p-2 -m-2 cursor-pointer' />
-              </PostSettingsDropdown>
-            </div>
+            <PostSettingsMenu userId={userId} post={post} />
           )}
         </div>
 
