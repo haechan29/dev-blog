@@ -1,4 +1,4 @@
-import PostPreview from '@/components/post/postPreview';
+import ProfileIcon from '@/components/user/profileIcon';
 import * as PostServerService from '@/features/post/domain/service/postServerService';
 import { createProps } from '@/features/post/ui/postProps';
 import * as UserServerService from '@/features/user/domain/service/userServerService';
@@ -24,12 +24,16 @@ export default async function UserPage({
 
   return (
     <div className='flex flex-col gap-8'>
-      {/* 프로필 헤더 */}
-      <div>
-        <h1 className='text-3xl font-bold'>{user.nickname}</h1>
-        <p className='text-gray-500 text-sm mt-2'>
-          {new Date(user.createdAt).toLocaleDateString()}
-        </p>
+      <div className='flex items-center space-x-3 mb-8'>
+        <ProfileIcon isGuest={false} nickname={user.nickname} />
+        <div>
+          <div className='font-semibold text-gray-900 text-xl'>
+            {user.nickname}
+          </div>
+          <p className='text-sm text-gray-500'>
+            가입일: {new Date(user.createdAt).toLocaleDateString()}
+          </p>
+        </div>
       </div>
 
       {/* TODO: 탭 (글/시리즈) */}
