@@ -1,8 +1,8 @@
 'use client';
 
+import Logo from '@/components/logo';
 import ToolbarProfileIcon from '@/components/post/toolbarProfileIcon';
 import clsx from 'clsx';
-import Link from 'next/link';
 
 export default function UserToolbar({ className }: { className?: string }) {
   return (
@@ -13,12 +13,7 @@ export default function UserToolbar({ className }: { className?: string }) {
         className
       )}
     >
-      <Link href='/' className='p-2 -m-2'>
-        <div className='text-2xl font-bold tracking-tight text-blue-500'>
-          Haechan
-        </div>
-      </Link>
-
+      <Logo />
       <ToolbarProfileIcon />
     </div>
   );
