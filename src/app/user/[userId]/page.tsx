@@ -39,14 +39,15 @@ export default async function UserPage({
       {/* TODO: 탭 (글/시리즈) */}
 
       {/* 글 목록 */}
-      <div className='flex flex-col'>
-        {posts.map((post, index) => (
-          <div key={post.id} className='mb-8'>
-            <PostPreview tag={null} post={post} />
-            {index !== posts.length - 1 && <div className='h-px bg-gray-200' />}
-          </div>
-        ))}
-      </div>
+      {posts.length === 0 ? (
+        <div className='text-center py-20 text-gray-500'>
+          작성한 글이 없습니다.
+        </div>
+      ) : (
+        <div className='text-center py-20 text-gray-500'>
+          작성한 글이 없습니다.
+        </div>
+      )}
     </div>
   );
 }
