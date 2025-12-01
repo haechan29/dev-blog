@@ -60,7 +60,7 @@ export default function PostHeader({
 
         {((!post.userId && !userId) || post.userId === userId) && (
           <PostSettingsDropdown userId={userId} post={post}>
-            <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2' />
+            <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2 cursor-pointer' />
           </PostSettingsDropdown>
         )}
       </div>

@@ -2,7 +2,7 @@ import PostPreview from '@/components/post/postPreview';
 import * as PostServerService from '@/features/post/domain/service/postServerService';
 import { createProps } from '@/features/post/ui/postProps';
 
-export default async function UserPage({
+export default async function PostsPage({
   params,
 }: {
   params: Promise<{ userId: string }>;

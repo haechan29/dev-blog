@@ -1,13 +1,15 @@
 import PostInfo from '@/components/post/postInfo';
+import PostSettingsDropdown from '@/components/post/postSettingsDropdown';
 import { PostProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
+import { MoreVertical } from 'lucide-react';
 import Link from 'next/link';
 
 const SCALE_ANIMATION_DELAY = 0.5;
 const SCROLL_ANIMATION_DELAY = 1;
 const MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION = 200;
 
-export default function PostPreview({
+export default async function PostPreview({
   tag,
   post,
 }: {
@@ -39,7 +41,20 @@ export default function PostPreview({
         href={`/read/${id}${tag ? `?tag=${tag}` : ''}`}
         className='w-full flex flex-col gap-4 text-gray-900'
       >
-        <div className='text-2xl font-semibold line-clamp-2'>{title}</div>
+        <div className='flex items-start gap-2'>
+          <div className='text-2xl font-semibold line-clamp-2 flex-1 min-w-0'>
+            {title}
+          </div>
+
+          {userId && post.userId === userId && (
+            <div className='shrink-0'>
+              <PostSettingsDropdown userId={userId} post={post}>
+                <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 bg-white rounded-full p-2 -m-2 cursor-pointer' />
+              </PostSettingsDropdown>
+            </div>
+          )}
+        </div>
+
         <div className='whitespace-pre-wrap break-keep wrap-anywhere'>
           {isScrollAnimationEnabled ? (
             <div className='relative h-18'>
