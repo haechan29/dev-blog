@@ -4,7 +4,7 @@ import { toDto } from '@/features/user/data/mapper/userMapper';
 import { supabase, supabaseNextAuth } from '@/lib/supabase';
 import 'server-only';
 
-export async function getUserById(userId: string) {
+export async function fetchUserById(userId: string) {
   const { data, error } = await supabase
     .from('users')
     .select('id, nickname, created_at, updated_at, deleted_at')

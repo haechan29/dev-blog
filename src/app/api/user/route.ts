@@ -16,7 +16,7 @@ export async function GET() {
       return NextResponse.json({ data: null });
     }
 
-    const data = await UserQueries.getUserById(userId);
+    const data = await UserQueries.fetchUserById(userId);
     return NextResponse.json({ data });
   } catch (error) {
     console.error('유저 조회에 실패했습니다', error);
