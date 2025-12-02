@@ -48,7 +48,7 @@ export async function PATCH(
 
     return NextResponse.json({ data: updated });
   } catch (error) {
-    console.log('댓글 수정 요청이 실패했습니다');
+    console.error('댓글 수정 요청이 실패했습니다', error);
 
     if (error instanceof ApiError) {
       return error.toResponse();
@@ -98,7 +98,7 @@ export async function DELETE(
 
     return NextResponse.json({ data: null });
   } catch (error) {
-    console.log('댓글 삭제 요청이 실패했습니다');
+    console.error('댓글 삭제 요청이 실패했습니다', error);
 
     if (error instanceof ApiError) {
       return error.toResponse();

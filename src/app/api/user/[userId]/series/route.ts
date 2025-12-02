@@ -13,9 +13,6 @@ export async function GET(
 ) {
   try {
     const { userId } = await params;
-    if (!userId) {
-      throw new ValidationError('사용자 아이디를 찾을 수 없습니다');
-    }
 
     const data = await SeriesQueries.fetchSeriesByUserId(userId);
     return NextResponse.json({ data });
@@ -39,9 +36,6 @@ export async function POST(
 ) {
   try {
     const { userId } = await params;
-    if (!userId) {
-      throw new ValidationError('사용자 아이디를 찾을 수 없습니다');
-    }
 
     const session = await auth();
     if (session?.user?.id !== userId) {

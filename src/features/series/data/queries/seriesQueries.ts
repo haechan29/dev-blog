@@ -38,3 +38,40 @@ export async function createSeries({
     throw new Error(error.message);
   }
 }
+
+export async function updateSeries({
+  seriesId,
+  title,
+  description,
+}: {
+  seriesId: string;
+  title: string;
+  description: string | null;
+}) {
+  const { data, error } = await supabase
+    .from('series')
+    .update({
+      title,
+      description,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', seriesId)
+    .select(
+      'id, title, description, user_id, created_at, updated_at, users:user_id(nickname), posts(count)'
+    )
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return toDto(data as unknown as SeriesEntity);
+}
+
+export async function deleteSeries(seriesId: string) {
+  const { error } = await supabase.from('series').delete().eq('id', seriesId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
