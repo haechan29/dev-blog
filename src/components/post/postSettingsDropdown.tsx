@@ -13,7 +13,7 @@ import useDebounce from '@/hooks/useDebounce';
 import { createRipple } from '@/lib/dom';
 import { setMode } from '@/lib/redux/post/postReaderSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
-import { Code2, Edit2, FileText, Trash2 } from 'lucide-react';
+import { Code2, Edit2, FileText, Layers, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { MouseEvent, ReactNode, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -34,7 +34,8 @@ export default function PostSettingsDropdown({
   const router = useRouter();
 
   const { mode } = useSelector((state: RootState) => state.postReader);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isSeriesDialogOpen, setIsSeriesDialogOpen] = useState(false);
   const [debouncedMode, setDebouncedMode] =
     useState<PostReader['mode']>('parsed');
 
@@ -47,17 +48,21 @@ export default function PostSettingsDropdown({
           dispatch(setMode(toggledMode));
           break;
         }
+        case 'series-settings': {
+          if (!isSeriesDialogOpen) setIsSeriesDialogOpen(true);
+          break;
+        }
         case 'edit': {
           router.push(`/read/${postId}/edit?step=write`);
           break;
         }
         case 'delete': {
-          if (!isOpen) setIsOpen(true);
+          if (!isDeleteDialogOpen) setIsDeleteDialogOpen(true);
           break;
         }
       }
     },
-    [dispatch, isOpen, mode, postId, router]
+    [dispatch, isDeleteDialogOpen, isSeriesDialogOpen, mode, postId, router]
   );
 
   useEffect(() => {
@@ -71,8 +76,8 @@ export default function PostSettingsDropdown({
       <DeletePostDialog
         userId={userId}
         postId={postId}
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
+        isOpen={isDeleteDialogOpen}
+        setIsOpen={setIsDeleteDialogOpen}
       />
       <DropdownMenu>
         <DropdownMenuTrigger
@@ -112,6 +117,15 @@ export default function PostSettingsDropdown({
               )}
             </DropdownMenuItem>
           )}
+
+          <DropdownMenuItem
+            data-action='series-settings'
+            onClick={handleAction}
+            className='w-full flex items-center gap-2 cursor-pointer'
+          >
+            <Layers className='w-4 h-4 text-gray-500' />
+            <div className='whitespace-nowrap text-gray-900'>시리즈 설정</div>
+          </DropdownMenuItem>
 
           <DropdownMenuItem
             data-action='edit'
