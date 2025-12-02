@@ -1,3 +1,5 @@
+import Post from '@/features/post/domain/model/post';
+
 export interface Series {
   id: string;
   title: string;
@@ -6,5 +8,6 @@ export interface Series {
   updatedAt: string;
   userId: string;
   authorName: string;
+  posts: Pick<Post, 'id' | 'title' | 'seriesOrder'>[];
   postCount: number;
 }

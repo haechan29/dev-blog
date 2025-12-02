@@ -1,4 +1,5 @@
 import { formatDate } from '@/features/post/domain/lib/date';
+import { PostProps } from '@/features/post/ui/postProps';
 import { Series } from '@/features/series/domain/model/series';
 
 export interface SeriesProps {
@@ -9,6 +10,7 @@ export interface SeriesProps {
   updatedAt: string;
   userId: string;
   authorName: string;
+  posts: Pick<PostProps, 'id' | 'title' | 'seriesOrder'>[];
   postCount: number;
 }
 
@@ -20,7 +22,8 @@ export function createProps(series: Series): SeriesProps {
     createdAt: formatDate(series.createdAt),
     updatedAt: formatDate(series.updatedAt),
     userId: series.userId,
-    postCount: series.postCount,
     authorName: series.authorName,
+    posts: series.posts,
+    postCount: series.postCount,
   };
 }

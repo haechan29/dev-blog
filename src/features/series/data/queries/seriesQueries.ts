@@ -3,11 +3,37 @@ import { toDto } from '@/features/series/data/mapper/seriesMapper';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
+export async function fetchSeries(seriesId: string) {
+  const { data, error } = await supabase
+    .from('series')
+    .select(
+      `
+      id, 
+      title, 
+      description, 
+      user_id, 
+      created_at, 
+      updated_at,
+      users:user_id(nickname),
+      posts(id, title, series_order)
+      `
+    )
+    .eq('id', seriesId)
+    .order('series_order', { referencedTable: 'posts', ascending: true })
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return toDto(data as unknown as SeriesEntity);
+}
+
 export async function fetchSeriesByUserId(userId: string) {
   const { data, error } = await supabase
     .from('series')
     .select(
-      `id, title, description, user_id, created_at, updated_at, users:user_id(nickname), posts(count)`
+      `id, title, description, user_id, created_at, updated_at, users:user_id(nickname), postCounts:posts(count)`
     )
     .eq('user_id', userId)
     .order('created_at', { ascending: false });

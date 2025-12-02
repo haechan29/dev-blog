@@ -1,3 +1,4 @@
+import { PostEntity } from '@/features/post/data/entities/postEntities';
 import { UserEntity } from '@/features/user/data/entities/userEntities';
 
 export interface SeriesEntity {
@@ -8,5 +9,6 @@ export interface SeriesEntity {
   created_at: string;
   updated_at: string;
   users?: Pick<UserEntity, 'nickname'> | null;
-  posts?: { count: number }[];
+  posts?: Pick<PostEntity, 'id' | 'title' | 'seriesOrder'>[];
+  postCounts?: { count: number }[];
 }
