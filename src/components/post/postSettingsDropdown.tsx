@@ -1,6 +1,7 @@
 'use client';
 
 import DeletePostDialog from '@/components/post/deletePostDialog';
+import SeriesSettingsDialog from '@/components/post/seriesSettingsDialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,7 +21,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostSettingsDropdown({
   userId,
-  post: { id: postId },
+  post,
   showRawContent,
   children,
 }: {
@@ -53,7 +54,7 @@ export default function PostSettingsDropdown({
           break;
         }
         case 'edit': {
-          router.push(`/read/${postId}/edit?step=write`);
+          router.push(`/read/${post.id}/edit?step=write`);
           break;
         }
         case 'delete': {
@@ -62,7 +63,7 @@ export default function PostSettingsDropdown({
         }
       }
     },
-    [dispatch, isDeleteDialogOpen, isSeriesDialogOpen, mode, postId, router]
+    [dispatch, isDeleteDialogOpen, isSeriesDialogOpen, mode, post.id, router]
   );
 
   useEffect(() => {
@@ -75,10 +76,17 @@ export default function PostSettingsDropdown({
     <>
       <DeletePostDialog
         userId={userId}
-        postId={postId}
+        postId={post.id}
         isOpen={isDeleteDialogOpen}
         setIsOpen={setIsDeleteDialogOpen}
       />
+
+      <SeriesSettingsDialog
+        post={post}
+        isOpen={isSeriesDialogOpen}
+        setIsOpen={setIsSeriesDialogOpen}
+      />
+
       <DropdownMenu>
         <DropdownMenuTrigger
           onTouchStart={e => {
