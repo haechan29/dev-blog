@@ -3,7 +3,7 @@ import SeriesPageClient from '@/components/series/seriesPageClient';
 import * as SeriesServerService from '@/features/series/domain/service/seriesServerService';
 import { createProps } from '@/features/series/ui/seriesProps';
 
-export default async function SeriesPage({
+export default async function SeriesListPage({
   params,
 }: {
   params: Promise<{ userId: string }>;

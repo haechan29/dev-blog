@@ -33,7 +33,7 @@ export default function SeriesPreview({
       )}
 
       <Link
-        href={`/user/${userId}/series/${series.id}`}
+        href={`/series/${series.id}`}
         className='w-full flex flex-col gap-4 text-gray-900'
       >
         <div

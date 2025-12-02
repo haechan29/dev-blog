@@ -10,6 +10,7 @@ import {
 import { SeriesProps } from '@/features/series/ui/seriesProps';
 import { createRipple } from '@/lib/dom';
 import { Edit2, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { MouseEvent, ReactNode, useCallback, useState } from 'react';
 
 export default function SeriesSettingsDropdown({
@@ -21,7 +22,7 @@ export default function SeriesSettingsDropdown({
   series: SeriesProps;
   children: ReactNode;
 }) {
-  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+  const router = useRouter();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const handleAction = useCallback(
@@ -29,7 +30,7 @@ export default function SeriesSettingsDropdown({
       const actionAttribute = e.currentTarget.getAttribute('data-action');
       switch (actionAttribute) {
         case 'update': {
-          if (!isUpdateDialogOpen) setIsUpdateDialogOpen(true);
+          router.push(`/@${userId}/series/${series.id}/edit`);
           break;
         }
         case 'delete': {
@@ -38,13 +39,11 @@ export default function SeriesSettingsDropdown({
         }
       }
     },
-    [isUpdateDialogOpen, isDeleteDialogOpen]
+    [isDeleteDialogOpen, router, series.id, userId]
   );
 
   return (
     <>
-      {/* TODO: DeleteSeriesDialog */}
-
       <DeleteSeriesDialog
         userId={userId}
         series={series}
