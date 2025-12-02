@@ -1,8 +1,9 @@
 import { auth } from '@/auth';
 import PostInfo from '@/components/post/postInfo';
-import PostSettingsMenu from '@/components/post/postSettingsMenu';
+import PostSettingsDropdown from '@/components/post/postSettingsDropdown';
 import { PostProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
+import { MoreVertical } from 'lucide-react';
 import Link from 'next/link';
 
 const SCALE_ANIMATION_DELAY = 0.5;
@@ -21,6 +22,7 @@ export default async function PostPreview({
   const { id, title, plainText, tags } = post;
   const isScrollAnimationEnabled =
     plainText.length >= MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION;
+  const canEdit = userId && post.userId === userId;
 
   return (
     <div
@@ -39,18 +41,29 @@ export default async function PostPreview({
         )}
       />
 
+      {canEdit && (
+        <div className='absolute top-0 right-0 z-10'>
+          <PostSettingsDropdown
+            userId={userId}
+            post={post}
+            showRawContent={false}
+          >
+            <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 hover:bg-gray-200 rounded-full p-2 -m-2 cursor-pointer' />
+          </PostSettingsDropdown>
+        </div>
+      )}
+
       <Link
         href={`/read/${id}${tag ? `?tag=${tag}` : ''}`}
         className='w-full flex flex-col gap-4 text-gray-900'
       >
-        <div className='flex items-start gap-2'>
-          <div className='text-2xl font-semibold line-clamp-2 flex-1 min-w-0'>
-            {title}
-          </div>
-
-          {userId && post.userId === userId && (
-            <PostSettingsMenu userId={userId} post={post} />
+        <div
+          className={clsx(
+            'text-2xl font-semibold line-clamp-2',
+            canEdit ? 'w-[calc(100%-3rem)]' : 'w-full'
           )}
+        >
+          {title}
         </div>
 
         <div className='whitespace-pre-wrap break-keep wrap-anywhere'>
