@@ -7,7 +7,7 @@ export async function fetchSeriesByUserId(userId: string) {
   const { data, error } = await supabase
     .from('series')
     .select(
-      'id, title, description, user_id, created_at, updated_at, users:user_id(nickname)'
+      `id, title, description, user_id, created_at, updated_at, users:user_id(nickname), posts(count)`
     )
     .eq('user_id', userId)
     .order('created_at', { ascending: false });

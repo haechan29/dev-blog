@@ -6,4 +6,5 @@ export interface Series {
   updatedAt: string;
   userId: string;
   authorName: string;
+  postCount: number;
 }

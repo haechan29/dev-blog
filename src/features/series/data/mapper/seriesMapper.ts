@@ -10,5 +10,6 @@ export function toDto(entity: SeriesEntity): SeriesDto {
     updatedAt: entity.updated_at,
     userId: entity.user_id,
     authorName: entity.users?.nickname ?? '익명',
+    postCount: entity.posts?.[0]?.count ?? 0,
   };
 }

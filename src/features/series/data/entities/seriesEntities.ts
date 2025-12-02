@@ -8,4 +8,5 @@ export interface SeriesEntity {
   created_at: string;
   updated_at: string;
   users?: Pick<UserEntity, 'nickname'> | null;
+  posts?: { count: number }[];
 }

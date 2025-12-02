@@ -52,7 +52,7 @@ export default function SeriesPreview({
         )}
 
         <div className='text-sm text-gray-500'>
-          최근 업데이트:{' '}
+          글 {series.postCount}개 · 최근 업데이트:{' '}
           {new Date(series.updatedAt).toLocaleDateString('ko-KR')}
         </div>
       </Link>
