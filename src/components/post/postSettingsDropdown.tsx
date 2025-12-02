@@ -1,7 +1,7 @@
 'use client';
 
 import DeletePostDialog from '@/components/post/deletePostDialog';
-import SeriesSettingsDialog from '@/components/post/seriesSettingsDialog';
+import SeriesSettingsDialog from '@/components/series/seriesSettingsDialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
