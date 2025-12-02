@@ -19,23 +19,18 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { PostProps } from '@/features/post/ui/postProps';
+import useSeries from '@/features/series/domain/hooks/useSeries';
 import clsx from 'clsx';
 import { Check, ChevronsUpDown, Loader2, X } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
-
-// 가짜 데이터
-const mockSeries = [
-  { id: null, name: '없음' },
-  { id: '1', name: 'Next.js 튜토리얼' },
-  { id: '2', name: 'TypeScript 기초' },
-  { id: '3', name: 'React 심화' },
-];
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export default function SeriesSettingsDialog({
+  userId,
   post,
   isOpen,
   setIsOpen,
 }: {
+  userId: string;
   post: PostProps;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
@@ -43,6 +38,16 @@ export default function SeriesSettingsDialog({
   const [isLoading, setIsLoading] = useState(false);
   const [selectedSeriesId, setSelectedSeriesId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+
+  const { seriesList } = useSeries(userId);
+  const seriesOptions = useMemo(
+    () => [{ id: null, title: '없음' }, ...(seriesList ?? [])],
+    [seriesList]
+  );
+  const selectedSeries = useMemo(
+    () => seriesOptions.find(s => s.id === selectedSeriesId),
+    [selectedSeriesId, seriesOptions]
+  );
 
   const handleSave = useCallback(async () => {
     setIsLoading(true);
@@ -61,8 +66,6 @@ export default function SeriesSettingsDialog({
       setSelectedSeriesId(null);
     }
   }, [isOpen]);
-
-  const selectedSeries = mockSeries.find(s => s.id === selectedSeriesId);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -89,7 +92,7 @@ export default function SeriesSettingsDialog({
               <span
                 className={selectedSeries ? 'text-gray-900' : 'text-gray-400'}
               >
-                {selectedSeries?.name || '시리즈를 선택하세요'}
+                {selectedSeries?.title || '시리즈를 선택하세요'}
               </span>
               <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
             </button>
@@ -98,18 +101,18 @@ export default function SeriesSettingsDialog({
             <Command>
               <CommandEmpty>시리즈를 찾을 수 없습니다.</CommandEmpty>
               <CommandGroup>
-                {mockSeries.map(series => (
+                {seriesOptions.map(({ id, title }) => (
                   <CommandItem
-                    key={series.id}
-                    value={series.name}
+                    key={id}
+                    value={title}
                     onSelect={() => {
-                      setSelectedSeriesId(series.id);
+                      setSelectedSeriesId(id);
                       setOpen(false);
                     }}
                     className='flex justify-between px-3 py-2 gap-1'
                   >
-                    <span>{series.name}</span>
-                    {selectedSeriesId === series.id && (
+                    <span>{title}</span>
+                    {selectedSeriesId === id && (
                       <Check className='h-4 w-4 text-blue-600 -mr-1' />
                     )}
                   </CommandItem>

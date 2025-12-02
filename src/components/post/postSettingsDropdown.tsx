@@ -81,11 +81,14 @@ export default function PostSettingsDropdown({
         setIsOpen={setIsDeleteDialogOpen}
       />
 
-      <SeriesSettingsDialog
-        post={post}
-        isOpen={isSeriesDialogOpen}
-        setIsOpen={setIsSeriesDialogOpen}
-      />
+      {userId && (
+        <SeriesSettingsDialog
+          userId={userId}
+          post={post}
+          isOpen={isSeriesDialogOpen}
+          setIsOpen={setIsSeriesDialogOpen}
+        />
+      )}
 
       <DropdownMenu>
         <DropdownMenuTrigger
@@ -126,14 +129,16 @@ export default function PostSettingsDropdown({
             </DropdownMenuItem>
           )}
 
-          <DropdownMenuItem
-            data-action='series-settings'
-            onClick={handleAction}
-            className='w-full flex items-center gap-2 cursor-pointer'
-          >
-            <Layers className='w-4 h-4 text-gray-500' />
-            <div className='whitespace-nowrap text-gray-900'>시리즈 설정</div>
-          </DropdownMenuItem>
+          {userId && (
+            <DropdownMenuItem
+              data-action='series-settings'
+              onClick={handleAction}
+              className='w-full flex items-center gap-2 cursor-pointer'
+            >
+              <Layers className='w-4 h-4 text-gray-500' />
+              <div className='whitespace-nowrap text-gray-900'>시리즈 설정</div>
+            </DropdownMenuItem>
+          )}
 
           <DropdownMenuItem
             data-action='edit'
