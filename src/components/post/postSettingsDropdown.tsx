@@ -21,10 +21,12 @@ import { useDispatch, useSelector } from 'react-redux';
 export default function PostSettingsDropdown({
   userId,
   post: { id: postId },
+  showRawContent,
   children,
 }: {
   userId: string | null;
   post: PostProps;
+  showRawContent: boolean;
   children: ReactNode;
 }) {
   const dispatch = useDispatch<AppDispatch>();
@@ -87,23 +89,29 @@ export default function PostSettingsDropdown({
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align='end'>
-          <DropdownMenuItem
-            data-action='toggle-mode'
-            onClick={handleAction}
-            className='w-full flex items-center gap-2 cursor-pointer'
-          >
-            {debouncedMode === 'parsed' ? (
-              <>
-                <Code2 className='w-4 h-4 text-gray-500' />
-                <div className='whitespace-nowrap text-gray-900'>원문 보기</div>
-              </>
-            ) : (
-              <>
-                <FileText className='w-4 h-4 text-gray-500' />
-                <div className='whitespace-nowrap text-gray-900'>일반 보기</div>
-              </>
-            )}
-          </DropdownMenuItem>
+          {showRawContent && (
+            <DropdownMenuItem
+              data-action='toggle-mode'
+              onClick={handleAction}
+              className='w-full flex items-center gap-2 cursor-pointer'
+            >
+              {debouncedMode === 'parsed' ? (
+                <>
+                  <Code2 className='w-4 h-4 text-gray-500' />
+                  <div className='whitespace-nowrap text-gray-900'>
+                    원문 보기
+                  </div>
+                </>
+              ) : (
+                <>
+                  <FileText className='w-4 h-4 text-gray-500' />
+                  <div className='whitespace-nowrap text-gray-900'>
+                    일반 보기
+                  </div>
+                </>
+              )}
+            </DropdownMenuItem>
+          )}
 
           <DropdownMenuItem
             data-action='edit'

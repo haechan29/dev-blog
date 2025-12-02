@@ -19,7 +19,7 @@ export default function PostSettingsMenu({
         e.stopPropagation();
       }}
     >
-      <PostSettingsDropdown userId={userId} post={post}>
+      <PostSettingsDropdown userId={userId} post={post} showRawContent={false}>
         <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 hover:bg-gray-200 rounded-full p-2 -m-2 cursor-pointer' />
       </PostSettingsDropdown>
     </div>
