@@ -40,13 +40,9 @@ export default function SeriesSettingsDialog({
   const [open, setOpen] = useState(false);
 
   const { seriesList } = useSeries(userId);
-  const seriesOptions = useMemo(
-    () => [{ id: null, title: '없음' }, ...(seriesList ?? [])],
-    [seriesList]
-  );
   const selectedSeries = useMemo(
-    () => seriesOptions.find(s => s.id === selectedSeriesId),
-    [selectedSeriesId, seriesOptions]
+    () => seriesList?.find(s => s.id === selectedSeriesId) ?? null,
+    [selectedSeriesId, seriesList]
   );
 
   const handleSave = useCallback(async () => {
@@ -92,32 +88,47 @@ export default function SeriesSettingsDialog({
               <span
                 className={selectedSeries ? 'text-gray-900' : 'text-gray-400'}
               >
-                {selectedSeries?.title || '시리즈를 선택하세요'}
+                {selectedSeries?.title ?? '시리즈를 선택하세요'}
               </span>
               <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
             </button>
           </PopoverTrigger>
+
           <PopoverContent className='w-(--radix-popover-trigger-width) p-0 rounded-sm'>
             <Command>
-              <CommandEmpty>시리즈를 찾을 수 없습니다.</CommandEmpty>
-              <CommandGroup>
-                {seriesOptions.map(({ id, title }) => (
-                  <CommandItem
-                    key={id}
-                    value={title}
-                    onSelect={() => {
-                      setSelectedSeriesId(id);
-                      setOpen(false);
-                    }}
-                    className='flex justify-between px-3 py-2 gap-1'
-                  >
-                    <span>{title}</span>
-                    {selectedSeriesId === id && (
-                      <Check className='h-4 w-4 text-blue-600 -mr-1' />
-                    )}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
+              {seriesList === undefined ? (
+                <div className='p-3 flex justify-center'>
+                  <Loader2
+                    size={18}
+                    strokeWidth={3}
+                    className='animate-spin text-gray-400'
+                  />
+                </div>
+              ) : (
+                <>
+                  <CommandEmpty>시리즈가 없습니다.</CommandEmpty>
+                  {seriesList.length > 0 && (
+                    <CommandGroup>
+                      {seriesList.map(({ id, title }) => (
+                        <CommandItem
+                          key={id}
+                          value={title}
+                          onSelect={() => {
+                            setSelectedSeriesId(id);
+                            setOpen(false);
+                          }}
+                          className='flex justify-between px-3 py-2 gap-1'
+                        >
+                          <span>{title}</span>
+                          {selectedSeriesId === id && (
+                            <Check className='h-4 w-4 text-blue-600 -mr-1' />
+                          )}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  )}
+                </>
+              )}
             </Command>
           </PopoverContent>
         </Popover>
