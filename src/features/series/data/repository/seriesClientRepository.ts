@@ -7,3 +7,15 @@ export async function fetchSeriesByUserId(
   const response = await api.get(`/api/user/${userId}/series`);
   return response.data;
 }
+
+export async function createSeries({
+  userId,
+  title,
+  description,
+}: {
+  userId: string;
+  title: string;
+  description: string | null;
+}): Promise<void> {
+  await api.post(`/api/user/${userId}/series`, { title, description });
+}

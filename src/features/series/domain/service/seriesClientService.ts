@@ -5,3 +5,15 @@ export async function fetchSeriesByUserId(userId: string) {
   const dtos = await SeriesClientRepository.fetchSeriesByUserId(userId);
   return dtos.map(toDomain);
 }
+
+export async function createSeries({
+  userId,
+  title,
+  description,
+}: {
+  userId: string;
+  title: string;
+  description: string | null;
+}) {
+  await SeriesClientRepository.createSeries({ userId, title, description });
+}

@@ -18,3 +18,23 @@ export async function fetchSeriesByUserId(userId: string) {
 
   return (data as unknown as SeriesEntity[]).map(toDto);
 }
+
+export async function createSeries({
+  title,
+  description,
+  userId,
+}: {
+  title: string;
+  description: string | null;
+  userId: string;
+}) {
+  const { error } = await supabase.from('series').insert({
+    title,
+    description,
+    user_id: userId,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
