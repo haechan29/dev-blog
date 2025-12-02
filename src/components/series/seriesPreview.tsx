@@ -1,3 +1,4 @@
+import SeriesSettingsDropdown from '@/components/series/seriesSettingsDropdown';
 import { SeriesProps } from '@/features/series/ui/seriesProps';
 import clsx from 'clsx';
 import { MoreVertical } from 'lucide-react';
@@ -25,7 +26,9 @@ export default function SeriesPreview({
 
       {userId === currentUserId && (
         <div className='absolute top-0 right-0 z-10'>
-          <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 hover:bg-gray-200 rounded-full p-2 -m-2 cursor-pointer' />
+          <SeriesSettingsDropdown userId={userId} series={series}>
+            <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 hover:bg-gray-200 rounded-full p-2 -m-2 cursor-pointer' />
+          </SeriesSettingsDropdown>
         </div>
       )}
 
