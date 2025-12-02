@@ -26,5 +26,33 @@ export default function useSeries(userId: string, initialData?: SeriesProps[]) {
     },
   });
 
-  return { seriesList, createSeriesMutation } as const;
+  const updateSeriesMutation = useMutation({
+    mutationFn: (params: {
+      seriesId: string;
+      title: string;
+      description: string | null;
+    }) => SeriesClientService.updateSeries({ userId, ...params }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['series', userId],
+      });
+    },
+  });
+
+  const deleteSeriesMutation = useMutation({
+    mutationFn: (seriesId: string) =>
+      SeriesClientService.deleteSeries({ userId, seriesId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['series', userId],
+      });
+    },
+  });
+
+  return {
+    seriesList,
+    createSeriesMutation,
+    updateSeriesMutation,
+    deleteSeriesMutation,
+  } as const;
 }

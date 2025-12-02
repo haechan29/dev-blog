@@ -19,3 +19,31 @@ export async function createSeries({
 }): Promise<void> {
   await api.post(`/api/user/${userId}/series`, { title, description });
 }
+
+export async function updateSeries({
+  userId,
+  seriesId,
+  title,
+  description,
+}: {
+  userId: string;
+  seriesId: string;
+  title: string;
+  description: string | null;
+}): Promise<SeriesDto> {
+  const response = await api.patch(`/api/user/${userId}/series/${seriesId}`, {
+    title,
+    description,
+  });
+  return response.data;
+}
+
+export async function deleteSeries({
+  userId,
+  seriesId,
+}: {
+  userId: string;
+  seriesId: string;
+}): Promise<void> {
+  await api.delete(`/api/user/${userId}/series/${seriesId}`);
+}

@@ -17,3 +17,33 @@ export async function createSeries({
 }) {
   await SeriesClientRepository.createSeries({ userId, title, description });
 }
+
+export async function updateSeries({
+  userId,
+  seriesId,
+  title,
+  description,
+}: {
+  userId: string;
+  seriesId: string;
+  title: string;
+  description: string | null;
+}) {
+  const dto = await SeriesClientRepository.updateSeries({
+    userId,
+    seriesId,
+    title,
+    description,
+  });
+  return toDomain(dto);
+}
+
+export async function deleteSeries({
+  userId,
+  seriesId,
+}: {
+  userId: string;
+  seriesId: string;
+}) {
+  await SeriesClientRepository.deleteSeries({ userId, seriesId });
+}
