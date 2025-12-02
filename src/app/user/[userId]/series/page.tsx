@@ -1,6 +1,7 @@
 import { auth } from '@/auth';
 import SeriesPageClient from '@/components/series/seriesPageClient';
 import * as SeriesServerService from '@/features/series/domain/service/seriesServerService';
+import { createProps } from '@/features/series/ui/seriesProps';
 
 export default async function SeriesPage({
   params,
@@ -9,7 +10,9 @@ export default async function SeriesPage({
 }) {
   const { userId } = await params;
   const session = await auth();
-  const seriesList = await SeriesServerService.fetchSeriesByUserId(userId);
+  const seriesList = await SeriesServerService.fetchSeriesByUserId(userId).then(
+    seriesList => seriesList.map(createProps)
+  );
 
   return (
     <SeriesPageClient

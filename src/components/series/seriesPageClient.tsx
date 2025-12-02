@@ -3,16 +3,16 @@
 import CreateSeriesButton from '@/components/series/createSeriesButton';
 import SeriesPreview from '@/components/series/seriesPreview';
 import useSeries from '@/features/series/domain/hooks/useSeries';
-import { Series } from '@/features/series/domain/model/series';
+import { SeriesProps } from '@/features/series/ui/seriesProps';
 
-export default function SeriesListClient({
+export default function SeriesPageClient({
   userId,
   currentUserId,
   initialSeriesList,
 }: {
   userId: string;
   currentUserId: string | null;
-  initialSeriesList: Series[];
+  initialSeriesList: SeriesProps[];
 }) {
   const { seriesList } = useSeries(userId, initialSeriesList);
 

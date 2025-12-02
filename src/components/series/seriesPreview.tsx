@@ -1,4 +1,4 @@
-import { Series } from '@/features/series/domain/model/series';
+import { SeriesProps } from '@/features/series/ui/seriesProps';
 import clsx from 'clsx';
 import { MoreVertical } from 'lucide-react';
 import Link from 'next/link';
@@ -10,11 +10,10 @@ export default function SeriesPreview({
 }: {
   userId: string;
   currentUserId: string | null;
-  series: Series;
+  series: SeriesProps;
 }) {
   return (
     <div className='relative flex flex-col group mb-8'>
-      {/* 호버 배경 */}
       <div
         className={clsx(
           'absolute -inset-x-6 -inset-y-4 -z-50 rounded-xl bg-gray-100/50',
@@ -24,14 +23,12 @@ export default function SeriesPreview({
         )}
       />
 
-      {/* 설정 메뉴 */}
       {userId === currentUserId && (
         <div className='absolute top-0 right-0 z-10'>
           <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 hover:bg-gray-200 rounded-full p-2 -m-2 cursor-pointer' />
         </div>
       )}
 
-      {/* 시리즈 내용 */}
       <Link
         href={`/user/${userId}/series/${series.id}`}
         className='w-full flex flex-col gap-4 text-gray-900'
@@ -51,11 +48,16 @@ export default function SeriesPreview({
           </div>
         )}
 
-        <div className='text-sm text-gray-500'>
-          글 {series.postCount}개 · 최근 업데이트:{' '}
-          {new Date(series.updatedAt).toLocaleDateString('ko-KR')}
+        <div className='flex gap-2 items-center text-xs text-gray-500'>
+          <div>글 {series.postCount}개</div>
+          <Divider />
+          <div>{series.updatedAt}</div>
         </div>
       </Link>
     </div>
   );
+}
+
+function Divider() {
+  return <div className='w-[3px] h-[3px] rounded-full bg-gray-500' />;
 }
