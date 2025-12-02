@@ -10,4 +10,6 @@ export interface PostResponseDto {
   authorName: string;
   isDeleted: boolean;
   isGuest: boolean;
+  seriesId: string | null;
+  seriesOrder: number | null;
 }

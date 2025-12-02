@@ -17,5 +17,7 @@ export function toDto(post: PostEntity): PostResponseDto {
       '익명',
     isDeleted: !!post.user_id && !!post.users?.deleted_at,
     isGuest: !post.user_id,
+    seriesId: post.seriesId,
+    seriesOrder: post.seriesOrder,
   };
 }

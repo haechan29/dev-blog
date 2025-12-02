@@ -13,6 +13,8 @@ export function toDomain(dto: PostResponseDto): Post {
     dto.guestId,
     dto.authorName,
     dto.isDeleted,
-    dto.isGuest
+    dto.isGuest,
+    dto.seriesId,
+    dto.seriesOrder
   );
 }

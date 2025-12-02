@@ -9,6 +9,8 @@ export interface PostEntity {
   updated_at: string | null;
   user_id: string | null;
   guest_id: string | null;
+  seriesId: string | null;
+  seriesOrder: number | null;
   users?: Pick<UserEntity, 'nickname' | 'deleted_at'> | null;
   password_hash?: string | null;
 }
