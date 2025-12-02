@@ -1,6 +1,7 @@
 'use client';
 
 import CreateSeriesButton from '@/components/series/createSeriesButton';
+import SeriesPreview from '@/components/series/seriesPreview';
 import useSeries from '@/features/series/domain/hooks/useSeries';
 import { Series } from '@/features/series/domain/model/series';
 
@@ -28,12 +29,16 @@ export default function SeriesListClient({
           시리즈가 없습니다.
         </div>
       ) : (
-        <div className='flex flex-col gap-8'>
-          {seriesList?.map(series => (
-            <div key={series.id}>
-              <div className='text-xl font-semibold'>{series.title}</div>
-              {series.description && (
-                <div className='text-gray-600 mt-2'>{series.description}</div>
+        <div className='flex flex-col'>
+          {seriesList?.map((series, index) => (
+            <div key={series.id} className='mb-8'>
+              <SeriesPreview
+                userId={userId}
+                currentUserId={currentUserId}
+                series={series}
+              />
+              {index !== seriesList.length - 1 && (
+                <div className='h-px bg-gray-200' />
               )}
             </div>
           ))}
