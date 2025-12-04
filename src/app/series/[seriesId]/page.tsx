@@ -67,7 +67,7 @@ export default async function SeriesPage({
                   {post.title}
                 </div>
                 <div className='flex items-center gap-2 text-xs text-gray-500'>
-                  <div>2024.12.01</div>
+                  <div>{post.createdAt}</div>
                   <Divider />
                   <div>조회 123</div>
                 </div>

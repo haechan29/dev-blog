@@ -10,7 +10,7 @@ export interface SeriesProps {
   updatedAt: string;
   userId: string;
   authorName: string;
-  posts: Pick<PostProps, 'id' | 'title' | 'seriesOrder'>[];
+  posts: Pick<PostProps, 'id' | 'title' | 'createdAt' | 'seriesOrder'>[];
   postCount: number;
 }
 
@@ -23,7 +23,9 @@ export function createProps(series: Series): SeriesProps {
     updatedAt: formatDate(series.updatedAt),
     userId: series.userId,
     authorName: series.authorName,
-    posts: series.posts,
+    posts: series.posts.map(post => {
+      return { ...post, createdAt: formatDate(post.createdAt) };
+    }),
     postCount: series.postCount,
   };
 }

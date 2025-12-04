@@ -14,6 +14,7 @@ export function toDto(entity: SeriesEntity): SeriesDto {
       entity.posts?.map(post => ({
         id: post.id,
         title: post.title,
+        createdAt: post.created_at,
         seriesOrder: post.seriesOrder,
       })) ?? [],
     postCount: entity.postCounts?.[0]?.count ?? entity.posts?.length ?? 0,
