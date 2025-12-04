@@ -1,9 +1,9 @@
 import { auth } from '@/auth';
+import SeriesPostList from '@/components/series/seriesPostList';
 import SeriesSettingsDropdown from '@/components/series/seriesSettingsDropdown';
 import * as SeriesServerService from '@/features/series/domain/service/seriesServerService';
 import { createProps } from '@/features/series/ui/seriesProps';
 import { MoreVertical } from 'lucide-react';
-import Link from 'next/link';
 
 export default async function SeriesPage({
   params,
@@ -47,35 +47,7 @@ export default async function SeriesPage({
 
       <div className='w-full h-px bg-gray-200 mb-10' />
 
-      {series.posts.length === 0 ? (
-        <div className='text-center py-20 text-gray-500'>
-          시리즈에 포함된 글이 없습니다
-        </div>
-      ) : (
-        <div className='flex flex-col gap-8'>
-          {series.posts.map((post, index) => (
-            <Link
-              key={post.id}
-              href={`/posts/${post.id}`}
-              className='relative flex items-start gap-4 group p-4 -m-4 rounded-xl hover:bg-gray-100/50 transition-colors'
-            >
-              <div className='text-xl font-semibold text-gray-300 group-hover:text-gray-400 min-w-8 mt-0.5'>
-                {index + 1}
-              </div>
-              <div className='flex-1 flex flex-col gap-2'>
-                <div className='text-xl font-semibold text-gray-900 line-clamp-2'>
-                  {post.title}
-                </div>
-                <div className='flex items-center gap-2 text-xs text-gray-500'>
-                  <div>{post.createdAt}</div>
-                  <Divider />
-                  <div>조회 123</div>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
+      <SeriesPostList series={series} />
     </>
   );
 }
