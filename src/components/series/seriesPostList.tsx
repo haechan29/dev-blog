@@ -1,5 +1,6 @@
 'use client';
 
+import AddPostDialog from '@/components/series/addPostDialog';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import usePostStat from '@/features/postStat/hooks/usePostStat';
 import { SeriesProps } from '@/features/series/ui/seriesProps';
@@ -32,6 +33,7 @@ export default function SeriesPostList({
   series: SeriesProps;
 }) {
   const [posts, setPosts] = useState(series.posts);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -68,6 +70,11 @@ export default function SeriesPostList({
     [posts]
   );
 
+  const handleAddPost = async (postId: string) => {
+    // TODO: API 호출
+    // 성공하면 setPosts로 목록 갱신
+  };
+
   if (posts.length === 0) {
     return (
       <div className='text-center py-20 text-gray-500'>
@@ -95,14 +102,22 @@ export default function SeriesPostList({
             </div>
           ))}
         </div>
-
         <button
-          onClick={() => {}}
+          onClick={() => setIsAddDialogOpen(true)}
           className='mt-6 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-700 transition-colors font-medium mx-auto'
         >
           <Plus className='w-5 h-5' />
           <div>글 추가</div>
         </button>
+
+        <AddPostDialog
+          userId={userId ?? ''}
+          seriesId={series.id}
+          existingPostIds={posts.map(p => p.id)}
+          isOpen={isAddDialogOpen}
+          setIsOpen={setIsAddDialogOpen}
+          onAdd={handleAddPost}
+        />
       </SortableContext>
     </DndContext>
   );
