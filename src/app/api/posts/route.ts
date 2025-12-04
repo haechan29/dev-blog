@@ -2,22 +2,29 @@ import { auth } from '@/auth';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 import { PostStatCreationError } from '@/features/postStat/data/errors/postStatErrors';
 import * as PostStatQueries from '@/features/postStat/data/queries/postStatQueries';
-import { ValidationError } from '@/features/user/data/errors/userErrors';
+import {
+  UnauthorizedError,
+  ValidationError,
+} from '@/features/user/data/errors/userErrors';
 import { ApiError } from '@/lib/api';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    const data = await PostQueries.fetchPosts();
+    const data = await PostQueries.fetchAllPosts();
     return NextResponse.json({ data });
   } catch (error) {
-    console.error('게시글 목록 조회 실패:', error);
-    const message =
-      process.env.NODE_ENV === 'development'
-        ? (error as Error).message
-        : '게시글 목록 조회 요청이 실패했습니다.';
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error('게시글 목록 조회에 실패했습니다', error);
+
+    if (error instanceof ApiError) {
+      return error.toResponse();
+    }
+
+    return NextResponse.json(
+      { error: '게시글 목록 조회에 실패했습니다' },
+      { status: 500 }
+    );
   }
 }
 
@@ -75,6 +82,48 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       { error: '게시글 생성 요청이 실패했습니다' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    if (!userId) {
+      throw new UnauthorizedError('인증되지 않은 요청입니다');
+    }
+
+    const { postIds } = await request.json();
+
+    if (!Array.isArray(postIds) || postIds.length === 0) {
+      throw new ValidationError('게시글 아이디 목록을 찾을 수 없습니다');
+    }
+
+    const posts = await PostQueries.fetchPosts(postIds);
+
+    if (posts.length !== postIds.length) {
+      throw new ValidationError('일부 게시글을 찾을 수 없습니다');
+    }
+
+    if (posts.some(post => post.user_id !== userId)) {
+      throw new UnauthorizedError('인증되지 않은 요청입니다');
+    }
+
+    await PostQueries.updatePostsOrder(postIds);
+
+    return NextResponse.json({ data: null });
+  } catch (error) {
+    console.error('게시글 순서 변경에 실패했습니다', error);
+
+    if (error instanceof ApiError) {
+      return error.toResponse();
+    }
+
+    return NextResponse.json(
+      { error: '게시글 순서 변경에 실패했습니다' },
       { status: 500 }
     );
   }

@@ -24,6 +24,10 @@ export async function updatePost(params: {
   return toDomain(post);
 }
 
+export async function updatePostsOrder(postIds: string[]) {
+  await PostClientRepository.updatePostsOrder(postIds);
+}
+
 export async function deletePost(postId: string, password: string) {
   await PostClientRepository.deletePost(postId, password);
 }

@@ -27,6 +27,10 @@ export async function updatePost({
   return response.data;
 }
 
+export async function updatePostsOrder(postIds: string[]): Promise<void> {
+  await api.patch(`/api/posts`, { postIds });
+}
+
 export async function deletePost(
   postId: string,
   password: string

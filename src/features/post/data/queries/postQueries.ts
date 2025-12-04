@@ -4,7 +4,7 @@ import { toDto } from '@/features/post/data/mapper/postMapper';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
-export async function fetchPosts() {
+export async function fetchAllPosts() {
   const { data, error } = await supabase
     .from('posts')
     .select(
@@ -37,6 +37,19 @@ export async function fetchPost(postId: string) {
   }
 
   return toDto(data as unknown as PostEntity);
+}
+
+export async function fetchPosts(postIds: string[]) {
+  const { data, error } = await supabase
+    .from('posts')
+    .select('id, user_id')
+    .in('id', postIds);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data as Array<{ id: string; user_id: string | null }>;
 }
 
 export async function fetchPostsByUserId(userId: string) {
@@ -148,6 +161,20 @@ export async function updatePost({
   }
 
   return toDto(data as unknown as PostEntity);
+}
+
+export async function updatePostsOrder(postIds: string[]) {
+  const updates = postIds.map((id, index) => ({
+    id,
+    series_order: index,
+    updated_at: new Date().toISOString(),
+  }));
+
+  const { error } = await supabase.from('posts').upsert(updates);
+
+  if (error) {
+    throw new Error(error.message);
+  }
 }
 
 export async function deletePost(postId: string) {
