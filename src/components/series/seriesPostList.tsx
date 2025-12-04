@@ -19,7 +19,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical } from 'lucide-react';
+import { GripVertical, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { ReactNode, useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -95,6 +95,14 @@ export default function SeriesPostList({
             </div>
           ))}
         </div>
+
+        <button
+          onClick={() => {}}
+          className='mt-6 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-700 transition-colors font-medium mx-auto'
+        >
+          <Plus className='w-5 h-5' />
+          <div>글 추가</div>
+        </button>
       </SortableContext>
     </DndContext>
   );
