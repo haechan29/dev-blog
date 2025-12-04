@@ -1,4 +1,4 @@
-import { PostResponseDto } from '@/features/post/data/dto/postResponseDto';
+import { PostDto } from '@/features/post/data/dto/postDto';
 import { api } from '@/lib/api';
 
 export async function createPost(requestDto: {
@@ -6,7 +6,7 @@ export async function createPost(requestDto: {
   content: string;
   tags: string[];
   password: string;
-}): Promise<PostResponseDto> {
+}): Promise<PostDto> {
   const response = await api.post(`/api/posts`, requestDto);
   return response.data;
 }
@@ -20,7 +20,9 @@ export async function updatePost({
   content?: string;
   tags?: string[];
   password?: string;
-}): Promise<PostResponseDto> {
+  seriesId?: string | null;
+  seriesOrder?: number | null;
+}): Promise<PostDto> {
   const response = await api.patch(`/api/posts/${postId}`, requestBody);
   return response.data;
 }

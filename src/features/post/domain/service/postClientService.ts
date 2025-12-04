@@ -17,6 +17,8 @@ export async function updatePost(params: {
   content?: string;
   tags?: string[];
   password?: string;
+  seriesId?: string | null;
+  seriesOrder?: number | null;
 }) {
   const post = await PostClientRepository.updatePost(params);
   return toDomain(post);

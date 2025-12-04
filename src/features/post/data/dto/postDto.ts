@@ -1,4 +1,4 @@
-export interface PostResponseDto {
+export interface PostDto {
   id: string;
   title: string;
   tags: string[];

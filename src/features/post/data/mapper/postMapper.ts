@@ -1,7 +1,7 @@
-import { PostResponseDto } from '@/features/post/data/dto/postResponseDto';
+import { PostDto } from '@/features/post/data/dto/postDto';
 import { PostEntity } from '@/features/post/data/entities/postEntities';
 
-export function toDto(post: PostEntity): PostResponseDto {
+export function toDto(post: PostEntity): PostDto {
   return {
     id: post.id,
     title: post.title,

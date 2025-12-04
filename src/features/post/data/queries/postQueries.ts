@@ -110,23 +110,28 @@ export async function createPost({
   return toDto(data as unknown as PostEntity);
 }
 
-export async function updatePost(
-  postId: string,
-  {
-    title,
-    content,
-    tags,
-  }: {
-    title?: string;
-    content?: string;
-    tags?: string[];
-  }
-) {
+export async function updatePost({
+  postId,
+  title,
+  content,
+  tags,
+  seriesId,
+  seriesOrder,
+}: {
+  postId: string;
+  title?: string;
+  content?: string;
+  tags?: string[];
+  seriesId?: string | null;
+  seriesOrder?: number | null;
+}) {
   const updates: Partial<PostEntity> = {
     updated_at: new Date().toISOString(),
     ...(title !== undefined && { title }),
     ...(content !== undefined && { content }),
     ...(tags !== undefined && { tags }),
+    ...(seriesId !== undefined && { series_id: seriesId }),
+    ...(seriesOrder !== undefined && { series_order: seriesOrder }),
   };
 
   const { data, error } = await supabase

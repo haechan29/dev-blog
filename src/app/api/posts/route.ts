@@ -1,11 +1,7 @@
 import { auth } from '@/auth';
-import {
-  createPost,
-  deletePost,
-  fetchPosts,
-} from '@/features/post/data/queries/postQueries';
+import * as PostQueries from '@/features/post/data/queries/postQueries';
 import { PostStatCreationError } from '@/features/postStat/data/errors/postStatErrors';
-import { createPostStat } from '@/features/postStat/data/queries/postStatQueries';
+import * as PostStatQueries from '@/features/postStat/data/queries/postStatQueries';
 import { ValidationError } from '@/features/user/data/errors/userErrors';
 import { ApiError } from '@/lib/api';
 import bcrypt from 'bcryptjs';
@@ -13,7 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    const data = await fetchPosts();
+    const data = await PostQueries.fetchPosts();
     return NextResponse.json({ data });
   } catch (error) {
     console.error('게시글 목록 조회 실패:', error);
@@ -50,7 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     const passwordHash = session ? null : await bcrypt.hash(password, 10);
-    const post = await createPost({
+    const post = await PostQueries.createPost({
       title,
       content,
       tags,
@@ -59,7 +55,7 @@ export async function POST(request: NextRequest) {
       guestId: session ? null : guestId,
     });
 
-    await createPostStat(post.id);
+    await PostStatQueries.createPostStat(post.id);
 
     return NextResponse.json({ data: post });
   } catch (error) {
@@ -67,7 +63,7 @@ export async function POST(request: NextRequest) {
 
     if (error instanceof PostStatCreationError) {
       try {
-        await deletePost(error.postId);
+        await PostQueries.deletePost(error.postId);
       } catch (error) {
         console.error('게시글 삭제 요청(롤백)이 실패했습니다', error);
       }

@@ -1,4 +1,4 @@
-import { PostResponseDto } from '@/features/post/data/dto/postResponseDto';
+import { PostDto } from '@/features/post/data/dto/postDto';
 
 export interface SeriesDto {
   id: string;
@@ -8,6 +8,6 @@ export interface SeriesDto {
   updatedAt: string;
   userId: string;
   authorName: string;
-  posts: Pick<PostResponseDto, 'id' | 'title' | 'seriesOrder'>[];
+  posts: Pick<PostDto, 'id' | 'title' | 'seriesOrder'>[];
   postCount: number;
 }
