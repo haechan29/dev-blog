@@ -47,7 +47,7 @@ export default async function SeriesPage({
 
       <div className='w-full h-px bg-gray-200 mb-10' />
 
-      <SeriesPostList series={series} />
+      <SeriesPostList userId={userId} series={series} />
     </>
   );
 }
