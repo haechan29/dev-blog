@@ -63,11 +63,11 @@ export default function WritePostToolbar({
           navigate({ pathname: `/read/${post.id}` });
           removeDraft();
         } catch (error) {
-          const errorMessage =
+          const message =
             error instanceof ApiError
               ? error.message
               : '게시글 생성에 실패했습니다';
-          toast.error(errorMessage);
+          toast.error(message);
         } finally {
           nProgress.done();
         }

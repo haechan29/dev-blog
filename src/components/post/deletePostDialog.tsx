@@ -44,9 +44,9 @@ export default function DeletePostDialog({
         router.push('/');
         toast.success('게시글이 삭제되었습니다');
       } catch (error) {
-        const errorMessage =
+        const message =
           error instanceof Error ? error.message : '게시글 삭제에 실패했습니다';
-        toast.error(errorMessage);
+        toast.error(message);
       }
       setIsLoading(false);
     },

@@ -18,11 +18,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { PostProps } from '@/features/post/ui/postProps';
 import useSeries from '@/features/series/domain/hooks/useSeries';
+import { ApiError } from '@/lib/api';
 import clsx from 'clsx';
 import { Check, ChevronsUpDown, Loader2, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import toast from 'react-hot-toast';
 
 export default function SeriesSettingsDialog({
   userId,
@@ -47,15 +50,25 @@ export default function SeriesSettingsDialog({
 
   const handleSave = useCallback(async () => {
     setIsLoading(true);
-    // TODO: API 연동
-    console.log('저장:', { postId: post.id, seriesId: selectedSeriesId });
 
-    // 가짜 딜레이
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      await PostClientService.updatePost({
+        postId: post.id,
+        seriesId: selectedSeriesId,
+        seriesOrder: selectedSeries?.postCount,
+      });
 
-    setIsLoading(false);
-    setIsOpen(false);
-  }, [post.id, selectedSeriesId, setIsOpen]);
+      setIsOpen(false);
+    } catch (error) {
+      const message =
+        error instanceof ApiError
+          ? error.message
+          : '시리즈 설정에 실패했습니다';
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [post.id, selectedSeries?.postCount, selectedSeriesId, setIsOpen]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -68,12 +81,12 @@ export default function SeriesSettingsDialog({
       <DialogContent showCloseButton={false} className='gap-0 rounded-sm'>
         <DialogTitle className='sr-only'>시리즈 설정 다이어로그</DialogTitle>
         <DialogDescription className='sr-only'>
-          게시글을 시리즈에 추가하거나 제거할 수 있습니다.
+          게시글을 시리즈에 추가하거나 제거할 수 있습니다
         </DialogDescription>
 
         <div className='text-xl font-bold mt-2 mb-1'>시리즈 설정</div>
         <div className='text-sm text-gray-500 mb-6'>
-          이 게시글을 시리즈에 추가하거나 제거할 수 있습니다.
+          게시글을 시리즈에 추가하거나 제거할 수 있습니다
         </div>
 
         <Popover open={open} onOpenChange={setOpen}>
@@ -145,7 +158,7 @@ export default function SeriesSettingsDialog({
             {isLoading ? (
               <Loader2 size={18} strokeWidth={3} className='animate-spin' />
             ) : (
-              <div className='shrink-0'>저장</div>
+              <div className='shrink-0'>확인</div>
             )}
           </button>
           <DialogClose asChild>
