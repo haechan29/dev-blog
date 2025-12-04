@@ -164,14 +164,13 @@ export async function updatePost({
 }
 
 export async function updatePostsOrder(postIds: string[]) {
-  const updates = postIds.map((id, index) => ({
-    id,
-    series_order: index,
-    updated_at: new Date().toISOString(),
-  }));
+  const promises = postIds.map((id, index) =>
+    supabase.from('posts').update({ series_order: index }).eq('id', id)
+  );
 
-  const { error } = await supabase.from('posts').upsert(updates);
+  const results = await Promise.all(promises);
 
+  const error = results.find(r => r.error)?.error;
   if (error) {
     throw new Error(error.message);
   }

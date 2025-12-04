@@ -1,7 +1,9 @@
 'use client';
 
+import * as PostClientService from '@/features/post/domain/service/postClientService';
 import usePostStat from '@/features/postStat/hooks/usePostStat';
 import { SeriesProps } from '@/features/series/ui/seriesProps';
+import { ApiError } from '@/lib/api';
 import {
   closestCenter,
   DndContext,
@@ -20,6 +22,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 import Link from 'next/link';
 import { ReactNode, useCallback, useState } from 'react';
+import toast from 'react-hot-toast';
 
 export default function SeriesPostList({
   userId,
@@ -38,19 +41,32 @@ export default function SeriesPostList({
     })
   );
 
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    const { active, over } = event;
+  const handleDragEnd = useCallback(
+    async (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
 
-    if (over && active.id !== over.id) {
-      setPosts(items => {
-        const oldIndex = items.findIndex(item => item.id === active.id);
-        const newIndex = items.findIndex(item => item.id === over.id);
-        return arrayMove(items, oldIndex, newIndex);
-      });
+      const prevPosts = posts;
 
-      // TODO: API 호출로 서버에 순서 저장
-    }
-  }, []);
+      const oldIndex = posts.findIndex(post => post.id === active.id);
+      const newIndex = posts.findIndex(post => post.id === over.id);
+      const newPosts = arrayMove(posts, oldIndex, newIndex);
+      setPosts(newPosts);
+
+      try {
+        const newPostIds = newPosts.map(post => post.id);
+        await PostClientService.updatePostsOrder(newPostIds);
+      } catch (error) {
+        setPosts(prevPosts);
+        const message =
+          error instanceof ApiError
+            ? error.message
+            : '게시글 순서 변경에 실패했습니다';
+        toast.error(message);
+      }
+    },
+    [posts]
+  );
 
   if (posts.length === 0) {
     return (
