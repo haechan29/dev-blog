@@ -15,7 +15,8 @@ export function toDto(entity: SeriesEntity): SeriesDto {
         id: post.id,
         title: post.title,
         createdAt: post.created_at,
-        seriesOrder: post.seriesOrder,
+        seriesId: post.series_id,
+        seriesOrder: post.series_order,
       })) ?? [],
     postCount: entity.postCounts?.[0]?.count ?? entity.posts?.length ?? 0,
   };

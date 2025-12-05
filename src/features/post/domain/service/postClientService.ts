@@ -1,5 +1,6 @@
 import * as PostClientRepository from '@/features/post/data/repository/postClientRepository';
 import { toDomain } from '@/features/post/domain/mapper/postMapper';
+import Post from '@/features/post/domain/model/post';
 
 export async function createPost(params: {
   title: string;
@@ -24,8 +25,10 @@ export async function updatePost(params: {
   return toDomain(post);
 }
 
-export async function updatePostsOrder(postIds: string[]) {
-  await PostClientRepository.updatePostsOrder(postIds);
+export async function updatePostsInSeries(
+  posts: Pick<Post, 'id' | 'seriesId' | 'seriesOrder'>[]
+) {
+  await PostClientRepository.updatePostsInSeries(posts);
 }
 
 export async function deletePost(postId: string, password: string) {

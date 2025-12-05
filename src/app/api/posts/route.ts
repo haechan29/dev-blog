@@ -96,23 +96,24 @@ export async function PATCH(request: NextRequest) {
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 
-    const { postIds } = await request.json();
+    const { posts } = await request.json();
 
-    if (!Array.isArray(postIds) || postIds.length === 0) {
-      throw new ValidationError('게시글 아이디 목록을 찾을 수 없습니다');
+    if (!Array.isArray(posts) || posts.length === 0) {
+      throw new ValidationError('게시글 목록을 찾을 수 없습니다');
     }
 
-    const posts = await PostQueries.fetchPosts(postIds);
+    const postIds = posts.map(p => p.id);
+    const existingPosts = await PostQueries.fetchPosts(postIds);
 
-    if (posts.length !== postIds.length) {
+    if (existingPosts.length !== postIds.length) {
       throw new ValidationError('일부 게시글을 찾을 수 없습니다');
     }
 
-    if (posts.some(post => post.user_id !== userId)) {
+    if (existingPosts.some(post => post.user_id !== userId)) {
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 
-    await PostQueries.updatePostsOrder(postIds);
+    await PostQueries.updatePostsInSeries(posts);
 
     return NextResponse.json({ data: null });
   } catch (error) {

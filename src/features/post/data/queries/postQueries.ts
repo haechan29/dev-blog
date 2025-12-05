@@ -1,6 +1,7 @@
 import { PostEntity } from '@/features/post/data/entities/postEntities';
 import { PostNotFoundError } from '@/features/post/data/errors/postErrors';
 import { toDto } from '@/features/post/data/mapper/postMapper';
+import Post from '@/features/post/domain/model/post';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
@@ -49,7 +50,7 @@ export async function fetchPosts(postIds: string[]) {
     throw new Error(error.message);
   }
 
-  return data as Array<{ id: string; user_id: string | null }>;
+  return data as { id: string; user_id: string | null }[];
 }
 
 export async function fetchPostsByUserId(userId: string) {
@@ -163,9 +164,14 @@ export async function updatePost({
   return toDto(data as unknown as PostEntity);
 }
 
-export async function updatePostsOrder(postIds: string[]) {
-  const promises = postIds.map((id, index) =>
-    supabase.from('posts').update({ series_order: index }).eq('id', id)
+export async function updatePostsInSeries(
+  posts: Pick<Post, 'id' | 'seriesId' | 'seriesOrder'>[]
+) {
+  const promises = posts.map(({ id, seriesId, seriesOrder }) =>
+    supabase
+      .from('posts')
+      .update({ series_id: seriesId, series_order: seriesOrder })
+      .eq('id', id)
   );
 
   const results = await Promise.all(promises);

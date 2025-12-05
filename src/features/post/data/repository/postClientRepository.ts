@@ -1,4 +1,5 @@
 import { PostDto } from '@/features/post/data/dto/postDto';
+import Post from '@/features/post/domain/model/post';
 import { api } from '@/lib/api';
 
 export async function createPost(requestDto: {
@@ -27,8 +28,10 @@ export async function updatePost({
   return response.data;
 }
 
-export async function updatePostsOrder(postIds: string[]): Promise<void> {
-  await api.patch(`/api/posts`, { postIds });
+export async function updatePostsInSeries(
+  posts: Pick<Post, 'id' | 'seriesId' | 'seriesOrder'>[]
+): Promise<void> {
+  await api.patch(`/api/posts`, { posts });
 }
 
 export async function deletePost(

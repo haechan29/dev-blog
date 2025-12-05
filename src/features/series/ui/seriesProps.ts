@@ -10,7 +10,10 @@ export interface SeriesProps {
   updatedAt: string;
   userId: string;
   authorName: string;
-  posts: Pick<PostProps, 'id' | 'title' | 'createdAt' | 'seriesOrder'>[];
+  posts: Pick<
+    PostProps,
+    'id' | 'title' | 'createdAt' | 'seriesId' | 'seriesOrder'
+  >[];
   postCount: number;
 }
 

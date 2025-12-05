@@ -9,6 +9,9 @@ export interface SeriesEntity {
   created_at: string;
   updated_at: string;
   users?: Pick<UserEntity, 'nickname'> | null;
-  posts?: Pick<PostEntity, 'id' | 'title' | 'created_at' | 'seriesOrder'>[];
+  posts?: Pick<
+    PostEntity,
+    'id' | 'title' | 'created_at' | 'series_id' | 'series_order'
+  >[];
   postCounts?: { count: number }[];
 }

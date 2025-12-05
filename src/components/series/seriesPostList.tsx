@@ -53,12 +53,15 @@ export default function SeriesPostList({
 
       const oldIndex = posts.findIndex(post => post.id === active.id);
       const newIndex = posts.findIndex(post => post.id === over.id);
-      const newPosts = arrayMove(posts, oldIndex, newIndex);
+      const newPosts = arrayMove(posts, oldIndex, newIndex).map(
+        (post, index) => {
+          return { ...post, seriesOrder: index };
+        }
+      );
       setPosts(newPosts);
 
       try {
-        const newPostIds = newPosts.map(post => post.id);
-        await PostClientService.updatePostsOrder(newPostIds);
+        await PostClientService.updatePostsInSeries(newPosts);
       } catch (error) {
         setPosts(prevPosts);
         const message =

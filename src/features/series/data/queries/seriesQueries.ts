@@ -15,7 +15,7 @@ export async function fetchSeries(seriesId: string) {
       created_at, 
       updated_at,
       users:user_id(nickname),
-      posts(id, title, created_at, series_order))
+      posts(id, title, created_at, series_id, series_order))
       `
     )
     .eq('id', seriesId)

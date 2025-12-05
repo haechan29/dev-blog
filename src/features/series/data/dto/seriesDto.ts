@@ -8,6 +8,9 @@ export interface SeriesDto {
   updatedAt: string;
   userId: string;
   authorName: string;
-  posts: Pick<PostDto, 'id' | 'title' | 'createdAt' | 'seriesOrder'>[];
+  posts: Pick<
+    PostDto,
+    'id' | 'title' | 'createdAt' | 'seriesId' | 'seriesOrder'
+  >[];
   postCount: number;
 }
