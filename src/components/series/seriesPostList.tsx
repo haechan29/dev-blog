@@ -105,7 +105,7 @@ export default function SeriesPostList({
 
         {userId === series.userId && (
           <RemovePostDialog
-            seriesId={series.id}
+            series={series}
             postId={selectedPostId}
             resetPostId={() => setSelectedPostId(null)}
           />

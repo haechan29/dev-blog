@@ -103,6 +103,7 @@ export default function DeleteCommentDialog({
               deleteCommentMutation.isPending ? 'bg-red-400' : 'bg-red-600'
             )}
             onClick={handleDelete}
+            disabled={deleteCommentMutation.isPending}
           >
             {deleteCommentMutation.isPending ? (
               <Loader2 size={18} strokeWidth={3} className='animate-spin' />

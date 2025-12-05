@@ -7,27 +7,31 @@ import {
   DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { X } from 'lucide-react';
+import useSeriesPosts from '@/features/series/domain/hooks/useSeriesPosts';
+import { SeriesProps } from '@/features/series/ui/seriesProps';
+import clsx from 'clsx';
+import { Loader2, X } from 'lucide-react';
 import { useCallback } from 'react';
 
 export default function RemovePostDialog({
-  seriesId,
+  series,
   postId,
   resetPostId,
 }: {
-  seriesId: string;
+  series: SeriesProps;
   postId: string | null;
   resetPostId: () => void;
 }) {
-  const handleRemove = useCallback(() => {
-    if (!postId) return;
+  const { removePostMutation } = useSeriesPosts(series);
 
-    // TODO: API 호출 로직
-    setTimeout(() => {
-      resetPostId();
-    }, 300);
-    console.log('Remove post:', seriesId, postId);
-  }, [postId, resetPostId, seriesId]);
+  const handleRemove = useCallback(async () => {
+    if (!postId) return;
+    removePostMutation.mutate(postId, {
+      onSuccess: () => {
+        resetPostId();
+      },
+    });
+  }, [postId, removePostMutation, resetPostId]);
 
   return (
     <Dialog
@@ -46,11 +50,20 @@ export default function RemovePostDialog({
 
         <div className='flex justify-between items-center'>
           <button
-            className='flex justify-center items-center px-6 h-10 rounded-sm font-bold text-white bg-red-600 hover:bg-red-400'
+            className={clsx(
+              'flex justify-center items-center px-6 h-10 rounded-sm font-bold text-white hover:bg-red-400',
+              removePostMutation.isPending ? 'bg-red-400' : 'bg-red-600'
+            )}
             onClick={handleRemove}
+            disabled={removePostMutation.isPending}
           >
-            제거
+            {removePostMutation.isPending ? (
+              <Loader2 size={18} strokeWidth={3} className='animate-spin' />
+            ) : (
+              '제거'
+            )}
           </button>
+
           <DialogClose asChild>
             <X className='w-10 h-10 p-2 cursor-pointer' />
           </DialogClose>
