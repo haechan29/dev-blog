@@ -3,13 +3,13 @@
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import * as SeriesClientService from '@/features/series/domain/service/seriesClientService';
 import { createProps, SeriesProps } from '@/features/series/ui/seriesProps';
+import { ApiError } from '@/lib/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 
-export default function useSeriesPosts(
-  userId: string,
-  seriesId: string,
-  initialData: SeriesProps
-) {
+export default function useSeriesPosts(initialSeries: SeriesProps) {
+  const { id: seriesId, userId } = initialSeries;
+
   const queryClient = useQueryClient();
 
   const { data: series } = useQuery({
@@ -18,7 +18,7 @@ export default function useSeriesPosts(
       const series = await SeriesClientService.fetchSeries(userId, seriesId);
       return createProps(series);
     },
-    initialData,
+    initialData: initialSeries,
   });
 
   const addPostMutation = useMutation({
@@ -33,6 +33,13 @@ export default function useSeriesPosts(
       queryClient.invalidateQueries({
         queryKey: ['series', seriesId, 'posts'],
       });
+    },
+    onError: error => {
+      const message =
+        error instanceof ApiError
+          ? error.message
+          : '시리즈에 게시글을 추가하는 데에 실패했습니다';
+      toast.error(message);
     },
   });
 
@@ -56,11 +63,63 @@ export default function useSeriesPosts(
         queryKey: ['series', seriesId, 'posts'],
       });
     },
+    onError: error => {
+      const message =
+        error instanceof ApiError
+          ? error.message
+          : '시리즈에서 게시글을 제거하는 데에 실패했습니다';
+      toast.error(message);
+    },
+  });
+
+  const reorderPostsMutation = useMutation({
+    mutationFn: (reorderedPosts: SeriesProps['posts']) => {
+      return PostClientService.updatePostsInSeries(reorderedPosts);
+    },
+    onMutate: async newPosts => {
+      await queryClient.cancelQueries({
+        queryKey: ['series', seriesId, 'posts'],
+      });
+
+      const previousSeries = queryClient.getQueryData<SeriesProps>([
+        'series',
+        seriesId,
+        'posts',
+      ]);
+
+      queryClient.setQueryData<SeriesProps>(
+        ['series', seriesId, 'posts'],
+        old => {
+          if (!old) return old;
+          return {
+            ...old,
+            posts: newPosts,
+          };
+        }
+      );
+
+      return { previousSeries };
+    },
+    onError: (error, _newPosts, context) => {
+      if (context?.previousSeries) {
+        queryClient.setQueryData(
+          ['series', seriesId, 'posts'],
+          context.previousSeries
+        );
+      }
+
+      const message =
+        error instanceof ApiError
+          ? error.message
+          : '게시글 순서 변경에 실패했습니다';
+      toast.error(message);
+    },
   });
 
   return {
     posts: series?.posts,
     addPostMutation,
     removePostMutation,
+    reorderPostsMutation,
   } as const;
 }

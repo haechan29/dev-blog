@@ -1,10 +1,9 @@
 'use client';
 
 import RemovePostDialog from '@/components/series/removePostDialog';
-import * as PostClientService from '@/features/post/domain/service/postClientService';
 import usePostStat from '@/features/postStat/hooks/usePostStat';
+import useSeriesPosts from '@/features/series/domain/hooks/useSeriesPosts';
 import { SeriesProps } from '@/features/series/ui/seriesProps';
-import { ApiError } from '@/lib/api';
 import {
   closestCenter,
   DndContext,
@@ -24,7 +23,6 @@ import clsx from 'clsx';
 import { GripVertical, X } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useState } from 'react';
-import toast from 'react-hot-toast';
 
 export default function SeriesPostList({
   userId,
@@ -33,7 +31,7 @@ export default function SeriesPostList({
   userId: string | null;
   series: SeriesProps;
 }) {
-  const [posts, setPosts] = useState(series.posts);
+  const { posts, reorderPostsMutation } = useSeriesPosts(series);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
 
   const sensors = useSensors(
@@ -49,29 +47,14 @@ export default function SeriesPostList({
       const { active, over } = event;
       if (!over || active.id === over.id) return;
 
-      const prevPosts = posts;
-
       const oldIndex = posts.findIndex(post => post.id === active.id);
       const newIndex = posts.findIndex(post => post.id === over.id);
       const newPosts = arrayMove(posts, oldIndex, newIndex).map(
-        (post, index) => {
-          return { ...post, seriesOrder: index };
-        }
+        (post, index) => ({ ...post, seriesOrder: index })
       );
-      setPosts(newPosts);
-
-      try {
-        await PostClientService.updatePostsInSeries(newPosts);
-      } catch (error) {
-        setPosts(prevPosts);
-        const message =
-          error instanceof ApiError
-            ? error.message
-            : '게시글 순서 변경에 실패했습니다';
-        toast.error(message);
-      }
+      reorderPostsMutation.mutate(newPosts);
     },
-    [posts]
+    [posts, reorderPostsMutation]
   );
 
   if (posts.length === 0) {
@@ -143,7 +126,12 @@ function SeriesPost({
   };
 
   return (
-    <div ref={setNodeRef} style={style} className='flex gap-4 items-center'>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className='flex gap-4 items-center'
+      suppressHydrationWarning
+    >
       <div className='flex-1 min-w-0'>
         <Link href={`/read/${post.id}`} className='flex items-start gap-4'>
           <div className='text-xl font-semibold text-gray-300 group-hover:text-gray-400 min-w-8 mt-0.5'>
