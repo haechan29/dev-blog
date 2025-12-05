@@ -1,5 +1,5 @@
 import { auth } from '@/auth';
-import SeriesPageClient from '@/components/series/seriesPageClient';
+import SeriesListPageClient from '@/components/series/seriesListPageClient';
 import * as SeriesServerService from '@/features/series/domain/service/seriesServerService';
 import { createProps } from '@/features/series/ui/seriesProps';
 
@@ -15,7 +15,7 @@ export default async function SeriesListPage({
   );
 
   return (
-    <SeriesPageClient
+    <SeriesListPageClient
       userId={userId}
       currentUserId={session?.user?.id ?? null}
       initialSeriesList={seriesList}
