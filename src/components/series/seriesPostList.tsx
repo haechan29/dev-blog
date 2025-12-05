@@ -22,7 +22,7 @@ import { CSS } from '@dnd-kit/utilities';
 import clsx from 'clsx';
 import { GripVertical, X } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function SeriesPostList({
   userId,
@@ -32,6 +32,8 @@ export default function SeriesPostList({
   series: SeriesProps;
 }) {
   const { posts, reorderPostsMutation } = useSeriesPosts(series);
+
+  const [localPosts, setLocalPosts] = useState(posts);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
 
   const sensors = useSensors(
@@ -47,17 +49,25 @@ export default function SeriesPostList({
       const { active, over } = event;
       if (!over || active.id === over.id) return;
 
-      const oldIndex = posts.findIndex(post => post.id === active.id);
-      const newIndex = posts.findIndex(post => post.id === over.id);
-      const newPosts = arrayMove(posts, oldIndex, newIndex).map(
+      const oldIndex = localPosts.findIndex(post => post.id === active.id);
+      const newIndex = localPosts.findIndex(post => post.id === over.id);
+      const newPosts = arrayMove(localPosts, oldIndex, newIndex).map(
         (post, index) => ({ ...post, seriesOrder: index })
       );
+      setLocalPosts(newPosts);
+
       reorderPostsMutation.mutate(newPosts);
     },
-    [posts, reorderPostsMutation]
+    [localPosts, reorderPostsMutation]
   );
 
-  if (posts.length === 0) {
+  useEffect(() => {
+    if (posts) {
+      setLocalPosts(posts);
+    }
+  }, [posts]);
+
+  if (localPosts.length === 0) {
     return (
       <div className='text-center pt-20 text-gray-500'>
         시리즈에 포함된 글이 없습니다
@@ -71,9 +81,12 @@ export default function SeriesPostList({
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
     >
-      <SortableContext items={posts} strategy={verticalListSortingStrategy}>
+      <SortableContext
+        items={localPosts}
+        strategy={verticalListSortingStrategy}
+      >
         <div className='flex flex-col gap-8'>
-          {posts.map((post, index) => (
+          {localPosts.map((post, index) => (
             <div
               key={post.id}
               className='relative p-4 -m-4 rounded-xl group hover:bg-gray-100/50 transition-colors'
@@ -126,12 +139,7 @@ function SeriesPost({
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className='flex gap-4 items-center'
-      suppressHydrationWarning
-    >
+    <div ref={setNodeRef} style={style} className='flex gap-4 items-center'>
       <div className='flex-1 min-w-0'>
         <Link href={`/read/${post.id}`} className='flex items-start gap-4'>
           <div className='text-xl font-semibold text-gray-300 group-hover:text-gray-400 min-w-8 mt-0.5'>

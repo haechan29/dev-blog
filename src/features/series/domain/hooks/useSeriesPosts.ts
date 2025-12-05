@@ -76,37 +76,15 @@ export default function useSeriesPosts(initialSeries: SeriesProps) {
     mutationFn: (reorderedPosts: SeriesProps['posts']) => {
       return PostClientService.updatePostsInSeries(reorderedPosts);
     },
-    onMutate: async newPosts => {
-      await queryClient.cancelQueries({
+    onSuccess: () => {
+      queryClient.invalidateQueries({
         queryKey: ['series', seriesId, 'posts'],
       });
-
-      const previousSeries = queryClient.getQueryData<SeriesProps>([
-        'series',
-        seriesId,
-        'posts',
-      ]);
-
-      queryClient.setQueryData<SeriesProps>(
-        ['series', seriesId, 'posts'],
-        old => {
-          if (!old) return old;
-          return {
-            ...old,
-            posts: newPosts,
-          };
-        }
-      );
-
-      return { previousSeries };
     },
-    onError: (error, _newPosts, context) => {
-      if (context?.previousSeries) {
-        queryClient.setQueryData(
-          ['series', seriesId, 'posts'],
-          context.previousSeries
-        );
-      }
+    onError: error => {
+      queryClient.invalidateQueries({
+        queryKey: ['series', seriesId, 'posts'],
+      });
 
       const message =
         error instanceof ApiError
