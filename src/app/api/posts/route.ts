@@ -10,9 +10,12 @@ import { ApiError } from '@/lib/api';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const data = await PostQueries.fetchAllPosts();
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId') ?? undefined;
+
+    const data = await PostQueries.fetchAllPosts(userId);
     return NextResponse.json({ data });
   } catch (error) {
     console.error('게시글 목록 조회에 실패했습니다', error);

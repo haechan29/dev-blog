@@ -5,19 +5,39 @@ import Post from '@/features/post/domain/model/post';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
-export async function fetchAllPosts() {
-  const { data, error } = await supabase
+export async function fetchAllPosts(userId?: string) {
+  let query = supabase
     .from('posts')
     .select(
       'id, title, content, tags, created_at, updated_at, user_id, guest_id, users:user_id(nickname, deleted_at)'
-    )
-    .order('created_at', { ascending: false });
+    );
+
+  if (userId) {
+    query = query.eq('user_id', userId);
+  }
+
+  query = query.order('created_at', { ascending: false });
+
+  const { data, error } = await query;
 
   if (error) {
     throw new Error(error.message);
   }
 
   return (data as unknown as PostEntity[]).map(toDto);
+}
+
+export async function fetchPosts(postIds: string[]) {
+  const { data, error } = await supabase
+    .from('posts')
+    .select('id, user_id')
+    .in('id', postIds);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data as { id: string; user_id: string | null }[];
 }
 
 export async function fetchPost(postId: string) {
@@ -38,35 +58,6 @@ export async function fetchPost(postId: string) {
   }
 
   return toDto(data as unknown as PostEntity);
-}
-
-export async function fetchPosts(postIds: string[]) {
-  const { data, error } = await supabase
-    .from('posts')
-    .select('id, user_id')
-    .in('id', postIds);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data as { id: string; user_id: string | null }[];
-}
-
-export async function fetchPostsByUserId(userId: string) {
-  const { data, error } = await supabase
-    .from('posts')
-    .select(
-      'id, title, content, tags, created_at, updated_at, user_id, guest_id, users:user_id(nickname, deleted_at)'
-    )
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return (data as unknown as PostEntity[]).map(toDto);
 }
 
 export async function fetchPostForAuth(postId: string) {
