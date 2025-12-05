@@ -1,7 +1,7 @@
 import '@/app/globals.css';
 import LayoutClient from '@/components/layoutClient';
 import LayoutContainer from '@/components/layoutContainer';
-import { fetchAllPosts } from '@/features/post/domain/service/postServerService';
+import { fetchPosts } from '@/features/post/domain/service/postServerService';
 import { createProps } from '@/features/post/ui/postProps';
 import Providers from '@/providers';
 import clsx from 'clsx';
@@ -27,7 +27,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const posts = await fetchAllPosts().then(posts => posts.map(createProps));
+  const posts = await fetchPosts().then(posts => posts.map(createProps));
 
   return (
     <html lang='ko'>

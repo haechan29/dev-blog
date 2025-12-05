@@ -3,8 +3,8 @@ import { toDomain } from '@/features/post/domain/mapper/postMapper';
 import Post from '@/features/post/domain/model/post';
 import 'server-only';
 
-export async function fetchAllPosts(userId?: string) {
-  const dtos = await PostServerRepository.fetchAllPosts(userId);
+export async function fetchPosts(userId?: string) {
+  const dtos = await PostServerRepository.fetchPosts(userId);
   return dtos.map(toDomain);
 }
 

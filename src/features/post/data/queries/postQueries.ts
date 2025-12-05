@@ -5,7 +5,7 @@ import Post from '@/features/post/domain/model/post';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
-export async function fetchAllPosts(userId?: string) {
+export async function fetchPosts(userId?: string) {
   let query = supabase
     .from('posts')
     .select(
@@ -27,7 +27,7 @@ export async function fetchAllPosts(userId?: string) {
   return (data as unknown as PostEntity[]).map(toDto);
 }
 
-export async function fetchPosts(postIds: string[]) {
+export async function fetchPostsOwnership(postIds: string[]) {
   const { data, error } = await supabase
     .from('posts')
     .select('id, user_id')

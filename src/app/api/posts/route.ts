@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId') ?? undefined;
 
-    const data = await PostQueries.fetchAllPosts(userId);
+    const data = await PostQueries.fetchPosts(userId);
     return NextResponse.json({ data });
   } catch (error) {
     console.error('게시글 목록 조회에 실패했습니다', error);
@@ -106,7 +106,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const postIds = posts.map(p => p.id);
-    const existingPosts = await PostQueries.fetchPosts(postIds);
+    const existingPosts = await PostQueries.fetchPostsOwnership(postIds);
 
     if (existingPosts.length !== postIds.length) {
       throw new ValidationError('일부 게시글을 찾을 수 없습니다');

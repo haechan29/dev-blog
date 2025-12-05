@@ -9,7 +9,7 @@ export default async function PostsPage({
 }) {
   const { userId } = await params;
 
-  const posts = await PostServerService.fetchAllPosts(userId).then(posts =>
+  const posts = await PostServerService.fetchPosts(userId).then(posts =>
     posts.map(createProps)
   );
 
