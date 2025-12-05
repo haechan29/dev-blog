@@ -14,23 +14,18 @@ import {
   DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { SeriesProps } from '@/features/series/ui/seriesProps';
 import { Check, Loader2, X } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 export default function AddPostDialog({
-  userId,
-  seriesId,
-  existingPostIds,
+  series,
   isOpen,
   setIsOpen,
-  onAdd,
 }: {
-  userId: string;
-  seriesId: string;
-  existingPostIds: string[];
+  series: SeriesProps;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  onAdd: (postId: string) => Promise<void>;
 }) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -50,15 +45,19 @@ export default function AddPostDialog({
     { id: '12', title: '열두 번째 글입니다' },
   ];
 
+  const existingPostIds = useMemo(() => {
+    return series.posts.map(post => post.id);
+  }, [series.posts]);
+
   const handleSelect = async (postId: string) => {
     if (existingPostIds.includes(postId)) return;
 
     setIsLoading(true);
     try {
-      await onAdd(postId);
+      // API 호출
+      console.log(postId);
       setIsOpen(false);
     } catch (error) {
-      // 에러는 부모에서 처리
     } finally {
       setIsLoading(false);
     }

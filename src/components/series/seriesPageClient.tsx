@@ -16,11 +16,6 @@ export default function SeriesPageClient({
 }) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
-  const handleAddPost = async (postId: string) => {
-    // TODO: API 호출
-    // 성공하면 setPosts로 목록 갱신
-  };
-
   return (
     <>
       <div className='flex flex-col gap-6 mb-10'>
@@ -63,12 +58,9 @@ export default function SeriesPageClient({
       )}
 
       <AddPostDialog
-        userId={userId ?? ''}
-        seriesId={series.id}
-        existingPostIds={series.posts.map(p => p.id)}
+        series={series}
         isOpen={isAddDialogOpen}
         setIsOpen={setIsAddDialogOpen}
-        onAdd={handleAddPost}
       />
     </>
   );
