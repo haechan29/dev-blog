@@ -2,6 +2,12 @@ import { PostDto } from '@/features/post/data/dto/postDto';
 import Post from '@/features/post/domain/model/post';
 import { api } from '@/lib/api';
 
+export async function fetchPosts(userId?: string): Promise<PostDto[]> {
+  const url = userId ? `/api/posts?userId=${userId}` : '/api/posts';
+  const response = await api.get(url);
+  return response.data;
+}
+
 export async function createPost(requestDto: {
   title: string;
   content: string;
