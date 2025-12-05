@@ -1,5 +1,6 @@
 'use client';
 
+import RemovePostDialog from '@/components/series/removePostDialog';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import usePostStat from '@/features/postStat/hooks/usePostStat';
 import { SeriesProps } from '@/features/series/ui/seriesProps';
@@ -33,6 +34,7 @@ export default function SeriesPostList({
   series: SeriesProps;
 }) {
   const [posts, setPosts] = useState(series.posts);
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -94,10 +96,21 @@ export default function SeriesPostList({
                 post={post}
                 index={index}
                 isOwner={userId === series.userId}
+                onRemoveClick={post => {
+                  setSelectedPostId(post.id);
+                }}
               />
             </div>
           ))}
         </div>
+
+        {userId === series.userId && (
+          <RemovePostDialog
+            seriesId={series.id}
+            postId={selectedPostId}
+            resetPostId={() => setSelectedPostId(null)}
+          />
+        )}
       </SortableContext>
     </DndContext>
   );
@@ -107,10 +120,12 @@ function SeriesPost({
   post,
   index,
   isOwner,
+  onRemoveClick,
 }: {
   post: SeriesProps['posts'][number];
   index: number;
   isOwner: boolean;
+  onRemoveClick: (post: { id: string; title: string }) => void;
 }) {
   const {
     stat: { viewCount },
@@ -146,8 +161,8 @@ function SeriesPost({
 
       {isOwner && (
         <button
-          onClick={e => {
-            // onRemove?.(id);
+          onClick={() => {
+            onRemoveClick(post);
           }}
           className='text-gray-300 group-hover:text-gray-400 hover:text-red-500 p-2 -m-2'
         >
