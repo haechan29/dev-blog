@@ -7,6 +7,28 @@ import {
 import { ApiError } from '@/lib/api';
 import { NextRequest, NextResponse } from 'next/server';
 
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ userId: string; seriesId: string }> }
+) {
+  try {
+    const { seriesId } = await params;
+    const data = await SeriesQueries.fetchSeries(seriesId);
+    return NextResponse.json({ data });
+  } catch (error) {
+    console.error('시리즈 조회 요청이 실패했습니다', error);
+
+    if (error instanceof ApiError) {
+      return error.toResponse();
+    }
+
+    return NextResponse.json(
+      { error: '시리즈 조회 요청이 실패했습니다' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ userId: string; seriesId: string }> }

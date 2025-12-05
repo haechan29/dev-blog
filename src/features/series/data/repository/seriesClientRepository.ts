@@ -1,6 +1,14 @@
 import { SeriesDto } from '@/features/series/data/dto/seriesDto';
 import { api } from '@/lib/api';
 
+export async function fetchSeries(
+  userId: string,
+  seriesId: string
+): Promise<SeriesDto> {
+  const response = await api.get(`/api/user/${userId}/series/${seriesId}`);
+  return response.data;
+}
+
 export async function fetchSeriesByUserId(
   userId: string
 ): Promise<SeriesDto[]> {

@@ -1,6 +1,11 @@
 import * as SeriesClientRepository from '@/features/series/data/repository/seriesClientRepository';
 import { toDomain } from '@/features/series/domain/mapper/seriesMapper';
 
+export async function fetchSeries(userId: string, seriesId: string) {
+  const dto = await SeriesClientRepository.fetchSeries(userId, seriesId);
+  return toDomain(dto);
+}
+
 export async function fetchSeriesByUserId(userId: string) {
   const dtos = await SeriesClientRepository.fetchSeriesByUserId(userId);
   return dtos.map(toDomain);
