@@ -14,9 +14,13 @@ import {
   DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
+import * as PostClientService from '@/features/post/domain/service/postClientService';
+import useSeriesPosts from '@/features/series/domain/hooks/useSeriesPosts';
 import { SeriesProps } from '@/features/series/ui/seriesProps';
-import { Check, Loader2, X } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import clsx from 'clsx';
+import { Loader2, X } from 'lucide-react';
+import { useCallback, useMemo } from 'react';
 
 export default function AddPostDialog({
   series,
@@ -27,41 +31,52 @@ export default function AddPostDialog({
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }) {
-  const [isLoading, setIsLoading] = useState(false);
+  const { data: posts } = useQuery({
+    queryKey: ['posts', series.userId],
+    queryFn: () => PostClientService.fetchPosts(series.userId),
+  });
 
-  // TODO: 사용자의 글 목록 조회
-  const posts = [
-    { id: '1', title: '첫 번째 글입니다' },
-    { id: '2', title: '두 번째 글입니다' },
-    { id: '3', title: '세 번째 글입니다' },
-    { id: '4', title: '네 번째 글입니다' },
-    { id: '5', title: '다섯 번째 글입니다' },
-    { id: '6', title: '여섯 번째 글입니다' },
-    { id: '7', title: '일곱 번째 글입니다' },
-    { id: '8', title: '여덟 번째 글입니다' },
-    { id: '9', title: '아홉 번째 글입니다' },
-    { id: '10', title: '열 번째 글입니다' },
-    { id: '11', title: '열한 번째 글입니다' },
-    { id: '12', title: '열두 번째 글입니다' },
-  ];
-
+  const { posts: existingPosts, addPostMutation } = useSeriesPosts(series);
   const existingPostIds = useMemo(() => {
-    return series.posts.map(post => post.id);
-  }, [series.posts]);
+    return existingPosts.map(post => post.id);
+  }, [existingPosts]);
 
-  const handleSelect = async (postId: string) => {
-    if (existingPostIds.includes(postId)) return;
+  const sortedPosts = useMemo(() => {
+    if (!posts) return undefined;
 
-    setIsLoading(true);
-    try {
-      // API 호출
-      console.log(postId);
-      setIsOpen(false);
-    } catch (error) {
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    return [...posts].sort((a, b) => {
+      const aAdded = existingPostIds.includes(a.id);
+      const bAdded = existingPostIds.includes(b.id);
+      if (aAdded !== bAdded) return aAdded ? 1 : -1;
+
+      if (a.seriesId === null && b.seriesId === null) {
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      } else if (a.seriesId === null) {
+        return -1;
+      } else if (b.seriesId === null) {
+        return 1;
+      }
+
+      return a.seriesId !== b.seriesId
+        ? a.seriesId.localeCompare(b.seriesId)
+        : (a.seriesOrder ?? 0) - (b.seriesOrder ?? 0);
+    });
+  }, [posts, existingPostIds]);
+
+  const handleSelect = useCallback(
+    (postId: string) => {
+      if (!posts || existingPostIds.includes(postId)) return;
+
+      addPostMutation.mutate(postId, {
+        onSuccess: () => {
+          setIsOpen(false);
+        },
+      });
+    },
+    [addPostMutation, existingPostIds, posts, setIsOpen]
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -78,7 +93,7 @@ export default function AddPostDialog({
 
         <Command className='border rounded-sm h-60'>
           <CommandInput placeholder='글 제목' />
-          {posts === undefined ? (
+          {sortedPosts === undefined ? (
             <div className='p-3 flex justify-center'>
               <Loader2
                 size={18}
@@ -89,22 +104,20 @@ export default function AddPostDialog({
           ) : (
             <>
               <CommandEmpty>글이 없습니다.</CommandEmpty>
-              {posts.length > 0 && (
+              {sortedPosts.length > 0 && (
                 <CommandGroup className='overflow-y-auto'>
-                  {posts.map(post => {
+                  {sortedPosts.map(post => {
                     const isAdded = existingPostIds.includes(post.id);
                     return (
                       <CommandItem
                         key={post.id}
                         value={post.title}
                         onSelect={() => handleSelect(post.id)}
-                        disabled={isAdded || isLoading}
-                        className='flex justify-between px-3 py-2 gap-1'
+                        className='cursor-pointer'
                       >
-                        <span className={isAdded ? 'text-gray-400' : ''}>
+                        <span className={clsx(isAdded && 'text-gray-400')}>
                           {post.title}
                         </span>
-                        {isAdded && <Check className='h-4 w-4 text-gray-400' />}
                       </CommandItem>
                     );
                   })}

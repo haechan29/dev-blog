@@ -6,11 +6,21 @@ import { supabase } from '@/lib/supabase';
 import 'server-only';
 
 export async function fetchPosts(userId?: string) {
-  let query = supabase
-    .from('posts')
-    .select(
-      'id, title, content, tags, created_at, updated_at, user_id, guest_id, users:user_id(nickname, deleted_at)'
-    );
+  let query = supabase.from('posts').select(
+    `
+      id,
+      title,
+      content,
+      tags,
+      created_at,
+      updated_at,
+      user_id,
+      guest_id,
+      series_id,
+      series_order,
+      users:user_id(nickname, deleted_at)
+    `
+  );
 
   if (userId) {
     query = query.eq('user_id', userId);
@@ -44,7 +54,19 @@ export async function fetchPost(postId: string) {
   const { data, error } = await supabase
     .from('posts')
     .select(
-      'id, title, content, tags, created_at, updated_at, user_id, guest_id, users:user_id(nickname, deleted_at)'
+      `
+        id,
+        title,
+        content,
+        tags,
+        created_at,
+        updated_at,
+        user_id,
+        guest_id,
+        series_id,
+        series_order,
+        users:user_id(nickname, deleted_at)
+      `
     )
     .eq('id', postId)
     .maybeSingle();
@@ -104,7 +126,19 @@ export async function createPost({
       guest_id: guestId,
     })
     .select(
-      'id, title, content, tags, created_at, updated_at, user_id, guest_id, users:user_id(nickname, deleted_at)'
+      `
+        id,
+        title,
+        content,
+        tags,
+        created_at,
+        updated_at,
+        user_id,
+        guest_id,
+        series_id,
+        series_order,
+        users:user_id(nickname, deleted_at)
+      `
     )
     .single();
 
@@ -144,7 +178,19 @@ export async function updatePost({
     .update(updates)
     .eq('id', postId)
     .select(
-      'id, title, content, tags, created_at, updated_at, user_id, guest_id, users:user_id(nickname, deleted_at)'
+      `
+        id,
+        title,
+        content,
+        tags,
+        created_at,
+        updated_at,
+        user_id,
+        guest_id,
+        series_id,
+        series_order,
+        users:user_id(nickname, deleted_at)
+      `
     )
     .single();
 

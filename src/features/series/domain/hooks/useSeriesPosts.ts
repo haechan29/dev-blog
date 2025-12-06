@@ -31,7 +31,7 @@ export default function useSeriesPosts(initialSeries: SeriesProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['series', seriesId, 'posts'],
+        queryKey: ['series'],
       });
     },
     onError: error => {
@@ -60,7 +60,7 @@ export default function useSeriesPosts(initialSeries: SeriesProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['series', seriesId, 'posts'],
+        queryKey: ['series'],
       });
     },
     onError: error => {

@@ -57,11 +57,13 @@ export default function SeriesPageClient({
         </button>
       )}
 
-      <AddPostDialog
-        series={series}
-        isOpen={isAddDialogOpen}
-        setIsOpen={setIsAddDialogOpen}
-      />
+      {userId === series.userId && (
+        <AddPostDialog
+          series={series}
+          isOpen={isAddDialogOpen}
+          setIsOpen={setIsAddDialogOpen}
+        />
+      )}
     </>
   );
 }
