@@ -24,7 +24,7 @@ import useSeries from '@/features/series/domain/hooks/useSeries';
 import { ApiError } from '@/lib/api';
 import clsx from 'clsx';
 import { Check, ChevronsUpDown, Loader2, X } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 
 export default function SeriesSettingsDialog({
@@ -39,12 +39,14 @@ export default function SeriesSettingsDialog({
   setIsOpen: (isOpen: boolean) => void;
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedSeriesId, setSelectedSeriesId] = useState<string | null>(null);
+  const [selectedSeriesId, setSelectedSeriesId] = useState<
+    string | null | undefined
+  >(post.seriesId ?? undefined);
   const [open, setOpen] = useState(false);
 
   const { seriesList } = useSeries(userId);
   const selectedSeries = useMemo(
-    () => seriesList?.find(s => s.id === selectedSeriesId) ?? null,
+    () => seriesList?.find(s => s.id === selectedSeriesId),
     [selectedSeriesId, seriesList]
   );
 
@@ -69,12 +71,6 @@ export default function SeriesSettingsDialog({
       setIsLoading(false);
     }
   }, [post.id, selectedSeries?.postCount, selectedSeriesId, setIsOpen]);
-
-  useEffect(() => {
-    if (!isOpen) {
-      setSelectedSeriesId(null);
-    }
-  }, [isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -101,9 +97,28 @@ export default function SeriesSettingsDialog({
               <span
                 className={selectedSeries ? 'text-gray-900' : 'text-gray-400'}
               >
-                {selectedSeries?.title ?? '시리즈를 선택하세요'}
+                {selectedSeriesId === undefined
+                  ? '시리즈를 선택하세요'
+                  : selectedSeriesId === null
+                  ? '시리즈 없음'
+                  : selectedSeries?.title}
               </span>
-              <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+
+              <div className='flex items-center gap-2'>
+                {selectedSeriesId && (
+                  <div className='relative h-4 w-4 shrink-0 group cursor-pointer'>
+                    <div className='absolute inset-0 bg-gray-400 group-hover:bg-gray-600 rounded-full transition-colors' />
+                    <X
+                      className='relative h-3 w-3 text-white stroke-[2.5] m-0.5'
+                      onClick={e => {
+                        e.stopPropagation();
+                        setSelectedSeriesId(null);
+                      }}
+                    />
+                  </div>
+                )}
+                <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+              </div>
             </button>
           </PopoverTrigger>
 
