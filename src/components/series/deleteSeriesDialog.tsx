@@ -8,11 +8,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import useSeries from '@/features/series/domain/hooks/useSeries';
-import { ApiError } from '@/lib/api';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
 import { useCallback } from 'react';
-import toast from 'react-hot-toast';
 
 export default function DeleteSeriesDialog({
   userId,
@@ -32,14 +30,6 @@ export default function DeleteSeriesDialog({
       deleteSeriesMutation.mutate(seriesId, {
         onSuccess: () => {
           setIsOpen(false);
-          toast.success('시리즈가 삭제되었습니다');
-        },
-        onError: error => {
-          const message =
-            error instanceof ApiError
-              ? error.message
-              : '시리즈 삭제에 실패했습니다';
-          toast.error(message);
         },
       });
     },

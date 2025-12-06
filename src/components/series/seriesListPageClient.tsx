@@ -1,6 +1,6 @@
 'use client';
 
-import CreateSeriesDialog from '@/components/series/createSeriesDialog';
+import SeriesFormDialog from '@/components/series/seriesFormDialog';
 import SeriesPreview from '@/components/series/seriesPreview';
 import useSeries from '@/features/series/domain/hooks/useSeries';
 import { SeriesProps } from '@/features/series/ui/seriesProps';
@@ -55,7 +55,8 @@ export default function SeriesListPageClient({
       )}
 
       {userId === currentUserId && (
-        <CreateSeriesDialog
+        <SeriesFormDialog
+          mode='create'
           userId={userId}
           isOpen={isOpen}
           setIsOpen={setIsOpen}

@@ -8,52 +8,54 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import useSeries from '@/features/series/domain/hooks/useSeries';
-import { ApiError } from '@/lib/api';
+import { SeriesProps } from '@/features/series/ui/seriesProps';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
+import { useEffect, useState } from 'react';
 
-export default function CreateSeriesDialog({
+interface DialogTexts {
+  dialogTitle: string;
+  dialogDescription: string;
+  buttonText: string;
+}
+
+const CREATE_TEXTS: DialogTexts = {
+  dialogTitle: '새 시리즈',
+  dialogDescription: '시리즈를 추가하려면 제목과 설명을 입력하세요',
+  buttonText: '만들기',
+};
+
+const EDIT_TEXTS: DialogTexts = {
+  dialogTitle: '시리즈 수정',
+  dialogDescription: '시리즈 정보를 수정합니다.',
+  buttonText: '저장',
+};
+
+export default function SeriesFormDialog({
+  mode,
   userId,
+  series,
   isOpen,
   setIsOpen,
 }: {
+  mode: 'create' | 'edit';
   userId: string;
+  series?: SeriesProps;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [title, setTitle] = useState(series?.title ?? '');
+  const [description, setDescription] = useState(series?.description ?? '');
   const [isTitleValid, setIsTitleValid] = useState(true);
 
-  useEffect(() => {
-    if (!isOpen) {
-      setTitle('');
-      setDescription('');
-      setIsTitleValid(true);
-    }
-  }, [isOpen]);
+  const { dialogTitle, dialogDescription, buttonText } =
+    mode === 'create' ? CREATE_TEXTS : EDIT_TEXTS;
 
-  const { createSeriesMutation } = useSeries(userId);
-  const createSeries = useCallback(
-    (params: { title: string; description: string | null }) => {
-      createSeriesMutation.mutate(params, {
-        onSuccess: () => {
-          setIsOpen(false);
-          toast.success('시리즈가 생성되었습니다');
-        },
-        onError: error => {
-          const message =
-            error instanceof ApiError
-              ? error.message
-              : '시리즈 생성에 실패했습니다';
-          toast.error(message);
-        },
-      });
-    },
-    [createSeriesMutation, setIsOpen]
-  );
+  const { createSeriesMutation, updateSeriesMutation } = useSeries(userId);
+  const isPending =
+    mode === 'create'
+      ? createSeriesMutation.isPending
+      : updateSeriesMutation.isPending;
 
   const handleCreate = () => {
     if (!title.trim()) {
@@ -61,23 +63,44 @@ export default function CreateSeriesDialog({
       return;
     }
 
-    createSeries({
-      title,
-      description: description.trim() || null,
-    });
+    const params = { title, description: description.trim() || null };
+
+    if (mode === 'create') {
+      createSeriesMutation.mutate(params, {
+        onSuccess: () => {
+          setIsOpen(false);
+        },
+      });
+    } else {
+      if (!series) return;
+      updateSeriesMutation.mutate(
+        { seriesId: series.id, ...params },
+        {
+          onSuccess: () => {
+            setIsOpen(false);
+          },
+        }
+      );
+    }
   };
+
+  useEffect(() => {
+    if (!isOpen) {
+      setTitle(series?.title ?? '');
+      setDescription(series?.description ?? '');
+      setIsTitleValid(true);
+    }
+  }, [isOpen, series?.description, series?.title]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent showCloseButton={false} className='gap-0 rounded-sm'>
-        <DialogTitle className='sr-only'>시리즈 추가 다이어로그</DialogTitle>
+        <DialogTitle className='sr-only'>{dialogTitle}</DialogTitle>
         <DialogDescription className='sr-only'>
-          새로운 시리즈를 생성합니다.
+          {dialogDescription}
         </DialogDescription>
-        <div className='text-xl font-bold mt-2 mb-1'>새 시리즈</div>
-        <div className='text-sm text-gray-500 mb-6'>
-          시리즈를 추가하려면 제목과 설명을 입력하세요
-        </div>
+        <div className='text-xl font-bold mt-2 mb-1'>{dialogTitle}</div>
+        <div className='text-sm text-gray-500 mb-6'>{dialogDescription}</div>
 
         <input
           className={clsx(
@@ -108,14 +131,14 @@ export default function CreateSeriesDialog({
           <button
             className={clsx(
               'flex justify-center items-center px-6 h-10 rounded-sm font-bold text-white hover:bg-blue-500',
-              createSeriesMutation.isPending ? 'bg-blue-500' : 'bg-blue-600'
+              isPending ? 'bg-blue-500' : 'bg-blue-600'
             )}
             onClick={handleCreate}
           >
-            {createSeriesMutation.isPending ? (
+            {isPending ? (
               <Loader2 size={18} strokeWidth={3} className='animate-spin' />
             ) : (
-              '만들기'
+              <span>{buttonText}</span>
             )}
           </button>
 

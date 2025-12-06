@@ -2,7 +2,9 @@
 
 import * as SeriesClientService from '@/features/series/domain/service/seriesClientService';
 import { createProps, SeriesProps } from '@/features/series/ui/seriesProps';
+import { ApiError } from '@/lib/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 
 export default function useSeries(userId: string, initialData?: SeriesProps[]) {
   const queryClient = useQueryClient();
@@ -24,6 +26,13 @@ export default function useSeries(userId: string, initialData?: SeriesProps[]) {
         queryKey: ['series', userId],
       });
     },
+    onError: error => {
+      const message =
+        error instanceof ApiError
+          ? error.message
+          : '시리즈 생성에 실패했습니다';
+      toast.error(message);
+    },
   });
 
   const updateSeriesMutation = useMutation({
@@ -37,6 +46,13 @@ export default function useSeries(userId: string, initialData?: SeriesProps[]) {
         queryKey: ['series', userId],
       });
     },
+    onError: error => {
+      const message =
+        error instanceof ApiError
+          ? error.message
+          : '시리즈 수정에 실패했습니다';
+      toast.error(message);
+    },
   });
 
   const deleteSeriesMutation = useMutation({
@@ -46,6 +62,13 @@ export default function useSeries(userId: string, initialData?: SeriesProps[]) {
       queryClient.invalidateQueries({
         queryKey: ['series', userId],
       });
+    },
+    onError: error => {
+      const message =
+        error instanceof ApiError
+          ? error.message
+          : '시리즈 삭제에 실패했습니다';
+      toast.error(message);
     },
   });
 

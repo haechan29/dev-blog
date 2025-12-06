@@ -1,6 +1,7 @@
 'use client';
 
 import DeleteSeriesDialog from '@/components/series/deleteSeriesDialog';
+import SeriesFormDialog from '@/components/series/seriesFormDialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +11,6 @@ import {
 import { SeriesProps } from '@/features/series/ui/seriesProps';
 import { createRipple } from '@/lib/dom';
 import { Edit2, Trash2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { MouseEvent, ReactNode, useCallback, useState } from 'react';
 
 export default function SeriesSettingsDropdown({
@@ -22,7 +22,7 @@ export default function SeriesSettingsDropdown({
   series: SeriesProps;
   children: ReactNode;
 }) {
-  const router = useRouter();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const handleAction = useCallback(
@@ -30,7 +30,7 @@ export default function SeriesSettingsDropdown({
       const actionAttribute = e.currentTarget.getAttribute('data-action');
       switch (actionAttribute) {
         case 'update': {
-          router.push(`/@${userId}/series/${series.id}/edit`);
+          if (!isEditDialogOpen) setIsEditDialogOpen(true);
           break;
         }
         case 'delete': {
@@ -39,11 +39,19 @@ export default function SeriesSettingsDropdown({
         }
       }
     },
-    [isDeleteDialogOpen, router, series.id, userId]
+    [isDeleteDialogOpen, isEditDialogOpen]
   );
 
   return (
     <>
+      <SeriesFormDialog
+        mode='edit'
+        userId={userId}
+        series={series}
+        isOpen={isEditDialogOpen}
+        setIsOpen={setIsEditDialogOpen}
+      />
+
       <DeleteSeriesDialog
         userId={userId}
         seriesId={series.id}
