@@ -22,6 +22,7 @@ import * as PostClientService from '@/features/post/domain/service/postClientSer
 import { PostProps } from '@/features/post/ui/postProps';
 import useSeriesList from '@/features/series/domain/hooks/useSeriesList';
 import { ApiError } from '@/lib/api';
+import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Check, ChevronsUpDown, Loader2, X } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
@@ -38,6 +39,8 @@ export default function SeriesSettingsDialog({
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }) {
+  const queryClient = useQueryClient();
+
   const [isLoading, setIsLoading] = useState(false);
   const [selectedSeriesId, setSelectedSeriesId] = useState<
     string | null | undefined
@@ -61,16 +64,28 @@ export default function SeriesSettingsDialog({
       });
 
       setIsOpen(false);
+
+      queryClient.invalidateQueries({
+        queryKey: ['user', userId, 'series'],
+      });
     } catch (error) {
       const message =
         error instanceof ApiError
           ? error.message
-          : '시리즈 설정에 실패했습니다';
+          : '시리즈에 게시글을 추가하는 데에 실패했습니다';
+
       toast.error(message);
     } finally {
       setIsLoading(false);
     }
-  }, [post.id, selectedSeries?.postCount, selectedSeriesId, setIsOpen]);
+  }, [
+    post.id,
+    queryClient,
+    selectedSeries?.postCount,
+    selectedSeriesId,
+    setIsOpen,
+    userId,
+  ]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
