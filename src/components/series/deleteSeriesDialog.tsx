@@ -7,7 +7,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
-import useSeries from '@/features/series/domain/hooks/useSeries';
+import useSeriesList from '@/features/series/domain/hooks/useSeriesList';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
 import { useCallback } from 'react';
@@ -23,7 +23,7 @@ export default function DeleteSeriesDialog({
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }) {
-  const { deleteSeriesMutation } = useSeries(userId);
+  const { deleteSeriesMutation } = useSeriesList(userId);
 
   const deleteSeries = useCallback(
     (seriesId: string) => {

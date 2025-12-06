@@ -2,7 +2,7 @@
 
 import RemovePostDialog from '@/components/series/removePostDialog';
 import usePostStat from '@/features/postStat/hooks/usePostStat';
-import useSeriesPosts from '@/features/series/domain/hooks/useSeriesPosts';
+import useSeries from '@/features/series/domain/hooks/useSeries';
 import { SeriesProps } from '@/features/series/ui/seriesProps';
 import {
   closestCenter,
@@ -26,14 +26,14 @@ import { useCallback, useEffect, useState } from 'react';
 
 export default function SeriesPostList({
   userId,
-  series,
+  initialSeries,
 }: {
   userId: string | null;
-  series: SeriesProps;
+  initialSeries: SeriesProps;
 }) {
-  const { posts, reorderPostsMutation } = useSeriesPosts(series);
+  const { series, reorderPostsMutation } = useSeries(initialSeries);
 
-  const [localPosts, setLocalPosts] = useState(posts);
+  const [localPosts, setLocalPosts] = useState(series.posts);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
 
   const sensors = useSensors(
@@ -62,10 +62,8 @@ export default function SeriesPostList({
   );
 
   useEffect(() => {
-    if (posts) {
-      setLocalPosts(posts);
-    }
-  }, [posts]);
+    setLocalPosts(series.posts);
+  }, [series.posts]);
 
   if (localPosts.length === 0) {
     return (
@@ -94,7 +92,7 @@ export default function SeriesPostList({
               <SeriesPost
                 post={post}
                 index={index}
-                isOwner={userId === series.userId}
+                isOwner={userId === initialSeries.userId}
                 onRemoveClick={post => {
                   setSelectedPostId(post.id);
                 }}
@@ -103,9 +101,9 @@ export default function SeriesPostList({
           ))}
         </div>
 
-        {userId === series.userId && (
+        {userId === initialSeries.userId && (
           <RemovePostDialog
-            series={series}
+            series={initialSeries}
             postId={selectedPostId}
             resetPostId={() => setSelectedPostId(null)}
           />

@@ -7,7 +7,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
-import useSeries from '@/features/series/domain/hooks/useSeries';
+import useSeriesList from '@/features/series/domain/hooks/useSeriesList';
 import { SeriesProps } from '@/features/series/ui/seriesProps';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
@@ -51,7 +51,7 @@ export default function SeriesFormDialog({
   const { dialogTitle, dialogDescription, buttonText } =
     mode === 'create' ? CREATE_TEXTS : EDIT_TEXTS;
 
-  const { createSeriesMutation, updateSeriesMutation } = useSeries(userId);
+  const { createSeriesMutation, updateSeriesMutation } = useSeriesList(userId);
   const isPending =
     mode === 'create'
       ? createSeriesMutation.isPending

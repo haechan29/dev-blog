@@ -45,7 +45,7 @@ export default function SeriesPageClient({
 
       <div className='w-full h-px bg-gray-200 mb-10' />
 
-      <SeriesPostList userId={userId} series={series} />
+      <SeriesPostList userId={userId} initialSeries={series} />
 
       {userId === series.userId && (
         <button
@@ -59,7 +59,7 @@ export default function SeriesPageClient({
 
       {userId === series.userId && (
         <AddPostDialog
-          series={series}
+          initialSeries={series}
           isOpen={isAddDialogOpen}
           setIsOpen={setIsAddDialogOpen}
         />

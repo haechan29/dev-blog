@@ -7,7 +7,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
-import useSeriesPosts from '@/features/series/domain/hooks/useSeriesPosts';
+import useSeries from '@/features/series/domain/hooks/useSeries';
 import { SeriesProps } from '@/features/series/ui/seriesProps';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
@@ -22,7 +22,7 @@ export default function RemovePostDialog({
   postId: string | null;
   resetPostId: () => void;
 }) {
-  const { removePostMutation } = useSeriesPosts(series);
+  const { removePostMutation } = useSeries(series);
 
   const handleRemove = useCallback(async () => {
     if (!postId) return;

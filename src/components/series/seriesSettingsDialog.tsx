@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/popover';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { PostProps } from '@/features/post/ui/postProps';
-import useSeries from '@/features/series/domain/hooks/useSeries';
+import useSeriesList from '@/features/series/domain/hooks/useSeriesList';
 import { ApiError } from '@/lib/api';
 import clsx from 'clsx';
 import { Check, ChevronsUpDown, Loader2, X } from 'lucide-react';
@@ -44,7 +44,7 @@ export default function SeriesSettingsDialog({
   >(post.seriesId ?? undefined);
   const [open, setOpen] = useState(false);
 
-  const { seriesList } = useSeries(userId);
+  const { seriesList } = useSeriesList(userId);
   const selectedSeries = useMemo(
     () => seriesList?.find(s => s.id === selectedSeriesId),
     [selectedSeriesId, seriesList]

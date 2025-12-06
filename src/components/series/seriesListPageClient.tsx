@@ -2,7 +2,7 @@
 
 import SeriesFormDialog from '@/components/series/seriesFormDialog';
 import SeriesPreview from '@/components/series/seriesPreview';
-import useSeries from '@/features/series/domain/hooks/useSeries';
+import useSeriesList from '@/features/series/domain/hooks/useSeriesList';
 import { SeriesProps } from '@/features/series/ui/seriesProps';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -17,7 +17,7 @@ export default function SeriesListPageClient({
   initialSeriesList: SeriesProps[];
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const { seriesList } = useSeries(userId, initialSeriesList);
+  const { seriesList } = useSeriesList(userId, initialSeriesList);
 
   return (
     <div>

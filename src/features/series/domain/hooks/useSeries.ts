@@ -1,81 +1,103 @@
 'use client';
 
+import * as PostClientService from '@/features/post/domain/service/postClientService';
 import * as SeriesClientService from '@/features/series/domain/service/seriesClientService';
 import { createProps, SeriesProps } from '@/features/series/ui/seriesProps';
 import { ApiError } from '@/lib/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 
-export default function useSeries(userId: string, initialData?: SeriesProps[]) {
+export default function useSeries(initialSeries: SeriesProps) {
+  const { id: seriesId, userId } = initialSeries;
+
   const queryClient = useQueryClient();
 
-  const { data: seriesList } = useQuery({
-    queryKey: ['series', userId],
+  const { data: series } = useQuery({
+    queryKey: ['user', userId, 'series', seriesId],
     queryFn: async () => {
-      const seriesList = await SeriesClientService.fetchSeriesByUserId(userId);
-      return seriesList.map(createProps);
+      const series = await SeriesClientService.fetchSeries(userId, seriesId);
+      return createProps(series);
     },
-    initialData,
+    initialData: initialSeries,
   });
 
-  const createSeriesMutation = useMutation({
-    mutationFn: (params: { title: string; description: string | null }) =>
-      SeriesClientService.createSeries({ userId, ...params }),
+  const addPostMutation = useMutation({
+    mutationFn: (postId: string) => {
+      return PostClientService.updatePost({
+        postId,
+        seriesId,
+        seriesOrder: series.postCount,
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['series', userId],
+        queryKey: ['user', userId, 'series'],
       });
     },
     onError: error => {
       const message =
         error instanceof ApiError
           ? error.message
-          : '시리즈 생성에 실패했습니다';
+          : '시리즈에 게시글을 추가하는 데에 실패했습니다';
       toast.error(message);
     },
   });
 
-  const updateSeriesMutation = useMutation({
-    mutationFn: (params: {
-      seriesId: string;
-      title: string;
-      description: string | null;
-    }) => SeriesClientService.updateSeries({ userId, ...params }),
+  const removePostMutation = useMutation({
+    mutationFn: (postId: string) => {
+      const updates = [
+        { id: postId, seriesId: null, seriesOrder: null },
+        ...series.posts
+          .filter(post => post.id !== postId)
+          .map((post, index) => ({
+            id: post.id,
+            seriesId,
+            seriesOrder: index,
+          })),
+      ];
+
+      return PostClientService.updatePostsInSeries(updates);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['series', userId],
+        queryKey: ['user', userId, 'series'],
       });
     },
     onError: error => {
       const message =
         error instanceof ApiError
           ? error.message
-          : '시리즈 수정에 실패했습니다';
+          : '시리즈에서 게시글을 제거하는 데에 실패했습니다';
       toast.error(message);
     },
   });
 
-  const deleteSeriesMutation = useMutation({
-    mutationFn: (seriesId: string) =>
-      SeriesClientService.deleteSeries({ userId, seriesId }),
+  const reorderPostsMutation = useMutation({
+    mutationFn: (reorderedPosts: SeriesProps['posts']) => {
+      return PostClientService.updatePostsInSeries(reorderedPosts);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['series', userId],
+        queryKey: ['user', userId, 'series', seriesId],
       });
     },
     onError: error => {
+      queryClient.invalidateQueries({
+        queryKey: ['user', userId, 'series', seriesId],
+      });
+
       const message =
         error instanceof ApiError
           ? error.message
-          : '시리즈 삭제에 실패했습니다';
+          : '게시글 순서 변경에 실패했습니다';
       toast.error(message);
     },
   });
 
   return {
-    seriesList,
-    createSeriesMutation,
-    updateSeriesMutation,
-    deleteSeriesMutation,
+    series,
+    addPostMutation,
+    removePostMutation,
+    reorderPostsMutation,
   } as const;
 }
