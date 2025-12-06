@@ -1,9 +1,11 @@
 'use client';
 
-import CreateSeriesButton from '@/components/series/createSeriesButton';
+import CreateSeriesDialog from '@/components/series/createSeriesDialog';
 import SeriesPreview from '@/components/series/seriesPreview';
 import useSeries from '@/features/series/domain/hooks/useSeries';
 import { SeriesProps } from '@/features/series/ui/seriesProps';
+import { Plus } from 'lucide-react';
+import { useState } from 'react';
 
 export default function SeriesListPageClient({
   userId,
@@ -14,18 +16,13 @@ export default function SeriesListPageClient({
   currentUserId: string | null;
   initialSeriesList: SeriesProps[];
 }) {
+  const [isOpen, setIsOpen] = useState(false);
   const { seriesList } = useSeries(userId, initialSeriesList);
 
   return (
     <div>
-      {userId === currentUserId && (
-        <div className='mb-6'>
-          <CreateSeriesButton userId={userId} />
-        </div>
-      )}
-
       {seriesList && seriesList.length === 0 ? (
-        <div className='text-center py-20 text-gray-500'>
+        <div className='text-center pt-20 text-gray-500'>
           시리즈가 없습니다.
         </div>
       ) : (
@@ -43,6 +40,26 @@ export default function SeriesListPageClient({
             </div>
           ))}
         </div>
+      )}
+
+      {userId === currentUserId && (
+        <button
+          onClick={() => {
+            setIsOpen(true);
+          }}
+          className='mt-6 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-700 transition-colors font-medium mx-auto'
+        >
+          <Plus className='w-5 h-5' />
+          <div>시리즈 만들기</div>
+        </button>
+      )}
+
+      {userId === currentUserId && (
+        <CreateSeriesDialog
+          userId={userId}
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+        />
       )}
     </div>
   );

@@ -46,7 +46,7 @@ export default function SeriesSettingsDropdown({
     <>
       <DeleteSeriesDialog
         userId={userId}
-        series={series}
+        seriesId={series.id}
         isOpen={isDeleteDialogOpen}
         setIsOpen={setIsDeleteDialogOpen}
       />
