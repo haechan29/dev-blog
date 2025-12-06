@@ -3,17 +3,19 @@
 import AddPostDialog from '@/components/series/addPostDialog';
 import SeriesPostList from '@/components/series/seriesPostList';
 import SeriesSettingsDropdown from '@/components/series/seriesSettingsDropdown';
+import useSeries from '@/features/series/domain/hooks/useSeries';
 import { SeriesProps } from '@/features/series/ui/seriesProps';
 import { MoreVertical, Plus } from 'lucide-react';
 import { useState } from 'react';
 
 export default function SeriesPageClient({
   userId,
-  series,
+  initialSeries,
 }: {
   userId: string | null;
-  series: SeriesProps;
+  initialSeries: SeriesProps;
 }) {
+  const { series } = useSeries(initialSeries);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   return (

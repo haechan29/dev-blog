@@ -16,5 +16,5 @@ export default async function SeriesPage({
     createProps
   );
 
-  return <SeriesPageClient userId={userId} series={series} />;
+  return <SeriesPageClient userId={userId} initialSeries={series} />;
 }

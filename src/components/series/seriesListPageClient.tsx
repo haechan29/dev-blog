@@ -29,11 +29,7 @@ export default function SeriesListPageClient({
         <div className='flex flex-col'>
           {seriesList?.map((series, index) => (
             <div key={series.id} className='mb-8'>
-              <SeriesPreview
-                userId={userId}
-                currentUserId={currentUserId}
-                series={series}
-              />
+              <SeriesPreview series={series} />
               {index !== seriesList.length - 1 && (
                 <div className='h-px bg-gray-200' />
               )}

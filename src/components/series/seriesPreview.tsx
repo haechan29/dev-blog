@@ -1,18 +1,8 @@
-import SeriesSettingsDropdown from '@/components/series/seriesSettingsDropdown';
 import { SeriesProps } from '@/features/series/ui/seriesProps';
 import clsx from 'clsx';
-import { MoreVertical } from 'lucide-react';
 import Link from 'next/link';
 
-export default function SeriesPreview({
-  userId,
-  currentUserId,
-  series,
-}: {
-  userId: string;
-  currentUserId: string | null;
-  series: SeriesProps;
-}) {
+export default function SeriesPreview({ series }: { series: SeriesProps }) {
   return (
     <div className='relative flex flex-col group mb-8'>
       <div
@@ -24,24 +14,11 @@ export default function SeriesPreview({
         )}
       />
 
-      {userId === currentUserId && (
-        <div className='absolute top-0 right-0 z-10'>
-          <SeriesSettingsDropdown userId={userId} series={series}>
-            <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 hover:bg-gray-200 rounded-full p-2 -m-2 cursor-pointer' />
-          </SeriesSettingsDropdown>
-        </div>
-      )}
-
       <Link
         href={`/series/${series.id}`}
         className='w-full flex flex-col gap-4 text-gray-900'
       >
-        <div
-          className={clsx(
-            'text-2xl font-semibold line-clamp-2',
-            userId === currentUserId ? 'w-[calc(100%-3rem)]' : 'w-full'
-          )}
-        >
+        <div className='text-2xl font-semibold line-clamp-2'>
           {series.title}
         </div>
 
