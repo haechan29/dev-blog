@@ -1,4 +1,5 @@
 import { UserEntity } from '@/features/user/data/entities/userEntities';
+import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
 import { toDto } from '@/features/user/data/mapper/userMapper';
 import { supabase, supabaseNextAuth } from '@/lib/supabase';
 import 'server-only';
@@ -30,6 +31,26 @@ export async function createUser() {
 
   return data.id as string;
 }
+
+export async function updateUser(
+  userId: string,
+  nickname: string,
+  authUserId?: string
+) {
+  const { error } = await supabase
+    .from('users')
+    .update({
+      nickname,
+      ...(authUserId !== undefined && { auth_user_id: authUserId }),
+    })
+    .eq('id', userId);
+
+  if (error) {
+    if (error.code === '23505') {
+      throw new DuplicateNicknameError(nickname);
+    }
+    throw new Error(error.message);
+  }
 }
 
 export async function deleteUser(userId: string) {
