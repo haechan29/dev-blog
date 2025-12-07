@@ -14,7 +14,7 @@ export default async function SignupLayout({
     redirect('/login');
   }
 
-  const user = await UserServerService.fetchUserById(session.user.id!);
+  const user = await UserServerService.fetchUserByAuthId(session.user.id!);
   if (user) {
     redirect('/');
   }

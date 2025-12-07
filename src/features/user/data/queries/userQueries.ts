@@ -18,6 +18,20 @@ export async function fetchUserById(userId: string) {
   return data ? toDto(data as unknown as UserEntity) : null;
 }
 
+export async function fetchUserByAuthId(authUserId: string) {
+  const { data, error } = await supabase
+    .from('users')
+    .select('id, nickname, created_at, updated_at, deleted_at')
+    .eq('auth_user_id', authUserId)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return data ? toDto(data as unknown as UserEntity) : null;
+}
+
 export async function createUser() {
   const { data, error } = await supabase
     .from('users')
