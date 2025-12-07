@@ -27,7 +27,7 @@ export default function SignupPage() {
   const [termsAgreed, setTermsAgreed] = useState(false);
   const [privacyAgreed, setPrivacyAgreed] = useState(false);
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (nickname.trim().length < 2 || nickname.trim().length > 20) {
       setNicknameError('length');
       setIsTermsValid(true);

@@ -1,5 +1,6 @@
 'use client';
 
+import * as UserAction from '@/features/user/domain/action/userAction';
 import * as UserClientService from '@/features/user/domain/service/userClientService';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
@@ -9,6 +10,15 @@ export default function useUser() {
   const { data: user } = useQuery({
     queryKey: ['user'],
     queryFn: () => UserClientService.fetchUser(),
+  });
+
+  const createUserMutation = useMutation({
+    mutationFn: () => UserAction.createUser(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['user'],
+      });
+    },
   });
 
   const updateUserMutation = useMutation({
@@ -32,6 +42,7 @@ export default function useUser() {
 
   return {
     user,
+    createUserMutation,
     updateUserMutation,
     deleteUserMutation,
   } as const;

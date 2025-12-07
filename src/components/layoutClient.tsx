@@ -2,33 +2,28 @@
 
 import LayoutContainer from '@/components/layoutContainer';
 import { PostProps } from '@/features/post/ui/postProps';
-import * as UserAction from '@/features/user/domain/action/userAction';
+import useUser from '@/features/user/domain/hooks/useUser';
 import { usePathname, useSearchParams } from 'next/navigation';
 import nProgress from 'nprogress';
 import { ReactNode, Suspense, useEffect } from 'react';
 
 export default function LayoutClient({
-  userId,
   posts,
   children,
 }: {
-  userId: string | null;
   posts: PostProps[];
   children: ReactNode;
 }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  const { user, createUserMutation } = useUser();
+
   useEffect(() => {
-    const handleNewUser = async () => {
-      if (!userId) {
-        try {
-          await UserAction.createUser();
-        } catch {}
-      }
-    };
-    handleNewUser();
-  }, [userId]);
+    if (!user) {
+      createUserMutation.mutate();
+    }
+  }, [createUserMutation, user]);
 
   useEffect(() => {
     nProgress.done();
