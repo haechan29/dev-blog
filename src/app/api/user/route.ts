@@ -5,18 +5,24 @@ import {
 } from '@/features/user/data/errors/userErrors';
 import * as UserQueries from '@/features/user/data/queries/userQueries';
 import { ApiError } from '@/lib/api';
+import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import 'server-only';
 
 export async function GET() {
   try {
     const session = await auth();
-    const userId = session?.user?.id;
-    if (!userId) {
-      return NextResponse.json({ data: null });
+
+    let data;
+    if (session?.user?.id) {
+      const authId = session.user.id;
+      data = await UserQueries.fetchUserByAuthId(authId);
+    } else {
+      const cookieStore = await cookies();
+      const userId = cookieStore.get('userId')?.value;
+      data = userId ? await UserQueries.fetchUserById(userId) : null;
     }
 
-    const data = await UserQueries.fetchUserById(userId);
     return NextResponse.json({ data });
   } catch (error) {
     console.error('유저 조회에 실패했습니다', error);
@@ -83,11 +89,11 @@ export async function DELETE() {
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 
-    const userId = session.user.id;
+    const authUserId = session.user.id;
 
     await Promise.all([
-      UserQueries.deleteUser(userId),
-      UserQueries.hardDeleteAuthUser(userId),
+      UserQueries.deleteUserByAuthId(authUserId),
+      UserQueries.hardDeleteAuthUser(authUserId),
     ]);
 
     return NextResponse.json({ data: null });

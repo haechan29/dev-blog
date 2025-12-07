@@ -55,7 +55,10 @@ export async function updateUser(
     .from('users')
     .update({
       nickname,
-      ...(authUserId !== undefined && { auth_user_id: authUserId }),
+      ...(authUserId !== undefined && {
+        auth_user_id: authUserId,
+        registered_at: new Date().toISOString(),
+      }),
     })
     .eq('id', userId);
 
@@ -67,22 +70,26 @@ export async function updateUser(
   }
 }
 
-export async function deleteUser(userId: string) {
+export async function deleteUserByAuthId(authUserId: string) {
   const { error } = await supabase
     .from('users')
-    .update({ deleted_at: new Date().toISOString(), nickname: null })
-    .eq('id', userId);
+    .update({
+      deleted_at: new Date().toISOString(),
+      nickname: null,
+      registered_at: null,
+    })
+    .eq('auth_user_id', authUserId);
 
   if (error) {
     throw new Error(error.message);
   }
 }
 
-export async function hardDeleteAuthUser(userId: string) {
+export async function hardDeleteAuthUser(authUserId: string) {
   const { error } = await supabaseNextAuth
     .from('users')
     .delete()
-    .eq('id', userId);
+    .eq('id', authUserId);
 
   if (error) {
     throw new Error(error.message);
