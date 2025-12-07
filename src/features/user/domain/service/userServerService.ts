@@ -6,3 +6,7 @@ export async function fetchUserById(userId: string) {
   const user = await UserServerRepository.fetchUserById(userId);
   return user ? toDomain(user) : null;
 }
+
+export async function createUser(): Promise<string> {
+  return await UserServerRepository.createUser();
+}

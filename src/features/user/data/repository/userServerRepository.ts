@@ -4,3 +4,7 @@ import 'server-only';
 export async function fetchUserById(userId: string) {
   return await UserQueries.fetchUserById(userId);
 }
+
+export async function createUser(): Promise<string> {
+  return await UserQueries.createUser();
+}
