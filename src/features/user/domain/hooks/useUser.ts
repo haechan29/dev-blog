@@ -11,9 +11,9 @@ export default function useUser() {
     queryFn: () => UserClientService.fetchUser(),
   });
 
-  const createUserMutation = useMutation({
+  const updateUserMutation = useMutation({
     mutationFn: (params: { nickname: string }) =>
-      UserClientService.createUser(params),
+      UserClientService.updateUser(params),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['user'],
@@ -30,5 +30,9 @@ export default function useUser() {
     },
   });
 
-  return { user, createUserMutation, deleteUserMutation } as const;
+  return {
+    user,
+    updateUserMutation,
+    deleteUserMutation,
+  } as const;
 }

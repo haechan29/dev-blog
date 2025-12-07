@@ -32,7 +32,7 @@ export async function GET() {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function PATCH(request: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -53,8 +53,15 @@ export async function POST(request: NextRequest) {
       throw new ValidationError('한글, 영문, 숫자만 사용 가능합니다');
     }
 
-    await UserQueries.createUser(session.user.id, nickname);
-    return NextResponse.json({ data: null });
+    const userId = request.cookies.get('userId')?.value;
+    if (!userId) {
+      throw new ValidationError('사용자 아이디를 찾을 수 없습니다');
+    }
+    await UserQueries.updateUser(userId, nickname, session.user.id);
+
+    const response = NextResponse.json({ data: null });
+    response.cookies.delete('userId');
+    return response;
   } catch (error) {
     console.error('회원가입 요청이 실패했습니다', error);
 

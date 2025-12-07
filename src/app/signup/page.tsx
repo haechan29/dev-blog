@@ -19,7 +19,7 @@ const nicknameErrorMessages = {
 
 export default function SignupPage() {
   const router = useRouter();
-  const { createUserMutation } = useUser();
+  const { updateUserMutation } = useUser();
   const [nickname, setNickname] = useState('');
   const [nicknameError, setNicknameError] = useState<NicknameError>(null);
   const [isTermsValid, setIsTermsValid] = useState(true);
@@ -56,7 +56,7 @@ export default function SignupPage() {
       return;
     }
 
-    createUserMutation.mutate(
+    updateUserMutation.mutate(
       { nickname: nickname.trim() },
       {
         onSuccess: () => {
@@ -187,10 +187,10 @@ export default function SignupPage() {
 
         <button
           onClick={handleSubmit}
-          disabled={createUserMutation.isPending}
+          disabled={updateUserMutation.isPending}
           className='w-full h-12 flex justify-center items-center font-bold text-white rounded-lg cursor-pointer bg-blue-600 hover:bg-blue-500'
         >
-          {createUserMutation.isPending ? (
+          {updateUserMutation.isPending ? (
             <Loader2 size={18} strokeWidth={3} className='animate-spin' />
           ) : (
             <div>시작하기</div>

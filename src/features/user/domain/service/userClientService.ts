@@ -6,8 +6,8 @@ export async function fetchUser() {
   return user ? toDomain(user) : null;
 }
 
-export async function createUser({ nickname }: { nickname: string }) {
-  await UserClientRepository.createUser({ nickname });
+export async function updateUser({ nickname }: { nickname: string }) {
+  await UserClientRepository.updateUser({ nickname });
 }
 
 export async function deleteUser() {
