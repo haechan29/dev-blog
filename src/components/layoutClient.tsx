@@ -1,12 +1,34 @@
 'use client';
 
+import LayoutContainer from '@/components/layoutContainer';
+import { PostProps } from '@/features/post/ui/postProps';
+import * as UserAction from '@/features/user/domain/action/userAction';
 import { usePathname, useSearchParams } from 'next/navigation';
 import nProgress from 'nprogress';
-import { useEffect } from 'react';
+import { ReactNode, Suspense, useEffect } from 'react';
 
-export default function LayoutClient() {
+export default function LayoutClient({
+  userId,
+  posts,
+  children,
+}: {
+  userId: string | null;
+  posts: PostProps[];
+  children: ReactNode;
+}) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const handleNewUser = async () => {
+      if (!userId) {
+        try {
+          await UserAction.createUser();
+        } catch {}
+      }
+    };
+    handleNewUser();
+  }, [userId]);
 
   useEffect(() => {
     nProgress.done();
@@ -40,5 +62,9 @@ export default function LayoutClient() {
     }
   }, []);
 
-  return null;
+  return (
+    <LayoutContainer posts={posts}>
+      <Suspense>{children}</Suspense>
+    </LayoutContainer>
+  );
 }
