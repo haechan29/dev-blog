@@ -5,25 +5,31 @@ import { PostProps } from '@/features/post/ui/postProps';
 import useUser from '@/features/user/domain/hooks/useUser';
 import { usePathname, useSearchParams } from 'next/navigation';
 import nProgress from 'nprogress';
-import { ReactNode, Suspense, useEffect } from 'react';
+import { ReactNode, Suspense, useEffect, useRef } from 'react';
 
 export default function LayoutClient({
+  authUserId,
+  cookieUserId,
   posts,
   children,
 }: {
+  authUserId: string | null;
+  cookieUserId: string | null;
   posts: PostProps[];
   children: ReactNode;
 }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const isCreatedRef = useRef(false);
 
-  const { user, createUserMutation } = useUser();
+  const { createUserMutation } = useUser();
 
   useEffect(() => {
-    if (!user) {
+    if (!authUserId && !cookieUserId && !isCreatedRef.current) {
+      isCreatedRef.current = true;
       createUserMutation.mutate();
     }
-  }, [createUserMutation, user]);
+  }, [authUserId, cookieUserId, createUserMutation]);
 
   useEffect(() => {
     nProgress.done();

@@ -3,16 +3,11 @@ import { auth } from '@/auth';
 import LayoutClient from '@/components/layoutClient';
 import { fetchPosts } from '@/features/post/domain/service/postServerService';
 import { createProps } from '@/features/post/ui/postProps';
-import * as UserServerService from '@/features/user/domain/service/userServerService';
 import Providers from '@/providers';
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from '@tanstack/react-query';
 import clsx from 'clsx';
 import type { Metadata } from 'next';
 import { Geist_Mono } from 'next/font/google';
+import { cookies } from 'next/headers';
 import 'nprogress/nprogress.css';
 import 'pretendard/dist/web/variable/pretendardvariable.css';
 import { ReactNode } from 'react';
@@ -34,14 +29,7 @@ export default async function RootLayout({
   children: ReactNode;
 }>) {
   const session = await auth();
-  const queryClient = new QueryClient();
-
-  if (session?.user?.id) {
-    queryClient.prefetchQuery({
-      queryKey: ['user'],
-      queryFn: () => UserServerService.fetchUserByAuthId(session.user!.id!),
-    });
-  }
+  const cookieStore = await cookies();
 
   const posts = await fetchPosts().then(posts => posts.map(createProps));
 
@@ -54,9 +42,13 @@ export default async function RootLayout({
         )}
       >
         <Providers>
-          <HydrationBoundary state={dehydrate(queryClient)}>
-            <LayoutClient posts={posts}>{children}</LayoutClient>
-          </HydrationBoundary>
+          <LayoutClient
+            authUserId={session?.user?.id ?? null}
+            cookieUserId={cookieStore.get('userId')?.value ?? null}
+            posts={posts}
+          >
+            {children}
+          </LayoutClient>
         </Providers>
 
         <Toaster />
