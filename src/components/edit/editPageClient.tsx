@@ -27,7 +27,7 @@ export default function EditPageClient({
   userId,
   post,
 }: {
-  userId: string | null;
+  userId: string;
   post: PostProps;
 }) {
   const searchParams = useSearchParams();

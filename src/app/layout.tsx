@@ -27,9 +27,8 @@ export default async function RootLayout({
   children: ReactNode;
 }>) {
   const session = await auth();
-  const cookieStore = await cookies();
-  const authUserId = session?.user?.id ?? null;
-  const cookieUserId = cookieStore.get('userId')?.value ?? null;
+  const userId =
+    session?.user?.user_id ?? (await cookies()).get('userId')?.value;
 
   return (
     <html lang='ko'>
@@ -40,10 +39,7 @@ export default async function RootLayout({
         )}
       >
         <Providers>
-          <LayoutClient
-            shouldCreateUser={!authUserId && !cookieUserId}
-            isLoggedIn={!!session}
-          >
+          <LayoutClient shouldCreateUser={!userId} isLoggedIn={!!session}>
             {children}
           </LayoutClient>
         </Providers>

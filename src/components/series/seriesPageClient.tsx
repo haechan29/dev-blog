@@ -12,7 +12,7 @@ export default function SeriesPageClient({
   userId,
   initialSeries,
 }: {
-  userId: string | null;
+  userId: string;
   initialSeries: SeriesProps;
 }) {
   const { series } = useSeries(initialSeries);
@@ -25,6 +25,7 @@ export default function SeriesPageClient({
           <div className='text-3xl font-bold line-clamp-2 flex-1'>
             {series.title}
           </div>
+
           {userId === series.userId && (
             <SeriesSettingsDropdown userId={userId} series={series}>
               <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2 cursor-pointer shrink-0' />

@@ -14,7 +14,7 @@ import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-export default function WritePageClient({ userId }: { userId: string | null }) {
+export default function WritePageClient({ userId }: { userId: string }) {
   const searchParams = useSearchParams();
   const step = searchParams.get('step') as keyof typeof writePostSteps;
   const dispatch = useDispatch<AppDispatch>();

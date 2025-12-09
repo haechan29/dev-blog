@@ -15,6 +15,8 @@ import EnterFullscreenButton from '@/components/postViewer/enterFullscreenButton
 import { fetchPost } from '@/features/post/domain/service/postServerService';
 import { createProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
+import { cookies } from 'next/headers';
+import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
 export default async function PostPage({
@@ -23,7 +25,12 @@ export default async function PostPage({
   params: Promise<{ postId: string }>;
 }) {
   const session = await auth();
-  const userId = session?.user?.id ?? null;
+  const userId =
+    session?.user?.user_id ?? (await cookies()).get('userId')?.value;
+
+  if (!userId) {
+    notFound();
+  }
 
   const { postId } = await params;
   const post = await fetchPost(postId).then(createProps);
@@ -36,7 +43,7 @@ export default async function PostPage({
       </Suspense>
 
       <Suspense>
-        <PostSidebar userId={post.userId!} currentPostId={post.id} />
+        <PostSidebar userId={post.userId} currentPostId={post.id} />
       </Suspense>
 
       <div

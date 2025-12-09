@@ -1,21 +1,13 @@
 import { auth } from '@/auth';
 import UserToolbar from '@/components/user/userToolbar';
-import * as SeriesServerService from '@/features/series/domain/service/seriesServerService';
-import { createProps } from '@/features/series/ui/seriesProps';
 import { ReactNode } from 'react';
 
 export default async function SeriesLayout({
-  params,
   children,
 }: {
-  params: Promise<{ seriesId: string }>;
   children: ReactNode;
 }) {
   const session = await auth();
-  const { seriesId } = await params;
-  const series = await SeriesServerService.fetchSeries(seriesId).then(
-    createProps
-  );
 
   return (
     <>

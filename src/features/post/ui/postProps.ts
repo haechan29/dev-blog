@@ -12,7 +12,7 @@ export type PostProps = {
   content: string;
   headings: Heading[];
   plainText: string;
-  userId: string | null;
+  userId: string;
   authorName: string;
   isDeleted: boolean;
   seriesId: string | null;

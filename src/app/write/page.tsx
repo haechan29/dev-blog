@@ -1,10 +1,14 @@
-import { auth } from '@/auth';
 import WritePageClient from '@/components/write/writePageClient';
+import { getUserId } from '@/lib/user';
+import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
 export default async function WritePage() {
-  const session = await auth();
-  const userId = session?.user?.id ?? null;
+  const userId = await getUserId();
+
+  if (!userId) {
+    notFound();
+  }
 
   return (
     <Suspense>
