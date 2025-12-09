@@ -140,7 +140,7 @@ export async function createPost({
   content: string;
   tags: string[];
   passwordHash: string | null;
-  userId: string | null;
+  userId: string;
 }) {
   const { data, error } = await supabase
     .from('posts')
