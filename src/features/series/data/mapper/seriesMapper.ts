@@ -9,15 +9,15 @@ export function toDto(entity: SeriesEntity): SeriesDto {
     createdAt: entity.created_at,
     updatedAt: entity.updated_at,
     userId: entity.user_id,
-    authorName: entity.users?.nickname ?? '익명',
-    posts:
-      entity.posts?.map(post => ({
-        id: post.id,
-        title: post.title,
-        createdAt: post.created_at,
-        seriesId: post.series_id,
-        seriesOrder: post.series_order,
-      })) ?? [],
-    postCount: entity.postCounts?.[0]?.count ?? entity.posts?.length ?? 0,
+    authorName:
+      entity.users.nickname ?? `Guest#${entity.user_id?.slice(0, 4) ?? '0000'}`,
+    posts: entity.posts.map(post => ({
+      id: post.id,
+      title: post.title,
+      createdAt: post.created_at,
+      seriesId: post.series_id,
+      seriesOrder: post.series_order,
+    })),
+    postCount: entity.posts.length,
   };
 }

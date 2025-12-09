@@ -1,10 +1,10 @@
-import { auth } from '@/auth';
 import * as SeriesQueries from '@/features/series/data/queries/seriesQueries';
 import {
   UnauthorizedError,
   ValidationError,
 } from '@/features/user/data/errors/userErrors';
 import { ApiError } from '@/lib/api';
+import { getUserId } from '@/lib/user';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
@@ -36,9 +36,9 @@ export async function POST(
 ) {
   try {
     const { userId } = await params;
+    const innerUserId = await getUserId();
 
-    const session = await auth();
-    if (session?.user?.id !== userId) {
+    if (userId !== innerUserId) {
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 

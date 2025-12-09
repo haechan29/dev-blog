@@ -6,7 +6,7 @@ export function toDto(comment: CommentEntity): CommentResponseDto {
     id: comment.id,
     postId: comment.post_id,
     authorName:
-      comment.users?.nickname ??
+      comment.users.nickname ??
       `Guest#${comment.user_id?.slice(0, 4) ?? '0000'}`,
     content: comment.content,
     createdAt: comment.created_at,

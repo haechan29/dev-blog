@@ -1,10 +1,10 @@
-import { auth } from '@/auth';
 import * as SeriesQueries from '@/features/series/data/queries/seriesQueries';
 import {
   UnauthorizedError,
   ValidationError,
 } from '@/features/user/data/errors/userErrors';
 import { ApiError } from '@/lib/api';
+import { getUserId } from '@/lib/user';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
@@ -36,8 +36,8 @@ export async function PATCH(
   try {
     const { userId, seriesId } = await params;
 
-    const session = await auth();
-    if (session?.user?.id !== userId) {
+    const innerUserId = await getUserId();
+    if (userId !== innerUserId) {
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 
@@ -50,6 +50,7 @@ export async function PATCH(
       seriesId,
       title,
       description: description ?? null,
+      userId,
     });
 
     return NextResponse.json({ data: updated });
@@ -74,12 +75,12 @@ export async function DELETE(
   try {
     const { userId, seriesId } = await params;
 
-    const session = await auth();
-    if (session?.user?.id !== userId) {
+    const innerUserId = await getUserId();
+    if (userId !== innerUserId) {
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 
-    await SeriesQueries.deleteSeries(seriesId);
+    await SeriesQueries.deleteSeries(seriesId, userId);
 
     return NextResponse.json({ data: null });
   } catch (error) {
