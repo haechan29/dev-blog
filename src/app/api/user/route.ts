@@ -65,9 +65,7 @@ export async function PATCH(request: NextRequest) {
     }
     await UserQueries.updateUser(userId, nickname, session.user.id);
 
-    const response = NextResponse.json({ data: null });
-    response.cookies.delete('userId');
-    return response;
+    return NextResponse.json({ data: null });
   } catch (error) {
     console.error('회원가입 요청이 실패했습니다', error);
 

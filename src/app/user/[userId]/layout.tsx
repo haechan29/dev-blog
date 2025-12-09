@@ -25,7 +25,7 @@ export default async function UserLayout({
 
       <div className='flex flex-col gap-8 pt-(--toolbar-height) pb-20 px-6 md:px-12'>
         <div className='flex items-center space-x-3'>
-          <ProfileIcon isGuest={false} nickname={user.nickname} />
+          <ProfileIcon />
           <div>
             <div className='font-semibold text-gray-900 text-xl'>
               {user.nickname}

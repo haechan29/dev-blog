@@ -63,7 +63,7 @@ export default function ProfileDropdown({ children }: { children: ReactNode }) {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align='end'>
-          {user ? (
+          {user?.userStatus === 'ACTIVE' ? (
             <>
               <DropdownMenuItem
                 data-action='logout'

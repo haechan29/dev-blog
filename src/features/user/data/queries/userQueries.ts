@@ -7,7 +7,17 @@ import 'server-only';
 export async function fetchUserById(userId: string) {
   const { data, error } = await supabase
     .from('users')
-    .select('id, nickname, created_at, updated_at, deleted_at')
+    .select(
+      `
+        id, 
+        nickname, 
+        created_at, 
+        updated_at, 
+        deleted_at, 
+        auth_user_id, 
+        registered_at
+      `
+    )
     .eq('id', userId)
     .maybeSingle();
 
@@ -21,7 +31,17 @@ export async function fetchUserById(userId: string) {
 export async function fetchUserByAuthId(authUserId: string) {
   const { data, error } = await supabase
     .from('users')
-    .select('id, nickname, created_at, updated_at, deleted_at')
+    .select(
+      `
+        id, 
+        nickname, 
+        created_at, 
+        updated_at, 
+        deleted_at, 
+        auth_user_id, 
+        registered_at
+      `
+    )
     .eq('auth_user_id', authUserId)
     .maybeSingle();
 
