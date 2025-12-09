@@ -16,11 +16,11 @@ import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function WritePostToolbar({
-  userId,
+  isLoggedIn,
   publishPost,
   removeDraft,
 }: {
-  userId: string | null;
+  isLoggedIn: boolean;
   publishPost: () => Promise<PostProps>;
   removeDraft: () => void;
 }) {
@@ -44,10 +44,10 @@ export default function WritePostToolbar({
     const currentStep = writePostSteps[currentStepId];
     return (
       currentStep.fields.find(
-        field => !validate(userId, writePostForm, field)
+        field => !validate(isLoggedIn, writePostForm, field)
       ) ?? null
     );
-  }, [currentStepId, userId, writePostForm]);
+  }, [currentStepId, isLoggedIn, writePostForm]);
 
   const onAction = useCallback(async () => {
     const currentStep = writePostSteps[currentStepId];
@@ -88,12 +88,12 @@ export default function WritePostToolbar({
   useEffect(() => {
     for (const step of Object.values(writePostSteps)) {
       if (currentStepId === step.id) break;
-      const isValid = validate(userId, writePostForm, ...step.fields);
+      const isValid = validate(isLoggedIn, writePostForm, ...step.fields);
       if (!isValid) {
         router.push(`/write?step=${step.id}`);
       }
     }
-  }, [currentStepId, router, userId, writePostForm]);
+  }, [currentStepId, isLoggedIn, router, writePostForm]);
 
   return (
     <div

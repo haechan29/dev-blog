@@ -11,10 +11,12 @@ import { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function PostHeader({
+  isLoggedIn,
   userId,
   post,
 }: {
-  userId: string | null;
+  isLoggedIn: boolean;
+  userId: string;
   post: PostProps;
 }) {
   const dispatch = useDispatch<AppDispatch>();
@@ -60,6 +62,7 @@ export default function PostHeader({
 
         {((!post.userId && !userId) || post.userId === userId) && (
           <PostSettingsDropdown
+            isLoggedIn={isLoggedIn}
             userId={userId}
             post={post}
             showRawContent={true}

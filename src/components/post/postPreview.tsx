@@ -4,7 +4,9 @@ import PostSettingsDropdown from '@/components/post/postSettingsDropdown';
 import { PostProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
 import { MoreVertical } from 'lucide-react';
+import { cookies } from 'next/headers';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 const SCALE_ANIMATION_DELAY = 0.5;
 const SCROLL_ANIMATION_DELAY = 1;
@@ -18,11 +20,16 @@ export default async function PostPreview({
   post: PostProps;
 }) {
   const session = await auth();
-  const userId = session?.user?.id ?? null;
+  const userId =
+    session?.user?.user_id ?? (await cookies()).get('userId')?.value;
+
+  if (!userId) {
+    notFound();
+  }
+
   const { id, title, plainText, tags } = post;
   const isScrollAnimationEnabled =
     plainText.length >= MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION;
-  const isOwner = userId && post.userId === userId;
 
   return (
     <div
@@ -41,9 +48,10 @@ export default async function PostPreview({
         )}
       />
 
-      {isOwner && (
+      {post.userId === userId && (
         <div className='absolute top-0 right-0 z-10'>
           <PostSettingsDropdown
+            isLoggedIn={!!session}
             userId={userId}
             post={post}
             showRawContent={false}
@@ -61,7 +69,7 @@ export default async function PostPreview({
           <div
             className={clsx(
               'text-2xl font-semibold line-clamp-2',
-              isOwner ? 'w-[calc(100%-3rem)]' : 'w-full'
+              post.userId === userId ? 'w-[calc(100%-3rem)]' : 'w-full'
             )}
           >
             {title}

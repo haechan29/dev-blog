@@ -1,7 +1,8 @@
-import { auth } from '@/auth';
 import SeriesListPageClient from '@/components/series/seriesListPageClient';
 import * as SeriesServerService from '@/features/series/domain/service/seriesServerService';
 import { createProps } from '@/features/series/ui/seriesProps';
+import { getUserId } from '@/lib/user';
+import { notFound } from 'next/navigation';
 
 export default async function SeriesListPage({
   params,
@@ -9,7 +10,12 @@ export default async function SeriesListPage({
   params: Promise<{ userId: string }>;
 }) {
   const { userId } = await params;
-  const session = await auth();
+  const currentUserId = await getUserId();
+
+  if (!currentUserId) {
+    notFound();
+  }
+
   const seriesList = await SeriesServerService.fetchSeriesByUserId(userId).then(
     seriesList => seriesList.map(createProps)
   );
@@ -17,7 +23,7 @@ export default async function SeriesListPage({
   return (
     <SeriesListPageClient
       userId={userId}
-      currentUserId={session?.user?.id ?? null}
+      currentUserId={currentUserId}
       initialSeriesList={seriesList}
     />
   );

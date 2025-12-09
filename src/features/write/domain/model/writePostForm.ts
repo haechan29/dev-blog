@@ -29,7 +29,7 @@ export interface WritePostForm {
 }
 
 export function validate(
-  userId: string | null,
+  isLoggedIn: boolean,
   form: WritePostForm,
   ...fields: string[]
 ) {
@@ -48,7 +48,7 @@ export function validate(
         );
       }
       case 'password': {
-        if (userId) return true;
+        if (isLoggedIn) return true;
         const { value, isEmptyAllowed, maxLength } = form[field];
         return (
           (isEmptyAllowed || value.length > 0) && value.length <= maxLength

@@ -20,12 +20,14 @@ import { MouseEvent, ReactNode, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostSettingsDropdown({
+  isLoggedIn,
   userId,
   post,
   showRawContent,
   children,
 }: {
-  userId: string | null;
+  isLoggedIn: boolean;
+  userId: string;
   post: PostProps;
   showRawContent: boolean;
   children: ReactNode;
@@ -75,20 +77,18 @@ export default function PostSettingsDropdown({
   return (
     <>
       <DeletePostDialog
-        userId={userId}
+        isLoggedIn={isLoggedIn}
         postId={post.id}
         isOpen={isDeleteDialogOpen}
         setIsOpen={setIsDeleteDialogOpen}
       />
 
-      {userId && (
-        <SeriesSettingsDialog
-          userId={userId}
-          post={post}
-          isOpen={isSeriesDialogOpen}
-          setIsOpen={setIsSeriesDialogOpen}
-        />
-      )}
+      <SeriesSettingsDialog
+        userId={userId}
+        post={post}
+        isOpen={isSeriesDialogOpen}
+        setIsOpen={setIsSeriesDialogOpen}
+      />
 
       <DropdownMenu>
         <DropdownMenuTrigger

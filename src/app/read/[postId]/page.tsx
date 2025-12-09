@@ -57,7 +57,7 @@ export default async function PostPage({
 
         <EnterFullscreenButton />
 
-        <PostHeader userId={userId} post={post} />
+        <PostHeader isLoggedIn={!!session} userId={userId} post={post} />
         <div className='w-full h-px bg-gray-200 mb-10' />
 
         <PostContentWrapper

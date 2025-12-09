@@ -14,7 +14,11 @@ import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-export default function WritePageClient({ userId }: { userId: string }) {
+export default function WritePageClient({
+  isLoggedIn,
+}: {
+  isLoggedIn: boolean;
+}) {
   const searchParams = useSearchParams();
   const step = searchParams.get('step') as keyof typeof writePostSteps;
   const dispatch = useDispatch<AppDispatch>();
@@ -52,12 +56,12 @@ export default function WritePageClient({ userId }: { userId: string }) {
       <RestoreDraftDialog draft={draft} isOpen={isOpen} setIsOpen={setIsOpen} />
       <div className='w-screen h-dvh flex flex-col'>
         <WritePostToolbar
-          userId={userId}
+          isLoggedIn={isLoggedIn}
           publishPost={createPost}
           removeDraft={removeDraft}
         />
         <div className='flex-1 min-h-0'>
-          <WritePostForm userId={userId} />
+          <WritePostForm isLoggedIn={isLoggedIn} />
         </div>
       </div>
     </QueryParamsValidator>

@@ -24,10 +24,10 @@ import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 
 export default function EditPageClient({
-  userId,
+  isLoggedIn,
   post,
 }: {
-  userId: string;
+  isLoggedIn: boolean;
   post: PostProps;
 }) {
   const searchParams = useSearchParams();
@@ -80,12 +80,12 @@ export default function EditPageClient({
       <RestoreDraftDialog draft={draft} isOpen={isOpen} setIsOpen={setIsOpen} />
       <div className='w-screen h-dvh flex flex-col'>
         <WritePostToolbar
-          userId={userId}
+          isLoggedIn={isLoggedIn}
           publishPost={async () => updatePost(post.id)}
           removeDraft={removeDraft}
         />
         <div className='flex-1 min-h-0'>
-          <WritePostForm userId={userId} />
+          <WritePostForm isLoggedIn={isLoggedIn} />
         </div>
       </div>
     </QueryParamsValidator>
