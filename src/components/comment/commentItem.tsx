@@ -1,10 +1,11 @@
 'use client';
 
 import CommentContentSection from '@/components/comment/commentContentSection';
-import CommentProfileIcon from '@/components/comment/commentProfileIcon';
 import CommentSettingsDropdown from '@/components/comment/commentSettingsDropdown';
+import ProfileIcon from '@/components/user/profileIcon';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
 import { MoreVertical } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 
 export default function CommentItem({
@@ -20,14 +21,16 @@ export default function CommentItem({
     <div className='py-4 border-b border-b-gray-200'>
       <div className='flex justify-between items-start mb-6'>
         <div className='flex items-center space-x-3'>
-          <CommentProfileIcon
-            isLoggedIn={isLoggedIn}
-            authorId={comment.userId}
-          />
+          <ProfileIcon isLoggedIn={isLoggedIn} />
+
           <div>
-            <div className='font-semibold text-gray-900'>
+            <Link
+              href={`/@${comment.userId}/posts`}
+              className='text-gray-900 hover:underline'
+            >
               {comment.authorName}
-            </div>
+            </Link>
+
             <p className='text-sm text-gray-500'>
               {comment.createdAt}
               {comment.isUpdated && (
