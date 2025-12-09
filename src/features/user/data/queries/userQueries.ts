@@ -1,10 +1,15 @@
+import { auth } from '@/auth';
 import { UserEntity } from '@/features/user/data/entities/userEntities';
-import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
+import {
+  DuplicateNicknameError,
+  UnauthorizedError,
+} from '@/features/user/data/errors/userErrors';
 import { toDto } from '@/features/user/data/mapper/userMapper';
 import { supabase, supabaseNextAuth } from '@/lib/supabase';
+import { cookies } from 'next/headers';
 import 'server-only';
 
-export async function fetchUserById(userId: string) {
+export async function fetchUser(userId: string) {
   const { data, error } = await supabase
     .from('users')
     .select(
@@ -28,30 +33,6 @@ export async function fetchUserById(userId: string) {
   return data ? toDto(data as unknown as UserEntity) : null;
 }
 
-export async function fetchUserByAuthId(authUserId: string) {
-  const { data, error } = await supabase
-    .from('users')
-    .select(
-      `
-        id, 
-        nickname, 
-        created_at, 
-        updated_at, 
-        deleted_at, 
-        auth_user_id, 
-        registered_at
-      `
-    )
-    .eq('auth_user_id', authUserId)
-    .maybeSingle();
-
-  if (error) {
-    throw error;
-  }
-
-  return data ? toDto(data as unknown as UserEntity) : null;
-}
-
 export async function createUser() {
   const { data, error } = await supabase
     .from('users')
@@ -66,20 +47,21 @@ export async function createUser() {
   return data.id as string;
 }
 
-export async function updateUser(
-  userId: string,
-  nickname: string,
-  authUserId?: string
-) {
+export async function updateUser(nickname: string) {
+  const userId = (await cookies()).get('userId')?.value;
+  const authUserId = (await auth())?.user?.id;
+
+  if (!userId || !authUserId) {
+    throw new UnauthorizedError('인증되지 않은 요청입니다');
+  }
+
   const { error } = await supabase
     .from('users')
     .update({
       nickname,
       deleted_at: null,
-      ...(authUserId !== undefined && {
-        auth_user_id: authUserId,
-        registered_at: new Date().toISOString(),
-      }),
+      auth_user_id: authUserId,
+      registered_at: new Date().toISOString(),
     })
     .eq('id', userId);
 
@@ -91,7 +73,17 @@ export async function updateUser(
   }
 }
 
-export async function deleteUserByAuthId(authUserId: string) {
+export async function deleteUser() {
+  const session = await auth();
+  if (!session) {
+    throw new UnauthorizedError('인증되지 않은 요청입니다');
+  }
+
+  const userId = session.user?.user_id;
+  if (!userId) {
+    throw new UnauthorizedError('인증되지 않은 요청입니다');
+  }
+
   const { error } = await supabase
     .from('users')
     .update({
@@ -99,14 +91,20 @@ export async function deleteUserByAuthId(authUserId: string) {
       nickname: null,
       registered_at: null,
     })
-    .eq('auth_user_id', authUserId);
+    .eq('id', userId);
 
   if (error) {
     throw new Error(error.message);
   }
 }
 
-export async function hardDeleteAuthUser(authUserId: string) {
+export async function hardDeleteAuthUser() {
+  const session = await auth();
+  const authUserId = session?.user?.id;
+  if (!authUserId) {
+    throw new UnauthorizedError('인증되지 않은 요청입니다');
+  }
+
   const { error } = await supabaseNextAuth
     .from('users')
     .delete()

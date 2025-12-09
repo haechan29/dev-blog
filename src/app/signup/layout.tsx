@@ -1,5 +1,4 @@
 import { auth } from '@/auth';
-import * as UserServerService from '@/features/user/domain/service/userServerService';
 import { redirect } from 'next/navigation';
 import { ReactNode } from 'react';
 
@@ -14,8 +13,7 @@ export default async function SignupLayout({
     redirect('/login');
   }
 
-  const user = await UserServerService.fetchUserByAuthId(session.user.id!);
-  if (user) {
+  if (session.user.user_id) {
     redirect('/');
   }
 
