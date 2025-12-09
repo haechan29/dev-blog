@@ -10,11 +10,11 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function CommentsClient({
+  isLoggedIn,
   postId,
-  userId,
 }: {
+  isLoggedIn: boolean;
   postId: string;
-  userId: string | null;
 }) {
   const dispatch = useDispatch<AppDispatch>();
   const { comments } = useComments({ postId });
@@ -35,7 +35,7 @@ export default function CommentsClient({
       <div className='text-xl font-bold text-gray-900 mb-8'>
         {`댓글 ${comments.length}개`}
       </div>
-      <CommentForm postId={postId} userId={userId} />
+      <CommentForm isLoggedIn={isLoggedIn} postId={postId} />
       <div className='space-y-6'>
         {comments.length === 0 ? (
           <div className='text-center py-12'>
@@ -45,7 +45,11 @@ export default function CommentsClient({
           </div>
         ) : (
           comments.map(comment => (
-            <CommentItem key={comment.id} userId={userId} comment={comment} />
+            <CommentItem
+              key={comment.id}
+              isLoggedIn={isLoggedIn}
+              comment={comment}
+            />
           ))
         )}
       </div>

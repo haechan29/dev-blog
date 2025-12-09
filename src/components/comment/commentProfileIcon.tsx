@@ -3,13 +3,11 @@
 import ProfileIcon from '@/components/user/profileIcon';
 
 export default function CommentProfileIcon({
-  isGuest,
+  isLoggedIn,
   authorId,
-  authorName,
 }: {
-  isGuest: boolean;
+  isLoggedIn: boolean;
   authorId: string | null;
-  authorName: string;
 }) {
   const handleClick = () => {
     if (authorId) {
@@ -22,7 +20,7 @@ export default function CommentProfileIcon({
       aria-label='댓글을 작성한 유저의 프로필 아이콘'
       onClick={handleClick}
     >
-      <ProfileIcon />
+      <ProfileIcon isLoggedIn={isLoggedIn} />
     </button>
   );
 }

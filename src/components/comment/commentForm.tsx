@@ -8,11 +8,11 @@ import { useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
 
 export default function CommentForm({
+  isLoggedIn,
   postId,
-  userId,
 }: {
+  isLoggedIn: boolean;
   postId: string;
-  userId: string | null;
 }) {
   const [password, setPassword] = useState('');
   const [content, setContent] = useState('');
@@ -40,7 +40,7 @@ export default function CommentForm({
   );
 
   const handleSubmit = () => {
-    if (!userId && !password.trim()) {
+    if (!isLoggedIn && !password.trim()) {
       setIsPasswordValid(false);
       setIsContentValid(true);
       return;
@@ -57,7 +57,7 @@ export default function CommentForm({
 
   return (
     <div className='mb-12'>
-      {!userId && (
+      {!isLoggedIn && (
         <input
           type='password'
           value={password}

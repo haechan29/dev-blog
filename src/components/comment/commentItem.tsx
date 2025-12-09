@@ -8,10 +8,10 @@ import { MoreVertical } from 'lucide-react';
 import { useState } from 'react';
 
 export default function CommentItem({
-  userId,
+  isLoggedIn,
   comment,
 }: {
-  userId: string | null;
+  isLoggedIn: boolean;
   comment: CommentItemProps;
 }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -21,9 +21,8 @@ export default function CommentItem({
       <div className='flex justify-between items-start mb-6'>
         <div className='flex items-center space-x-3'>
           <CommentProfileIcon
-            isGuest={comment.isGuest}
+            isLoggedIn={isLoggedIn}
             authorId={comment.userId}
-            authorName={comment.authorName}
           />
           <div>
             <div className='font-semibold text-gray-900'>
