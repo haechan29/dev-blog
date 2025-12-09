@@ -1,8 +1,12 @@
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 import 'server-only';
 
-export async function fetchPosts(userId?: string) {
-  return await PostQueries.fetchPosts(userId);
+export async function fetchPosts() {
+  return await PostQueries.fetchPosts();
+}
+
+export async function fetchPostsByUserId(userId: string) {
+  return await PostQueries.fetchPostsByUserId(userId);
 }
 
 export async function fetchPost(postId: string) {

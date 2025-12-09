@@ -75,6 +75,7 @@ export async function updateUser(
     .from('users')
     .update({
       nickname,
+      deleted_at: null,
       ...(authUserId !== undefined && {
         auth_user_id: authUserId,
         registered_at: new Date().toISOString(),

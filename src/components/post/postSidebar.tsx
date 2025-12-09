@@ -1,7 +1,7 @@
 import PostSidebarClient from '@/components/post/postSidebarClient';
-import { fetchPosts } from '@/features/post/domain/service/postServerService';
+import * as PostServerService from '@/features/post/domain/service/postServerService';
 import { createProps } from '@/features/post/ui/postProps';
-import { fetchSeriesByUserId } from '@/features/series/domain/service/seriesServerService';
+import * as SeriesServerService from '@/features/series/domain/service/seriesServerService';
 
 export default async function PostSidebar({
   userId,
@@ -11,8 +11,10 @@ export default async function PostSidebar({
   currentPostId: string;
 }) {
   const [authorPosts, authorSeries] = await Promise.all([
-    fetchPosts(userId).then(posts => posts.map(createProps)),
-    fetchSeriesByUserId(userId),
+    PostServerService.fetchPostsByUserId(userId).then(posts =>
+      posts.map(createProps)
+    ),
+    SeriesServerService.fetchSeriesByUserId(userId),
   ]);
 
   return (

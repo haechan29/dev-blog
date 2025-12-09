@@ -2,7 +2,7 @@ import * as PostClientRepository from '@/features/post/data/repository/postClien
 import { toDomain } from '@/features/post/domain/mapper/postMapper';
 import Post from '@/features/post/domain/model/post';
 
-export async function fetchPosts(userId?: string) {
+export async function fetchPosts(userId: string) {
   const dtos = await PostClientRepository.fetchPosts(userId);
   return dtos.map(toDomain);
 }

@@ -10,10 +10,8 @@ export function toDomain(dto: PostDto): Post {
     dto.content,
     dto.tags,
     dto.userId,
-    dto.guestId,
     dto.authorName,
     dto.isDeleted,
-    dto.isGuest,
     dto.seriesId,
     dto.seriesOrder
   );

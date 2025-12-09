@@ -10,13 +10,9 @@ export function toDto(post: PostEntity): PostDto {
     createdAt: post.created_at,
     updatedAt: post.updated_at ?? post.created_at,
     userId: post.user_id,
-    guestId: post.guest_id,
     authorName:
-      post.users?.nickname ||
-      `Guest#${post.guest_id?.slice(0, 4) ?? '0000'}` ||
-      '익명',
-    isDeleted: !!post.user_id && !!post.users?.deleted_at,
-    isGuest: !post.user_id,
+      post.users?.nickname ?? `Guest#${post.user_id?.slice(0, 4) ?? '0000'}`,
+    isDeleted: !!post.users.deleted_at,
     seriesId: post.series_id,
     seriesOrder: post.series_order,
   };

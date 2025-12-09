@@ -2,12 +2,22 @@ import { PostEntity } from '@/features/post/data/entities/postEntities';
 import { PostNotFoundError } from '@/features/post/data/errors/postErrors';
 import { toDto } from '@/features/post/data/mapper/postMapper';
 import Post from '@/features/post/domain/model/post';
+import { ValidationError } from '@/features/user/data/errors/userErrors';
 import { supabase } from '@/lib/supabase';
+import { getUserId } from '@/lib/user';
 import 'server-only';
 
-export async function fetchPosts(userId?: string) {
-  let query = supabase.from('posts').select(
-    `
+export async function fetchPosts() {
+  const userId = await getUserId();
+
+  if (!userId) {
+    throw new ValidationError('사용자를 찾을 수 없습니다');
+  }
+
+  const { data, error } = await supabase
+    .from('posts')
+    .select(
+      `
       id,
       title,
       content,
@@ -15,20 +25,40 @@ export async function fetchPosts(userId?: string) {
       created_at,
       updated_at,
       user_id,
-      guest_id,
       series_id,
       series_order,
       users:user_id(nickname, deleted_at)
     `
-  );
+    )
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
 
-  if (userId) {
-    query = query.eq('user_id', userId);
+  if (error) {
+    throw new Error(error.message);
   }
 
-  query = query.order('created_at', { ascending: false });
+  return (data as unknown as PostEntity[]).map(toDto);
+}
 
-  const { data, error } = await query;
+export async function fetchPostsByUserId(userId: string) {
+  const { data, error } = await supabase
+    .from('posts')
+    .select(
+      `
+      id,
+      title,
+      content,
+      tags,
+      created_at,
+      updated_at,
+      user_id,
+      series_id,
+      series_order,
+      users:user_id(nickname, deleted_at)
+    `
+    )
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
 
   if (error) {
     throw new Error(error.message);
@@ -62,7 +92,6 @@ export async function fetchPost(postId: string) {
         created_at,
         updated_at,
         user_id,
-        guest_id,
         series_id,
         series_order,
         users:user_id(nickname, deleted_at)
@@ -85,7 +114,7 @@ export async function fetchPost(postId: string) {
 export async function fetchPostForAuth(postId: string) {
   const { data, error } = await supabase
     .from('posts')
-    .select('user_id, guest_id, password_hash')
+    .select('user_id, password_hash')
     .eq('id', postId)
     .maybeSingle();
 
@@ -97,7 +126,7 @@ export async function fetchPostForAuth(postId: string) {
     throw new PostNotFoundError(`게시물을 찾을 수 없습니다 (${postId})`);
   }
 
-  return data as Pick<PostEntity, 'user_id' | 'guest_id' | 'password_hash'>;
+  return data as Pick<PostEntity, 'user_id' | 'password_hash'>;
 }
 
 export async function createPost({
@@ -106,14 +135,12 @@ export async function createPost({
   tags,
   passwordHash,
   userId,
-  guestId,
 }: {
   title: string;
   content: string;
   tags: string[];
   passwordHash: string | null;
   userId: string | null;
-  guestId: string | null;
 }) {
   const { data, error } = await supabase
     .from('posts')
@@ -123,7 +150,6 @@ export async function createPost({
       tags,
       password_hash: passwordHash,
       user_id: userId,
-      guest_id: guestId,
     })
     .select(
       `
@@ -134,7 +160,6 @@ export async function createPost({
         created_at,
         updated_at,
         user_id,
-        guest_id,
         series_id,
         series_order,
         users:user_id(nickname, deleted_at)
@@ -186,7 +211,6 @@ export async function updatePost({
         created_at,
         updated_at,
         user_id,
-        guest_id,
         series_id,
         series_order,
         users:user_id(nickname, deleted_at)

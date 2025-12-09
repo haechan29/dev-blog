@@ -15,7 +15,11 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId') ?? undefined;
 
-    const data = await PostQueries.fetchPosts(userId);
+    if (!userId) {
+      throw new ValidationError('사용자를 찾을 수 없습니다');
+    }
+
+    const data = await PostQueries.fetchPostsByUserId(userId);
     return NextResponse.json({ data });
   } catch (error) {
     console.error('게시글 목록 조회에 실패했습니다', error);
@@ -37,7 +41,6 @@ export async function POST(request: NextRequest) {
 
     const session = await auth();
     const userId = session?.user?.id ?? null;
-    const guestId = request.cookies.get('guestId')?.value ?? null;
 
     if (!title) {
       throw new ValidationError('제목을 찾을 수 없습니다');
@@ -51,9 +54,6 @@ export async function POST(request: NextRequest) {
     if (!session && !password) {
       throw new ValidationError('비밀번호를 찾을 수 없습니다');
     }
-    if (!session && !guestId) {
-      throw new ValidationError('게스트 아이디를 찾을 수 없습니다');
-    }
 
     const passwordHash = session ? null : await bcrypt.hash(password, 10);
     const post = await PostQueries.createPost({
@@ -62,7 +62,6 @@ export async function POST(request: NextRequest) {
       tags,
       passwordHash,
       userId,
-      guestId: session ? null : guestId,
     });
 
     await PostStatQueries.createPostStat(post.id);
