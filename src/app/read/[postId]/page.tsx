@@ -35,7 +35,9 @@ export default async function PostPage({
         <PostToolbar className='xl:hidden' />
       </Suspense>
 
-      <PostSidebar posts={[]} />
+      <Suspense>
+        <PostSidebar userId={post.userId!} currentPostId={post.id} />
+      </Suspense>
 
       <div
         className={clsx(

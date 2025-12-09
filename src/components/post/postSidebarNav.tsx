@@ -2,6 +2,7 @@
 
 import { EMPTY_TAG_NAME } from '@/features/post/constants/tagName';
 import { PostProps } from '@/features/post/ui/postProps';
+import { SeriesProps } from '@/features/series/ui/seriesProps';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
@@ -10,7 +11,15 @@ import { useParams, useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function PostSidebarNav({ posts }: { posts: PostProps[] }) {
+export default function PostSidebarNav({
+  currentPostId,
+  posts,
+  series,
+}: {
+  currentPostId: string;
+  posts: PostProps[];
+  series: SeriesProps[];
+}) {
   const tagCount = useMemo(() => getTagCounts(posts), [posts]);
 
   return (
