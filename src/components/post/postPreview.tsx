@@ -22,7 +22,7 @@ export default async function PostPreview({
   const { id, title, plainText, tags } = post;
   const isScrollAnimationEnabled =
     plainText.length >= MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION;
-  const canEdit = userId && post.userId === userId;
+  const isOwner = userId && post.userId === userId;
 
   return (
     <div
@@ -41,7 +41,7 @@ export default async function PostPreview({
         )}
       />
 
-      {canEdit && (
+      {isOwner && (
         <div className='absolute top-0 right-0 z-10'>
           <PostSettingsDropdown
             userId={userId}
@@ -53,52 +53,54 @@ export default async function PostPreview({
         </div>
       )}
 
-      <Link
-        href={`/read/${id}${tag ? `?tag=${tag}` : ''}`}
-        className='w-full flex flex-col gap-4 text-gray-900'
-      >
-        <div
-          className={clsx(
-            'text-2xl font-semibold line-clamp-2',
-            canEdit ? 'w-[calc(100%-3rem)]' : 'w-full'
-          )}
+      <div className='w-full flex flex-col gap-4'>
+        <Link
+          href={`/read/${id}${tag ? `?tag=${tag}` : ''}`}
+          className='w-full flex flex-col gap-4 text-gray-900'
         >
-          {title}
-        </div>
+          <div
+            className={clsx(
+              'text-2xl font-semibold line-clamp-2',
+              isOwner ? 'w-[calc(100%-3rem)]' : 'w-full'
+            )}
+          >
+            {title}
+          </div>
 
-        <div className='whitespace-pre-wrap break-keep wrap-anywhere'>
-          {isScrollAnimationEnabled ? (
-            <div className='relative h-18'>
-              <div
-                className={clsx(
-                  'absolute inset-x-0 top-0',
-                  'h-18 line-clamp-3 group-hover:h-(--extended-height) group-hover:line-clamp-9999',
-                  'transition-discrete ease-in-out duration-300 group-hover:duration-(--scale-delay)',
-                  'delay-0 group-hover:delay-(--scale-delay)'
-                )}
-                style={{
-                  '--extended-height': tags.length > 0 ? '9rem' : '7rem',
-                }}
-              >
-                <div className='group-hover:hidden'>{plainText}</div>
+          <div className='whitespace-pre-wrap break-keep wrap-anywhere'>
+            {isScrollAnimationEnabled ? (
+              <div className='relative h-18'>
                 <div
                   className={clsx(
-                    'text-transparent group-hover:text-gray-900 absolute inset-x-0 top-0',
-                    'transition-transform ease-linear duration-[0] group-hover:duration-(--scroll-duration)',
-                    'delay-0 group-hover:delay-(--scroll-delay) group-hover:translate-y-[calc(-100%+9rem)]'
+                    'absolute inset-x-0 top-0',
+                    'h-18 line-clamp-3 group-hover:h-(--extended-height) group-hover:line-clamp-9999',
+                    'transition-discrete ease-in-out duration-300 group-hover:duration-(--scale-delay)',
+                    'delay-0 group-hover:delay-(--scale-delay)'
                   )}
                   style={{
-                    '--scroll-duration': `${plainText.length / 50}s`,
+                    '--extended-height': tags.length > 0 ? '9rem' : '7rem',
                   }}
                 >
-                  {plainText}
+                  <div className='group-hover:hidden'>{plainText}</div>
+                  <div
+                    className={clsx(
+                      'text-transparent group-hover:text-gray-900 absolute inset-x-0 top-0',
+                      'transition-transform ease-linear duration-[0] group-hover:duration-(--scroll-duration)',
+                      'delay-0 group-hover:delay-(--scroll-delay) group-hover:translate-y-[calc(-100%+9rem)]'
+                    )}
+                    style={{
+                      '--scroll-duration': `${plainText.length / 50}s`,
+                    }}
+                  >
+                    {plainText}
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            <div className='max-h-18 overflow-hidden'>{plainText}</div>
-          )}
-        </div>
+            ) : (
+              <div className='max-h-18 overflow-hidden'>{plainText}</div>
+            )}
+          </div>
+        </Link>
 
         <div
           className={clsx(
@@ -125,7 +127,7 @@ export default async function PostPreview({
 
           <PostInfo post={post} />
         </div>
-      </Link>
+      </div>
     </div>
   );
 }

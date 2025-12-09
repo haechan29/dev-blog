@@ -56,7 +56,7 @@ export default function PostHeader({
       )}
 
       <div className='flex justify-between items-center'>
-        <PostInfo post={post} isAuthorNameVisible={false} />
+        <PostInfo post={post} />
 
         {((!post.userId && !userId) || post.userId === userId) && (
           <PostSettingsDropdown
