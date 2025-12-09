@@ -17,7 +17,7 @@ export default async function UserLayout({
   const { userId } = await params;
   const user = await UserServerService.fetchUserById(userId);
 
-  if (!user || user.deletedAt !== null) {
+  if (!user || user.userStatus === 'DELETED') {
     notFound();
   }
 
