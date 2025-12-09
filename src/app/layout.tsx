@@ -30,6 +30,8 @@ export default async function RootLayout({
 }>) {
   const session = await auth();
   const cookieStore = await cookies();
+  const authUserId = session?.user?.id ?? null;
+  const cookieUserId = cookieStore.get('userId')?.value ?? null;
 
   const posts = await fetchPosts().then(posts => posts.map(createProps));
 
@@ -43,8 +45,8 @@ export default async function RootLayout({
       >
         <Providers>
           <LayoutClient
-            authUserId={session?.user?.id ?? null}
-            cookieUserId={cookieStore.get('userId')?.value ?? null}
+            shouldCreateUser={!authUserId && !cookieUserId}
+            isLoggedIn={!!session}
             posts={posts}
           >
             {children}

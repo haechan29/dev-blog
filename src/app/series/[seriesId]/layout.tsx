@@ -1,3 +1,4 @@
+import { auth } from '@/auth';
 import UserToolbar from '@/components/user/userToolbar';
 import * as SeriesServerService from '@/features/series/domain/service/seriesServerService';
 import { createProps } from '@/features/series/ui/seriesProps';
@@ -10,6 +11,7 @@ export default async function SeriesLayout({
   params: Promise<{ seriesId: string }>;
   children: ReactNode;
 }) {
+  const session = await auth();
   const { seriesId } = await params;
   const series = await SeriesServerService.fetchSeries(seriesId).then(
     createProps
@@ -17,7 +19,7 @@ export default async function SeriesLayout({
 
   return (
     <>
-      <UserToolbar />
+      <UserToolbar isLoggedIn={!session} />
 
       <div className='pt-(--toolbar-height) pb-20 px-6 md:px-12'>
         {children}

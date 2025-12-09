@@ -9,9 +9,11 @@ import { usePathname } from 'next/navigation';
 import { ReactNode, Suspense } from 'react';
 
 export default function LayoutContainer({
+  isLoggedIn,
   posts,
   children,
 }: {
+  isLoggedIn: boolean;
   posts: PostProps[];
   children: ReactNode;
 }) {
@@ -24,10 +26,10 @@ export default function LayoutContainer({
   return (
     <>
       <Suspense>
-        {isPostsPage && <PostsToolbar />}
+        {isPostsPage && <PostsToolbar isLoggedIn={isLoggedIn} />}
         {isPostPage && (
           <>
-            <PostsToolbar className='max-xl:hidden' />
+            <PostsToolbar isLoggedIn={isLoggedIn} className='max-xl:hidden' />
             <PostToolbar className='xl:hidden' />
           </>
         )}

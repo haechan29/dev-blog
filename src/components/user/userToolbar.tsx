@@ -4,7 +4,13 @@ import Logo from '@/components/logo';
 import ToolbarProfileIcon from '@/components/post/toolbarProfileIcon';
 import clsx from 'clsx';
 
-export default function UserToolbar({ className }: { className?: string }) {
+export default function UserToolbar({
+  isLoggedIn,
+  className,
+}: {
+  isLoggedIn: boolean;
+  className?: string;
+}) {
   return (
     <div
       className={clsx(
@@ -14,7 +20,7 @@ export default function UserToolbar({ className }: { className?: string }) {
       )}
     >
       <Logo />
-      <ToolbarProfileIcon />
+      <ToolbarProfileIcon isLoggedIn={isLoggedIn} />
     </div>
   );
 }

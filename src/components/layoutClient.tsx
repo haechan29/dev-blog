@@ -8,13 +8,13 @@ import nProgress from 'nprogress';
 import { ReactNode, Suspense, useEffect, useRef } from 'react';
 
 export default function LayoutClient({
-  authUserId,
-  cookieUserId,
+  shouldCreateUser,
+  isLoggedIn,
   posts,
   children,
 }: {
-  authUserId: string | null;
-  cookieUserId: string | null;
+  shouldCreateUser: boolean;
+  isLoggedIn: boolean;
   posts: PostProps[];
   children: ReactNode;
 }) {
@@ -25,11 +25,11 @@ export default function LayoutClient({
   const { createUserMutation } = useUser();
 
   useEffect(() => {
-    if (!authUserId && !cookieUserId && !isCreatedRef.current) {
+    if (shouldCreateUser && !isCreatedRef.current) {
       isCreatedRef.current = true;
       createUserMutation.mutate();
     }
-  }, [authUserId, cookieUserId, createUserMutation]);
+  }, [createUserMutation, shouldCreateUser]);
 
   useEffect(() => {
     nProgress.done();
@@ -64,7 +64,7 @@ export default function LayoutClient({
   }, []);
 
   return (
-    <LayoutContainer posts={posts}>
+    <LayoutContainer isLoggedIn={isLoggedIn} posts={posts}>
       <Suspense>{children}</Suspense>
     </LayoutContainer>
   );

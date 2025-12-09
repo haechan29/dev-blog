@@ -1,3 +1,4 @@
+import { auth } from '@/auth';
 import ProfileIcon from '@/components/user/profileIcon';
 import UserNavTabs from '@/components/user/userTabs';
 import UserToolbar from '@/components/user/userToolbar';
@@ -12,6 +13,7 @@ export default async function UserLayout({
   params: Promise<{ userId: string }>;
   children: ReactNode;
 }) {
+  const session = await auth();
   const { userId } = await params;
   const user = await UserServerService.fetchUserById(userId);
 
@@ -21,7 +23,7 @@ export default async function UserLayout({
 
   return (
     <>
-      <UserToolbar />
+      <UserToolbar isLoggedIn={!!session} />
 
       <div className='flex flex-col gap-8 pt-(--toolbar-height) pb-20 px-6 md:px-12'>
         <div className='flex items-center space-x-3'>

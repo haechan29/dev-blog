@@ -2,22 +2,18 @@
 
 import useUser from '@/features/user/domain/hooks/useUser';
 import clsx from 'clsx';
-import { useMemo } from 'react';
 
-export default function ProfileIcon() {
+export default function ProfileIcon({ isLoggedIn }: { isLoggedIn: boolean }) {
   const { user } = useUser();
-
-  const isActiveUser = useMemo(() => {
-    return user?.userStatus === 'ACTIVE';
-  }, [user?.userStatus]);
-
-  const initial = (user?.nickname ?? 'Guest').charAt(0).toUpperCase();
+  const initial = (isLoggedIn && user?.nickname ? user.nickname : 'Guest')
+    .charAt(0)
+    .toUpperCase();
 
   return (
     <div
       className={clsx(
         'w-8 h-8 rounded-full flex items-center justify-center cursor-pointer',
-        isActiveUser
+        isLoggedIn
           ? 'bg-blue-400 hover:bg-blue-500'
           : 'bg-gray-300 hover:bg-gray-400'
       )}
@@ -25,7 +21,7 @@ export default function ProfileIcon() {
       <span
         className={clsx(
           'text-sm font-semibold',
-          isActiveUser ? 'text-white' : 'text-gray-600'
+          isLoggedIn ? 'text-white' : 'text-gray-600'
         )}
       >
         {initial}

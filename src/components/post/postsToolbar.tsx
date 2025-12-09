@@ -11,7 +11,13 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function PostsToolbar({ className }: { className?: string }) {
+export default function PostsToolbar({
+  isLoggedIn,
+  className,
+}: {
+  isLoggedIn: boolean;
+  className?: string;
+}) {
   const dispatch = useDispatch<AppDispatch>();
   const [query, setQuery] = useState('');
 
@@ -64,7 +70,7 @@ export default function PostsToolbar({ className }: { className?: string }) {
           <Search className='w-5 h-5' />
         </button>
 
-        <ToolbarProfileIcon />
+        <ToolbarProfileIcon isLoggedIn={isLoggedIn} />
       </div>
     </div>
   );
