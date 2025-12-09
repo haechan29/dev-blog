@@ -6,8 +6,6 @@ export interface CommentResponseDto {
   createdAt: string;
   updatedAt: string;
   likeCount: number;
-  userId: string | null;
-  guestId: string | null;
+  userId: string;
   isDeleted: boolean;
-  isGuest: boolean;
 }
