@@ -1,46 +1,32 @@
 'use client';
 
-import PostSidebar from '@/components/post/postSidebar';
 import PostsToolbar from '@/components/post/postsToolbar';
-import PostToolbar from '@/components/post/postToolbar';
-import { PostProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
 import { usePathname } from 'next/navigation';
 import { ReactNode, Suspense } from 'react';
 
 export default function LayoutContainer({
   isLoggedIn,
-  posts,
   children,
 }: {
   isLoggedIn: boolean;
-  posts: PostProps[];
   children: ReactNode;
 }) {
   const pathname = usePathname();
   const isPostsPage = pathname === '/';
-  const isPostPage = pathname.match(/^\/read\/[^/]+$/);
 
-  if (!isPostsPage && !isPostPage) return children;
+  if (!isPostsPage) return children;
 
   return (
     <>
       <Suspense>
-        {isPostsPage && <PostsToolbar isLoggedIn={isLoggedIn} />}
-        {isPostPage && (
-          <>
-            <PostsToolbar isLoggedIn={isLoggedIn} className='max-xl:hidden' />
-            <PostToolbar className='xl:hidden' />
-          </>
-        )}
-        <PostSidebar posts={posts} />
+        <PostsToolbar isLoggedIn={isLoggedIn} />
       </Suspense>
 
       <div
         className={clsx(
-          'mt-(--toolbar-height) mb-20 px-6 md:px-12 xl:px-18',
-          'xl:ml-(--sidebar-width)',
-          'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
+          'px-6 md:px-12 xl:px-18',
+          'mt-(--toolbar-height) mb-20'
         )}
       >
         {children}

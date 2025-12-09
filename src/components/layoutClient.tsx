@@ -1,7 +1,6 @@
 'use client';
 
 import LayoutContainer from '@/components/layoutContainer';
-import { PostProps } from '@/features/post/ui/postProps';
 import useUser from '@/features/user/domain/hooks/useUser';
 import { usePathname, useSearchParams } from 'next/navigation';
 import nProgress from 'nprogress';
@@ -10,12 +9,10 @@ import { ReactNode, Suspense, useEffect, useRef } from 'react';
 export default function LayoutClient({
   shouldCreateUser,
   isLoggedIn,
-  posts,
   children,
 }: {
   shouldCreateUser: boolean;
   isLoggedIn: boolean;
-  posts: PostProps[];
   children: ReactNode;
 }) {
   const pathname = usePathname();
@@ -64,7 +61,7 @@ export default function LayoutClient({
   }, []);
 
   return (
-    <LayoutContainer isLoggedIn={isLoggedIn} posts={posts}>
+    <LayoutContainer isLoggedIn={isLoggedIn}>
       <Suspense>{children}</Suspense>
     </LayoutContainer>
   );

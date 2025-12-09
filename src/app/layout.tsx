@@ -1,8 +1,6 @@
 import '@/app/globals.css';
 import { auth } from '@/auth';
 import LayoutClient from '@/components/layoutClient';
-import { fetchPosts } from '@/features/post/domain/service/postServerService';
-import { createProps } from '@/features/post/ui/postProps';
 import Providers from '@/providers';
 import clsx from 'clsx';
 import type { Metadata } from 'next';
@@ -33,8 +31,6 @@ export default async function RootLayout({
   const authUserId = session?.user?.id ?? null;
   const cookieUserId = cookieStore.get('userId')?.value ?? null;
 
-  const posts = await fetchPosts().then(posts => posts.map(createProps));
-
   return (
     <html lang='ko'>
       <body
@@ -47,7 +43,6 @@ export default async function RootLayout({
           <LayoutClient
             shouldCreateUser={!authUserId && !cookieUserId}
             isLoggedIn={!!session}
-            posts={posts}
           >
             {children}
           </LayoutClient>
