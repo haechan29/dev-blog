@@ -10,7 +10,7 @@ export default async function PostSidebar({
   userId: string;
   currentPostId: string;
 }) {
-  const [authorPosts, authorSeries] = await Promise.all([
+  const [authorPosts, authorSeriesList] = await Promise.all([
     PostServerService.fetchPostsByUserId(userId).then(posts =>
       posts.map(createProps)
     ),
@@ -21,7 +21,7 @@ export default async function PostSidebar({
     <PostSidebarClient
       currentPostId={currentPostId}
       posts={authorPosts}
-      series={authorSeries}
+      seriesList={authorSeriesList}
     />
   );
 }

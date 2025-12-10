@@ -15,11 +15,11 @@ import { useDispatch, useSelector } from 'react-redux';
 export default function PostSidebarClient({
   currentPostId,
   posts,
-  series,
+  seriesList,
 }: {
   currentPostId: string;
   posts: PostProps[];
-  series: SeriesProps[];
+  seriesList: SeriesProps[];
 }) {
   const dispatch = useDispatch<AppDispatch>();
   const isVisible = useSelector((state: RootState) => {
@@ -127,7 +127,7 @@ export default function PostSidebarClient({
         <PostSidebarNav
           currentPostId={currentPostId}
           posts={posts}
-          series={series}
+          seriesList={seriesList}
         />
       </div>
     </>
