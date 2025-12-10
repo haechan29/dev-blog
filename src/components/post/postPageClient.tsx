@@ -29,7 +29,7 @@ export default function PostPageClient({
   parsedContent,
 }: {
   isLoggedIn: boolean;
-  userId: string;
+  userId?: string;
   initialPost: PostProps;
   initialComments: CommentItemProps[];
   parsedContent: ReactNode;

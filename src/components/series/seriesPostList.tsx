@@ -28,7 +28,7 @@ export default function SeriesPostList({
   userId,
   initialSeries,
 }: {
-  userId: string | null;
+  userId?: string;
   initialSeries: SeriesProps;
 }) {
   const { series, reorderPostsMutation } = useSeries(initialSeries);

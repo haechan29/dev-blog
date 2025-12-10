@@ -2,18 +2,10 @@ import { PostEntity } from '@/features/post/data/entities/postEntities';
 import { PostNotFoundError } from '@/features/post/data/errors/postErrors';
 import { toDto } from '@/features/post/data/mapper/postMapper';
 import Post from '@/features/post/domain/model/post';
-import { ValidationError } from '@/features/user/data/errors/userErrors';
 import { supabase } from '@/lib/supabase';
-import { getUserId } from '@/lib/user';
 import 'server-only';
 
 export async function fetchPosts() {
-  const userId = await getUserId();
-
-  if (!userId) {
-    throw new ValidationError('사용자를 찾을 수 없습니다');
-  }
-
   const { data, error } = await supabase
     .from('posts')
     .select(

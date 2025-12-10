@@ -13,7 +13,7 @@ export default function SeriesListPageClient({
   initialSeriesList,
 }: {
   userId: string;
-  currentUserId: string;
+  currentUserId?: string;
   initialSeriesList: SeriesProps[];
 }) {
   const [isOpen, setIsOpen] = useState(false);

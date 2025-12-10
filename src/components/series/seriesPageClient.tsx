@@ -12,7 +12,7 @@ export default function SeriesPageClient({
   userId,
   initialSeries,
 }: {
-  userId: string;
+  userId?: string;
   initialSeries: SeriesProps;
 }) {
   const { series } = useSeries(initialSeries);

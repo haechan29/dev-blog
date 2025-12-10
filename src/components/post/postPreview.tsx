@@ -6,7 +6,6 @@ import clsx from 'clsx';
 import { MoreVertical } from 'lucide-react';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 
 const SCALE_ANIMATION_DELAY = 0.5;
 const SCROLL_ANIMATION_DELAY = 1;
@@ -16,10 +15,6 @@ export default async function PostPreview({ post }: { post: PostProps }) {
   const session = await auth();
   const userId =
     session?.user?.user_id ?? (await cookies()).get('userId')?.value;
-
-  if (!userId) {
-    notFound();
-  }
 
   const { id, title, plainText, tags } = post;
   const isScrollAnimationEnabled =

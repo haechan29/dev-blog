@@ -7,7 +7,6 @@ import * as CommentServerService from '@/features/comment/domain/service/comment
 import * as PostServerService from '@/features/post/domain/service/postServerService';
 import { createProps } from '@/features/post/ui/postProps';
 import { cookies } from 'next/headers';
-import { notFound } from 'next/navigation';
 
 export default async function PostPage({
   params,
@@ -17,10 +16,6 @@ export default async function PostPage({
   const session = await auth();
   const userId =
     session?.user?.user_id ?? (await cookies()).get('userId')?.value;
-
-  if (!userId) {
-    notFound();
-  }
 
   const { postId } = await params;
   const [post, comments] = await Promise.all([

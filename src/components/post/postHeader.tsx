@@ -16,7 +16,7 @@ export default function PostHeader({
   post,
 }: {
   isLoggedIn: boolean;
-  userId: string;
+  userId?: string;
   post: PostProps;
 }) {
   const dispatch = useDispatch<AppDispatch>();
@@ -60,7 +60,7 @@ export default function PostHeader({
       <div className='flex justify-between items-center'>
         <PostInfo post={post} />
 
-        {((!post.userId && !userId) || post.userId === userId) && (
+        {post.userId === userId && (
           <PostSettingsDropdown
             isLoggedIn={isLoggedIn}
             userId={userId}

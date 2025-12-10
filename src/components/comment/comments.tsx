@@ -17,7 +17,7 @@ export default function Comments({
   initialComments,
 }: {
   isLoggedIn: boolean;
-  userId: string;
+  userId?: string;
   postId: string;
   initialComments: CommentItemProps[];
 }) {

@@ -14,7 +14,7 @@ export default function CommentItem({
   comment,
 }: {
   isLoggedIn: boolean;
-  userId: string;
+  userId?: string;
   comment: CommentItemProps;
 }) {
   const [isEditing, setIsEditing] = useState(false);
