@@ -11,9 +11,11 @@ import { useDispatch } from 'react-redux';
 
 export default function CommentsClient({
   isLoggedIn,
+  userId,
   postId,
 }: {
   isLoggedIn: boolean;
+  userId: string;
   postId: string;
 }) {
   const dispatch = useDispatch<AppDispatch>();
@@ -48,6 +50,7 @@ export default function CommentsClient({
             <CommentItem
               key={comment.id}
               isLoggedIn={isLoggedIn}
+              userId={userId}
               comment={comment}
             />
           ))

@@ -10,9 +10,11 @@ import { useState } from 'react';
 
 export default function CommentItem({
   isLoggedIn,
+  userId,
   comment,
 }: {
   isLoggedIn: boolean;
+  userId: string;
   comment: CommentItemProps;
 }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -40,9 +42,9 @@ export default function CommentItem({
           </div>
         </div>
 
-        {((!comment.userId && !userId) || comment.userId === userId) && (
+        {comment.userId === userId && (
           <CommentSettingsDropdown
-            userId={userId}
+            isLoggedIn={isLoggedIn}
             comment={comment}
             onEdit={() => setIsEditing(prev => !prev)}
           >
@@ -53,7 +55,7 @@ export default function CommentItem({
 
       <CommentContentSection
         comment={comment}
-        userId={userId}
+        isLoggedIn={isLoggedIn}
         isEditing={isEditing}
         setIsEditing={setIsEditing}
       />

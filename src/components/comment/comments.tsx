@@ -6,11 +6,15 @@ import {
   HydrationBoundary,
   QueryClient,
 } from '@tanstack/react-query';
+import { cookies } from 'next/headers';
+import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
 export default async function Comments({ id: postId }: { id: string }) {
   const session = await auth();
+  const userId =
+    session?.user?.user_id ?? (await cookies()).get('userId')?.value;
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({
@@ -21,11 +25,19 @@ export default async function Comments({ id: postId }: { id: string }) {
     },
   });
 
+  if (!userId) {
+    notFound();
+  }
+
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <ErrorBoundary fallback={<div></div>}>
         <Suspense>
-          <CommentsClient isLoggedIn={!!session} postId={postId} />
+          <CommentsClient
+            isLoggedIn={!!session}
+            userId={userId}
+            postId={postId}
+          />
         </Suspense>
       </ErrorBoundary>
     </HydrationBoundary>

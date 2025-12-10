@@ -13,12 +13,12 @@ import { Edit2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 export default function CommentSettingsDropdown({
-  userId,
+  isLoggedIn,
   comment: { postId, id: commentId },
   onEdit,
   children,
 }: {
-  userId: string | null;
+  isLoggedIn: boolean;
   comment: CommentItemProps;
   onEdit: () => void;
   children: React.ReactNode;
@@ -28,7 +28,7 @@ export default function CommentSettingsDropdown({
   return (
     <>
       <DeleteCommentDialog
-        userId={userId}
+        isLoggedIn={isLoggedIn}
         postId={postId}
         commentId={commentId}
         isOpen={isOpen}

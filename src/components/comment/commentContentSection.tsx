@@ -12,12 +12,12 @@ import toast from 'react-hot-toast';
 
 export default function CommentContentSection({
   comment,
-  userId,
+  isLoggedIn,
   isEditing,
   setIsEditing,
 }: {
   comment: CommentItemProps;
-  userId: string | null;
+  isLoggedIn: boolean;
   isEditing: boolean;
   setIsEditing: (isEditing: boolean) => void;
 }) {
@@ -59,7 +59,7 @@ export default function CommentContentSection({
   });
 
   const handleEdit = () => {
-    if (!userId && !password.trim()) {
+    if (!isLoggedIn && !password.trim()) {
       setIsPasswordValid(false);
       setIsContentValid(true);
       return;
@@ -83,7 +83,7 @@ export default function CommentContentSection({
     <div className='mb-2'>
       {isEditing ? (
         <div className='space-y-3'>
-          {!userId && (
+          {!isLoggedIn && (
             <input
               type='password'
               value={password}

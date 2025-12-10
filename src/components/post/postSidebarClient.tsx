@@ -43,7 +43,7 @@ export default function PostSidebarClient({
   });
 
   const { seriesList } = useSeriesList(userId, initialSeriesList);
-  console.log('render', { posts: !!posts, seriesList: !!seriesList });
+
   const handleTouchStart = useCallback((e: React.TouchEvent<HTMLElement>) => {
     const sidebar = e.currentTarget;
     startRef.current = [e.touches[0].clientX, e.touches[0].clientY];
