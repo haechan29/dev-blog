@@ -19,9 +19,10 @@ export default async function PostSidebar({
 
   return (
     <PostSidebarClient
+      userId={userId}
       currentPostId={currentPostId}
-      posts={authorPosts}
-      seriesList={authorSeriesList}
+      initialPosts={authorPosts}
+      initialSeriesList={authorSeriesList}
     />
   );
 }

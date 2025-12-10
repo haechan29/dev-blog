@@ -1,25 +1,30 @@
 'use client';
 
 import PostSidebarNav from '@/components/post/postSidebarNav';
-import { PostProps } from '@/features/post/ui/postProps';
+import * as PostClientService from '@/features/post/domain/service/postClientService';
+import { createProps, PostProps } from '@/features/post/ui/postProps';
+import useSeriesList from '@/features/series/domain/hooks/useSeriesList';
 import { SeriesProps } from '@/features/series/ui/seriesProps';
 import useScrollLock from '@/hooks/useScrollLock';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { cn } from '@/lib/utils';
+import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Menu } from 'lucide-react';
 import { useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostSidebarClient({
+  userId,
   currentPostId,
-  posts,
-  seriesList,
+  initialPosts,
+  initialSeriesList,
 }: {
+  userId: string;
   currentPostId: string;
-  posts: PostProps[];
-  seriesList: SeriesProps[];
+  initialPosts: PostProps[];
+  initialSeriesList: SeriesProps[];
 }) {
   const dispatch = useDispatch<AppDispatch>();
   const isVisible = useSelector((state: RootState) => {
@@ -28,6 +33,17 @@ export default function PostSidebarClient({
   const startRef = useRef<[number, number] | null>(null);
   const scrollDirectionRef = useRef<'horizontal' | 'vertical' | null>(null);
 
+  const { data: posts } = useQuery({
+    queryKey: ['user', userId, 'posts'],
+    queryFn: async () => {
+      const posts = await PostClientService.fetchPosts(userId);
+      return posts.map(createProps);
+    },
+    initialData: initialPosts,
+  });
+
+  const { seriesList } = useSeriesList(userId, initialSeriesList);
+  console.log('render', { posts: !!posts, seriesList: !!seriesList });
   const handleTouchStart = useCallback((e: React.TouchEvent<HTMLElement>) => {
     const sidebar = e.currentTarget;
     startRef.current = [e.touches[0].clientX, e.touches[0].clientY];
@@ -127,7 +143,7 @@ export default function PostSidebarClient({
         <PostSidebarNav
           currentPostId={currentPostId}
           posts={posts}
-          seriesList={seriesList}
+          seriesList={seriesList!}
         />
       </div>
     </>
