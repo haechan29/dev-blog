@@ -1,5 +1,6 @@
 'use client';
 
+import PostRawContent from '@/components/post/postRawContent';
 import TableOfContentsItem from '@/components/post/tableOfContentsItem';
 import PostViewer from '@/components/postViewer/postViewer';
 import Heading from '@/features/post/domain/model/heading';
@@ -13,12 +14,10 @@ import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostContentWrapper({
   post,
-  parsed,
-  raw,
+  parsedContent,
 }: {
   post: PostProps;
-  parsed: ReactNode;
-  raw: ReactNode;
+  parsedContent: ReactNode;
 }) {
   const dispatch = useDispatch<AppDispatch>();
   const isInitialMount = useRef(true);
@@ -71,7 +70,13 @@ export default function PostContentWrapper({
       )}
 
       <PostViewer post={post} />
-      <div className='mb-20'>{mode === 'raw' ? <>{raw}</> : <>{parsed}</>}</div>
+      <div className='mb-20'>
+        {mode === 'raw' ? (
+          <PostRawContent content={post.content} />
+        ) : (
+          <>{parsedContent}</>
+        )}
+      </div>
     </>
   );
 }
