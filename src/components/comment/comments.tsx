@@ -1,34 +1,66 @@
-import { auth } from '@/auth';
-import CommentsClient from '@/components/comment/commentsClient';
-import * as CommentServerService from '@/features/comment/domain/service/commentServerService';
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from '@tanstack/react-query';
-import { Suspense } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
+'use client';
 
-export default async function Comments({ id: postId }: { id: string }) {
-  const session = await auth();
-  const userId = session?.user?.id ?? null;
-  const queryClient = new QueryClient();
+import CommentForm from '@/components/comment/commentForm';
+import CommentItem from '@/components/comment/commentItem';
+import useComments from '@/features/comment/hooks/useComments';
+import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import { setAreCommentsVisible } from '@/lib/redux/post/postViewerSlice';
+import { AppDispatch } from '@/lib/redux/store';
+import { MessageCircle } from 'lucide-react';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 
-  await queryClient.prefetchQuery({
-    queryKey: ['posts', postId, 'comments'],
-    queryFn: async () => {
-      const comments = await CommentServerService.getComments(postId);
-      return comments.map(comment => comment.toProps());
-    },
-  });
+export default function Comments({
+  isLoggedIn,
+  userId,
+  postId,
+  initialComments,
+}: {
+  isLoggedIn: boolean;
+  userId?: string;
+  postId: string;
+  initialComments: CommentItemProps[];
+}) {
+  const dispatch = useDispatch<AppDispatch>();
+  const { comments } = useComments({ postId, initialComments });
+
+  useEffect(() => {
+    const commentsObserver = new IntersectionObserver(entries =>
+      dispatch(setAreCommentsVisible(entries[0].isIntersecting))
+    );
+    const comments = document.querySelector('[data-post-comments]');
+    if (comments) {
+      commentsObserver.observe(comments);
+    }
+    return () => commentsObserver.disconnect();
+  }, [dispatch]);
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <ErrorBoundary fallback={<div></div>}>
-        <Suspense>
-          <CommentsClient postId={postId} userId={userId} />
-        </Suspense>
-      </ErrorBoundary>
-    </HydrationBoundary>
+    !!comments && (
+      <div data-post-comments>
+        <div className='text-xl font-bold text-gray-900 mb-8'>
+          {`댓글 ${comments.length}개`}
+        </div>
+        <CommentForm isLoggedIn={isLoggedIn} postId={postId} />
+        <div className='space-y-6'>
+          {comments.length === 0 ? (
+            <div className='text-center py-12'>
+              <MessageCircle className='mx-auto text-gray-300 mb-4' size={48} />
+              <p className='text-gray-500 text-lg'>아직 댓글이 없습니다.</p>
+              <p className='text-gray-400'>첫 번째 댓글을 작성해보세요!</p>
+            </div>
+          ) : (
+            comments.map(comment => (
+              <CommentItem
+                key={comment.id}
+                isLoggedIn={isLoggedIn}
+                userId={userId}
+                comment={comment}
+              />
+            ))
+          )}
+        </div>
+      </div>
+    )
   );
 }

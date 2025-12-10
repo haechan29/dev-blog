@@ -4,4 +4,6 @@ export interface UserResponseDto {
   createdAt: string;
   updatedAt: string | null;
   deletedAt: string | null;
+  authUserId: string | null;
+  registeredAt: string | null;
 }

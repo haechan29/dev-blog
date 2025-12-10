@@ -8,5 +8,7 @@ export function toDto(user: UserEntity): UserResponseDto {
     createdAt: user.created_at,
     updatedAt: user.updated_at,
     deletedAt: user.deleted_at,
+    authUserId: user.auth_user_id,
+    registeredAt: user.registered_at,
   };
 }

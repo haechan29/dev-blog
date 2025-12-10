@@ -1,12 +1,32 @@
 'use client';
 
+import LayoutContainer from '@/components/layoutContainer';
+import useUser from '@/features/user/domain/hooks/useUser';
 import { usePathname, useSearchParams } from 'next/navigation';
 import nProgress from 'nprogress';
-import { useEffect } from 'react';
+import { ReactNode, useEffect, useRef } from 'react';
 
-export default function LayoutClient() {
+export default function LayoutClient({
+  shouldCreateUser,
+  isLoggedIn,
+  children,
+}: {
+  shouldCreateUser: boolean;
+  isLoggedIn: boolean;
+  children: ReactNode;
+}) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const isCreatedRef = useRef(false);
+
+  const { createUserMutation } = useUser();
+
+  useEffect(() => {
+    if (shouldCreateUser && !isCreatedRef.current) {
+      isCreatedRef.current = true;
+      createUserMutation.mutate();
+    }
+  }, [createUserMutation, shouldCreateUser]);
 
   useEffect(() => {
     nProgress.done();
@@ -20,6 +40,9 @@ export default function LayoutClient() {
       if (
         link &&
         link.href &&
+        e.button === 0 &&
+        !e.ctrlKey &&
+        !e.metaKey &&
         link.href.startsWith(window.location.origin) &&
         link.pathname !== pathname
       ) {
@@ -37,5 +60,5 @@ export default function LayoutClient() {
     }
   }, []);
 
-  return null;
+  return <LayoutContainer isLoggedIn={isLoggedIn}>{children}</LayoutContainer>;
 }

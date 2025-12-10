@@ -2,21 +2,25 @@
 
 import * as CommentClientService from '@/features/comment/domain/service/commentClientService';
 import { getComments } from '@/features/comment/domain/service/commentClientService';
-import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery,
-} from '@tanstack/react-query';
+import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-export default function useComments({ postId }: { postId: string }) {
+export default function useComments({
+  postId,
+  initialComments,
+}: {
+  postId: string;
+  initialComments?: CommentItemProps[];
+}) {
   const queryClient = useQueryClient();
 
-  const { data: comments } = useSuspenseQuery({
+  const { data: comments } = useQuery({
     queryKey: ['posts', postId, 'comments'],
     queryFn: async () => {
       const comments = await getComments(postId);
       return comments.map(comment => comment.toProps());
     },
+    initialData: initialComments,
   });
 
   const createCommentMutation = useMutation({

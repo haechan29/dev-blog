@@ -11,11 +11,11 @@ export default class Post {
     public readonly updatedAt: string,
     public readonly content: string,
     public readonly tags: string[],
-    public readonly userId: string | null,
-    public readonly guestId: string | null,
+    public readonly userId: string,
     public readonly authorName: string,
     public readonly isDeleted: boolean,
-    public readonly isGuest: boolean
+    public readonly seriesId: string | null,
+    public readonly seriesOrder: number | null
   ) {
     this.headings = extractHeadings(content);
   }

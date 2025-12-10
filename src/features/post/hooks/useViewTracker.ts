@@ -3,7 +3,7 @@
 import { incrementViewCount } from '@/features/postStat/domain/service/postStatService';
 import { useCallback, useEffect } from 'react';
 
-export default function useViewTracker({ id: postId }: { id: string }) {
+export default function useViewTracker(postId: string) {
   const key = `post-view-${postId}`;
 
   const getLastViewTime = useCallback(() => {

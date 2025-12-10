@@ -7,6 +7,7 @@ import {
   ValidationError,
 } from '@/features/user/data/errors/userErrors';
 import { ApiError } from '@/lib/api';
+import { getUserId } from '@/lib/user';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -19,14 +20,14 @@ export async function GET(
     const data = await PostQueries.fetchPost(postId);
     return NextResponse.json({ data });
   } catch (error) {
-    console.error('게시글 조회 실패:', error);
+    console.error('게시글 조회에 실패했습니다', error);
 
     if (error instanceof PostNotFoundError) {
       return NextResponse.json({ error: error.message }, { status: 404 });
     }
 
     return NextResponse.json(
-      { error: '게시글 조회 요청이 실패했습니다.' },
+      { error: '게시글 조회에 실패했습니다' },
       { status: 500 }
     );
   }
@@ -38,37 +39,43 @@ export async function PATCH(
 ) {
   try {
     const { postId } = await params;
-    const { title, content, tags, password } = await request.json();
+    const { title, content, tags, password, seriesId, seriesOrder } =
+      await request.json();
 
     const session = await auth();
-    const userId = session?.user?.id ?? null;
+    const userId = await getUserId();
 
-    if (session && !userId) {
+    if (!userId) {
       throw new ValidationError('사용자 아이디를 찾을 수 없습니다');
     }
+
     if (!session && !password) {
       throw new ValidationError('비밀번호를 찾을 수 없습니다');
     }
 
     const post = await PostQueries.fetchPostForAuth(postId);
 
-    if (post.user_id) {
-      if (userId !== post.user_id) {
-        throw new UnauthorizedError('인증되지 않은 요청입니다');
-      }
-    } else {
+    if (userId !== post.user_id) {
+      throw new UnauthorizedError('인증되지 않은 요청입니다');
+    }
+
+    if (!session) {
       const isValid =
         post.password_hash &&
         (await bcrypt.compare(password, post.password_hash));
+
       if (!isValid) {
         throw new UnauthorizedError('비밀번호가 일치하지 않습니다');
       }
     }
 
-    const updated = await PostQueries.updatePost(postId, {
+    const updated = await PostQueries.updatePost({
+      postId,
       title,
       content,
       tags,
+      seriesId,
+      seriesOrder,
     });
 
     return NextResponse.json({ data: updated });
@@ -95,26 +102,28 @@ export async function DELETE(
     const password = request.headers.get('X-Post-Password');
 
     const session = await auth();
-    const userId = session?.user?.id ?? null;
+    const userId = await getUserId();
 
-    if (session && !userId) {
+    if (!userId) {
       throw new ValidationError('사용자 아이디를 찾을 수 없습니다');
     }
+
     if (!session && !password) {
       throw new ValidationError('비밀번호를 찾을 수 없습니다');
     }
 
     const post = await PostQueries.fetchPostForAuth(postId);
 
-    if (post.user_id) {
-      if (userId !== post.user_id) {
-        throw new UnauthorizedError('인증되지 않은 요청입니다');
-      }
-    } else {
+    if (userId !== post.user_id) {
+      throw new UnauthorizedError('인증되지 않은 요청입니다');
+    }
+
+    if (!session) {
       const isValid =
         password &&
         post.password_hash &&
         (await bcrypt.compare(password, post.password_hash));
+
       if (!isValid) {
         throw new UnauthorizedError('비밀번호가 일치하지 않습니다');
       }

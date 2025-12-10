@@ -2,6 +2,7 @@ import { auth } from '@/auth';
 import EditPageClient from '@/components/edit/editPageClient';
 import { fetchPost } from '@/features/post/domain/service/postServerService';
 import { createProps } from '@/features/post/ui/postProps';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 
@@ -11,19 +12,18 @@ export default async function EditPage({
   params: Promise<{ postId: string }>;
 }) {
   const session = await auth();
-  const userId = session?.user?.id ?? null;
-
+  const userId =
+    session?.user?.user_id ?? (await cookies()).get('userId')?.value;
   const { postId } = await params;
   const post = await fetchPost(postId).then(createProps);
 
-  const canEdit = (!post.userId && !userId) || post.userId === userId;
-  if (!canEdit) {
+  if (post.userId !== userId) {
     redirect('/');
   }
 
   return (
     <Suspense>
-      <EditPageClient userId={userId} post={post} />
+      <EditPageClient isLoggedIn={!!session} post={post} />
     </Suspense>
   );
 }

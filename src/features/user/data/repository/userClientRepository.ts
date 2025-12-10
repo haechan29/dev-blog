@@ -7,13 +7,13 @@ export async function fetchUser(): Promise<UserResponseDto | null> {
   return response.data;
 }
 
-export async function createUser({
+export async function updateUser({
   nickname,
 }: {
   nickname: string;
 }): Promise<void> {
   try {
-    await api.post('/api/user', { nickname });
+    await api.patch('/api/user', { nickname });
   } catch (error) {
     if (error instanceof ApiError && error.code === 'DUPLICATE_NICKNAME') {
       throw new DuplicateNicknameError(nickname);

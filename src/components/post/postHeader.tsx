@@ -11,10 +11,12 @@ import { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function PostHeader({
+  isLoggedIn,
   userId,
   post,
 }: {
-  userId: string | null;
+  isLoggedIn: boolean;
+  userId?: string;
   post: PostProps;
 }) {
   const dispatch = useDispatch<AppDispatch>();
@@ -56,11 +58,16 @@ export default function PostHeader({
       )}
 
       <div className='flex justify-between items-center'>
-        <PostInfo post={post} isAuthorNameVisible={false} />
+        <PostInfo post={post} />
 
-        {((!post.userId && !userId) || post.userId === userId) && (
-          <PostSettingsDropdown userId={userId} post={post}>
-            <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2' />
+        {post.userId === userId && (
+          <PostSettingsDropdown
+            isLoggedIn={isLoggedIn}
+            userId={userId}
+            post={post}
+            showRawContent={true}
+          >
+            <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2 cursor-pointer' />
           </PostSettingsDropdown>
         )}
       </div>

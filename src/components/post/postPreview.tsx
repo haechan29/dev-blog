@@ -1,19 +1,21 @@
+import { auth } from '@/auth';
 import PostInfo from '@/components/post/postInfo';
+import PostSettingsDropdown from '@/components/post/postSettingsDropdown';
 import { PostProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
+import { MoreVertical } from 'lucide-react';
+import { cookies } from 'next/headers';
 import Link from 'next/link';
 
 const SCALE_ANIMATION_DELAY = 0.5;
 const SCROLL_ANIMATION_DELAY = 1;
 const MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION = 200;
 
-export default function PostPreview({
-  tag,
-  post,
-}: {
-  tag: string | null;
-  post: PostProps;
-}) {
+export default async function PostPreview({ post }: { post: PostProps }) {
+  const session = await auth();
+  const userId =
+    session?.user?.user_id ?? (await cookies()).get('userId')?.value;
+
   const { id, title, plainText, tags } = post;
   const isScrollAnimationEnabled =
     plainText.length >= MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION;
@@ -35,44 +37,67 @@ export default function PostPreview({
         )}
       />
 
-      <Link
-        href={`/read/${id}${tag ? `?tag=${tag}` : ''}`}
-        className='w-full flex flex-col gap-4 text-gray-900'
-      >
-        <div className='text-2xl font-semibold line-clamp-2'>{title}</div>
-        <div className='whitespace-pre-wrap break-keep wrap-anywhere'>
-          {isScrollAnimationEnabled ? (
-            <div className='relative h-18'>
-              <div
-                className={clsx(
-                  'absolute inset-x-0 top-0',
-                  'h-18 line-clamp-3 group-hover:h-(--extended-height) group-hover:line-clamp-9999',
-                  'transition-discrete ease-in-out duration-300 group-hover:duration-(--scale-delay)',
-                  'delay-0 group-hover:delay-(--scale-delay)'
-                )}
-                style={{
-                  '--extended-height': tags.length > 0 ? '9rem' : '7rem',
-                }}
-              >
-                <div className='group-hover:hidden'>{plainText}</div>
+      {post.userId === userId && (
+        <div className='absolute top-0 right-0 z-10'>
+          <PostSettingsDropdown
+            isLoggedIn={!!session}
+            userId={userId}
+            post={post}
+            showRawContent={false}
+          >
+            <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 hover:bg-gray-200 rounded-full p-2 -m-2 cursor-pointer' />
+          </PostSettingsDropdown>
+        </div>
+      )}
+
+      <div className='w-full flex flex-col gap-4'>
+        <Link
+          href={`/read/${id}`}
+          className='w-full flex flex-col gap-4 text-gray-900'
+        >
+          <div
+            className={clsx(
+              'text-2xl font-semibold line-clamp-2',
+              post.userId === userId ? 'w-[calc(100%-3rem)]' : 'w-full'
+            )}
+          >
+            {title}
+          </div>
+
+          <div className='whitespace-pre-wrap break-keep wrap-anywhere'>
+            {isScrollAnimationEnabled ? (
+              <div className='relative h-18'>
                 <div
                   className={clsx(
-                    'text-transparent group-hover:text-gray-900 absolute inset-x-0 top-0',
-                    'transition-transform ease-linear duration-[0] group-hover:duration-(--scroll-duration)',
-                    'delay-0 group-hover:delay-(--scroll-delay) group-hover:translate-y-[calc(-100%+9rem)]'
+                    'absolute inset-x-0 top-0',
+                    'h-18 line-clamp-3 group-hover:h-(--extended-height) group-hover:line-clamp-9999',
+                    'transition-discrete ease-in-out duration-300 group-hover:duration-(--scale-delay)',
+                    'delay-0 group-hover:delay-(--scale-delay)'
                   )}
                   style={{
-                    '--scroll-duration': `${plainText.length / 50}s`,
+                    '--extended-height': tags.length > 0 ? '9rem' : '7rem',
                   }}
                 >
-                  {plainText}
+                  <div className='group-hover:hidden'>{plainText}</div>
+                  <div
+                    className={clsx(
+                      'text-transparent group-hover:text-gray-900 absolute inset-x-0 top-0',
+                      'transition-transform ease-linear duration-[0] group-hover:duration-(--scroll-duration)',
+                      'delay-0 group-hover:delay-(--scroll-delay) group-hover:translate-y-[calc(-100%+9rem)]'
+                    )}
+                    style={{
+                      '--scroll-duration': `${plainText.length / 50}s`,
+                    }}
+                  >
+                    {plainText}
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            <div className='max-h-18 overflow-hidden'>{plainText}</div>
-          )}
-        </div>
+            ) : (
+              <div className='max-h-18 overflow-hidden'>{plainText}</div>
+            )}
+          </div>
+        </Link>
 
         <div
           className={clsx(
@@ -99,7 +124,7 @@ export default function PostPreview({
 
           <PostInfo post={post} />
         </div>
-      </Link>
+      </div>
     </div>
   );
 }

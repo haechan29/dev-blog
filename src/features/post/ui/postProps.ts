@@ -12,11 +12,11 @@ export type PostProps = {
   content: string;
   headings: Heading[];
   plainText: string;
-  userId: string | null;
-  guestId: string | null;
+  userId: string;
   authorName: string;
   isDeleted: boolean;
-  isGuest: boolean;
+  seriesId: string | null;
+  seriesOrder: number | null;
 };
 
 export function createProps(post: Post): PostProps {
@@ -30,9 +30,9 @@ export function createProps(post: Post): PostProps {
     headings: post.headings,
     plainText: extractPlainText(post.content),
     userId: post.userId,
-    guestId: post.guestId,
     authorName: post.authorName,
     isDeleted: post.isDeleted,
-    isGuest: post.isGuest,
+    seriesId: post.seriesId,
+    seriesOrder: post.seriesOrder,
   };
 }

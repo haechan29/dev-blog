@@ -1,7 +1,7 @@
-import { PostResponseDto } from '@/features/post/data/dto/postResponseDto';
+import { PostDto } from '@/features/post/data/dto/postDto';
 import Post from '@/features/post/domain/model/post';
 
-export function toDomain(dto: PostResponseDto): Post {
+export function toDomain(dto: PostDto): Post {
   return new Post(
     dto.id,
     dto.title,
@@ -10,9 +10,9 @@ export function toDomain(dto: PostResponseDto): Post {
     dto.content,
     dto.tags,
     dto.userId,
-    dto.guestId,
     dto.authorName,
     dto.isDeleted,
-    dto.isGuest
+    dto.seriesId,
+    dto.seriesOrder
   );
 }

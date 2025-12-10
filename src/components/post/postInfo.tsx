@@ -2,13 +2,12 @@
 
 import { PostProps } from '@/features/post/ui/postProps';
 import usePostStat from '@/features/postStat/hooks/usePostStat';
+import Link from 'next/link';
 
 export default function PostInfo({
-  post: { id: postId, authorName, createdAt },
-  isAuthorNameVisible = true,
+  post: { id: postId, userId, authorName, createdAt },
 }: {
   post: PostProps;
-  isAuthorNameVisible?: boolean;
 }) {
   const {
     stat: { viewCount },
@@ -16,12 +15,15 @@ export default function PostInfo({
 
   return (
     <div className='flex gap-2 items-center text-xs text-gray-500'>
-      {isAuthorNameVisible && (
-        <>
-          <div>{authorName}</div>
-          <Divider />
-        </>
-      )}
+      <>
+        <Link
+          href={`/@${userId}/posts`}
+          className='text-gray-900 hover:underline'
+        >
+          {authorName}
+        </Link>
+        <Divider />
+      </>
       <div>{createdAt}</div>
       <Divider />
       <div>{`조회 ${viewCount}`}</div>

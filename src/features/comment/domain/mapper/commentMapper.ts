@@ -11,8 +11,6 @@ export function toDomain(dto: CommentResponseDto): Comment {
     dto.updatedAt,
     dto.likeCount,
     dto.userId,
-    dto.guestId,
-    dto.isDeleted,
-    dto.isGuest
+    dto.isDeleted
   );
 }

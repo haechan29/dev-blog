@@ -1,15 +1,14 @@
 import '@/app/globals.css';
+import { auth } from '@/auth';
 import LayoutClient from '@/components/layoutClient';
-import LayoutContainer from '@/components/layoutContainer';
-import { fetchPosts } from '@/features/post/domain/service/postServerService';
-import { createProps } from '@/features/post/ui/postProps';
 import Providers from '@/providers';
 import clsx from 'clsx';
 import type { Metadata } from 'next';
 import { Geist_Mono } from 'next/font/google';
+import { cookies } from 'next/headers';
 import 'nprogress/nprogress.css';
 import 'pretendard/dist/web/variable/pretendardvariable.css';
-import { ReactNode, Suspense } from 'react';
+import { ReactNode } from 'react';
 import { Toaster } from 'react-hot-toast';
 
 const geistMono = Geist_Mono({
@@ -27,7 +26,9 @@ export default async function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const posts = await fetchPosts().then(posts => posts.map(createProps));
+  const session = await auth();
+  const userId =
+    session?.user?.user_id ?? (await cookies()).get('userId')?.value;
 
   return (
     <html lang='ko'>
@@ -37,12 +38,10 @@ export default async function RootLayout({
           'min-h-dvh bg-white antialiased overflow-y-auto'
         )}
       >
-        <Suspense>
-          <LayoutClient />
-        </Suspense>
-
         <Providers>
-          <LayoutContainer posts={posts}>{children}</LayoutContainer>
+          <LayoutClient shouldCreateUser={!userId} isLoggedIn={!!session}>
+            {children}
+          </LayoutClient>
         </Providers>
 
         <Toaster />

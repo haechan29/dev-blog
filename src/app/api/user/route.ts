@@ -1,22 +1,14 @@
-import { auth } from '@/auth';
-import {
-  UnauthorizedError,
-  ValidationError,
-} from '@/features/user/data/errors/userErrors';
+import { ValidationError } from '@/features/user/data/errors/userErrors';
 import * as UserQueries from '@/features/user/data/queries/userQueries';
 import { ApiError } from '@/lib/api';
+import { getUserId } from '@/lib/user';
 import { NextRequest, NextResponse } from 'next/server';
 import 'server-only';
 
 export async function GET() {
   try {
-    const session = await auth();
-    const userId = session?.user?.id;
-    if (!userId) {
-      return NextResponse.json({ data: null });
-    }
-
-    const data = await UserQueries.getUserById(userId);
+    const userId = await getUserId();
+    const data = userId ? await UserQueries.fetchUser(userId) : null;
     return NextResponse.json({ data });
   } catch (error) {
     console.error('유저 조회에 실패했습니다', error);
@@ -32,13 +24,8 @@ export async function GET() {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function PATCH(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      throw new UnauthorizedError('인증되지 않은 요청입니다');
-    }
-
     const { nickname } = await request.json();
 
     if (!nickname) {
@@ -53,7 +40,8 @@ export async function POST(request: NextRequest) {
       throw new ValidationError('한글, 영문, 숫자만 사용 가능합니다');
     }
 
-    await UserQueries.createUser(session.user.id, nickname);
+    await UserQueries.updateUser(nickname);
+
     return NextResponse.json({ data: null });
   } catch (error) {
     console.error('회원가입 요청이 실패했습니다', error);
@@ -71,16 +59,9 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE() {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      throw new UnauthorizedError('인증되지 않은 요청입니다');
-    }
-
-    const userId = session.user.id;
-
     await Promise.all([
-      UserQueries.deleteUser(userId),
-      UserQueries.hardDeleteAuthUser(userId),
+      UserQueries.deleteUser(),
+      UserQueries.hardDeleteAuthUser(),
     ]);
 
     return NextResponse.json({ data: null });

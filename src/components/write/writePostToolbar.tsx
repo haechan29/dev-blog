@@ -7,6 +7,7 @@ import useNavigationWithParams from '@/hooks/useNavigationWithParams';
 import { ApiError } from '@/lib/api';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { setInvalidField } from '@/lib/redux/write/writePostFormSlice';
+import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -16,15 +17,16 @@ import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function WritePostToolbar({
-  userId,
+  isLoggedIn,
   publishPost,
   removeDraft,
 }: {
-  userId: string | null;
+  isLoggedIn: boolean;
   publishPost: () => Promise<PostProps>;
   removeDraft: () => void;
 }) {
   const dispatch = useDispatch<AppDispatch>();
+  const queryClient = useQueryClient();
   const router = useRouter();
   const { currentStepId } = useSelector((state: RootState) => state.writePost);
   const writePostForm = useSelector((state: RootState) => state.writePostForm);
@@ -44,10 +46,10 @@ export default function WritePostToolbar({
     const currentStep = writePostSteps[currentStepId];
     return (
       currentStep.fields.find(
-        field => !validate(userId, writePostForm, field)
+        field => !validate(isLoggedIn, writePostForm, field)
       ) ?? null
     );
-  }, [currentStepId, userId, writePostForm]);
+  }, [currentStepId, isLoggedIn, writePostForm]);
 
   const onAction = useCallback(async () => {
     const currentStep = writePostSteps[currentStepId];
@@ -60,21 +62,22 @@ export default function WritePostToolbar({
         try {
           nProgress.start();
           const post = await publishPost();
+          queryClient.setQueryData(['post', post.id], post);
           navigate({ pathname: `/read/${post.id}` });
           removeDraft();
         } catch (error) {
-          const errorMessage =
+          const message =
             error instanceof ApiError
               ? error.message
               : '게시글 생성에 실패했습니다';
-          toast.error(errorMessage);
+          toast.error(message);
         } finally {
           nProgress.done();
         }
         break;
       }
     }
-  }, [currentStepId, navigate, publishPost, removeDraft]);
+  }, [currentStepId, navigate, publishPost, queryClient, removeDraft]);
 
   const onActionButtonClick = useCallback(() => {
     const invalidField = getInvalidField();
@@ -88,12 +91,12 @@ export default function WritePostToolbar({
   useEffect(() => {
     for (const step of Object.values(writePostSteps)) {
       if (currentStepId === step.id) break;
-      const isValid = validate(userId, writePostForm, ...step.fields);
+      const isValid = validate(isLoggedIn, writePostForm, ...step.fields);
       if (!isValid) {
         router.push(`/write?step=${step.id}`);
       }
     }
-  }, [currentStepId, router, userId, writePostForm]);
+  }, [currentStepId, isLoggedIn, router, writePostForm]);
 
   return (
     <div

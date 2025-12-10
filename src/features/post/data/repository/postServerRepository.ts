@@ -5,6 +5,10 @@ export async function fetchPosts() {
   return await PostQueries.fetchPosts();
 }
 
+export async function fetchPostsByUserId(userId: string) {
+  return await PostQueries.fetchPostsByUserId(userId);
+}
+
 export async function fetchPost(postId: string) {
   return await PostQueries.fetchPost(postId);
 }

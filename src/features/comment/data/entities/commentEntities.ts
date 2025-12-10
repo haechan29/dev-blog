@@ -7,8 +7,7 @@ export interface CommentEntity {
   created_at: string;
   updated_at: string;
   like_count: number;
-  user_id: string | null;
-  guest_id: string | null;
-  users?: Pick<UserEntity, 'nickname' | 'deleted_at'> | null;
+  user_id: string;
+  users: Pick<UserEntity, 'nickname' | 'deleted_at'>;
   password_hash?: string | null;
 }

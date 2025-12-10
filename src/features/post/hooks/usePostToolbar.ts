@@ -30,21 +30,16 @@ function createProps({
       return {
         isVisible: !postToolbar.isScrollingDown,
         mode,
-        breadcrumb: postToolbar.tag ? [postToolbar.tag] : [],
         title: postToolbar.title!,
       };
     case 'collapsed': {
-      const items = [
-        postToolbar.tag,
-        postToolbar.title!,
-        postReader.currentHeading?.text,
-      ].filter(item => item != null);
-      const lastItem = items.pop()!;
+      const title = postToolbar.title!;
+      const headingText = postReader.currentHeading?.text;
       return {
         isVisible: !postToolbar.isScrollingDown,
         mode,
-        breadcrumb: items,
-        title: lastItem,
+        breadcrumb: headingText ? title : undefined,
+        title: headingText ?? title,
         headings: postToolbar.headings,
       };
     }
@@ -52,9 +47,7 @@ function createProps({
       return {
         isVisible: !postToolbar.isScrollingDown,
         mode,
-        breadcrumb: postToolbar.tag
-          ? [postToolbar.tag, postToolbar.title!]
-          : [postToolbar.title!],
+        breadcrumb: postToolbar.title!,
         title: postReader.currentHeading!.text,
         headings: postToolbar.headings,
       };

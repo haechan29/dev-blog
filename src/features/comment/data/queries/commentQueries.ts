@@ -8,7 +8,7 @@ import 'server-only';
 export async function fetchComment(commentId: number) {
   const { data, error } = await supabase
     .from('comments')
-    .select('user_id, guest_id, password_hash')
+    .select('user_id, password_hash')
     .eq('id', commentId)
     .maybeSingle();
 
@@ -20,14 +20,14 @@ export async function fetchComment(commentId: number) {
     throw new CommentNotFoundError('댓글을 찾을 수 없습니다');
   }
 
-  return data as Pick<CommentEntity, 'user_id' | 'guest_id' | 'password_hash'>;
+  return data as Pick<CommentEntity, 'user_id' | 'password_hash'>;
 }
 
 export async function fetchComments(postId: string) {
   const { data, error } = await supabase
     .from('comments')
     .select(
-      'id, post_id, content, created_at, updated_at, like_count, user_id, guest_id, users:user_id(nickname, deleted_at)'
+      'id, post_id, content, created_at, updated_at, like_count, user_id, users:user_id(nickname, deleted_at)'
     )
     .eq('post_id', postId)
     .order('created_at', { ascending: true });
@@ -47,8 +47,7 @@ export async function createComments(
   postId: string,
   content: string,
   passwordHash: string | null,
-  userId: string | null,
-  guestId: string | null
+  userId: string
 ) {
   const { data, error } = await supabase
     .from('comments')
@@ -57,10 +56,9 @@ export async function createComments(
       content,
       password_hash: passwordHash,
       user_id: userId,
-      guest_id: guestId,
     })
     .select(
-      'id, post_id, content, created_at, updated_at, like_count, user_id, guest_id, users:user_id(nickname, deleted_at)'
+      'id, post_id, content, created_at, updated_at, like_count, user_id, users:user_id(nickname, deleted_at)'
     )
     .single();
 
@@ -80,7 +78,7 @@ export async function updateComment(commentId: number, content: string) {
     })
     .eq('id', commentId)
     .select(
-      'id, post_id, content, created_at, updated_at, like_count, user_id, guest_id, users:user_id(nickname, deleted_at)'
+      'id, post_id, content, created_at, updated_at, like_count, user_id, users:user_id(nickname, deleted_at)'
     )
     .single();
 

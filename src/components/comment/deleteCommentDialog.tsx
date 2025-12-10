@@ -15,13 +15,13 @@ import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
 export default function DeleteCommentDialog({
-  userId,
+  isLoggedIn,
   postId,
   commentId,
   isOpen,
   setIsOpen,
 }: {
-  userId: string | null;
+  isLoggedIn: boolean;
   postId: string;
   commentId: number;
   isOpen: boolean;
@@ -57,7 +57,7 @@ export default function DeleteCommentDialog({
   );
 
   const handleDelete = () => {
-    if (!userId && !password.trim()) {
+    if (!isLoggedIn && !password.trim()) {
       setIsPasswordValid(false);
       return;
     }
@@ -77,7 +77,7 @@ export default function DeleteCommentDialog({
           정말로 댓글을 삭제할까요?
         </div>
 
-        {!userId && (
+        {!isLoggedIn && (
           <input
             className={clsx(
               'w-full border p-3 mb-8 rounded-sm outline-none',
@@ -103,6 +103,7 @@ export default function DeleteCommentDialog({
               deleteCommentMutation.isPending ? 'bg-red-400' : 'bg-red-600'
             )}
             onClick={handleDelete}
+            disabled={deleteCommentMutation.isPending}
           >
             {deleteCommentMutation.isPending ? (
               <Loader2 size={18} strokeWidth={3} className='animate-spin' />

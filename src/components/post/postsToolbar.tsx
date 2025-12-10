@@ -1,5 +1,6 @@
 'use client';
 
+import Logo from '@/components/logo';
 import ToolbarProfileIcon from '@/components/post/toolbarProfileIcon';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { AppDispatch } from '@/lib/redux/store';
@@ -10,7 +11,13 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function PostsToolbar({ className }: { className?: string }) {
+export default function PostsToolbar({
+  isLoggedIn,
+  className,
+}: {
+  isLoggedIn: boolean;
+  className?: string;
+}) {
   const dispatch = useDispatch<AppDispatch>();
   const [query, setQuery] = useState('');
 
@@ -22,15 +29,7 @@ export default function PostsToolbar({ className }: { className?: string }) {
         className
       )}
     >
-      <Link
-        onClick={() => dispatch(setIsVisible(false))}
-        className='p-2 -m-2'
-        href='/'
-      >
-        <div className='text-2xl font-bold tracking-tight text-blue-500'>
-          Haechan
-        </div>
-      </Link>
+      <Logo onClick={() => dispatch(setIsVisible(false))} />
 
       <div className='flex flex-1 min-w-0 justify-center'>
         <div className='max-md:hidden flex w-1/2 px-4 py-2 border border-gray-200 rounded-full'>
@@ -71,7 +70,7 @@ export default function PostsToolbar({ className }: { className?: string }) {
           <Search className='w-5 h-5' />
         </button>
 
-        <ToolbarProfileIcon />
+        <ToolbarProfileIcon isLoggedIn={isLoggedIn} />
       </div>
     </div>
   );

@@ -1,125 +1,131 @@
 'use client';
 
-import { EMPTY_TAG_NAME } from '@/features/post/constants/tagName';
 import { PostProps } from '@/features/post/ui/postProps';
-import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
-import { AppDispatch } from '@/lib/redux/store';
+import { SeriesProps } from '@/features/series/ui/seriesProps';
 import clsx from 'clsx';
 import Link from 'next/link';
-import { useParams, useSearchParams } from 'next/navigation';
-import { useMemo } from 'react';
-import { useDispatch } from 'react-redux';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-export default function PostSidebarNav({ posts }: { posts: PostProps[] }) {
-  const tagCount = useMemo(() => getTagCounts(posts), [posts]);
+export default function PostSidebarNav({
+  currentPostId,
+  posts,
+  seriesList,
+}: {
+  currentPostId: string;
+  posts: PostProps[];
+  seriesList: SeriesProps[];
+}) {
+  const currentSeriesId = useMemo(() => {
+    const currentPost = posts.find(post => post.id === currentPostId);
+    return currentPost?.seriesId ?? null;
+  }, [currentPostId, posts]);
+
+  const [openSeriesIds, setOpenSeriesIds] = useState<Set<string>>(
+    new Set(currentSeriesId ? [currentSeriesId] : [])
+  );
+
+  const noSeriesPosts = useMemo(() => {
+    return posts.filter(post => post.seriesId === null);
+  }, [posts]);
+
+  const toggleSeries = useCallback((id: string) => {
+    setOpenSeriesIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (currentSeriesId) {
+      setOpenSeriesIds(prev => new Set(prev).add(currentSeriesId));
+    }
+  }, [currentSeriesId]);
 
   return (
     <div className='flex flex-col flex-1 overflow-y-auto'>
-      {tagCount.map(([tag, count]) => {
-        return (
-          <div key={tag}>
-            <NavCategory tag={tag} count={count} />
-            <NavPostList tag={tag} posts={posts} />
-          </div>
-        );
-      })}
-    </div>
-  );
-}
+      {seriesList.map(series => (
+        <div key={series.id}>
+          <NavCategory
+            series={series}
+            isActive={
+              !openSeriesIds.has(series.id) && currentSeriesId === series.id
+            }
+            onToggle={() => toggleSeries(series.id)}
+          />
+          {openSeriesIds.has(series.id) && (
+            <NavPostList series={series} currentPostId={currentPostId} />
+          )}
+        </div>
+      ))}
 
-function NavCategory({ tag, count }: { tag: string; count: number }) {
-  const searchParams = useSearchParams();
-  const currentTag = searchParams.get('tag') ?? null;
-
-  const params = useParams();
-  const currentPostId = params.postId as string | undefined;
-
-  const categoryUrl = useMemo(() => {
-    let categoryUrl = '/read';
-    if (currentPostId) categoryUrl += `/${currentPostId}`;
-    if (currentPostId || currentTag !== tag) categoryUrl += `?tag=${tag}`;
-    return categoryUrl;
-  }, [currentPostId, currentTag, tag]);
-
-  return (
-    <Link
-      href={categoryUrl}
-      className={clsx(
-        'flex items-center w-full p-3 gap-2 rounded-sm hover:text-blue-500',
-        !currentPostId && currentTag === tag
-          ? 'bg-blue-50 font-semibold text-blue-500'
-          : 'text-gray-900'
-      )}
-    >
-      <div className='flex-1 text-sm'>{tag}</div>
-      {currentTag !== tag && (
-        <div className='shrink-0 text-xs text-gray-400'>{count}</div>
-      )}
-    </Link>
-  );
-}
-
-function NavPostList({ tag, posts }: { tag: string; posts: PostProps[] }) {
-  const dispatch = useDispatch<AppDispatch>();
-
-  const searchParams = useSearchParams();
-  const currentTag = searchParams.get('tag') ?? null;
-
-  const params = useParams();
-  const currentPostId = params.postId as string | undefined;
-
-  const postsOfTag = useMemo(() => {
-    if (!currentTag) return [];
-    return posts.filter(post => {
-      return post.tags.length > 0
-        ? post.tags.includes(currentTag)
-        : currentTag === EMPTY_TAG_NAME;
-    });
-  }, [posts, currentTag]);
-
-  return (
-    currentTag === tag &&
-    postsOfTag.map(post => {
-      const postUrl = getPostUrl(currentTag, post);
-      const isCurrentPost = post.id === currentPostId;
-
-      return (
+      {noSeriesPosts.map(post => (
         <Link
-          key={`${tag}-${post.id} `}
-          href={postUrl}
-          onClick={() => dispatch(setIsVisible(false))}
+          key={post.id}
+          href={`/read/${post.id}`}
           className={clsx(
-            'flex w-full py-3 pl-6 pr-3 rounded-sm hover:text-blue-500',
-            isCurrentPost
+            'flex w-full py-3 pl-3 pr-3 rounded-sm hover:text-blue-500',
+            post.id === currentPostId
               ? 'bg-blue-50 font-semibold text-blue-500'
               : 'text-gray-900'
           )}
         >
           <div className='text-sm'>{post.title}</div>
         </Link>
-      );
-    })
+      ))}
+    </div>
   );
 }
 
-function getTagCounts(posts: PostProps[]) {
-  let emptyTagCount = 0;
-  const tagMap = posts.reduce((acc, post) => {
-    if (post.tags.length > 0) {
-      post.tags.forEach(tag => {
-        acc.set(tag, (acc.get(tag) ?? 0) + 1);
-      });
-    } else {
-      emptyTagCount++;
-    }
-    return acc;
-  }, new Map<string, number>());
-  tagMap.set(EMPTY_TAG_NAME, emptyTagCount);
-  return [...tagMap.entries()];
+function NavCategory({
+  series,
+  isActive,
+  onToggle,
+}: {
+  series: SeriesProps;
+  isActive: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <div
+      onClick={onToggle}
+      className={clsx(
+        'flex items-center w-full p-3 gap-2 rounded-sm hover:text-blue-500 cursor-pointer',
+        isActive ? 'bg-blue-50 font-semibold text-blue-500' : 'text-gray-900'
+      )}
+    >
+      <div className='flex-1 text-sm'>{series.title}</div>
+      <div className='shrink-0 text-xs text-gray-400'>{series.postCount}</div>
+    </div>
+  );
 }
 
-function getPostUrl(tag: string | null, post: PostProps) {
-  let postUrl = `/read/${post.id}`;
-  if (tag) postUrl += `?tag=${tag}`;
-  return postUrl;
+function NavPostList({
+  series,
+  currentPostId,
+}: {
+  series: SeriesProps;
+  currentPostId: string;
+}) {
+  const sortedPosts = useMemo(() => {
+    return [...series.posts].sort(
+      (a, b) => (a.seriesOrder ?? 0) - (b.seriesOrder ?? 0)
+    );
+  }, [series.posts]);
+
+  return sortedPosts.map(post => (
+    <Link
+      key={post.id}
+      href={`/read/${post.id}`}
+      className={clsx(
+        'flex w-full py-3 pl-6 pr-3 rounded-sm hover:text-blue-500',
+        post.id === currentPostId
+          ? 'bg-blue-50 font-semibold text-blue-500'
+          : 'text-gray-900'
+      )}
+    >
+      <div className='text-sm'>{post.title}</div>
+    </Link>
+  ));
 }
