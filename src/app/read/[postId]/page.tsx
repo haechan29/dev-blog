@@ -42,9 +42,7 @@ export default async function PostPage({
         <PostToolbar className='xl:hidden' />
       </Suspense>
 
-      <Suspense>
-        <PostSidebar userId={post.userId} currentPostId={post.id} />
-      </Suspense>
+      <PostSidebar userId={post.userId} currentPostId={post.id} />
 
       <div
         className={clsx(

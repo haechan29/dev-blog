@@ -4,7 +4,7 @@ import LayoutContainer from '@/components/layoutContainer';
 import useUser from '@/features/user/domain/hooks/useUser';
 import { usePathname, useSearchParams } from 'next/navigation';
 import nProgress from 'nprogress';
-import { ReactNode, Suspense, useEffect, useRef } from 'react';
+import { ReactNode, useEffect, useRef } from 'react';
 
 export default function LayoutClient({
   shouldCreateUser,
@@ -60,9 +60,5 @@ export default function LayoutClient({
     }
   }, []);
 
-  return (
-    <LayoutContainer isLoggedIn={isLoggedIn}>
-      <Suspense>{children}</Suspense>
-    </LayoutContainer>
-  );
+  return <LayoutContainer isLoggedIn={isLoggedIn}>{children}</LayoutContainer>;
 }
