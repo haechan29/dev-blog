@@ -19,7 +19,7 @@ export default async function PostsPage({
     <div className='flex flex-col'>
       {posts.map((post, index) => (
         <div key={post.id} className='mb-8'>
-          <PostPreview tag={null} post={post} />
+          <PostPreview post={post} />
           {index !== posts.length - 1 && <div className='h-px bg-gray-200' />}
         </div>
       ))}

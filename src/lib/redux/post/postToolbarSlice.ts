@@ -3,7 +3,6 @@ import PostToolbar from '@/features/post/domain/model/postToolbar';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: PostToolbar = {
-  tag: null,
   isHeaderVisible: false,
   isContentVisible: false,
   isScrollingDown: false,
@@ -15,9 +14,6 @@ const postToolbarSlice = createSlice({
   name: 'postToolbar',
   initialState,
   reducers: {
-    setTag: (state, action: PayloadAction<string | null>) => {
-      state.tag = action.payload;
-    },
     setIsHeaderVisible: (state, action: PayloadAction<boolean>) => {
       state.isHeaderVisible = action.payload;
     },
@@ -45,7 +41,6 @@ export const {
   setIsContentVisible,
   setIsScrollingDown,
   setIsExpanded,
-  setTag,
   setHeadings,
   setTitle,
 } = postToolbarSlice.actions;

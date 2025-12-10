@@ -12,13 +12,7 @@ const SCALE_ANIMATION_DELAY = 0.5;
 const SCROLL_ANIMATION_DELAY = 1;
 const MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION = 200;
 
-export default async function PostPreview({
-  tag,
-  post,
-}: {
-  tag: string | null;
-  post: PostProps;
-}) {
+export default async function PostPreview({ post }: { post: PostProps }) {
   const session = await auth();
   const userId =
     session?.user?.user_id ?? (await cookies()).get('userId')?.value;
@@ -63,7 +57,7 @@ export default async function PostPreview({
 
       <div className='w-full flex flex-col gap-4'>
         <Link
-          href={`/read/${id}${tag ? `?tag=${tag}` : ''}`}
+          href={`/read/${id}`}
           className='w-full flex flex-col gap-4 text-gray-900'
         >
           <div

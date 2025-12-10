@@ -14,8 +14,8 @@ import { AppDispatch } from '@/lib/redux/store';
 import { scrollIntoElement } from '@/lib/scroll';
 import { cn } from '@/lib/utils';
 import clsx from 'clsx';
-import { ChevronDown, ChevronRight, Menu } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ChevronDown, Menu } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function PostToolbar({ className }: { className?: string }) {
@@ -24,14 +24,6 @@ export default function PostToolbar({ className }: { className?: string }) {
   const lastScrollYRef = useRef(0);
   const throttle = useThrottle();
   const [isMounted, setIsMounted] = useState(false);
-
-  const breadcrumb = useMemo(() => {
-    return postToolbar.mode === 'basic' ||
-      postToolbar.mode === 'collapsed' ||
-      postToolbar.mode === 'expanded'
-      ? postToolbar.breadcrumb
-      : [];
-  }, [postToolbar]);
 
   const onContentClick = useCallback(
     (heading: Heading) => {
@@ -93,7 +85,11 @@ export default function PostToolbar({ className }: { className?: string }) {
           className
         )}
       >
-        <Breadcrumb breadcrumb={breadcrumb} />
+        {!!postToolbar.breadcrumb && (
+          <div className='h-3 flex items-center mx-8 text-xs text-gray-400 transition-discrete duration-300 ease-in-out'>
+            {postToolbar.breadcrumb}
+          </div>
+        )}
 
         <div className='flex gap-2 md:gap-3 w-full items-start'>
           <button
@@ -109,26 +105,6 @@ export default function PostToolbar({ className }: { className?: string }) {
         </div>
       </div>
     )
-  );
-}
-
-function Breadcrumb({ breadcrumb }: { breadcrumb: string[] }) {
-  return (
-    <div
-      className={clsx(
-        'flex overflow-y-hidden mx-10 text-xs text-gray-400 transition-discrete duration-300 ease-in-out',
-        breadcrumb.length === 0 ? 'h-0' : 'h-3'
-      )}
-    >
-      {breadcrumb.map(item => {
-        return (
-          <div key={item} className='flex items-center'>
-            <div>{item}</div>
-            <ChevronRight className='w-3 h-3' />
-          </div>
-        );
-      })}
-    </div>
   );
 }
 

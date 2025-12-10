@@ -30,7 +30,6 @@ export async function fetchPosts() {
       users:user_id(nickname, deleted_at)
     `
     )
-    .eq('user_id', userId)
     .order('created_at', { ascending: false });
 
   if (error) {

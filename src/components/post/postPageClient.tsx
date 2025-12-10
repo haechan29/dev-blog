@@ -14,9 +14,12 @@ import useBgmController from '@/features/post/hooks/useBgmController';
 import usePostToolbarSync from '@/features/post/hooks/usePostToolbarSync';
 import useViewTracker from '@/features/post/hooks/useViewTracker';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
+import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
+import { AppDispatch } from '@/lib/redux/store';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { ReactNode, Suspense } from 'react';
+import { ReactNode, Suspense, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 
 export default function PostPageClient({
   isLoggedIn,
@@ -31,6 +34,8 @@ export default function PostPageClient({
   initialComments: CommentItemProps[];
   parsedContent: ReactNode;
 }) {
+  const dispatch = useDispatch<AppDispatch>();
+
   const { data: post } = useQuery({
     queryKey: ['post', initialPost.id],
     queryFn: () =>
@@ -41,6 +46,10 @@ export default function PostPageClient({
   usePostToolbarSync(initialPost);
   useViewTracker(initialPost.id);
   useBgmController();
+
+  useEffect(() => {
+    dispatch(setIsVisible(false));
+  }, [dispatch]);
 
   return (
     <>

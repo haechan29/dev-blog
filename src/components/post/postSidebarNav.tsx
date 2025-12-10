@@ -2,12 +2,9 @@
 
 import { PostProps } from '@/features/post/ui/postProps';
 import { SeriesProps } from '@/features/series/ui/seriesProps';
-import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
-import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useDispatch } from 'react-redux';
 
 export default function PostSidebarNav({
   currentPostId,
@@ -18,8 +15,6 @@ export default function PostSidebarNav({
   posts: PostProps[];
   seriesList: SeriesProps[];
 }) {
-  const dispatch = useDispatch<AppDispatch>();
-
   const currentSeriesId = useMemo(() => {
     const currentPost = posts.find(post => post.id === currentPostId);
     return currentPost?.seriesId ?? null;
@@ -45,9 +40,8 @@ export default function PostSidebarNav({
   useEffect(() => {
     if (currentSeriesId) {
       setOpenSeriesIds(prev => new Set(prev).add(currentSeriesId));
-      dispatch(setIsVisible(false));
     }
-  }, [currentSeriesId, dispatch]);
+  }, [currentSeriesId]);
 
   return (
     <div className='flex flex-col flex-1 overflow-y-auto'>
