@@ -172,7 +172,7 @@ function SeriesPost({
           {...attributes}
           {...listeners}
           className={clsx(
-            'cursor-grab active:cursor-grabbing text-gray-300 group-hover:text-gray-400 shrink-0',
+            'touch-none cursor-grab active:cursor-grabbing text-gray-300 group-hover:text-gray-400 shrink-0',
             'p-2 -m-2 rounded-full hover:bg-gray-200'
           )}
         >
