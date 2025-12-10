@@ -63,7 +63,7 @@ export async function POST(
 
     return NextResponse.json({ data });
   } catch (error) {
-    console.error('댓글 생성 요청이 실패했습니다');
+    console.error('댓글 생성 요청이 실패했습니다', error);
 
     if (error instanceof ApiError) {
       return error.toResponse();

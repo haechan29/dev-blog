@@ -47,7 +47,7 @@ export async function createComments(
   postId: string,
   content: string,
   passwordHash: string | null,
-  userId: string | null
+  userId: string
 ) {
   const { data, error } = await supabase
     .from('comments')
