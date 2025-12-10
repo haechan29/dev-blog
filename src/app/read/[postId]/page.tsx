@@ -34,7 +34,7 @@ export default async function PostPage({
     <PostPageClient
       isLoggedIn={!!session}
       userId={userId}
-      post={post}
+      initialPost={post}
       initialComments={comments}
       parsedContent={<PostParsedContent content={post.content} />}
     />

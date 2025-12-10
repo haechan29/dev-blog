@@ -20,14 +20,14 @@ export async function GET(
     const data = await PostQueries.fetchPost(postId);
     return NextResponse.json({ data });
   } catch (error) {
-    console.error('게시글 조회 실패:', error);
+    console.error('게시글 조회에 실패했습니다', error);
 
     if (error instanceof PostNotFoundError) {
       return NextResponse.json({ error: error.message }, { status: 404 });
     }
 
     return NextResponse.json(
-      { error: '게시글 조회 요청이 실패했습니다.' },
+      { error: '게시글 조회에 실패했습니다' },
       { status: 500 }
     );
   }

@@ -9,28 +9,37 @@ import PostsToolbar from '@/components/post/postsToolbar';
 import PostToolbar from '@/components/post/postToolbar';
 import EnterFullscreenButton from '@/components/postViewer/enterFullscreenButton';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import * as PostClientService from '@/features/post/domain/service/postClientService';
 import useBgmController from '@/features/post/hooks/useBgmController';
 import usePostToolbarSync from '@/features/post/hooks/usePostToolbarSync';
 import useViewTracker from '@/features/post/hooks/useViewTracker';
-import { PostProps } from '@/features/post/ui/postProps';
+import { createProps, PostProps } from '@/features/post/ui/postProps';
+import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { ReactNode, Suspense } from 'react';
 
 export default function PostPageClient({
   isLoggedIn,
   userId,
-  post,
+  initialPost,
   initialComments,
   parsedContent,
 }: {
   isLoggedIn: boolean;
   userId: string;
-  post: PostProps;
+  initialPost: PostProps;
   initialComments: CommentItemProps[];
   parsedContent: ReactNode;
 }) {
-  usePostToolbarSync(post);
-  useViewTracker(post.id);
+  const { data: post } = useQuery({
+    queryKey: ['post', initialPost.id],
+    queryFn: () =>
+      PostClientService.fetchPost(initialPost.id).then(createProps),
+    initialData: initialPost,
+  });
+
+  usePostToolbarSync(initialPost);
+  useViewTracker(initialPost.id);
   useBgmController();
 
   return (

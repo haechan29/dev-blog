@@ -7,6 +7,7 @@ import useNavigationWithParams from '@/hooks/useNavigationWithParams';
 import { ApiError } from '@/lib/api';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { setInvalidField } from '@/lib/redux/write/writePostFormSlice';
+import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -25,6 +26,7 @@ export default function WritePostToolbar({
   removeDraft: () => void;
 }) {
   const dispatch = useDispatch<AppDispatch>();
+  const queryClient = useQueryClient();
   const router = useRouter();
   const { currentStepId } = useSelector((state: RootState) => state.writePost);
   const writePostForm = useSelector((state: RootState) => state.writePostForm);
@@ -60,6 +62,7 @@ export default function WritePostToolbar({
         try {
           nProgress.start();
           const post = await publishPost();
+          queryClient.setQueryData(['post', post.id], post);
           navigate({ pathname: `/read/${post.id}` });
           removeDraft();
         } catch (error) {
@@ -74,7 +77,7 @@ export default function WritePostToolbar({
         break;
       }
     }
-  }, [currentStepId, navigate, publishPost, removeDraft]);
+  }, [currentStepId, navigate, publishPost, queryClient, removeDraft]);
 
   const onActionButtonClick = useCallback(() => {
     const invalidField = getInvalidField();

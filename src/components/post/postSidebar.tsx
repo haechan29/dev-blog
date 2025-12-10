@@ -8,10 +8,10 @@ import useScrollLock from '@/hooks/useScrollLock';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { cn } from '@/lib/utils';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Menu } from 'lucide-react';
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostSidebar({
@@ -22,6 +22,7 @@ export default function PostSidebar({
   currentPostId: string;
 }) {
   const dispatch = useDispatch<AppDispatch>();
+  const queryClient = useQueryClient();
   const isVisible = useSelector((state: RootState) => {
     return state.postSidebar.isVisible;
   });
@@ -95,6 +96,14 @@ export default function PostSidebar({
   );
 
   useScrollLock({ isLocked: isVisible });
+
+  useEffect(() => {
+    if (posts) {
+      posts.forEach(post => {
+        queryClient.setQueryData(['post', post.id], post);
+      });
+    }
+  }, [posts, queryClient]);
 
   return (
     <>

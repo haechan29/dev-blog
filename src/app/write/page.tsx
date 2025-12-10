@@ -1,10 +1,13 @@
+import { auth } from '@/auth';
 import WritePageClient from '@/components/write/writePageClient';
-import { getUserId } from '@/lib/user';
+import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
 export default async function WritePage() {
-  const userId = await getUserId();
+  const session = await auth();
+  const userId =
+    session?.user?.user_id ?? (await cookies()).get('userId')?.value;
 
   if (!userId) {
     notFound();
@@ -12,7 +15,7 @@ export default async function WritePage() {
 
   return (
     <Suspense>
-      <WritePageClient userId={userId} />
+      <WritePageClient isLoggedIn={!!session} />
     </Suspense>
   );
 }
