@@ -4,6 +4,7 @@ import Comments from '@/components/comment/comments';
 import LikeButton from '@/components/post/likeButton';
 import PostContentWrapper from '@/components/post/postContentWrapper';
 import PostHeader from '@/components/post/postHeader';
+import PostSeriesNav from '@/components/post/postSeriesNav';
 import PostSidebar from '@/components/post/postSidebar';
 import PostsToolbar from '@/components/post/postsToolbar';
 import PostToolbar from '@/components/post/postToolbar';
@@ -75,6 +76,8 @@ export default function PostPageClient({
         <PostContentWrapper post={post} parsedContent={parsedContent} />
 
         <LikeButton postId={post.id} />
+
+        <PostSeriesNav post={post} />
 
         <Comments
           isLoggedIn={isLoggedIn}
