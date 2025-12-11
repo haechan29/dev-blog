@@ -54,6 +54,20 @@ export async function getFollowers(userId: string) {
   return data.map(row => row.follower);
 }
 
+export async function getFollowing(userId: string) {
+  const { data, error } = await supabase
+    .from('subscriptions')
+    .select('following:users!following_id(id, nickname)')
+    .eq('follower_id', userId)
+    .is('following.deleted_at', null);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data.map(row => row.following);
+}
+
 export async function createSubscription(followingId: string) {
   const followerId = await getUserId();
   if (!followerId) {
