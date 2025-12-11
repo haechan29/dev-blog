@@ -17,6 +17,7 @@ export type PostProps = {
   isDeleted: boolean;
   seriesId: string | null;
   seriesOrder: number | null;
+  seriesTitle: string | null;
 };
 
 export function createProps(post: Post): PostProps {
@@ -34,5 +35,6 @@ export function createProps(post: Post): PostProps {
     isDeleted: post.isDeleted,
     seriesId: post.seriesId,
     seriesOrder: post.seriesOrder,
+    seriesTitle: post.seriesTitle,
   };
 }

@@ -13,6 +13,7 @@ export function toDomain(dto: PostDto): Post {
     dto.authorName,
     dto.isDeleted,
     dto.seriesId,
-    dto.seriesOrder
+    dto.seriesOrder,
+    dto.seriesTitle
   );
 }

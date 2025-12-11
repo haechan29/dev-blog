@@ -1,14 +1,12 @@
 'use client';
 
 import PostSidebarNav from '@/components/post/postSidebarNav';
-import * as PostClientService from '@/features/post/domain/service/postClientService';
-import { createProps } from '@/features/post/ui/postProps';
-import useSeriesList from '@/features/series/domain/hooks/useSeriesList';
+import usePosts from '@/features/post/hooks/usePosts';
 import useScrollLock from '@/hooks/useScrollLock';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { cn } from '@/lib/utils';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Menu } from 'lucide-react';
 import { useCallback, useEffect, useRef } from 'react';
@@ -29,15 +27,7 @@ export default function PostSidebar({
   const startRef = useRef<[number, number] | null>(null);
   const scrollDirectionRef = useRef<'horizontal' | 'vertical' | null>(null);
 
-  const { data: posts } = useQuery({
-    queryKey: ['user', userId, 'posts'],
-    queryFn: async () => {
-      const posts = await PostClientService.fetchPosts(userId);
-      return posts.map(createProps);
-    },
-  });
-
-  const { seriesList } = useSeriesList(userId);
+  const { posts } = usePosts(userId);
 
   const handleTouchStart = useCallback((e: React.TouchEvent<HTMLElement>) => {
     const sidebar = e.currentTarget;
@@ -143,12 +133,8 @@ export default function PostSidebar({
           </button>
         </div>
 
-        {posts && seriesList && (
-          <PostSidebarNav
-            currentPostId={currentPostId}
-            posts={posts}
-            seriesList={seriesList}
-          />
+        {posts && (
+          <PostSidebarNav currentPostId={currentPostId} posts={posts} />
         )}
       </div>
     </>

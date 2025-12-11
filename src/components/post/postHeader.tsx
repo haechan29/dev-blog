@@ -3,6 +3,7 @@
 import PostInfo from '@/components/post/postInfo';
 import PostSettingsDropdown from '@/components/post/postSettingsDropdown';
 import { PostProps } from '@/features/post/ui/postProps';
+import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { setIsHeaderVisible } from '@/lib/redux/post/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
@@ -39,7 +40,23 @@ export default function PostHeader({
 
   return (
     <div data-post-header className='flex flex-col gap-6 mb-10'>
-      <div className='text-3xl font-bold line-clamp-2'>{title}</div>
+      <div className='flex flex-col gap-2 items-start'>
+        {post.seriesTitle && post.seriesOrder !== null && (
+          <button
+            onClick={() => {
+              dispatch(setIsVisible(true));
+            }}
+            className={clsx(
+              'text-sm text-gray-500  p-1 -m-1',
+              'max-xl:hover:text-blue-600 max-xl:cursor-pointer',
+              'xl:pointer-events-none'
+            )}
+          >
+            {post.seriesTitle} · {post.seriesOrder + 1}편
+          </button>
+        )}
+        <div className='text-3xl font-bold line-clamp-2'>{title}</div>
+      </div>
 
       {tags.length > 0 && (
         <div className='w-full flex overflow-x-auto scrollbar-hide gap-3'>
