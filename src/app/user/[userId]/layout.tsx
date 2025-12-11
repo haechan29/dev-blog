@@ -1,4 +1,3 @@
-import { auth } from '@/auth';
 import ProfileIcon from '@/components/user/profileIcon';
 import UserNavTabs from '@/components/user/userTabs';
 import * as UserServerService from '@/features/user/domain/service/userServerService';
@@ -12,7 +11,6 @@ export default async function UserLayout({
   params: Promise<{ userId: string }>;
   children: ReactNode;
 }) {
-  const session = await auth();
   const { userId } = await params;
   const user = await UserServerService.fetchUserById(userId);
 
@@ -23,7 +21,10 @@ export default async function UserLayout({
   return (
     <div className='flex flex-col gap-8 pt-(--toolbar-height) pb-20 px-6 md:px-12'>
       <div className='flex items-center space-x-3'>
-        <ProfileIcon isLoggedIn={!!session} />
+        <ProfileIcon
+          nickname={user.nickname!}
+          isActive={user.userStatus === 'ACTIVE'}
+        />
         <div>
           <div className='font-semibold text-gray-900 text-xl'>
             {user.nickname}

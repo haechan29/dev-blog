@@ -23,7 +23,10 @@ export default function CommentItem({
     <div className='py-4 border-b border-b-gray-200'>
       <div className='flex justify-between items-start mb-6'>
         <div className='flex items-center space-x-3'>
-          <ProfileIcon isLoggedIn={isLoggedIn} />
+          <ProfileIcon
+            nickname={comment.authorName}
+            isActive={comment.userStatus === 'ACTIVE'}
+          />
 
           <div>
             <Link
