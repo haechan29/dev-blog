@@ -9,8 +9,10 @@ export async function GET(
 ) {
   try {
     const { userId } = await params;
-    const isSubscribed = await SubscriptionQueries.isSubscribed(userId);
-    return NextResponse.json({ data: { isSubscribed } });
+    const subscriptionInfo = await SubscriptionQueries.getSubscriptionInfo(
+      userId
+    );
+    return NextResponse.json({ data: subscriptionInfo });
   } catch (error) {
     console.error('구독 여부 조회가 실패했습니다', error);
     if (error instanceof ApiError) return error.toResponse();

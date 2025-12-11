@@ -6,6 +6,40 @@ import { supabase } from '@/lib/supabase';
 import { getUserId } from '@/lib/user';
 import 'server-only';
 
+export async function getSubscriptionInfo(followingId: string) {
+  const followerId = await getUserId();
+
+  let isSubscribed = false;
+  if (followerId) {
+    const { data, error } = await supabase
+      .from('subscriptions')
+      .select('follower_id')
+      .eq('follower_id', followerId)
+      .eq('following_id', followingId)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    isSubscribed = data !== null;
+  }
+
+  const { count, error } = await supabase
+    .from('subscriptions')
+    .select('*', { count: 'exact', head: true })
+    .eq('following_id', followingId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return {
+    isSubscribed,
+    subscriberCount: count ?? 0,
+  };
+}
+
 export async function createSubscription(followingId: string) {
   const followerId = await getUserId();
   if (!followerId) {
@@ -50,22 +84,4 @@ export async function deleteSubscription(followingId: string) {
   if (error) {
     throw new Error(error.message);
   }
-}
-
-export async function isSubscribed(followingId: string) {
-  const followerId = await getUserId();
-  if (!followerId) return false;
-
-  const { data, error } = await supabase
-    .from('subscriptions')
-    .select('follower_id')
-    .eq('follower_id', followerId)
-    .eq('following_id', followingId)
-    .maybeSingle();
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data !== null;
 }
