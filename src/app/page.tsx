@@ -25,7 +25,11 @@ export default async function HomePage() {
         <HomeToolbar isLoggedIn={!!session} />
       </Suspense>
 
-      {userId && <HomeSidebar userId={userId} />}
+      {userId && (
+        <div className='max-xl:hidden'>
+          <HomeSidebar userId={userId} />
+        </div>
+      )}
 
       <div
         className={clsx(
