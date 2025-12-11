@@ -21,7 +21,7 @@ export default function AuthorProfile({
   });
 
   return (
-    <div className='flex items-center justify-between mb-12'>
+    <div className='flex items-center max-sm:justify-between sm:gap-12 mb-12'>
       <div className='flex items-center gap-3'>
         <ProfileIcon nickname={authorName} isActive={userStatus === 'ACTIVE'} />
         <div>

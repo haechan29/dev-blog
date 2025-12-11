@@ -21,7 +21,7 @@ export default function ProfileIcon({
 }: {
   nickname: string;
   isActive: boolean;
-  size?: 'sm' | 'md';
+  size?: 'sm' | 'md' | 'lg';
 }) {
   const initial = nickname.charAt(0).toUpperCase();
   const color = isActive
@@ -32,14 +32,14 @@ export default function ProfileIcon({
     <div
       className={clsx(
         'rounded-full flex items-center justify-center cursor-pointer',
-        size === 'sm' ? 'w-6 h-6' : 'w-8 h-8',
+        size === 'sm' ? 'w-6 h-6' : size === 'md' ? 'w-8 h-8' : 'w-14 h-14',
         color
       )}
     >
       <span
         className={clsx(
           'font-semibold',
-          size === 'sm' ? 'text-xs' : 'text-sm',
+          size === 'sm' ? 'text-xs' : size === 'md' ? 'text-sm' : 'text-2xl',
           isActive ? 'text-white' : 'text-gray-600'
         )}
       >
