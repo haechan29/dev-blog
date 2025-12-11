@@ -1,6 +1,7 @@
 'use client';
 
 import Comments from '@/components/comment/comments';
+import AuthorProfile from '@/components/post/authorProfile';
 import LikeButton from '@/components/post/likeButton';
 import PostContentWrapper from '@/components/post/postContentWrapper';
 import PostHeader from '@/components/post/postHeader';
@@ -78,6 +79,8 @@ export default function PostPageClient({
         <LikeButton postId={post.id} />
 
         <PostSeriesNav post={post} />
+
+        <AuthorProfile post={post} currentUserId={userId} />
 
         <Comments
           isLoggedIn={isLoggedIn}

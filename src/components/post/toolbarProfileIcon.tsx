@@ -20,6 +20,7 @@ export default function ToolbarProfileIcon({
   }, []);
 
   return (
+    isMounted &&
     user && (
       <ProfileDropdown isLoggedIn={isLoggedIn}>
         <div aria-label='프로필 아이콘'>
