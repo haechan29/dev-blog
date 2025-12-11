@@ -2,6 +2,7 @@ import { formatDate } from '@/features/post/domain/lib/date';
 import { extractPlainText } from '@/features/post/domain/lib/parse';
 import Heading from '@/features/post/domain/model/heading';
 import Post from '@/features/post/domain/model/post';
+import { UserStatus } from '@/features/user/domain/model/user';
 
 export type PostProps = {
   id: string;
@@ -14,7 +15,7 @@ export type PostProps = {
   plainText: string;
   userId: string;
   authorName: string;
-  isDeleted: boolean;
+  userStatus: UserStatus;
   seriesId: string | null;
   seriesOrder: number | null;
   seriesTitle: string | null;
@@ -32,7 +33,7 @@ export function createProps(post: Post): PostProps {
     plainText: extractPlainText(post.content),
     userId: post.userId,
     authorName: post.authorName,
-    isDeleted: post.isDeleted,
+    userStatus: post.userStatus,
     seriesId: post.seriesId,
     seriesOrder: post.seriesOrder,
     seriesTitle: post.seriesTitle,

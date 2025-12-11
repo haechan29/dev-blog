@@ -10,7 +10,7 @@ export interface PostEntity {
   user_id: string;
   series_id: string | null;
   series_order: number | null;
-  users: Pick<UserEntity, 'nickname' | 'deleted_at'>;
+  users: Pick<UserEntity, 'nickname' | 'deleted_at' | 'registered_at'>;
   series: { title: string } | null;
   password_hash?: string | null;
 }
