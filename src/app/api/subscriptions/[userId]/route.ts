@@ -3,6 +3,24 @@ import { ApiError } from '@/lib/api';
 import { NextRequest, NextResponse } from 'next/server';
 import 'server-only';
 
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ userId: string }> }
+) {
+  try {
+    const { userId } = await params;
+    const isSubscribed = await SubscriptionQueries.isSubscribed(userId);
+    return NextResponse.json({ data: { isSubscribed } });
+  } catch (error) {
+    console.error('구독 여부 조회가 실패했습니다', error);
+    if (error instanceof ApiError) return error.toResponse();
+    return NextResponse.json(
+      { error: '구독 여부 조회가 실패했습니다' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ userId: string }> }
