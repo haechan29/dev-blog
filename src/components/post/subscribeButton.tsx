@@ -1,41 +1,47 @@
 'use client';
 
+import { SubscriptionDto } from '@/features/subscription/data/dto/subscriptionDto';
 import * as SubscriptionClientRepository from '@/features/subscription/data/repository/subscriptionClientRepository';
-import * as SubscriptionClientService from '@/features/subscription/domain/service/subscriptionClientService';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { useCallback } from 'react';
 
 export default function SubscribeButton({
   authorId,
-  userId: userId,
+  userId,
+  isSubscribed,
 }: {
   authorId: string;
   userId?: string;
+  isSubscribed: boolean;
 }) {
   const queryClient = useQueryClient();
-
-  const { data: isSubscribed, isLoading } = useQuery({
-    queryKey: ['subscription', authorId],
-    queryFn: () => SubscriptionClientService.checkSubscription(authorId),
-    enabled: userId !== authorId,
-  });
 
   const subscribe = useMutation({
     mutationFn: () => SubscriptionClientRepository.subscribe(authorId),
     onSuccess: () => {
-      queryClient.setQueryData(['subscription', authorId], {
-        isSubscribed: true,
-      });
+      queryClient.setQueryData<SubscriptionDto>(
+        ['subscription', authorId],
+        prev =>
+          prev && {
+            isSubscribed: true,
+            subscriberCount: prev.subscriberCount + 1,
+          }
+      );
     },
   });
 
   const unsubscribe = useMutation({
     mutationFn: () => SubscriptionClientRepository.unsubscribe(authorId),
     onSuccess: () => {
-      queryClient.setQueryData(['subscription', authorId], {
-        isSubscribed: false,
-      });
+      queryClient.setQueryData<SubscriptionDto>(
+        ['subscription', authorId],
+        prev =>
+          prev && {
+            isSubscribed: false,
+            subscriberCount: prev.subscriberCount - 1,
+          }
+      );
     },
   });
 
@@ -51,9 +57,8 @@ export default function SubscribeButton({
     userId !== authorId && (
       <button
         onClick={handleClick}
-        disabled={isLoading}
         className={clsx(
-          'px-4 py-2 rounded-full text-sm font-medium transition-colors',
+          'px-4 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer',
           isSubscribed
             ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             : 'bg-blue-500 text-white hover:bg-blue-600'

@@ -80,7 +80,7 @@ export default function PostPageClient({
 
         <PostSeriesNav post={post} />
 
-        <AuthorProfile post={post} currentUserId={userId} />
+        <AuthorProfile post={post} userId={userId} />
 
         <Comments
           isLoggedIn={isLoggedIn}
