@@ -38,7 +38,7 @@ export default function PostPageClient({
   const dispatch = useDispatch<AppDispatch>();
 
   const { data: post } = useQuery({
-    queryKey: ['post', initialPost.id],
+    queryKey: ['posts', initialPost.id],
     queryFn: () =>
       PostClientService.fetchPost(initialPost.id).then(createProps),
     initialData: initialPost,

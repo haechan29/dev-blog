@@ -90,7 +90,7 @@ export default function PostSidebar({
   useEffect(() => {
     if (posts) {
       posts.forEach(post => {
-        queryClient.setQueryData(['post', post.id], post);
+        queryClient.setQueryData(['posts', post.id], post);
       });
     }
   }, [posts, queryClient]);

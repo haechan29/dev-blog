@@ -62,7 +62,7 @@ export default function WritePostToolbar({
         try {
           nProgress.start();
           const post = await publishPost();
-          queryClient.setQueryData(['post', post.id], post);
+          queryClient.setQueryData(['posts', post.id], post);
           navigate({ pathname: `/read/${post.id}` });
           removeDraft();
         } catch (error) {
