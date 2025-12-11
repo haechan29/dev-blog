@@ -13,6 +13,7 @@ export function toDto(comment: CommentEntity): CommentResponseDto {
     updatedAt: comment.updated_at,
     likeCount: comment.like_count,
     userId: comment.user_id,
-    isDeleted: !!comment.users.deleted_at,
+    deletedAt: comment.users.deleted_at,
+    registeredAt: comment.users.registered_at,
   };
 }

@@ -1,3 +1,5 @@
+import { UserStatus } from '@/features/user/domain/model/user';
+
 export type CommentItemProps = {
   id: number;
   postId: string;
@@ -7,5 +9,5 @@ export type CommentItemProps = {
   isUpdated: boolean;
   likeCount: number;
   userId: string;
-  isDeleted: boolean;
+  userStatus: UserStatus;
 };
