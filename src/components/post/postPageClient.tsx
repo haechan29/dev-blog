@@ -1,13 +1,13 @@
 'use client';
 
 import Comments from '@/components/comment/comments';
+import HomeToolbar from '@/components/home/homeToolbar';
 import AuthorProfile from '@/components/post/authorProfile';
 import LikeButton from '@/components/post/likeButton';
 import PostContentWrapper from '@/components/post/postContentWrapper';
 import PostHeader from '@/components/post/postHeader';
 import PostSeriesNav from '@/components/post/postSeriesNav';
 import PostSidebar from '@/components/post/postSidebar';
-import PostsToolbar from '@/components/post/postsToolbar';
 import PostToolbar from '@/components/post/postToolbar';
 import EnterFullscreenButton from '@/components/postViewer/enterFullscreenButton';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
@@ -56,7 +56,7 @@ export default function PostPageClient({
   return (
     <>
       <Suspense>
-        <PostsToolbar isLoggedIn={isLoggedIn} className='max-xl:hidden' />
+        <HomeToolbar isLoggedIn={isLoggedIn} className='max-xl:hidden' />
         <PostToolbar className='xl:hidden' />
       </Suspense>
 

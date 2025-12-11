@@ -1,11 +1,10 @@
 import '@/app/globals.css';
-import { auth } from '@/auth';
-import LayoutClient from '@/components/layoutClient';
+import LayoutClient from '@/components/home/layoutClient';
+import { getUserId } from '@/lib/user';
 import Providers from '@/providers';
 import clsx from 'clsx';
 import type { Metadata } from 'next';
 import { Geist_Mono } from 'next/font/google';
-import { cookies } from 'next/headers';
 import 'nprogress/nprogress.css';
 import 'pretendard/dist/web/variable/pretendardvariable.css';
 import { ReactNode } from 'react';
@@ -26,9 +25,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const session = await auth();
-  const userId =
-    session?.user?.user_id ?? (await cookies()).get('userId')?.value;
+  const userId = await getUserId();
 
   return (
     <html lang='ko'>
@@ -39,9 +36,7 @@ export default async function RootLayout({
         )}
       >
         <Providers>
-          <LayoutClient shouldCreateUser={!userId} isLoggedIn={!!session}>
-            {children}
-          </LayoutClient>
+          <LayoutClient userId={userId}>{children}</LayoutClient>
         </Providers>
 
         <Toaster />
