@@ -46,7 +46,11 @@ export default function PostHeader({
             onClick={() => {
               dispatch(setIsVisible(true));
             }}
-            className='text-sm text-gray-500 hover:text-blue-600 cursor-pointer p-1 -m-1'
+            className={clsx(
+              'text-sm text-gray-500  p-1 -m-1',
+              'max-xl:hover:text-blue-600 max-xl:cursor-pointer',
+              'xl:pointer-events-none'
+            )}
           >
             {post.seriesTitle} · {post.seriesOrder + 1}편
           </button>

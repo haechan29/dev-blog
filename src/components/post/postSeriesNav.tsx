@@ -4,6 +4,7 @@ import usePosts from '@/features/post/hooks/usePosts';
 import { PostProps } from '@/features/post/ui/postProps';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { AppDispatch } from '@/lib/redux/store';
+import clsx from 'clsx';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo } from 'react';
@@ -36,7 +37,11 @@ export default function PostSeriesNav({
           onClick={() => {
             dispatch(setIsVisible(true));
           }}
-          className='text-xs text-gray-400 hover:text-blue-600 cursor-pointer mb-3'
+          className={clsx(
+            'text-xs text-gray-400 mb-3',
+            'max-xl:hover:text-blue-600 max-xl:cursor-pointer',
+            'xl:pointer-events-none'
+          )}
         >
           {seriesTitle} · {seriesOrder + 1}편
         </button>
