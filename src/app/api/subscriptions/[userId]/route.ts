@@ -20,3 +20,21 @@ export async function POST(
     );
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ userId: string }> }
+) {
+  try {
+    const { userId } = await params;
+    await SubscriptionQueries.deleteSubscription(userId);
+    return NextResponse.json({ data: null });
+  } catch (error) {
+    console.error('구독취소 요청이 실패했습니다', error);
+    if (error instanceof ApiError) return error.toResponse();
+    return NextResponse.json(
+      { error: '구독취소 요청이 실패했습니다' },
+      { status: 500 }
+    );
+  }
+}
