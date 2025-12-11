@@ -15,7 +15,8 @@ export default class Post {
     public readonly authorName: string,
     public readonly isDeleted: boolean,
     public readonly seriesId: string | null,
-    public readonly seriesOrder: number | null
+    public readonly seriesOrder: number | null,
+    public readonly seriesTitle: string | null
   ) {
     this.headings = extractHeadings(content);
   }

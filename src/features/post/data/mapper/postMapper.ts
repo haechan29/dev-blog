@@ -15,5 +15,6 @@ export function toDto(post: PostEntity): PostDto {
     isDeleted: !!post.users.deleted_at,
     seriesId: post.series_id,
     seriesOrder: post.series_order,
+    seriesTitle: post.series?.title ?? null,
   };
 }

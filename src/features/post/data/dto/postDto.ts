@@ -10,4 +10,5 @@ export interface PostDto {
   isDeleted: boolean;
   seriesId: string | null;
   seriesOrder: number | null;
+  seriesTitle: string | null;
 }
