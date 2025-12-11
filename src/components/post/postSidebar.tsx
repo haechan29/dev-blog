@@ -2,7 +2,6 @@
 
 import PostSidebarNav from '@/components/post/postSidebarNav';
 import usePosts from '@/features/post/hooks/usePosts';
-import useSeriesList from '@/features/series/domain/hooks/useSeriesList';
 import useScrollLock from '@/hooks/useScrollLock';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
@@ -29,8 +28,6 @@ export default function PostSidebar({
   const scrollDirectionRef = useRef<'horizontal' | 'vertical' | null>(null);
 
   const { posts } = usePosts(userId);
-
-  const { seriesList } = useSeriesList(userId);
 
   const handleTouchStart = useCallback((e: React.TouchEvent<HTMLElement>) => {
     const sidebar = e.currentTarget;
@@ -136,12 +133,8 @@ export default function PostSidebar({
           </button>
         </div>
 
-        {posts && seriesList && (
-          <PostSidebarNav
-            currentPostId={currentPostId}
-            posts={posts}
-            seriesList={seriesList}
-          />
+        {posts && (
+          <PostSidebarNav currentPostId={currentPostId} posts={posts} />
         )}
       </div>
     </>

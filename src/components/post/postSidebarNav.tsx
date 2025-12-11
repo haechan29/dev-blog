@@ -1,7 +1,6 @@
 'use client';
 
 import { PostProps } from '@/features/post/ui/postProps';
-import { SeriesProps } from '@/features/series/ui/seriesProps';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -9,12 +8,32 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 export default function PostSidebarNav({
   currentPostId,
   posts,
-  seriesList,
 }: {
   currentPostId: string;
   posts: PostProps[];
-  seriesList: SeriesProps[];
 }) {
+  const seriesMap = useMemo(() => {
+    const map = new Map<string, PostProps[]>();
+    const sortedPosts = [...posts].sort(
+      (a, b) => (a.seriesOrder ?? 0) - (b.seriesOrder ?? 0)
+    );
+    sortedPosts.forEach(post => {
+      if (!post.seriesId) return;
+      const existing = map.get(post.seriesId);
+      if (existing) {
+        existing.push(post);
+      } else {
+        map.set(post.seriesId, [post]);
+      }
+    });
+    return map;
+  }, [posts]);
+
+  const seriesList = useMemo(
+    () => Array.from(seriesMap.entries()),
+    [seriesMap]
+  );
+
   const currentSeriesId = useMemo(() => {
     const currentPost = posts.find(post => post.id === currentPostId);
     return currentPost?.seriesId ?? null;
@@ -45,17 +64,17 @@ export default function PostSidebarNav({
 
   return (
     <div className='flex flex-col flex-1 overflow-y-auto'>
-      {seriesList.map(series => (
-        <div key={series.id}>
+      {seriesList.map(([seriesId, seriesPosts]) => (
+        <div key={seriesId}>
           <NavCategory
-            series={series}
+            posts={seriesPosts}
             isActive={
-              !openSeriesIds.has(series.id) && currentSeriesId === series.id
+              !openSeriesIds.has(seriesId) && currentSeriesId === seriesId
             }
-            onToggle={() => toggleSeries(series.id)}
+            onToggle={() => toggleSeries(seriesId)}
           />
-          {openSeriesIds.has(series.id) && (
-            <NavPostList series={series} currentPostId={currentPostId} />
+          {openSeriesIds.has(seriesId) && (
+            <NavPostList posts={seriesPosts} currentPostId={currentPostId} />
           )}
         </div>
       ))}
@@ -79,42 +98,38 @@ export default function PostSidebarNav({
 }
 
 function NavCategory({
-  series,
+  posts,
   isActive,
   onToggle,
 }: {
-  series: SeriesProps;
+  posts: PostProps[];
   isActive: boolean;
   onToggle: () => void;
 }) {
   return (
-    <div
-      onClick={onToggle}
-      className={clsx(
-        'flex items-center w-full p-3 gap-2 rounded-sm hover:text-blue-500 cursor-pointer',
-        isActive ? 'bg-blue-50 font-semibold text-blue-500' : 'text-gray-900'
-      )}
-    >
-      <div className='flex-1 text-sm'>{series.title}</div>
-      <div className='shrink-0 text-xs text-gray-400'>{series.postCount}</div>
-    </div>
+    posts.length > 0 && (
+      <div
+        onClick={onToggle}
+        className={clsx(
+          'flex items-center w-full p-3 gap-2 rounded-sm hover:text-blue-500 cursor-pointer',
+          isActive ? 'bg-blue-50 font-semibold text-blue-500' : 'text-gray-900'
+        )}
+      >
+        <div className='flex-1 text-sm'>{posts[0].seriesTitle}</div>
+        <div className='shrink-0 text-xs text-gray-400'>{posts.length}</div>
+      </div>
+    )
   );
 }
 
 function NavPostList({
-  series,
+  posts,
   currentPostId,
 }: {
-  series: SeriesProps;
+  posts: PostProps[];
   currentPostId: string;
 }) {
-  const sortedPosts = useMemo(() => {
-    return [...series.posts].sort(
-      (a, b) => (a.seriesOrder ?? 0) - (b.seriesOrder ?? 0)
-    );
-  }, [series.posts]);
-
-  return sortedPosts.map(post => (
+  return posts.map(post => (
     <Link
       key={post.id}
       href={`/read/${post.id}`}
