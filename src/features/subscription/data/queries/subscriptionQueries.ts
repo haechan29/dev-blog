@@ -30,3 +30,24 @@ export async function createSubscription(followingId: string) {
     throw new Error(error.message);
   }
 }
+
+export async function deleteSubscription(followingId: string) {
+  const followerId = await getUserId();
+  if (!followerId) {
+    throw new UnauthorizedError('인증되지 않은 요청입니다');
+  }
+
+  if (followerId === followingId) {
+    throw new ValidationError('자기 자신을 구독취소할 수 없습니다');
+  }
+
+  const { error } = await supabase
+    .from('subscriptions')
+    .delete()
+    .eq('follower_id', followerId)
+    .eq('following_id', followingId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
