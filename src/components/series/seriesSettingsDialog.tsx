@@ -65,9 +65,8 @@ export default function SeriesSettingsDialog({
 
       setIsOpen(false);
 
-      queryClient.invalidateQueries({
-        queryKey: ['user', userId, 'series'],
-      });
+      queryClient.invalidateQueries({ queryKey: ['user', userId, 'series'] });
+      queryClient.invalidateQueries({ queryKey: ['post', post.id] });
     } catch (error) {
       const message =
         error instanceof ApiError
