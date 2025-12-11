@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { auth } from '@/auth';
+import HomeSidebar from '@/components/home/homeSidebar';
 import HomeToolbar from '@/components/home/homeToolbar';
 import PostPreview from '@/components/post/postPreview';
 import * as PostServerService from '@/features/post/domain/service/postServerService';
@@ -23,6 +24,8 @@ export default async function HomePage() {
       <Suspense>
         <HomeToolbar isLoggedIn={!!session} />
       </Suspense>
+
+      {userId && <HomeSidebar userId={userId} />}
 
       <div
         className={clsx(
