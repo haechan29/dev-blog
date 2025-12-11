@@ -58,7 +58,7 @@ export default function PostSidebarNav({
 
   useEffect(() => {
     if (currentSeriesId) {
-      setOpenSeriesIds(prev => new Set(prev).add(currentSeriesId));
+      setOpenSeriesIds(new Set([currentSeriesId]));
     }
   }, [currentSeriesId]);
 
