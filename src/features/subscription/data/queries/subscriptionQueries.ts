@@ -51,3 +51,21 @@ export async function deleteSubscription(followingId: string) {
     throw new Error(error.message);
   }
 }
+
+export async function isSubscribed(followingId: string) {
+  const followerId = await getUserId();
+  if (!followerId) return false;
+
+  const { data, error } = await supabase
+    .from('subscriptions')
+    .select('follower_id')
+    .eq('follower_id', followerId)
+    .eq('following_id', followingId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data !== null;
+}
