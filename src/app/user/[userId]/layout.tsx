@@ -40,7 +40,7 @@ export default async function UserLayout({
 
         {currentUserId !== userId && (
           <SubscribeButton
-            authorId={userId}
+            userId={userId}
             userId={'123'}
             isSubscribed={false}
           />

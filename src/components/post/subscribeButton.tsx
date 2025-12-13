@@ -7,21 +7,19 @@ import clsx from 'clsx';
 import { useCallback } from 'react';
 
 export default function SubscribeButton({
-  authorId,
   userId,
   isSubscribed,
 }: {
-  authorId: string;
-  userId?: string;
+  userId: string;
   isSubscribed: boolean;
 }) {
   const queryClient = useQueryClient();
 
   const subscribe = useMutation({
-    mutationFn: () => SubscriptionClientRepository.subscribe(authorId),
+    mutationFn: () => SubscriptionClientRepository.subscribe(userId),
     onSuccess: () => {
       queryClient.setQueryData<SubscriptionDto>(
-        ['subscription', authorId],
+        ['subscription', userId],
         prev =>
           prev && {
             isSubscribed: true,
@@ -32,10 +30,10 @@ export default function SubscribeButton({
   });
 
   const unsubscribe = useMutation({
-    mutationFn: () => SubscriptionClientRepository.unsubscribe(authorId),
+    mutationFn: () => SubscriptionClientRepository.unsubscribe(userId),
     onSuccess: () => {
       queryClient.setQueryData<SubscriptionDto>(
-        ['subscription', authorId],
+        ['subscription', userId],
         prev =>
           prev && {
             isSubscribed: false,
@@ -54,18 +52,16 @@ export default function SubscribeButton({
   }, [isSubscribed, subscribe, unsubscribe]);
 
   return (
-    userId !== authorId && (
-      <button
-        onClick={handleClick}
-        className={clsx(
-          'px-4 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer',
-          isSubscribed
-            ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            : 'bg-blue-500 text-white hover:bg-blue-600'
-        )}
-      >
-        {isSubscribed ? '구독중' : '구독'}
-      </button>
-    )
+    <button
+      onClick={handleClick}
+      className={clsx(
+        'px-4 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer',
+        isSubscribed
+          ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          : 'bg-blue-500 text-white hover:bg-blue-600'
+      )}
+    >
+      {isSubscribed ? '구독중' : '구독'}
+    </button>
   );
 }
