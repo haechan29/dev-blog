@@ -85,6 +85,7 @@ export default function PostPageClient({
           userName={post.authorName}
           userStatus={post.userStatus}
           currentUserId={userId}
+          className='mb-12'
         />
 
         <Comments

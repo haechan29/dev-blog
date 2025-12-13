@@ -1,5 +1,4 @@
-import SubscribeButton from '@/components/post/subscribeButton';
-import ProfileIcon from '@/components/user/profileIcon';
+import UserProfile from '@/components/post/userProfile';
 import UserNavTabs from '@/components/user/userTabs';
 import * as UserServerService from '@/features/user/domain/service/userServerService';
 import { getUserId } from '@/lib/user';
@@ -23,29 +22,13 @@ export default async function UserLayout({
 
   return (
     <div className='flex flex-col gap-8 pt-(--toolbar-height) pb-20 px-6 md:px-12'>
-      <div className='flex items-center max-sm:justify-between sm:gap-12'>
-        <div className='flex items-center gap-4'>
-          <ProfileIcon
-            nickname={user.nickname!}
-            isActive={user.userStatus === 'ACTIVE'}
-            size='lg'
-          />
-          <div>
-            <div className='font-semibold text-gray-900 text-xl'>
-              {user.nickname}
-            </div>
-            <div className='text-sm text-gray-500'>{`구독자 ${100}명`}</div>
-          </div>
-        </div>
-
-        {currentUserId !== userId && (
-          <SubscribeButton
-            userId={userId}
-            userId={'123'}
-            isSubscribed={false}
-          />
-        )}
-      </div>
+      <UserProfile
+        userId={userId}
+        userName={user.nickname!}
+        userStatus={user.userStatus}
+        currentUserId={currentUserId}
+        size='lg'
+      />
 
       <UserNavTabs userId={userId} />
 
