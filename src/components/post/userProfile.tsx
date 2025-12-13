@@ -2,6 +2,7 @@
 
 import SubscribeButton from '@/components/post/subscribeButton';
 import ProfileIcon from '@/components/user/profileIcon';
+import { SubscriptionDto } from '@/features/subscription/data/dto/subscriptionDto';
 import * as SubscriptionClientRepository from '@/features/subscription/data/repository/subscriptionClientRepository';
 import { UserStatus } from '@/features/user/domain/model/user';
 import { cn } from '@/lib/utils';
@@ -13,6 +14,7 @@ export default function UserProfile({
   userId,
   userName,
   userStatus,
+  initialData,
   currentUserId,
   size = 'sm',
   className,
@@ -20,6 +22,7 @@ export default function UserProfile({
   userId: string;
   userName: string;
   userStatus: UserStatus;
+  initialData?: SubscriptionDto;
   currentUserId?: string;
   size?: 'sm' | 'lg';
   className?: string;
@@ -28,6 +31,7 @@ export default function UserProfile({
     queryKey: ['subscription', userId],
     queryFn: () => SubscriptionClientRepository.getSubscriptionInfo(userId),
     enabled: currentUserId !== userId,
+    initialData,
   });
 
   return (

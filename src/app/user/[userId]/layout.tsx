@@ -1,5 +1,6 @@
 import UserProfile from '@/components/post/userProfile';
 import UserNavTabs from '@/components/user/userTabs';
+import * as SubscriptionServerRepository from '@/features/subscription/data/repository/subscriptionServerRepository';
 import * as UserServerService from '@/features/user/domain/service/userServerService';
 import { getUserId } from '@/lib/user';
 import { notFound } from 'next/navigation';
@@ -14,7 +15,10 @@ export default async function UserLayout({
 }) {
   const currentUserId = await getUserId();
   const { userId } = await params;
-  const user = await UserServerService.fetchUserById(userId);
+  const [user, subscriptionInfo] = await Promise.all([
+    UserServerService.fetchUserById(userId),
+    SubscriptionServerRepository.getSubscriptionInfo(userId),
+  ]);
 
   if (!user || user.userStatus === 'DELETED') {
     notFound();
@@ -26,6 +30,7 @@ export default async function UserLayout({
         userId={userId}
         userName={user.nickname!}
         userStatus={user.userStatus}
+        initialData={subscriptionInfo}
         currentUserId={currentUserId}
         size='lg'
       />
