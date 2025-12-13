@@ -4,9 +4,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import DeleteAccountDialog from '@/components/user/deleteAccountDialog';
+import ProfileIcon from '@/components/user/profileIcon';
 import { createRipple } from '@/lib/dom';
 import { LogIn, LogOut, UserX } from 'lucide-react';
 import { signIn, signOut } from 'next-auth/react';
@@ -15,9 +17,13 @@ import { MouseEvent, ReactNode, useCallback, useState } from 'react';
 
 export default function ProfileDropdown({
   isLoggedIn,
+  userId,
+  nickname,
   children,
 }: {
   isLoggedIn: boolean;
+  userId?: string;
+  nickname: string;
   children: ReactNode;
 }) {
   const router = useRouter();
@@ -61,12 +67,18 @@ export default function ProfileDropdown({
               currentTarget: e.currentTarget,
             });
           }}
-          asChild
         >
           {children}
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent align='end'>
+        <DropdownMenuContent align='end' className='min-w-48'>
+          <div className='flex items-center gap-3 p-2'>
+            <ProfileIcon nickname={nickname} isActive={isLoggedIn} />
+            <div className='text-sm font-medium text-gray-900'>{nickname}</div>
+          </div>
+
+          <DropdownMenuSeparator />
+
           {isLoggedIn ? (
             <>
               <DropdownMenuItem

@@ -12,21 +12,23 @@ export default function ToolbarProfileIcon({
 }) {
   const { user } = useUser();
   const [isMounted, setIsMounted] = useState(false);
-  const displayName =
-    isMounted && isLoggedIn && user?.nickname ? user.nickname : 'Guest';
+  const displayName = !isMounted
+    ? 'Guest'
+    : isLoggedIn && user?.nickname
+    ? user.nickname
+    : `Guest#${user?.id?.slice(0, 4) ?? '0000'}`;
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
   return (
-    isMounted &&
-    user && (
-      <ProfileDropdown isLoggedIn={isLoggedIn}>
-        <div aria-label='프로필 아이콘'>
-          <ProfileIcon nickname={displayName} isActive={isLoggedIn} />
-        </div>
-      </ProfileDropdown>
-    )
+    <ProfileDropdown
+      isLoggedIn={isLoggedIn}
+      userId={user?.id}
+      nickname={displayName}
+    >
+      <ProfileIcon nickname={displayName} isActive={!!user && isLoggedIn} />
+    </ProfileDropdown>
   );
 }
