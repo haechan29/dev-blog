@@ -72,9 +72,23 @@ export default function ProfileDropdown({
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align='end' className='min-w-48'>
-          <div className='flex items-center gap-3 p-2'>
-            <ProfileIcon nickname={nickname} isActive={isLoggedIn} />
-            <div className='text-sm font-medium text-gray-900'>{nickname}</div>
+          <div
+            className='flex items-center gap-3 p-2 cursor-pointer group'
+            onClick={() => userId && router.push(`/@${userId}/posts`)}
+          >
+            <ProfileIcon
+              nickname={nickname}
+              isActive={isLoggedIn}
+              hoverable={false}
+            />
+            <div className='flex flex-col'>
+              <div className='text-sm font-medium text-gray-900'>
+                {nickname}
+              </div>
+              <div className='text-xs text-blue-600 group-hover:underline'>
+                프로필 보기
+              </div>
+            </div>
           </div>
 
           <DropdownMenuSeparator />
