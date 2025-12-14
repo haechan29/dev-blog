@@ -7,7 +7,8 @@ export interface PostDto {
   updatedAt: string;
   userId: string;
   authorName: string;
-  isDeleted: boolean;
+  deletedAt: string | null;
+  registeredAt: string | null;
   seriesId: string | null;
   seriesOrder: number | null;
   seriesTitle: string | null;

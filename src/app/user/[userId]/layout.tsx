@@ -1,7 +1,8 @@
-import { auth } from '@/auth';
-import ProfileIcon from '@/components/user/profileIcon';
+import UserProfile from '@/components/post/userProfile';
 import UserNavTabs from '@/components/user/userTabs';
+import * as SubscriptionServerRepository from '@/features/subscription/data/repository/subscriptionServerRepository';
 import * as UserServerService from '@/features/user/domain/service/userServerService';
+import { getUserId } from '@/lib/user';
 import { notFound } from 'next/navigation';
 import { ReactNode } from 'react';
 
@@ -12,9 +13,12 @@ export default async function UserLayout({
   params: Promise<{ userId: string }>;
   children: ReactNode;
 }) {
-  const session = await auth();
+  const currentUserId = await getUserId();
   const { userId } = await params;
-  const user = await UserServerService.fetchUserById(userId);
+  const [user, subscriptionInfo] = await Promise.all([
+    UserServerService.fetchUserById(userId),
+    SubscriptionServerRepository.getSubscriptionInfo(userId),
+  ]);
 
   if (!user || user.userStatus === 'DELETED') {
     notFound();
@@ -22,17 +26,14 @@ export default async function UserLayout({
 
   return (
     <div className='flex flex-col gap-8 pt-(--toolbar-height) pb-20 px-6 md:px-12'>
-      <div className='flex items-center space-x-3'>
-        <ProfileIcon isLoggedIn={!!session} />
-        <div>
-          <div className='font-semibold text-gray-900 text-xl'>
-            {user.nickname}
-          </div>
-          <p className='text-sm text-gray-500'>
-            가입일: {new Date(user.createdAt).toLocaleDateString()}
-          </p>
-        </div>
-      </div>
+      <UserProfile
+        userId={userId}
+        userName={user.nickname!}
+        userStatus={user.userStatus}
+        initialData={subscriptionInfo}
+        currentUserId={currentUserId}
+        size='lg'
+      />
 
       <UserNavTabs userId={userId} />
 

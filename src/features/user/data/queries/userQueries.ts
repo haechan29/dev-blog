@@ -19,7 +19,6 @@ export async function fetchUser(userId: string) {
         created_at, 
         updated_at, 
         deleted_at, 
-        auth_user_id, 
         registered_at
       `
     )
@@ -89,7 +88,6 @@ export async function deleteUser() {
     .update({
       deleted_at: new Date().toISOString(),
       nickname: null,
-      registered_at: null,
     })
     .eq('id', userId);
 

@@ -1,9 +1,11 @@
 import { UserResponseDto } from '@/features/user/data/dto/userResponseDto';
 import { User, UserStatus } from '@/features/user/domain/model/user';
 
-function getUserStatus(dto: UserResponseDto): UserStatus {
-  if (dto.authUserId) return 'ACTIVE';
+export function getUserStatus(
+  dto: Pick<UserResponseDto, 'deletedAt' | 'registeredAt'>
+): UserStatus {
   if (dto.deletedAt) return 'DELETED';
+  if (dto.registeredAt) return 'ACTIVE';
   return 'GUEST';
 }
 

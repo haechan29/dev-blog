@@ -19,7 +19,7 @@ export async function fetchPosts() {
       user_id,
       series_id,
       series_order,
-      users:user_id(nickname, deleted_at),
+      users:user_id(nickname, deleted_at, registered_at),
       series:series_id(title)
     `
     )
@@ -46,7 +46,7 @@ export async function fetchPostsByUserId(userId: string) {
       user_id,
       series_id,
       series_order,
-      users:user_id(nickname, deleted_at),
+      users:user_id(nickname, deleted_at, registered_at),
       series:series_id(title)
     `
     )
@@ -87,7 +87,7 @@ export async function fetchPost(postId: string) {
         user_id,
         series_id,
         series_order,
-        users:user_id(nickname, deleted_at),
+        users:user_id(nickname, deleted_at, registered_at),
         series:series_id(title)
       `
     )
@@ -156,7 +156,7 @@ export async function createPost({
         user_id,
         series_id,
         series_order,
-        users:user_id(nickname, deleted_at),
+        users:user_id(nickname, deleted_at, registered_at),
         series:series_id(title)
       `
     )
@@ -208,7 +208,7 @@ export async function updatePost({
         user_id,
         series_id,
         series_order,
-        users:user_id(nickname, deleted_at),
+        users:user_id(nickname, deleted_at, registered_at),
         series:series_id(title)
       `
     )

@@ -1,13 +1,14 @@
 'use client';
 
 import Comments from '@/components/comment/comments';
+import HomeToolbar from '@/components/home/homeToolbar';
 import LikeButton from '@/components/post/likeButton';
 import PostContentWrapper from '@/components/post/postContentWrapper';
 import PostHeader from '@/components/post/postHeader';
 import PostSeriesNav from '@/components/post/postSeriesNav';
 import PostSidebar from '@/components/post/postSidebar';
-import PostsToolbar from '@/components/post/postsToolbar';
 import PostToolbar from '@/components/post/postToolbar';
+import UserProfile from '@/components/post/userProfile';
 import EnterFullscreenButton from '@/components/postViewer/enterFullscreenButton';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
@@ -38,7 +39,7 @@ export default function PostPageClient({
   const dispatch = useDispatch<AppDispatch>();
 
   const { data: post } = useQuery({
-    queryKey: ['post', initialPost.id],
+    queryKey: ['posts', initialPost.id],
     queryFn: () =>
       PostClientService.fetchPost(initialPost.id).then(createProps),
     initialData: initialPost,
@@ -55,7 +56,7 @@ export default function PostPageClient({
   return (
     <>
       <Suspense>
-        <PostsToolbar isLoggedIn={isLoggedIn} className='max-xl:hidden' />
+        <HomeToolbar isLoggedIn={isLoggedIn} className='max-xl:hidden' />
         <PostToolbar className='xl:hidden' />
       </Suspense>
 
@@ -78,6 +79,14 @@ export default function PostPageClient({
         <LikeButton postId={post.id} />
 
         <PostSeriesNav post={post} />
+
+        <UserProfile
+          userId={post.userId}
+          userName={post.authorName}
+          userStatus={post.userStatus}
+          currentUserId={userId}
+          className='mb-12'
+        />
 
         <Comments
           isLoggedIn={isLoggedIn}

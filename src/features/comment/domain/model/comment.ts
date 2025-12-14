@@ -1,4 +1,5 @@
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import { UserStatus } from '@/features/user/domain/model/user';
 
 export class Comment {
   constructor(
@@ -10,7 +11,7 @@ export class Comment {
     public readonly updatedAt: string,
     public readonly likeCount: number,
     public readonly userId: string,
-    public readonly isDeleted: boolean
+    public readonly userStatus: UserStatus
   ) {}
 
   toProps(): CommentItemProps {
@@ -23,7 +24,7 @@ export class Comment {
       isUpdated: this.createdAt !== this.updatedAt,
       likeCount: this.likeCount,
       userId: this.userId,
-      isDeleted: this.isDeleted,
+      userStatus: this.userStatus,
     };
   }
 }

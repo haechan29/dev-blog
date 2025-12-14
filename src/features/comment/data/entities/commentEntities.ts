@@ -8,6 +8,6 @@ export interface CommentEntity {
   updated_at: string;
   like_count: number;
   user_id: string;
-  users: Pick<UserEntity, 'nickname' | 'deleted_at'>;
+  users: Pick<UserEntity, 'nickname' | 'deleted_at' | 'registered_at'>;
   password_hash?: string | null;
 }

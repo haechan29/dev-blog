@@ -2,7 +2,7 @@ import { auth } from '@/auth';
 import UserToolbar from '@/components/user/userToolbar';
 import { ReactNode } from 'react';
 
-export default async function UsersLayout({
+export default async function UserToolbarLayout({
   children,
 }: {
   children: ReactNode;
