@@ -28,7 +28,7 @@ export default async function UserLayout({
     <div className='flex flex-col gap-8 pt-(--toolbar-height) pb-20 px-6 md:px-12'>
       <UserProfile
         userId={userId}
-        userName={user.nickname!}
+        userName={user?.nickname ?? `Guest#${userId.slice(0, 4)}`}
         userStatus={user.userStatus}
         initialData={subscriptionInfo}
         currentUserId={currentUserId}
