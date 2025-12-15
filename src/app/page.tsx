@@ -15,9 +15,8 @@ export default async function HomePage() {
   const userId =
     session?.user?.user_id ?? (await cookies()).get('userId')?.value;
 
-  const posts = await PostServerService.fetchPosts().then(posts =>
-    posts.map(createProps)
-  );
+  const { posts } = await PostServerService.getFeedPosts(null, userId);
+  const postProps = posts.map(createProps);
 
   return (
     <>
@@ -39,10 +38,10 @@ export default async function HomePage() {
         )}
       >
         <div className='flex flex-col mt-8 mb-20'>
-          {posts.map((post, index) => (
+          {postProps.map((post, index) => (
             <div key={post.id} className='mb-8'>
               <PostPreview post={post} />
-              {index !== posts.length - 1 && (
+              {index !== postProps.length - 1 && (
                 <div className='h-px bg-gray-200' />
               )}
             </div>
