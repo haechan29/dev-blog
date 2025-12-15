@@ -7,10 +7,22 @@ export type FeedPost = Awaited<
 >[number];
 
 export async function getFeedPosts(
-  userId: string,
   limit: number,
-  cursor?: string
+  cursor: string | null,
+  userId?: string
 ) {
+  if (!userId) {
+    const posts = await FeedQueries.fetchFeedPosts({
+      limit,
+      cursor,
+    });
+
+    return {
+      posts: posts.map(toDto),
+      nextCursor: posts.at(-1)?.post_stats[0]?.popularity.toString() ?? null,
+    };
+  }
+
   const [followingIds, viewedPosts, skippedPosts] = await Promise.all([
     SubscriptionQueries.getFollowingIds(userId),
     FeedQueries.fetchViewedPosts(userId),
@@ -24,9 +36,9 @@ export async function getFeedPosts(
   const skipMap = new Map(skippedPosts.map(s => [s.post_id, s.skip_count]));
 
   const posts = await FeedQueries.fetchFeedPosts({
+    limit,
     excludeIds: viewedPostIds,
     cursor,
-    limit,
   });
 
   const seriesFirstUnread = findSeriesFirstUnread(posts, viewedSeriesIds);

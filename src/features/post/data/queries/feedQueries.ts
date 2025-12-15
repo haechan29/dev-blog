@@ -38,7 +38,7 @@ export async function fetchFeedPosts({
 }: {
   limit: number;
   excludeIds?: string[];
-  cursor?: string;
+  cursor: string | null;
 }) {
   let query = supabase
     .from('posts')
