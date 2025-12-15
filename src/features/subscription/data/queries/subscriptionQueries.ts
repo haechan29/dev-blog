@@ -68,6 +68,19 @@ export async function getFollowing(userId: string) {
   return data.map(row => row.following);
 }
 
+export async function getFollowingIds(userId: string) {
+  const { data, error } = await supabase
+    .from('subscriptions')
+    .select('following_id')
+    .eq('follower_id', userId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data.map(s => s.following_id);
+}
+
 export async function createSubscription(followingId: string) {
   const followerId = await getUserId();
   if (!followerId) {
