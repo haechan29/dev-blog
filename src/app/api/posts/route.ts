@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     if (type === 'feed') {
       const userId = await getUserId();
       const cursor = searchParams.get('cursor');
-      const data = await FeedUsecase.getFeedPosts(20, cursor, userId);
+      const data = await FeedUsecase.getFeedPosts(cursor, userId);
       return NextResponse.json({ data });
     }
 

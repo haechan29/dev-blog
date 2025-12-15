@@ -2,18 +2,16 @@ import { toDto } from '@/features/post/data/mapper/feedMapper';
 import * as FeedQueries from '@/features/post/data/queries/feedQueries';
 import * as SubscriptionQueries from '@/features/subscription/data/queries/subscriptionQueries';
 
+const FEED_LIMIT = 20;
+
 export type FeedPost = Awaited<
   ReturnType<typeof FeedQueries.fetchFeedPosts>
 >[number];
 
-export async function getFeedPosts(
-  limit: number,
-  cursor: string | null,
-  userId?: string
-) {
+export async function getFeedPosts(cursor: string | null, userId?: string) {
   if (!userId) {
     const posts = await FeedQueries.fetchFeedPosts({
-      limit,
+      limit: FEED_LIMIT,
       cursor,
     });
 
@@ -36,7 +34,7 @@ export async function getFeedPosts(
   const skipMap = new Map(skippedPosts.map(s => [s.post_id, s.skip_count]));
 
   const posts = await FeedQueries.fetchFeedPosts({
-    limit,
+    limit: FEED_LIMIT,
     excludeIds: viewedPostIds,
     cursor,
   });
