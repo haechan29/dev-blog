@@ -1,12 +1,9 @@
+import { FeedPostEntity } from '@/features/post/data/entities/feedPostEntities';
 import { toDto } from '@/features/post/data/mapper/feedMapper';
 import * as FeedQueries from '@/features/post/data/queries/feedQueries';
 import * as SubscriptionQueries from '@/features/subscription/data/queries/subscriptionQueries';
 
 const FEED_LIMIT = 20;
-
-export type FeedPost = Awaited<
-  ReturnType<typeof FeedQueries.fetchFeedPosts>
->[number];
 
 export async function getFeedPosts(cursor: string | null, userId?: string) {
   if (!userId) {
@@ -17,7 +14,7 @@ export async function getFeedPosts(cursor: string | null, userId?: string) {
 
     return {
       posts: posts.map(toDto),
-      nextCursor: posts.at(-1)?.post_stats[0]?.popularity.toString() ?? null,
+      nextCursor: posts.at(-1)?.post_stats.popularity.toString() ?? null,
     };
   }
 
@@ -56,7 +53,7 @@ export async function getFeedPosts(cursor: string | null, userId?: string) {
 }
 
 function findSeriesFirstUnread(
-  posts: FeedPost[],
+  posts: FeedPostEntity[],
   viewedSeriesIds: string[]
 ): Set<string> {
   const seriesFirstUnread = new Set<string>();
@@ -66,8 +63,8 @@ function findSeriesFirstUnread(
     .filter(post => post.series_id && viewedSeriesIds.includes(post.series_id))
     .sort((a, b) => (a.series_order ?? 0) - (b.series_order ?? 0))
     .forEach(post => {
-      if (!seenSeries.has(post.series_id)) {
-        seenSeries.add(post.series_id);
+      if (!seenSeries.has(post.series_id!)) {
+        seenSeries.add(post.series_id!);
         seriesFirstUnread.add(post.id);
       }
     });
@@ -76,7 +73,7 @@ function findSeriesFirstUnread(
 }
 
 function calculateScores(
-  posts: FeedPost[],
+  posts: FeedPostEntity[],
   {
     followingIds,
     seriesFirstUnread,
@@ -88,7 +85,7 @@ function calculateScores(
   }
 ) {
   return posts.map(post => {
-    const popularity = post.post_stats[0]?.popularity ?? 0;
+    const popularity = post.post_stats.popularity ?? 0;
     let multiplier = 1.0;
 
     if (followingIds.includes(post.user_id)) multiplier += 0.3;

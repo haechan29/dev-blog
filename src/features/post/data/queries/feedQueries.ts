@@ -1,3 +1,4 @@
+import { FeedPostEntity } from '@/features/post/data/entities/feedPostEntities';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
@@ -75,5 +76,5 @@ export async function fetchFeedPosts({
     throw new Error(error.message);
   }
 
-  return data;
+  return data as unknown as FeedPostEntity[];
 }
