@@ -1,8 +1,49 @@
+import { toDto } from '@/features/post/data/mapper/feedMapper';
 import * as FeedQueries from '@/features/post/data/queries/feedQueries';
+import * as SubscriptionQueries from '@/features/subscription/data/queries/subscriptionQueries';
 
 export type FeedPost = Awaited<
   ReturnType<typeof FeedQueries.fetchFeedPosts>
 >[number];
+
+export async function getFeedPosts(
+  userId: string,
+  limit: number,
+  cursor?: string
+) {
+  const [followingIds, viewedPosts, skippedPosts] = await Promise.all([
+    SubscriptionQueries.getFollowingIds(userId),
+    FeedQueries.fetchViewedPosts(userId),
+    FeedQueries.fetchSkippedPosts(userId),
+  ]);
+
+  const viewedPostIds = viewedPosts.map(v => v.post_id);
+  const viewedSeriesIds = [
+    ...new Set(viewedPosts.map(v => v.posts[0]?.series_id).filter(Boolean)),
+  ];
+  const skipMap = new Map(skippedPosts.map(s => [s.post_id, s.skip_count]));
+
+  const posts = await FeedQueries.fetchFeedPosts({
+    excludeIds: viewedPostIds,
+    cursor,
+    limit,
+  });
+
+  const seriesFirstUnread = findSeriesFirstUnread(posts, viewedSeriesIds);
+
+  const scoredPosts = calculateScores(posts, {
+    followingIds,
+    seriesFirstUnread,
+    skipMap,
+  });
+
+  scoredPosts.sort((a, b) => b.score - a.score);
+
+  return {
+    posts: scoredPosts.map(p => toDto(p)),
+    nextCursor: scoredPosts.at(-1)?.popularity.toString() ?? null,
+  };
+}
 
 function findSeriesFirstUnread(
   posts: FeedPost[],
