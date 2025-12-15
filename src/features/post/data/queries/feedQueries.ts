@@ -15,3 +15,18 @@ export async function fetchViewedPosts(userId: string) {
 
   return data;
 }
+
+export async function fetchSkippedPosts(userId: string) {
+  const { data, error } = await supabase
+    .from('post_skips')
+    .select('post_id, skip_count')
+    .eq('user_id', userId)
+    .order('updated_at', { ascending: false })
+    .limit(1000);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
