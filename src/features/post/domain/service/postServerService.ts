@@ -8,6 +8,14 @@ export async function fetchPosts() {
   return dtos.map(toDomain);
 }
 
+export async function getFeedPosts(cursor: string | null, userId?: string) {
+  const result = await PostServerRepository.getFeedPosts(cursor, userId);
+  return {
+    posts: result.posts.map(toDomain),
+    nextCursor: result.nextCursor,
+  };
+}
+
 export async function fetchPostsByUserId(userId: string) {
   const dtos = await PostServerRepository.fetchPostsByUserId(userId);
   return dtos.map(toDomain);
