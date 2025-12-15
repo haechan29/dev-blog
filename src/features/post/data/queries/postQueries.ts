@@ -10,18 +10,18 @@ export async function fetchPosts() {
     .from('posts')
     .select(
       `
-      id,
-      title,
-      content,
-      tags,
-      created_at,
-      updated_at,
-      user_id,
-      series_id,
-      series_order,
-      users:user_id(nickname, deleted_at, registered_at),
-      series:series_id(title)
-    `
+        id,
+        title,
+        content,
+        tags,
+        created_at,
+        updated_at,
+        user_id,
+        series_id,
+        series_order,
+        users:user_id(nickname, deleted_at, registered_at),
+        series:series_id(title)
+      `
     )
     .order('created_at', { ascending: false });
 
@@ -37,18 +37,18 @@ export async function fetchPostsByUserId(userId: string) {
     .from('posts')
     .select(
       `
-      id,
-      title,
-      content,
-      tags,
-      created_at,
-      updated_at,
-      user_id,
-      series_id,
-      series_order,
-      users:user_id(nickname, deleted_at, registered_at),
-      series:series_id(title)
-    `
+        id,
+        title,
+        content,
+        tags,
+        created_at,
+        updated_at,
+        user_id,
+        series_id,
+        series_order,
+        users:user_id(nickname, deleted_at, registered_at),
+        series:series_id(title)
+      `
     )
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
