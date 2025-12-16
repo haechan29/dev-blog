@@ -23,6 +23,21 @@ export async function deleteLike(userId: string, postId: string) {
   }
 }
 
+export async function fetchViewedPosts(userId: string) {
+  const { data, error } = await supabase
+    .from('post_views')
+    .select('post_id, posts(series_id)')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(1000);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
 export async function insertView(
   userId: string,
   postId: string,
@@ -38,6 +53,21 @@ export async function insertView(
   if (error) {
     throw new Error(error.message);
   }
+}
+
+export async function fetchSkippedPosts(userId: string) {
+  const { data, error } = await supabase
+    .from('post_skips')
+    .select('post_id, skip_count')
+    .eq('user_id', userId)
+    .order('updated_at', { ascending: false })
+    .limit(1000);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
 }
 
 export async function incrementSkips(userId: string, postIds: string[]) {

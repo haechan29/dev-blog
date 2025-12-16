@@ -21,8 +21,8 @@ export async function getFeedPosts(cursor: string | null, userId?: string) {
 
   const [followingIds, viewedPosts, skippedPosts] = await Promise.all([
     SubscriptionQueries.getFollowingIds(userId),
-    FeedQueries.fetchViewedPosts(userId),
-    FeedQueries.fetchSkippedPosts(userId),
+    InteractionQueries.fetchViewedPosts(userId),
+    InteractionQueries.fetchSkippedPosts(userId),
   ]);
 
   const viewedPostIds = viewedPosts.map(v => v.post_id);
