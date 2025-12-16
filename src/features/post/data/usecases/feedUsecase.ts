@@ -1,3 +1,4 @@
+import * as InteractionQueries from '@/features/post-interaction/data/queries/interactionQueries';
 import { FeedPostEntity } from '@/features/post/data/entities/feedPostEntities';
 import { toDto } from '@/features/post/data/mapper/feedMapper';
 import * as FeedQueries from '@/features/post/data/queries/feedQueries';
@@ -45,6 +46,9 @@ export async function getFeedPosts(cursor: string | null, userId?: string) {
   });
 
   scoredPosts.sort((a, b) => b.score - a.score);
+
+  const postIds = scoredPosts.map(p => p.id);
+  await InteractionQueries.incrementSkips(userId, postIds);
 
   return {
     posts: scoredPosts.map(p => toDto(p)),

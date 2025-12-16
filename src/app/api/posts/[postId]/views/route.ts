@@ -1,4 +1,4 @@
-import { insertView } from '@/features/post-interaction/data/queries/interactionQueries';
+import * as InteractionUsecase from '@/features/post-interaction/data/usecases/interactionUsecase';
 import { UnauthorizedError } from '@/features/user/data/errors/userErrors';
 import { ApiError } from '@/lib/api';
 import { getUserId } from '@/lib/user';
@@ -16,9 +16,9 @@ export async function POST(
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 
-    const { readDuration } = await request.json();
+    const { readDuration, fromFeed } = await request.json();
 
-    await insertView(userId, postId, readDuration);
+    await InteractionUsecase.recordView(userId, postId, readDuration, fromFeed);
 
     return NextResponse.json({ data: null });
   } catch (error) {
