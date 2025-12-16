@@ -2,18 +2,17 @@ import { supabase } from '@/lib/supabase';
 import 'server-only';
 
 export async function selectLike(userId: string, postId: string) {
-  const { data, error } = await supabase
+  const { count, error } = await supabase
     .from('post_likes')
-    .select('id')
+    .select('*', { count: 'exact', head: true })
     .eq('user_id', userId)
-    .eq('post_id', postId)
-    .maybeSingle();
+    .eq('post_id', postId);
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return data !== null;
+  return count !== null && count > 0;
 }
 
 export async function insertLike(userId: string, postId: string) {
