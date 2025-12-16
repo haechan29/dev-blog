@@ -10,13 +10,3 @@ export async function fetchPostStat(
   const postStat: PostStat = response.data;
   return toData(postStat);
 }
-
-export async function incrementLikeCount(
-  postId: string
-): Promise<PostStatResponseDto> {
-  const response = await api.post(
-    `/api/posts/${postId}/stats/likeCount/increment`
-  );
-  const postStat = response.data;
-  return toData(postStat);
-}
