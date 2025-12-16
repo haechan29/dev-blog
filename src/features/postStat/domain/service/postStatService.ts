@@ -11,8 +11,3 @@ export async function incrementLikeCount(postId: string): Promise<PostStat> {
   const dto = await PostStatRepository.incrementLikeCount(postId);
   return toDomain(dto);
 }
-
-export async function incrementViewCount(postId: string): Promise<PostStat> {
-  const dto = await PostStatRepository.incrementViewCount(postId);
-  return toDomain(dto);
-}

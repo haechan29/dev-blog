@@ -20,13 +20,3 @@ export async function incrementLikeCount(
   const postStat = response.data;
   return toData(postStat);
 }
-
-export async function incrementViewCount(
-  postId: string
-): Promise<PostStatResponseDto> {
-  const response = await api.post(
-    `/api/posts/${postId}/stats/viewCount/increment`
-  );
-  const postStat = response.data;
-  return toData(postStat);
-}
