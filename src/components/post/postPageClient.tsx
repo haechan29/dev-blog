@@ -76,7 +76,7 @@ export default function PostPageClient({
 
         <PostContentWrapper post={post} parsedContent={parsedContent} />
 
-        <LikeButton postId={post.id} />
+        <LikeButton postId={post.id} likeCount={post.likeCount} />
 
         <PostSeriesNav post={post} />
 

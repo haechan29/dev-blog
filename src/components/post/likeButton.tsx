@@ -1,18 +1,33 @@
 'use client';
 
 import useLike from '@/features/post-interaction/hooks/useLike';
-import usePostStat from '@/features/postStat/hooks/usePostStat';
 import useThrottle from '@/hooks/useThrottle';
 import clsx from 'clsx';
 import { Heart } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-export default function LikeButton({ postId }: { postId: string }) {
+export default function LikeButton({
+  postId,
+  likeCount,
+}: {
+  postId: string;
+  likeCount: number;
+}) {
   const throttle = useThrottle();
 
   const { isLiked, toggleLike } = useLike({ postId });
-  const { stat, incrementLikeCount } = usePostStat({ postId });
+  const initialIsLikedRef = useRef<boolean | undefined>();
   const [isAnimating, setIsAnimating] = useState(false);
+
+  const likedCount = useMemo(() => {
+    if (initialIsLikedRef.current === undefined) return likeCount;
+    return initialIsLikedRef.current ? likeCount : likeCount + 1;
+  }, [likeCount]);
+
+  const unlikedCount = useMemo(() => {
+    if (initialIsLikedRef.current === undefined) return likeCount;
+    return initialIsLikedRef.current ? likeCount - 1 : likeCount;
+  }, [likeCount]);
 
   const handleClick = useCallback(() => {
     throttle(() => {
@@ -21,6 +36,12 @@ export default function LikeButton({ postId }: { postId: string }) {
       setTimeout(() => setIsAnimating(false), 300);
     }, 1000);
   }, [throttle, toggleLike]);
+
+  useEffect(() => {
+    if (initialIsLikedRef.current === undefined && isLiked !== undefined) {
+      initialIsLikedRef.current = isLiked;
+    }
+  }, [isLiked]);
 
   return (
     <div className='flex justify-center mb-20'>
@@ -49,7 +70,7 @@ export default function LikeButton({ postId }: { postId: string }) {
           )}
         >
           <div className={clsx(isAnimating && 'invisible')}>
-            {isLiked ? stat.likeCount + 1 : stat.likeCount}
+            {isLiked ? likedCount : unlikedCount}
           </div>
           <div
             className={clsx(
@@ -58,8 +79,8 @@ export default function LikeButton({ postId }: { postId: string }) {
               !isAnimating && 'invisible'
             )}
           >
-            <div>{stat.likeCount}</div>
-            <div>{stat.likeCount + 1}</div>
+            <div>{unlikedCount}</div>
+            <div>{likedCount}</div>
           </div>
         </div>
       </button>
