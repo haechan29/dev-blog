@@ -1,14 +1,10 @@
 export const dynamic = 'force-dynamic';
 
 import { auth } from '@/auth';
-import HomeSidebar from '@/components/home/homeSidebar';
-import HomeToolbar from '@/components/home/homeToolbar';
-import PostPreview from '@/components/post/postPreview';
+import HomePageClient from '@/components/home/homePageClient';
 import * as PostServerService from '@/features/post/domain/service/postServerService';
 import { createProps } from '@/features/post/ui/postProps';
-import clsx from 'clsx';
 import { cookies } from 'next/headers';
-import { Suspense } from 'react';
 
 export default async function HomePage() {
   const session = await auth();
@@ -19,35 +15,6 @@ export default async function HomePage() {
   const postProps = posts.map(createProps);
 
   return (
-    <>
-      <Suspense>
-        <HomeToolbar isLoggedIn={!!session} />
-      </Suspense>
-
-      {userId && (
-        <div className='max-xl:hidden'>
-          <HomeSidebar userId={userId} />
-        </div>
-      )}
-
-      <div
-        className={clsx(
-          'mt-(--toolbar-height) mb-20 px-6 md:px-12 xl:px-18',
-          'xl:ml-(--sidebar-width)',
-          'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
-        )}
-      >
-        <div className='flex flex-col mt-8 mb-20'>
-          {postProps.map((post, index) => (
-            <div key={post.id} className='mb-8'>
-              <PostPreview isLoggedIn={!!session} post={post} userId={userId} />
-              {index !== postProps.length - 1 && (
-                <div className='h-px bg-gray-200' />
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-    </>
+    <HomePageClient isLoggedIn={!!session} posts={postProps} userId={userId} />
   );
 }
