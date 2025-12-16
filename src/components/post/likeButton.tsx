@@ -5,7 +5,7 @@ import usePostStat from '@/features/postStat/hooks/usePostStat';
 import useThrottle from '@/hooks/useThrottle';
 import clsx from 'clsx';
 import { Heart } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 export default function LikeButton({ postId }: { postId: string }) {
   const throttle = useThrottle();
@@ -27,7 +27,7 @@ export default function LikeButton({ postId }: { postId: string }) {
       <button
         onClick={handleClick}
         className={clsx(
-          'flex items-center gap-2 px-6 py-3 rounded-lg border transition-all duration-300',
+          'flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300',
           isLiked && isAnimating && 'scale-105',
           isLiked
             ? 'border-red-300 bg-red-50'
@@ -42,57 +42,27 @@ export default function LikeButton({ postId }: { postId: string }) {
           )}
         />
 
-        <RollingCounter heartFilled={isLiked} count={stat.likeCount} />
+        <div
+          className={clsx(
+            'relative text-sm overflow-hidden',
+            isLiked ? 'text-red-600' : 'text-gray-600'
+          )}
+        >
+          <div className={clsx(isAnimating && 'invisible')}>
+            {isLiked ? stat.likeCount + 1 : stat.likeCount}
+          </div>
+          <div
+            className={clsx(
+              'absolute top-0 inset-x-0 mx-auto transition-transform duration-300 ease-out',
+              isLiked && '-translate-y-[50%]',
+              !isAnimating && 'invisible'
+            )}
+          >
+            <div>{stat.likeCount}</div>
+            <div>{stat.likeCount + 1}</div>
+          </div>
+        </div>
       </button>
-    </div>
-  );
-}
-
-function RollingCounter({
-  heartFilled,
-  count,
-}: {
-  heartFilled: boolean;
-  count: number;
-}) {
-  const [prevCount, setPrevCount] = useState(0);
-  const isRolling = useMemo(() => count !== prevCount, [count, prevCount]);
-
-  return (
-    <div className='relative w-6 h-6 font-medium overflow-hidden flex items-center justify-center'>
-      <span
-        className={clsx(
-          'absolute h-6 flex items-center justify-center',
-          heartFilled ? 'text-red-600' : 'text-gray-600',
-          isRolling && 'hidden'
-        )}
-      >
-        {count}
-      </span>
-      <div
-        className={clsx(
-          'absolute flex flex-col font-medium transition-transform duration-300 ease-out',
-          isRolling ? '-translate-y-3 visible' : 'translate-y-3 invisible'
-        )}
-        onTransitionEnd={() => setPrevCount(count)}
-      >
-        <span
-          className={clsx(
-            'h-6 flex items-center justify-center',
-            heartFilled ? 'text-red-600' : 'text-gray-600'
-          )}
-        >
-          {prevCount}
-        </span>
-        <span
-          className={clsx(
-            'h-6 flex items-center justify-center',
-            heartFilled ? 'text-red-600' : 'text-gray-600'
-          )}
-        >
-          {count}
-        </span>
-      </div>
     </div>
   );
 }
