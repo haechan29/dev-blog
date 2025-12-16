@@ -6,7 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 export default function useLike({ postId }: { postId: string }) {
   const queryClient = useQueryClient();
 
-  const { data: isLiked = false } = useQuery({
+  const { data: isLiked } = useQuery({
     queryKey: ['posts', postId, 'like'],
     queryFn: () => InteractionRepository.getIsLiked(postId),
   });

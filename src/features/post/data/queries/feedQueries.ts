@@ -26,7 +26,7 @@ export async function fetchFeedPosts({
         series_order,
         users:user_id(nickname, deleted_at, registered_at),
         series:series_id(title),
-        post_stats(popularity)
+        post_stats(like_count, view_count, popularity)
       `
     )
     .order('post_stats(popularity)', { ascending: false })

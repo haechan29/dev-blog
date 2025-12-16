@@ -12,5 +12,6 @@ export interface PostEntity {
   series_order: number | null;
   users: Pick<UserEntity, 'nickname' | 'deleted_at' | 'registered_at'>;
   series: { title: string } | null;
+  post_stats: { like_count: number; view_count: number };
   password_hash?: string | null;
 }

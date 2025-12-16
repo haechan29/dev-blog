@@ -17,5 +17,7 @@ export function toDto(post: FeedPostEntity): PostDto {
     seriesId: post.series_id,
     seriesOrder: post.series_order,
     seriesTitle: post.series?.title ?? null,
+    likeCount: post.post_stats?.like_count ?? 0,
+    viewCount: post.post_stats?.view_count ?? 0,
   };
 }

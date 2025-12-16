@@ -15,6 +15,8 @@ export function toDomain(dto: PostDto): Post {
     getUserStatus(dto),
     dto.seriesId,
     dto.seriesOrder,
-    dto.seriesTitle
+    dto.seriesTitle,
+    dto.likeCount,
+    dto.viewCount
   );
 }

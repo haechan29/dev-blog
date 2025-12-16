@@ -17,7 +17,9 @@ export default class Post {
     public readonly userStatus: UserStatus,
     public readonly seriesId: string | null,
     public readonly seriesOrder: number | null,
-    public readonly seriesTitle: string | null
+    public readonly seriesTitle: string | null,
+    public readonly likeCount: number,
+    public readonly viewCount: number
   ) {
     this.headings = extractHeadings(content);
   }

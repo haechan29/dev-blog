@@ -12,4 +12,6 @@ export interface PostDto {
   seriesId: string | null;
   seriesOrder: number | null;
   seriesTitle: string | null;
+  likeCount: number;
+  viewCount: number;
 }
