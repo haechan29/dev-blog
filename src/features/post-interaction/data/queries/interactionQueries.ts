@@ -1,6 +1,21 @@
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
+export async function selectLike(userId: string, postId: string) {
+  const { data, error } = await supabase
+    .from('post_likes')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('post_id', postId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data !== null;
+}
+
 export async function insertLike(userId: string, postId: string) {
   const { error } = await supabase
     .from('post_likes')
