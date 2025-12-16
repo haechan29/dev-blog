@@ -40,7 +40,7 @@ export default async function HomePage() {
         <div className='flex flex-col mt-8 mb-20'>
           {postProps.map((post, index) => (
             <div key={post.id} className='mb-8'>
-              <PostPreview post={post} />
+              <PostPreview isLoggedIn={!!session} post={post} userId={userId} />
               {index !== postProps.length - 1 && (
                 <div className='h-px bg-gray-200' />
               )}
