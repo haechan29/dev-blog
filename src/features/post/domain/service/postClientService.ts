@@ -7,6 +7,14 @@ export async function fetchPost(postId: string): Promise<Post> {
   return toDomain(dto);
 }
 
+export async function getFeedPosts(cursor: string | null) {
+  const result = await PostClientRepository.getFeedPosts(cursor);
+  return {
+    posts: result.posts.map(toDomain),
+    nextCursor: result.nextCursor,
+  };
+}
+
 export async function fetchPosts(userId: string) {
   const dtos = await PostClientRepository.fetchPosts(userId);
   return dtos.map(toDomain);

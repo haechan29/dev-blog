@@ -7,6 +7,19 @@ export async function fetchPost(postId: string): Promise<PostDto> {
   return response.data;
 }
 
+export async function getFeedPosts(cursor: string | null): Promise<{
+  posts: PostDto[];
+  nextCursor: string | null;
+}> {
+  const params = new URLSearchParams({
+    type: 'feed',
+    ...(cursor && { cursor }),
+  });
+
+  const response = await api.get(`/api/posts?${params}`);
+  return response.data;
+}
+
 export async function fetchPosts(userId: string): Promise<PostDto[]> {
   const response = await api.get(`/api/posts?userId=${userId}`);
   return response.data;
