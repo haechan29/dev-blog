@@ -15,7 +15,7 @@ export async function fetchSeries(seriesId: string) {
         created_at, 
         updated_at,
         users:user_id(nickname),
-        posts(id, title, created_at, series_id, series_order))
+        posts(id, title, created_at, series_id, series_order, post_stats(like_count, view_count))
       `
     )
     .eq('id', seriesId)
@@ -41,7 +41,7 @@ export async function fetchSeriesByUserId(userId: string) {
         created_at, 
         updated_at,
         users:user_id(nickname),
-        posts(id, title, created_at, series_id, series_order))
+        posts(id, title, created_at, series_id, series_order, post_stats(like_count, view_count))
       `
     )
     .eq('user_id', userId)
@@ -103,7 +103,7 @@ export async function updateSeries({
         created_at, 
         updated_at,
         users:user_id(nickname),
-        posts(id, title, created_at, series_id, series_order))
+        posts(id, title, created_at, series_id, series_order, post_stats(like_count, view_count))
       `
     )
     .single();

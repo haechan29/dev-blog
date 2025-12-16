@@ -10,7 +10,13 @@ export interface SeriesDto {
   authorName: string;
   posts: Pick<
     PostDto,
-    'id' | 'title' | 'createdAt' | 'seriesId' | 'seriesOrder'
+    | 'id'
+    | 'title'
+    | 'createdAt'
+    | 'seriesId'
+    | 'seriesOrder'
+    | 'likeCount'
+    | 'viewCount'
   >[];
   postCount: number;
 }

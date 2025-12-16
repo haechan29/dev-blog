@@ -10,7 +10,13 @@ export interface Series {
   authorName: string;
   posts: Pick<
     Post,
-    'id' | 'title' | 'createdAt' | 'seriesId' | 'seriesOrder'
+    | 'id'
+    | 'title'
+    | 'createdAt'
+    | 'seriesId'
+    | 'seriesOrder'
+    | 'likeCount'
+    | 'viewCount'
   >[];
   postCount: number;
 }

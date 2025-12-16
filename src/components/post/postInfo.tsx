@@ -1,18 +1,13 @@
 'use client';
 
 import { PostProps } from '@/features/post/ui/postProps';
-import usePostStat from '@/features/postStat/hooks/usePostStat';
 import Link from 'next/link';
 
 export default function PostInfo({
-  post: { id: postId, userId, authorName, createdAt },
+  post: { userId, authorName, createdAt, viewCount },
 }: {
   post: PostProps;
 }) {
-  const {
-    stat: { viewCount },
-  } = usePostStat({ postId });
-
   return (
     <div className='flex gap-2 items-center text-xs text-gray-500'>
       <>

@@ -1,7 +1,6 @@
 'use client';
 
 import RemovePostDialog from '@/components/series/removePostDialog';
-import usePostStat from '@/features/postStat/hooks/usePostStat';
 import useSeries from '@/features/series/domain/hooks/useSeries';
 import { SeriesProps } from '@/features/series/ui/seriesProps';
 import {
@@ -124,10 +123,6 @@ function SeriesPost({
   isOwner: boolean;
   onRemoveClick: (post: { id: string; title: string }) => void;
 }) {
-  const {
-    stat: { viewCount },
-  } = usePostStat({ postId: post.id });
-
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: post.id, disabled: !isOwner });
 
@@ -150,7 +145,7 @@ function SeriesPost({
             <div className='flex items-center gap-2 text-xs text-gray-500'>
               <div>{post.createdAt}</div>
               <Divider />
-              <div>조회 {viewCount}</div>
+              <div>조회 {post.viewCount}</div>
             </div>
           </div>
         </Link>
