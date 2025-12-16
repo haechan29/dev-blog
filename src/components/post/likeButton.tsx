@@ -12,10 +12,13 @@ export default function LikeButton({ postId }: { postId: string }) {
 
   const { isLiked, toggleLike } = useLike({ postId });
   const { stat, incrementLikeCount } = usePostStat({ postId });
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const handleClick = useCallback(() => {
     throttle(() => {
       toggleLike.mutate();
+      setIsAnimating(true);
+      setTimeout(() => setIsAnimating(false), 300);
     }, 1000);
   }, [throttle, toggleLike]);
 
@@ -24,9 +27,10 @@ export default function LikeButton({ postId }: { postId: string }) {
       <button
         onClick={handleClick}
         className={clsx(
-          'flex items-center gap-2 px-6 py-3 rounded-lg border transition-all duration-300 hover:scale-105',
+          'flex items-center gap-2 px-6 py-3 rounded-lg border transition-all duration-300',
+          isLiked && isAnimating && 'scale-105',
           isLiked
-            ? 'border-red-300 bg-red-50 shadow-lg shadow-red-200/50'
+            ? 'border-red-300 bg-red-50'
             : 'border-gray-200 hover:bg-gray-50 hover:border-gray-300'
         )}
       >
