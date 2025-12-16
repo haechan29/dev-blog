@@ -40,8 +40,7 @@ export default function PostPageClient({
 
   const { data: post } = useQuery({
     queryKey: ['posts', initialPost.id],
-    queryFn: () =>
-      PostClientService.fetchPost(initialPost.id).then(createProps),
+    queryFn: () => PostClientService.getPost(initialPost.id).then(createProps),
     initialData: initialPost,
   });
 

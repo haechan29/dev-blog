@@ -6,7 +6,7 @@ export default function usePosts(userId: string) {
   const { data } = useQuery({
     queryKey: ['user', userId, 'posts'],
     queryFn: async () => {
-      const posts = await PostClientService.fetchPosts(userId);
+      const posts = await PostClientService.getPosts(userId);
       return posts.map(createProps);
     },
   });

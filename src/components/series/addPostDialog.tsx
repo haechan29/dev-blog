@@ -33,7 +33,7 @@ export default function AddPostDialog({
 }) {
   const { data: posts } = useQuery({
     queryKey: ['posts', initialSeries.userId],
-    queryFn: () => PostClientService.fetchPosts(initialSeries.userId),
+    queryFn: () => PostClientService.getPosts(initialSeries.userId),
   });
 
   const { series, addPostMutation } = useSeries(initialSeries);

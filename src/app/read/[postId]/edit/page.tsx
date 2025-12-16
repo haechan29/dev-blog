@@ -1,6 +1,6 @@
 import { auth } from '@/auth';
 import EditPageClient from '@/components/edit/editPageClient';
-import { fetchPost } from '@/features/post/domain/service/postServerService';
+import { getPost } from '@/features/post/domain/service/postServerService';
 import { createProps } from '@/features/post/ui/postProps';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -15,7 +15,7 @@ export default async function EditPage({
   const userId =
     session?.user?.user_id ?? (await cookies()).get('userId')?.value;
   const { postId } = await params;
-  const post = await fetchPost(postId).then(createProps);
+  const post = await getPost(postId).then(createProps);
 
   if (post.userId !== userId) {
     redirect('/');

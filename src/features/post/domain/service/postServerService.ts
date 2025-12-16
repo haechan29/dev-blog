@@ -11,12 +11,12 @@ export async function getFeedPosts(cursor: string | null, userId?: string) {
   };
 }
 
-export async function fetchPostsByUserId(userId: string) {
-  const dtos = await PostServerRepository.fetchPostsByUserId(userId);
+export async function getPostsByUserId(userId: string) {
+  const dtos = await PostServerRepository.getPostsByUserId(userId);
   return dtos.map(toDomain);
 }
 
-export async function fetchPost(postId: string): Promise<Post> {
-  const dto = await PostServerRepository.fetchPost(postId);
+export async function getPost(postId: string): Promise<Post> {
+  const dto = await PostServerRepository.getPost(postId);
   return toDomain(dto);
 }

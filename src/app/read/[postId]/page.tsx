@@ -19,7 +19,7 @@ export default async function PostPage({
 
   const { postId } = await params;
   const [post, comments] = await Promise.all([
-    PostServerService.fetchPost(postId).then(createProps),
+    PostServerService.getPost(postId).then(createProps),
     CommentServerService.getComments(postId).then(comments =>
       comments.map(comment => comment.toProps())
     ),

@@ -2,8 +2,8 @@ import * as PostClientRepository from '@/features/post/data/repository/postClien
 import { toDomain } from '@/features/post/domain/mapper/postMapper';
 import Post from '@/features/post/domain/model/post';
 
-export async function fetchPost(postId: string): Promise<Post> {
-  const dto = await PostClientRepository.fetchPost(postId);
+export async function getPost(postId: string): Promise<Post> {
+  const dto = await PostClientRepository.getPost(postId);
   return toDomain(dto);
 }
 
@@ -15,8 +15,8 @@ export async function getFeedPosts(cursor: string | null) {
   };
 }
 
-export async function fetchPosts(userId: string) {
-  const dtos = await PostClientRepository.fetchPosts(userId);
+export async function getPosts(userId: string) {
+  const dtos = await PostClientRepository.getPosts(userId);
   return dtos.map(toDomain);
 }
 
