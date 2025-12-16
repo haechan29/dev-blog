@@ -14,7 +14,7 @@ import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import useBgmController from '@/features/post/hooks/useBgmController';
 import usePostToolbarSync from '@/features/post/hooks/usePostToolbarSync';
-import useViewTracker from '@/features/post/hooks/useViewTracker';
+import useRecordView from '@/features/post/hooks/useRecordView';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { AppDispatch } from '@/lib/redux/store';
@@ -46,7 +46,7 @@ export default function PostPageClient({
   });
 
   usePostToolbarSync(initialPost);
-  useViewTracker(initialPost.id);
+  useRecordView(initialPost.id);
   useBgmController();
 
   useEffect(() => {

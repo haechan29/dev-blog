@@ -52,7 +52,7 @@ export default async function PostPreview({ post }: { post: PostProps }) {
 
       <div className='w-full flex flex-col gap-4'>
         <Link
-          href={`/read/${id}`}
+          href={`/read/${id}?from=feed`}
           className='w-full flex flex-col gap-4 text-gray-900'
         >
           <div

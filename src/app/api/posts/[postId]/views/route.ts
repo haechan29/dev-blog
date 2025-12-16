@@ -1,5 +1,4 @@
 import * as InteractionUsecase from '@/features/post-interaction/data/usecases/interactionUsecase';
-import { UnauthorizedError } from '@/features/user/data/errors/userErrors';
 import { ApiError } from '@/lib/api';
 import { getUserId } from '@/lib/user';
 import { NextRequest, NextResponse } from 'next/server';
@@ -13,7 +12,7 @@ export async function POST(
     const userId = await getUserId();
 
     if (!userId) {
-      throw new UnauthorizedError('인증되지 않은 요청입니다');
+      return NextResponse.json({ data: null });
     }
 
     const { readDuration, fromFeed } = await request.json();
