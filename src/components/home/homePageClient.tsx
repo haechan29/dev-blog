@@ -7,6 +7,7 @@ import * as PostClientService from '@/features/post/domain/service/postClientSer
 import { createProps, PostProps } from '@/features/post/ui/postProps';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
+import { Loader2 } from 'lucide-react';
 import { Suspense, useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 
@@ -67,12 +68,12 @@ export default function HomePageClient({
 
       <div
         className={clsx(
-          'mt-(--toolbar-height) mb-20 px-6 md:px-12 xl:px-18',
+          'mt-(--toolbar-height) mb-8 px-6 md:px-12 xl:px-18',
           'xl:ml-(--sidebar-width)',
           'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
         )}
       >
-        <div className='flex flex-col mt-8 mb-20'>
+        <div className='flex flex-col mt-8'>
           {posts.map((post, index) => (
             <div key={post.id} className='mb-8'>
               <PostPreview
@@ -87,6 +88,11 @@ export default function HomePageClient({
           ))}
 
           <div ref={ref} />
+          {isFetchingNextPage && (
+            <div className='flex justify-center py-4'>
+              <Loader2 strokeWidth={3} className='animate-spin text-gray-400' />
+            </div>
+          )}
         </div>
       </div>
     </>
