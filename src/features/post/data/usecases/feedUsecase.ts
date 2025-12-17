@@ -8,14 +8,19 @@ const FEED_LIMIT = 20;
 
 export async function getFeedPosts(cursor: string | null, userId?: string) {
   if (!userId) {
-    const posts = await FeedQueries.fetchFeedPosts({
-      limit: FEED_LIMIT,
+    const fetchedPosts = await FeedQueries.fetchFeedPosts({
+      limit: FEED_LIMIT + 1,
       cursor,
     });
 
+    const isLastPage = fetchedPosts.length <= FEED_LIMIT;
+    const posts = fetchedPosts.slice(0, FEED_LIMIT);
+
     return {
       posts: posts.map(toDto),
-      nextCursor: posts.at(-1)?.post_stats.popularity.toString() ?? null,
+      nextCursor: isLastPage
+        ? null
+        : posts.at(-1)?.post_stats.popularity.toString() ?? null,
     };
   }
 
@@ -31,11 +36,14 @@ export async function getFeedPosts(cursor: string | null, userId?: string) {
   ];
   const skipMap = new Map(skippedPosts.map(s => [s.post_id, s.skip_count]));
 
-  const posts = await FeedQueries.fetchFeedPosts({
-    limit: FEED_LIMIT,
+  const fetchedPosts = await FeedQueries.fetchFeedPosts({
+    limit: FEED_LIMIT + 1,
     excludeIds: viewedPostIds,
     cursor,
   });
+
+  const isLastPage = fetchedPosts.length <= FEED_LIMIT;
+  const posts = fetchedPosts.slice(0, FEED_LIMIT);
 
   const seriesFirstUnread = findSeriesFirstUnread(posts, viewedSeriesIds);
 
@@ -52,7 +60,9 @@ export async function getFeedPosts(cursor: string | null, userId?: string) {
 
   return {
     posts: scoredPosts.map(p => toDto(p)),
-    nextCursor: scoredPosts.at(-1)?.popularity.toString() ?? null,
+    nextCursor: isLastPage
+      ? null
+      : posts.at(-1)?.post_stats.popularity.toString() ?? null,
   };
 }
 
