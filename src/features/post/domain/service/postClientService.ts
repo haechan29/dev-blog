@@ -7,8 +7,8 @@ export async function getPost(postId: string): Promise<Post> {
   return toDomain(dto);
 }
 
-export async function getFeedPosts(cursor: string | null) {
-  const result = await PostClientRepository.getFeedPosts(cursor);
+export async function getFeedPosts(cursor: string | null, excludeId?: string) {
+  const result = await PostClientRepository.getFeedPosts(cursor, excludeId);
   return {
     posts: result.posts.map(toDomain),
     nextCursor: result.nextCursor,

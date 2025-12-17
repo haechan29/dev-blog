@@ -7,13 +7,17 @@ export async function getPost(postId: string): Promise<PostDto> {
   return response.data;
 }
 
-export async function getFeedPosts(cursor: string | null): Promise<{
+export async function getFeedPosts(
+  cursor: string | null,
+  excludeId?: string
+): Promise<{
   posts: PostDto[];
   nextCursor: string | null;
 }> {
   const params = new URLSearchParams({
     type: 'feed',
     ...(cursor && { cursor }),
+    ...(excludeId && { excludeId }),
   });
 
   const response = await api.get(`/api/posts?${params}`);

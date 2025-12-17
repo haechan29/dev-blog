@@ -6,11 +6,16 @@ import * as SubscriptionQueries from '@/features/subscription/data/queries/subsc
 
 const FEED_LIMIT = 20;
 
-export async function getFeedPosts(cursor: string | null, userId?: string) {
+export async function getFeedPosts(
+  cursor: string | null,
+  userId?: string,
+  excludeId?: string
+) {
   if (!userId) {
     const fetchedPosts = await FeedQueries.fetchFeedPosts({
       limit: FEED_LIMIT + 1,
       cursor,
+      excludeIds: excludeId ? [excludeId] : [],
     });
 
     const isLastPage = fetchedPosts.length <= FEED_LIMIT;
@@ -38,7 +43,7 @@ export async function getFeedPosts(cursor: string | null, userId?: string) {
 
   const fetchedPosts = await FeedQueries.fetchFeedPosts({
     limit: FEED_LIMIT + 1,
-    excludeIds: viewedPostIds,
+    excludeIds: excludeId ? [...viewedPostIds, excludeId] : viewedPostIds,
     cursor,
   });
 
