@@ -16,7 +16,7 @@ export default function UserProfile({
   userStatus,
   initialData,
   currentUserId,
-  size = 'sm',
+  size = 'md',
   className,
 }: {
   userId: string;
@@ -24,7 +24,7 @@ export default function UserProfile({
   userStatus: UserStatus;
   initialData?: SubscriptionDto;
   currentUserId?: string;
-  size?: 'sm' | 'lg';
+  size?: 'md' | 'lg';
   className?: string;
 }) {
   const { data } = useQuery({
