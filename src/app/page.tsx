@@ -11,10 +11,18 @@ export default async function HomePage() {
   const userId =
     session?.user?.user_id ?? (await cookies()).get('userId')?.value;
 
-  const { posts } = await PostServerService.getFeedPosts(null, userId);
+  const { posts, nextCursor } = await PostServerService.getFeedPosts(
+    null,
+    userId
+  );
   const postProps = posts.map(createProps);
 
   return (
-    <HomePageClient isLoggedIn={!!session} posts={postProps} userId={userId} />
+    <HomePageClient
+      isLoggedIn={!!session}
+      initialPosts={postProps}
+      initialCursor={nextCursor}
+      userId={userId}
+    />
   );
 }
