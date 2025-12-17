@@ -20,7 +20,7 @@ export default function CommentItem({
   const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <div className='py-4 border-b border-b-gray-200'>
+    <div className='px-6 md:px-12 py-4'>
       <div className='flex justify-between items-start mb-6'>
         <div className='flex items-center space-x-3'>
           <ProfileIcon

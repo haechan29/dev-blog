@@ -70,18 +70,22 @@ export default function Comments({
           onOpenChange={setIsPanelOpen}
           title={`댓글 ${comments.length}개`}
         >
-          <div className='flex flex-col h-full'>
+          <div className='flex flex-col h-full min-h-0'>
             <div className='p-4'>
               <CommentForm isLoggedIn={isLoggedIn} postId={postId} />
             </div>
-            <div className='flex-1 overflow-y-auto p-4 space-y-6'>
-              {comments.map(comment => (
-                <CommentItem
-                  key={comment.id}
-                  isLoggedIn={isLoggedIn}
-                  userId={userId}
-                  comment={comment}
-                />
+            <div className='flex-1 overflow-y-auto space-y-6'>
+              {comments.map((comment, idx) => (
+                <div key={comment.id}>
+                  <CommentItem
+                    isLoggedIn={isLoggedIn}
+                    userId={userId}
+                    comment={comment}
+                  />
+                  {idx !== comments.length - 1 && (
+                    <div className='w-full h-px bg-gray-200' />
+                  )}
+                </div>
               ))}
             </div>
           </div>

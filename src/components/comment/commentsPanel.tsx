@@ -42,8 +42,8 @@ export default function CommentsPanel({
   ) : (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>{title}</DrawerTitle>
+        <DrawerHeader className='px-6 md:px-12 border-b border-b-gray-200'>
+          <DrawerTitle className='text-left text-lg'>{title}</DrawerTitle>
         </DrawerHeader>
         {children}
       </DrawerContent>
