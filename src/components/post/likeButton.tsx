@@ -4,7 +4,7 @@ import useLike from '@/features/post-interaction/hooks/useLike';
 import useThrottle from '@/hooks/useThrottle';
 import clsx from 'clsx';
 import { Heart } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 export default function LikeButton({
   postId,
@@ -16,18 +16,7 @@ export default function LikeButton({
   const throttle = useThrottle();
 
   const { isLiked, toggleLike } = useLike({ postId });
-  const initialIsLikedRef = useRef<boolean | undefined>();
   const [isAnimating, setIsAnimating] = useState(false);
-
-  const likedCount = useMemo(() => {
-    if (initialIsLikedRef.current === undefined) return likeCount;
-    return initialIsLikedRef.current ? likeCount : likeCount + 1;
-  }, [likeCount]);
-
-  const unlikedCount = useMemo(() => {
-    if (initialIsLikedRef.current === undefined) return likeCount;
-    return initialIsLikedRef.current ? likeCount - 1 : likeCount;
-  }, [likeCount]);
 
   const handleClick = useCallback(() => {
     throttle(() => {
@@ -36,12 +25,6 @@ export default function LikeButton({
       setTimeout(() => setIsAnimating(false), 300);
     }, 1000);
   }, [throttle, toggleLike]);
-
-  useEffect(() => {
-    if (initialIsLikedRef.current === undefined && isLiked !== undefined) {
-      initialIsLikedRef.current = isLiked;
-    }
-  }, [isLiked]);
 
   return (
     <div className='flex justify-center mb-20'>
@@ -70,7 +53,7 @@ export default function LikeButton({
           )}
         >
           <div className={clsx(isAnimating && 'invisible')}>
-            {isLiked ? likedCount : unlikedCount}
+            {isLiked ? likeCount + 1 : likeCount}
           </div>
           <div
             className={clsx(
@@ -79,8 +62,8 @@ export default function LikeButton({
               !isAnimating && 'invisible'
             )}
           >
-            <div>{unlikedCount}</div>
-            <div>{likedCount}</div>
+            <div>{likeCount}</div>
+            <div>{likeCount + 1}</div>
           </div>
         </div>
       </button>
