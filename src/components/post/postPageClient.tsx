@@ -5,6 +5,7 @@ import HomeToolbar from '@/components/home/homeToolbar';
 import LikeButton from '@/components/post/likeButton';
 import PostContentWrapper from '@/components/post/postContentWrapper';
 import PostHeader from '@/components/post/postHeader';
+import PostPreview from '@/components/post/postPreview';
 import PostSeriesNav from '@/components/post/postSeriesNav';
 import PostSidebar from '@/components/post/postSidebar';
 import PostToolbar from '@/components/post/postToolbar';
@@ -18,9 +19,11 @@ import useRecordView from '@/features/post/hooks/useRecordView';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { AppDispatch } from '@/lib/redux/store';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { ReactNode, Suspense, useEffect } from 'react';
+import { Loader2 } from 'lucide-react';
+import { ReactNode, Suspense, useEffect, useMemo } from 'react';
+import { useInView } from 'react-intersection-observer';
 import { useDispatch } from 'react-redux';
 
 export default function PostPageClient({
@@ -28,21 +31,57 @@ export default function PostPageClient({
   userId,
   initialPost,
   initialComments,
+  initialPosts,
+  initialCursor,
   parsedContent,
 }: {
   isLoggedIn: boolean;
   userId?: string;
   initialPost: PostProps;
   initialComments: CommentItemProps[];
+  initialPosts: PostProps[];
+  initialCursor: string | null;
   parsedContent: ReactNode;
 }) {
   const dispatch = useDispatch<AppDispatch>();
+
+  const { ref, inView } = useInView();
+
+  const {
+    data: { pages },
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['posts', { excludeId: initialPost.id }],
+    queryFn: async ({ pageParam }) => {
+      const result = await PostClientService.getFeedPosts(
+        pageParam,
+        initialPost.id
+      );
+      return {
+        posts: result.posts.map(createProps),
+        nextCursor: result.nextCursor,
+      };
+    },
+    initialPageParam: null as string | null,
+    getNextPageParam: lastPage => lastPage.nextCursor,
+    initialData: {
+      pages: [{ posts: initialPosts, nextCursor: initialCursor }],
+      pageParams: [null],
+    },
+  });
 
   const { data: post } = useQuery({
     queryKey: ['posts', initialPost.id],
     queryFn: () => PostClientService.getPost(initialPost.id).then(createProps),
     initialData: initialPost,
   });
+
+  const recommendedPosts = useMemo(
+    () => pages.flatMap(page => page.posts),
+    [pages]
+  );
 
   usePostToolbarSync(initialPost);
   useRecordView(initialPost.id);
@@ -51,6 +90,12 @@ export default function PostPageClient({
   useEffect(() => {
     dispatch(setIsVisible(false));
   }, [dispatch]);
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
     <>
@@ -63,7 +108,7 @@ export default function PostPageClient({
 
       <div
         className={clsx(
-          'mt-(--toolbar-height) mb-20 px-6 md:px-12 xl:px-18',
+          'mt-(--toolbar-height) mb-12 px-6 md:px-12 xl:px-18',
           'xl:ml-(--sidebar-width)',
           'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
         )}
@@ -93,6 +138,28 @@ export default function PostPageClient({
           postId={post.id}
           initialComments={initialComments}
         />
+
+        <div className='flex flex-col'>
+          {recommendedPosts.map((post, index) => (
+            <div key={post.id} className='mb-8'>
+              <PostPreview
+                isLoggedIn={isLoggedIn}
+                post={post}
+                userId={userId}
+              />
+              {index !== recommendedPosts.length - 1 && (
+                <div className='h-px bg-gray-200' />
+              )}
+            </div>
+          ))}
+
+          <div ref={ref} />
+          {isFetchingNextPage && (
+            <div className='flex justify-center py-4'>
+              <Loader2 strokeWidth={3} className='animate-spin text-gray-400' />
+            </div>
+          )}
+        </div>
       </div>
     </>
   );

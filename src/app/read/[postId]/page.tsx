@@ -18,19 +18,22 @@ export default async function PostPage({
     session?.user?.user_id ?? (await cookies()).get('userId')?.value;
 
   const { postId } = await params;
-  const [post, comments] = await Promise.all([
+  const [post, comments, { posts, nextCursor }] = await Promise.all([
     PostServerService.getPost(postId).then(createProps),
-    CommentServerService.getComments(postId).then(comments =>
-      comments.map(comment => comment.toProps())
-    ),
+    CommentServerService.getComments(postId),
+    PostServerService.getFeedPosts(null, userId, postId),
   ]);
+  const commentProps = comments.map(comment => comment.toProps());
+  const postProps = posts.map(createProps);
 
   return (
     <PostPageClient
       isLoggedIn={!!session}
       userId={userId}
       initialPost={post}
-      initialComments={comments}
+      initialComments={commentProps}
+      initialPosts={postProps}
+      initialCursor={nextCursor}
       parsedContent={<PostParsedContent content={post.content} />}
     />
   );

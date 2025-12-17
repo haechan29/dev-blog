@@ -37,7 +37,7 @@ export default function Comments({
 
   return (
     !!comments && (
-      <div data-post-comments>
+      <div data-post-comments className='mb-12'>
         <div className='text-xl font-bold text-gray-900 mb-8'>
           {`댓글 ${comments.length}개`}
         </div>
