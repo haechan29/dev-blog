@@ -158,14 +158,14 @@ export default function CommentContentSection({
         </div>
 
         {!isExpanded && isOverflow && (
-          <button
-            onClick={() => setIsExpanded(true)}
-            className='h-6 absolute bottom-0 right-0 pl-8 bg-linear-to-l from-white from-60% to-transparent'
-          >
-            <div className='cursor-pointer text-sm text-gray-400 hover:text-gray-500'>
+          <div className='h-6 absolute bottom-0 right-0 pl-8 bg-linear-to-l from-white from-60% to-transparent'>
+            <button
+              onClick={() => setIsExpanded(true)}
+              className='cursor-pointer text-sm text-gray-400 hover:text-gray-500'
+            >
               더보기
-            </div>
-          </button>
+            </button>
+          </div>
         )}
       </div>
 

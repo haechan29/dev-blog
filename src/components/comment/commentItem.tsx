@@ -20,7 +20,7 @@ export default function CommentItem({
   const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <div className='px-6 md:px-12 my-4 flex space-x-2'>
+    <div className='px-6 md:px-12 xl:px-4 my-4 flex space-x-2'>
       <ProfileIcon
         nickname={comment.authorName}
         isActive={comment.userStatus === 'ACTIVE'}
