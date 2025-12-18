@@ -37,7 +37,7 @@ export default function ProfileIcon({
   return (
     <div
       className={clsx(
-        'rounded-full flex items-center justify-center',
+        'shrink-0 rounded-full flex items-center justify-center',
         hoverable && 'cursor-pointer',
         size === 'sm' ? 'w-6 h-6' : size === 'md' ? 'w-8 h-8' : 'w-14 h-14',
         baseColor,

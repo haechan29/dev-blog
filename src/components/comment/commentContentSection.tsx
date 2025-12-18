@@ -79,71 +79,67 @@ export default function CommentContentSection({
     });
   };
 
-  return (
-    <div className='mb-2'>
-      {isEditing ? (
-        <div className='space-y-3'>
-          {!isLoggedIn && (
-            <input
-              type='password'
-              value={password}
-              onChange={e => {
-                setIsPasswordValid(true);
-                setPassword(e.target.value);
-              }}
-              placeholder='비밀번호'
-              className={clsx(
-                'w-full p-3 outline-none border rounded-lg',
-                isPasswordValid
-                  ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
-                  : 'border-red-400 animate-shake',
-                password ? 'bg-white' : 'bg-gray-50'
-              )}
-            />
+  return isEditing ? (
+    <div className='space-y-3'>
+      {!isLoggedIn && (
+        <input
+          type='password'
+          value={password}
+          onChange={e => {
+            setIsPasswordValid(true);
+            setPassword(e.target.value);
+          }}
+          placeholder='비밀번호'
+          className={clsx(
+            'w-full p-2 outline-none border rounded-lg',
+            isPasswordValid
+              ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
+              : 'border-red-400 animate-shake',
+            password ? 'bg-white' : 'bg-gray-50'
           )}
-          <textarea
-            value={content}
-            onChange={e => setContent(e.target.value)}
-            placeholder='댓글을 작성해주세요'
-            className={clsx(
-              'w-full p-4 resize-none outline-none border rounded-lg overflow-y-hidden',
-              isContentValid
-                ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
-                : 'border-red-400 animate-shake',
-              content ? 'bg-white' : 'bg-gray-50'
-            )}
-            rows={3}
-          />
-          <div className='flex space-x-2 text-sm'>
-            <button
-              onClick={handleEdit}
-              className={clsx(
-                'h-10 flex justify-center items-center px-4 text-white rounded-lg hover:bg-blue-500',
-                editComment.isPending ? 'bg-blue-500' : 'bg-blue-600'
-              )}
-            >
-              {editComment.isPending ? (
-                <Loader2 size={18} strokeWidth={2} className='animate-spin' />
-              ) : (
-                '댓글 수정'
-              )}
-            </button>
-            <button
-              onClick={() => setIsEditing(false)}
-              className='w-14 h-10 flex justify-center items-center bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300'
-            >
-              취소
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div>
-          <div className='text-gray-800 leading-relaxed mb-4'>
-            {comment.content}
-          </div>
-          <CommentLikeButton comment={comment} />
-        </div>
+        />
       )}
+      <textarea
+        value={content}
+        onChange={e => setContent(e.target.value)}
+        placeholder='댓글을 작성해주세요'
+        className={clsx(
+          'w-full p-3 resize-none outline-none border rounded-lg overflow-y-hidden',
+          isContentValid
+            ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
+            : 'border-red-400 animate-shake',
+          content ? 'bg-white' : 'bg-gray-50'
+        )}
+        rows={3}
+      />
+      <div className='flex space-x-2 text-sm'>
+        <button
+          onClick={handleEdit}
+          className={clsx(
+            'h-9 flex justify-center items-center px-4 text-white rounded-lg hover:bg-blue-500',
+            editComment.isPending ? 'bg-blue-500' : 'bg-blue-600'
+          )}
+        >
+          {editComment.isPending ? (
+            <Loader2 size={18} strokeWidth={2} className='animate-spin' />
+          ) : (
+            '댓글 수정'
+          )}
+        </button>
+        <button
+          onClick={() => setIsEditing(false)}
+          className='w-14 h-9 flex justify-center items-center bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300'
+        >
+          취소
+        </button>
+      </div>
+    </div>
+  ) : (
+    <div>
+      <div className='text-gray-800 leading-relaxed mb-3'>
+        {comment.content}
+      </div>
+      <CommentLikeButton comment={comment} />
     </div>
   );
 }
