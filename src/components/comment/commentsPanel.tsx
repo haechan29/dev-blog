@@ -33,10 +33,10 @@ export default function CommentsPanel({
   if (isLargerThanXl === undefined) return null;
 
   return isLargerThanXl ? (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={onOpenChange} modal={false}>
       <SheetContent
         side='right'
-        className='w-[400px] gap-0 *:data-[slot=sheet-close]:hidden'
+        className='w-80 gap-0 *:data-[slot=sheet-close]:hidden'
       >
         <SheetHeader className='px-4 border-b border-b-gray-200 flex-row items-center justify-between'>
           <SheetTitle>{title}</SheetTitle>
@@ -51,7 +51,7 @@ export default function CommentsPanel({
       </SheetContent>
     </Sheet>
   ) : (
-    <Drawer open={open} onOpenChange={onOpenChange}>
+    <Drawer open={open} onOpenChange={onOpenChange} modal={false}>
       <DrawerContent>
         <DrawerHeader className='px-6 md:px-12 border-b border-b-gray-200'>
           <DrawerTitle className='text-left text-lg'>{title}</DrawerTitle>
