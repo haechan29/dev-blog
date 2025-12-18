@@ -7,7 +7,7 @@ import { ApiError } from '@/lib/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
 export default function CommentContentSection({
@@ -21,12 +21,14 @@ export default function CommentContentSection({
   isEditing: boolean;
   setIsEditing: (isEditing: boolean) => void;
 }) {
+  const queryClient = useQueryClient();
+  const contentRef = useRef<HTMLDivElement>(null);
   const [password, setPassword] = useState('');
   const [content, setContent] = useState(comment.content);
   const [isPasswordValid, setIsPasswordValid] = useState(true);
   const [isContentValid, setIsContentValid] = useState(true);
-
-  const queryClient = useQueryClient();
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isOverflow, setIsOverflow] = useState(false);
 
   useEffect(() => {
     if (!isEditing) {
@@ -36,6 +38,14 @@ export default function CommentContentSection({
       setIsContentValid(true);
     }
   }, [isEditing, comment.content]);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      setIsOverflow(
+        contentRef.current.scrollHeight > contentRef.current.clientHeight
+      );
+    }
+  }, [comment.content]);
 
   const editComment = useMutation({
     mutationKey: ['posts', comment.postId, 'comments', comment.id],
@@ -135,11 +145,31 @@ export default function CommentContentSection({
       </div>
     </div>
   ) : (
-    <div>
-      <div className='text-gray-800 leading-relaxed mb-3'>
-        {comment.content}
+    <>
+      <div className='relative'>
+        <div
+          ref={contentRef}
+          className={clsx(
+            'text-gray-800 mb-3',
+            !isExpanded && 'max-h-18 overflow-hidden'
+          )}
+        >
+          {comment.content}
+        </div>
+
+        {!isExpanded && isOverflow && (
+          <button
+            onClick={() => setIsExpanded(true)}
+            className='h-6 absolute bottom-0 right-0 pl-8 bg-linear-to-l from-white from-60% to-transparent'
+          >
+            <div className='cursor-pointer text-sm text-gray-400 hover:text-gray-500'>
+              더보기
+            </div>
+          </button>
+        )}
       </div>
+
       <CommentLikeButton comment={comment} />
-    </div>
+    </>
   );
 }
