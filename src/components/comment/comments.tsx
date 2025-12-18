@@ -1,15 +1,18 @@
 'use client';
 
 import CommentItem from '@/components/comment/commentItem';
+import CommentPasswordDialog from '@/components/comment/commentPasswordDialog';
 import CommentsPanel from '@/components/comment/commentsPanel';
 import ProfileIcon from '@/components/user/profileIcon';
 import useComments from '@/features/comment/hooks/useComments';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import { ApiError } from '@/lib/api';
 import { remToPx } from '@/lib/dom';
 import { setAreCommentsVisible } from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 
 export default function Comments({
@@ -25,10 +28,14 @@ export default function Comments({
 }) {
   const dispatch = useDispatch<AppDispatch>();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { comments } = useComments({ postId, initialComments });
+  const { comments, createCommentMutation } = useComments({
+    postId,
+    initialComments,
+  });
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [content, setContent] = useState('');
   const [isInputVisible, setIsInputVisible] = useState(false);
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
 
   const handleClickWrite = () => {
     setIsInputVisible(true);
@@ -47,6 +54,36 @@ export default function Comments({
     }
     return () => commentsObserver.disconnect();
   }, [dispatch]);
+
+  const handleSubmit = useCallback(
+    (password?: string) => {
+      if (!content.trim()) return;
+
+      if (!isLoggedIn && !isPasswordDialogOpen) {
+        setIsPasswordDialogOpen(true);
+        return;
+      }
+
+      createCommentMutation.mutate(
+        { postId, content, ...(!isLoggedIn && { password }) },
+        {
+          onSuccess: () => {
+            setContent('');
+            setIsInputVisible(false);
+            setIsPasswordDialogOpen(false);
+          },
+          onError: error => {
+            const message =
+              error instanceof ApiError
+                ? error.message
+                : '댓글 작성에 실패했습니다';
+            toast.error(message);
+          },
+        }
+      );
+    },
+    [content, createCommentMutation, isLoggedIn, isPasswordDialogOpen, postId]
+  );
 
   return (
     !!comments && (
@@ -103,9 +140,11 @@ export default function Comments({
             <div
               className='fixed inset-0 z-90'
               onClick={() => {
+                if (createCommentMutation.isPending) return;
                 textareaRef.current?.blur();
               }}
               onTouchStart={() => {
+                if (createCommentMutation.isPending) return;
                 textareaRef.current?.blur();
               }}
             />
@@ -123,7 +162,10 @@ export default function Comments({
                 ref={textareaRef}
                 value={content}
                 onChange={e => setContent(e.target.value)}
-                onBlur={() => setIsInputVisible(false)}
+                onBlur={() => {
+                  if (createCommentMutation.isPending) return;
+                  setIsInputVisible(false);
+                }}
                 placeholder='댓글을 입력하세요'
                 className={clsx(
                   'max-h-36 flex-1 min-w-0 p-3 outline-none resize-none bg-gray-50 border rounded-lg',
@@ -144,13 +186,27 @@ export default function Comments({
               <button
                 onMouseDown={e => e.preventDefault()} // prevent keyboard from closing
                 onTouchStart={e => e.preventDefault()} // prevent keyboard from closing
-                className='shrink-0 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 py-2 px-4 rounded-full'
+                onClick={() => {
+                  if (!content.trim()) return;
+                  handleSubmit();
+                }}
+                className={clsx(
+                  'shrink-0 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 py-2 px-4 rounded-full',
+                  content.trim() ? 'cursor-pointer' : 'opacity-50'
+                )}
               >
                 완료
               </button>
             </div>
           </div>
         </CommentsPanel>
+
+        <CommentPasswordDialog
+          isOpen={isPasswordDialogOpen}
+          setIsOpen={setIsPasswordDialogOpen}
+          onSubmit={handleSubmit}
+          isLoading={createCommentMutation.isPending}
+        />
       </div>
     )
   );
