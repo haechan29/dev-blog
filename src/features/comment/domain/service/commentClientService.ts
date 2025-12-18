@@ -16,7 +16,7 @@ export async function getComments(postId: string): Promise<Comment[]> {
 export async function createComment(params: {
   postId: string;
   content: string;
-  password: string;
+  password?: string;
 }): Promise<Comment> {
   const comment = await CommentClientRepository.createComment(params);
   return toDomain(comment);
@@ -26,7 +26,7 @@ export async function updateComment(params: {
   postId: string;
   commentId: number;
   content: string;
-  password: string;
+  password?: string;
 }): Promise<Comment> {
   const comment = await CommentClientRepository.updateComment(params);
   return toDomain(comment);
@@ -35,7 +35,7 @@ export async function updateComment(params: {
 export async function deleteComment(
   postId: string,
   commentId: number,
-  password: string
+  password?: string
 ): Promise<void> {
   await CommentClientRepository.deleteComment(postId, commentId, password);
 }

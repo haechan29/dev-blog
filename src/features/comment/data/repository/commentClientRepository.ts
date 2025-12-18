@@ -14,7 +14,7 @@ export async function createComment({
 }: {
   postId: string;
   content: string;
-  password: string;
+  password?: string;
 }): Promise<CommentResponseDto> {
   const response = await api.post(`/api/posts/${postId}/comments`, requestBody);
   return response.data;
@@ -28,7 +28,7 @@ export async function updateComment({
   postId: string;
   commentId: number;
   content: string;
-  password: string;
+  password?: string;
 }): Promise<CommentResponseDto> {
   const response = await api.patch(
     `/api/posts/${postId}/comments/${commentId}`,
@@ -40,11 +40,11 @@ export async function updateComment({
 export async function deleteComment(
   postId: string,
   commentId: number,
-  password: string
+  password?: string
 ): Promise<void> {
   await api.delete(`/api/posts/${postId}/comments/${commentId}`, {
     headers: {
-      'X-Comment-Password': password,
+      ...(password && { 'X-Comment-Password': password }),
     },
   });
 }

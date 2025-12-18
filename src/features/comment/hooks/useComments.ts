@@ -27,7 +27,7 @@ export default function useComments({
     mutationFn: (params: {
       postId: string;
       content: string;
-      password: string;
+      password?: string;
     }) => CommentClientService.createComment(params),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -44,7 +44,7 @@ export default function useComments({
     }: {
       postId: string;
       commentId: number;
-      password: string;
+      password?: string;
     }) => CommentClientService.deleteComment(postId, commentId, password),
     onSuccess: () => {
       queryClient.invalidateQueries({

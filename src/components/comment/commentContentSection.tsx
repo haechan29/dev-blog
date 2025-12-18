@@ -7,7 +7,7 @@ import { ApiError } from '@/lib/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
 export default function CommentContentSection({
@@ -53,7 +53,7 @@ export default function CommentContentSection({
       postId: string;
       commentId: number;
       content: string;
-      password: string;
+      password?: string;
     }) => updateComment(params),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -68,7 +68,7 @@ export default function CommentContentSection({
     },
   });
 
-  const handleEdit = () => {
+  const handleEdit = useCallback(() => {
     if (!isLoggedIn && !password.trim()) {
       setIsPasswordValid(false);
       setIsContentValid(true);
@@ -85,9 +85,9 @@ export default function CommentContentSection({
       postId: comment.postId,
       commentId: comment.id,
       content: content.trim(),
-      password: password.trim(),
+      ...(!isLoggedIn && { password: password.trim() }),
     });
-  };
+  }, [comment.id, comment.postId, content, editComment, isLoggedIn, password]);
 
   return isEditing ? (
     <div className='space-y-3'>
