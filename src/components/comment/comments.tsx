@@ -1,14 +1,15 @@
 'use client';
 
-import CommentForm from '@/components/comment/commentForm';
 import CommentItem from '@/components/comment/commentItem';
 import CommentsPanel from '@/components/comment/commentsPanel';
 import ProfileIcon from '@/components/user/profileIcon';
 import useComments from '@/features/comment/hooks/useComments';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import { remToPx } from '@/lib/dom';
 import { setAreCommentsVisible } from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch } from '@/lib/redux/store';
-import { useEffect, useState } from 'react';
+import clsx from 'clsx';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function Comments({
@@ -23,8 +24,18 @@ export default function Comments({
   initialComments: CommentItemProps[];
 }) {
   const dispatch = useDispatch<AppDispatch>();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { comments } = useComments({ postId, initialComments });
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [content, setContent] = useState('');
+  const [isInputVisible, setIsInputVisible] = useState(false);
+
+  const handleClickWrite = () => {
+    setIsInputVisible(true);
+    requestAnimationFrame(() => {
+      textareaRef.current?.focus();
+    });
+  };
 
   useEffect(() => {
     const commentsObserver = new IntersectionObserver(entries =>
@@ -69,12 +80,10 @@ export default function Comments({
           open={isPanelOpen}
           onOpenChange={setIsPanelOpen}
           title={`댓글 ${comments.length}개`}
+          onClickWrite={handleClickWrite}
         >
           <div className='flex flex-col h-full min-h-0'>
-            <div className='p-4'>
-              <CommentForm isLoggedIn={isLoggedIn} postId={postId} />
-            </div>
-            <div className='flex-1 overflow-y-auto space-y-6'>
+            <div className='flex-1 overflow-y-auto'>
               {comments.map((comment, idx) => (
                 <div key={comment.id}>
                   <CommentItem
@@ -87,6 +96,58 @@ export default function Comments({
                   )}
                 </div>
               ))}
+            </div>
+          </div>
+
+          {isInputVisible && (
+            <div
+              className='fixed inset-0 z-90'
+              onClick={() => {
+                textareaRef.current?.blur();
+              }}
+              onTouchStart={() => {
+                textareaRef.current?.blur();
+              }}
+            />
+          )}
+
+          <div
+            className={clsx(
+              'fixed inset-x-0 bottom-0 z-100 bg-white border-t border-gray-200 px-6 py-4',
+              'transition-transform duration-300 ease-in-out',
+              isInputVisible ? 'translate-y-0' : 'translate-y-full'
+            )}
+          >
+            <div className='flex gap-3 items-end'>
+              <textarea
+                ref={textareaRef}
+                value={content}
+                onChange={e => setContent(e.target.value)}
+                onBlur={() => setIsInputVisible(false)}
+                placeholder='댓글을 입력하세요'
+                className={clsx(
+                  'max-h-36 flex-1 min-w-0 p-3 outline-none resize-none bg-gray-50 border rounded-lg',
+                  'border-gray-200 hover:border-blue-500 focus:border-blue-500',
+                  !content && 'bg-gray-50'
+                )}
+                rows={1}
+                onInput={e => {
+                  const target = e.target as HTMLTextAreaElement;
+                  target.style.height = 'auto';
+                  target.style.height = `${Math.min(
+                    target.scrollHeight,
+                    remToPx(9)
+                  )}px`;
+                }}
+              />
+
+              <button
+                onMouseDown={e => e.preventDefault()} // prevent keyboard from closing
+                onTouchStart={e => e.preventDefault()} // prevent keyboard from closing
+                className='shrink-0 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 py-2 px-4 rounded-full'
+              >
+                완료
+              </button>
             </div>
           </div>
         </CommentsPanel>

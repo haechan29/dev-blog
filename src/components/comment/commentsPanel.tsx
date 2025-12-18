@@ -21,11 +21,13 @@ export default function CommentsPanel({
   open,
   onOpenChange,
   title,
+  onClickWrite,
   children,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
+  onClickWrite: () => void;
   children: ReactNode;
 }) {
   const isLargerThanXl = useMediaQuery('(min-width: 1280px)');
@@ -51,7 +53,12 @@ export default function CommentsPanel({
       </SheetContent>
     </Sheet>
   ) : (
-    <Drawer open={open} onOpenChange={onOpenChange} modal={false}>
+    <Drawer
+      open={open}
+      onOpenChange={onOpenChange}
+      modal={false}
+      repositionInputs={false}
+    >
       <DrawerContent>
         <DrawerHeader className='px-6 md:px-12 border-b border-b-gray-200 flex-row items-center justify-between'>
           <DrawerTitle className='text-left text-lg'>{title}</DrawerTitle>
@@ -61,10 +68,12 @@ export default function CommentsPanel({
               댓글 달기
             </button>
             <input
+              onFocus={onClickWrite}
               className='absolute inset-0 opacity-0 cursor-pointer'
             />
           </div>
         </DrawerHeader>
+
         {children}
       </DrawerContent>
     </Drawer>
