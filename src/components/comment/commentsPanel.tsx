@@ -53,8 +53,17 @@ export default function CommentsPanel({
   ) : (
     <Drawer open={open} onOpenChange={onOpenChange} modal={false}>
       <DrawerContent>
-        <DrawerHeader className='px-6 md:px-12 border-b border-b-gray-200'>
+        <DrawerHeader className='px-6 md:px-12 border-b border-b-gray-200 flex-row items-center justify-between'>
           <DrawerTitle className='text-left text-lg'>{title}</DrawerTitle>
+
+          <div className='relative'>
+            <button className='text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 py-2 px-4 rounded-full'>
+              댓글 달기
+            </button>
+            <input
+              className='absolute inset-0 opacity-0 cursor-pointer'
+            />
+          </div>
         </DrawerHeader>
         {children}
       </DrawerContent>

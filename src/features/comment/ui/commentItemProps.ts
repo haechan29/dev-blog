@@ -1,6 +1,6 @@
 import { UserStatus } from '@/features/user/domain/model/user';
 
-export type CommentItemProps = {
+export interface CommentItemProps {
   id: number;
   postId: string;
   authorName: string;
@@ -10,4 +10,4 @@ export type CommentItemProps = {
   likeCount: number;
   userId: string;
   userStatus: UserStatus;
-};
+}
