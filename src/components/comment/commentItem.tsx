@@ -12,10 +12,12 @@ export default function CommentItem({
   isLoggedIn,
   userId,
   comment,
+  closePanel,
 }: {
   isLoggedIn: boolean;
   userId?: string;
   comment: CommentItemProps;
+  closePanel: () => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -50,6 +52,7 @@ export default function CommentItem({
               isLoggedIn={isLoggedIn}
               comment={comment}
               onEdit={() => setIsEditing(prev => !prev)}
+              closePanel={closePanel}
             >
               <MoreVertical className='w-8 h-8 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2' />
             </CommentSettingsDropdown>

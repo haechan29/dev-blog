@@ -16,11 +16,13 @@ export default function CommentSettingsDropdown({
   isLoggedIn,
   comment: { postId, id: commentId },
   onEdit,
+  closePanel,
   children,
 }: {
   isLoggedIn: boolean;
   comment: CommentItemProps;
   onEdit: () => void;
+  closePanel: () => void;
   children: React.ReactNode;
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,6 +35,7 @@ export default function CommentSettingsDropdown({
         commentId={commentId}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
+        closePanel={closePanel}
       />
       <DropdownMenu>
         <DropdownMenuTrigger

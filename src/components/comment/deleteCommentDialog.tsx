@@ -20,12 +20,14 @@ export default function DeleteCommentDialog({
   commentId,
   isOpen,
   setIsOpen,
+  closePanel,
 }: {
   isLoggedIn: boolean;
   postId: string;
   commentId: number;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  closePanel: () => void;
 }) {
   const [password, setPassword] = useState('');
   const [isPasswordValid, setIsPasswordValid] = useState(true);
@@ -43,6 +45,8 @@ export default function DeleteCommentDialog({
       deleteCommentMutation.mutate(params, {
         onSuccess: () => {
           setIsOpen(false);
+          closePanel();
+          toast.success('댓글이 삭제되었습니다');
         },
         onError: error => {
           const message =
@@ -53,7 +57,7 @@ export default function DeleteCommentDialog({
         },
       });
     },
-    [deleteCommentMutation, setIsOpen]
+    [closePanel, deleteCommentMutation, setIsOpen]
   );
 
   const handleDelete = useCallback(() => {
