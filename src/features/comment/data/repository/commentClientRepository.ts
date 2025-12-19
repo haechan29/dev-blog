@@ -2,9 +2,12 @@ import { CommentResponseDto } from '@/features/comment/data/dto/commentResponseD
 import { api } from '@/lib/api';
 
 export async function getComments(
-  postId: string
+  postId: string,
+  timestamp: string
 ): Promise<CommentResponseDto[]> {
-  const response = await api.get(`/api/posts/${postId}/comments`);
+  const response = await api.get(
+    `/api/posts/${postId}/comments?timestamp=${timestamp}`
+  );
   return response.data;
 }
 

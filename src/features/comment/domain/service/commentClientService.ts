@@ -2,15 +2,12 @@ import * as CommentClientRepository from '@/features/comment/data/repository/com
 import { toDomain } from '@/features/comment/domain/mapper/commentMapper';
 import { Comment } from '@/features/comment/domain/model/comment';
 
-export async function getComments(postId: string): Promise<Comment[]> {
-  const comments = await CommentClientRepository.getComments(postId);
-  return comments
-    .map(comment => toDomain(comment))
-    .sort((a: Comment, b: Comment) => {
-      if (a.likeCount > b.likeCount) return -1;
-      else if (a.likeCount < b.likeCount) return 1;
-      return a.createdAt > b.createdAt ? 1 : -1;
-    });
+export async function getComments(
+  postId: string,
+  timestamp: string
+): Promise<Comment[]> {
+  const comments = await CommentClientRepository.getComments(postId, timestamp);
+  return comments.map(comment => toDomain(comment));
 }
 
 export async function createComment(params: {
