@@ -31,10 +31,11 @@ export default function useComments({
       content: string;
       password?: string;
     }) => CommentClientService.createComment(params),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['posts', postId, 'comments'],
-      });
+    onSuccess: newComment => {
+      queryClient.setQueryData(
+        ['posts', postId, 'comments'],
+        (old: CommentItemProps[]) => [newComment.toProps(), ...old]
+      );
     },
   });
 

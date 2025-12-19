@@ -27,7 +27,9 @@ export default function Comments({
   initialComments: CommentItemProps[];
 }) {
   const dispatch = useDispatch<AppDispatch>();
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const commentsPreview = useRef<HTMLButtonElement | null>(null);
+  const commentsListRef = useRef<HTMLDivElement | null>(null);
   const { comments, createCommentMutation } = useComments({
     postId,
     initialComments,
@@ -45,14 +47,14 @@ export default function Comments({
   };
 
   useEffect(() => {
-    const commentsObserver = new IntersectionObserver(entries =>
-      dispatch(setAreCommentsVisible(entries[0].isIntersecting))
-    );
-    const comments = document.querySelector('[data-post-comments]');
-    if (comments) {
-      commentsObserver.observe(comments);
-    }
-    return () => commentsObserver.disconnect();
+    if (!commentsPreview.current) return;
+    const commentsObserver = new IntersectionObserver(entries => {
+      dispatch(setAreCommentsVisible(entries[0].isIntersecting));
+    });
+    commentsObserver.observe(commentsPreview.current);
+    return () => {
+      commentsObserver.disconnect();
+    };
   }, [dispatch]);
 
   const handleSubmit = useCallback(
@@ -71,6 +73,7 @@ export default function Comments({
             setContent('');
             setIsInputVisible(false);
             setIsPasswordDialogOpen(false);
+            commentsListRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
           },
           onError: error => {
             const message =
@@ -87,10 +90,11 @@ export default function Comments({
 
   return (
     !!comments && (
-      <div data-post-comments className='mb-12'>
+      <>
         <button
+          ref={commentsPreview}
           onClick={() => setIsPanelOpen(true)}
-          className='w-full p-4 bg-gray-50 rounded-lg text-left cursor-pointer hover:bg-gray-100'
+          className='w-full p-4 mb-12 bg-gray-50 rounded-lg text-left cursor-pointer hover:bg-gray-100'
         >
           <div className='mb-2 text-sm font-medium text-gray-700'>
             {`댓글 ${comments.length}개`}
@@ -120,7 +124,7 @@ export default function Comments({
           onClickWrite={handleClickWrite}
         >
           <div className='flex flex-col h-full min-h-0'>
-            <div className='flex-1 overflow-y-auto'>
+            <div ref={commentsListRef} className='flex-1 overflow-y-auto'>
               {comments.length === 0 ? (
                 <div className='flex items-center justify-center bg-gray-50 h-full text-gray-500 text-sm'>
                   아직 댓글이 없습니다
@@ -214,7 +218,7 @@ export default function Comments({
           onSubmit={handleSubmit}
           isLoading={createCommentMutation.isPending}
         />
-      </div>
+      </>
     )
   );
 }
