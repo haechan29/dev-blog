@@ -121,19 +121,25 @@ export default function Comments({
         >
           <div className='flex flex-col h-full min-h-0'>
             <div className='flex-1 overflow-y-auto'>
-              {comments.map((comment, idx) => (
-                <div key={comment.id}>
-                  <CommentItem
-                    isLoggedIn={isLoggedIn}
-                    userId={userId}
-                    comment={comment}
-                    closePanel={() => setIsPanelOpen(false)}
-                  />
-                  {idx !== comments.length - 1 && (
-                    <div className='w-full h-px bg-gray-200' />
-                  )}
+              {comments.length === 0 ? (
+                <div className='flex items-center justify-center bg-gray-50 h-full text-gray-500 text-sm'>
+                  아직 댓글이 없습니다
                 </div>
-              ))}
+              ) : (
+                comments.map((comment, idx) => (
+                  <div key={comment.id}>
+                    <CommentItem
+                      isLoggedIn={isLoggedIn}
+                      userId={userId}
+                      comment={comment}
+                      closePanel={() => setIsPanelOpen(false)}
+                    />
+                    {idx !== comments.length - 1 && (
+                      <div className='w-full h-px bg-gray-200' />
+                    )}
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
