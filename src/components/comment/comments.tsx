@@ -153,7 +153,42 @@ export default function Comments({
         }
         commentInput={
           isLargerThanXl ? (
-            <></>
+            <div className='flex gap-3 items-end border-t border-gray-200 p-4'>
+              <textarea
+                ref={textareaRef}
+                value={content}
+                onChange={e => setContent(e.target.value)}
+                onInput={e => {
+                  const target = e.target as HTMLTextAreaElement;
+                  target.style.height = 'auto';
+                  target.style.height = `${Math.min(
+                    target.scrollHeight,
+                    remToPx(9)
+                  )}px`;
+                }}
+                placeholder='댓글을 입력하세요'
+                className={clsx(
+                  'max-h-36 flex-1 min-w-0 p-3 outline-none resize-none border rounded-lg scrollbar-hide',
+                  'border-gray-200 hover:border-blue-500 focus:border-blue-500',
+                  !content && 'bg-gray-50'
+                )}
+                rows={1}
+              />
+
+              <button
+                onMouseDown={e => e.preventDefault()}
+                onClick={() => {
+                  if (!content.trim()) return;
+                  handleSubmit();
+                }}
+                className={clsx(
+                  'shrink-0 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 py-2 px-4 rounded-full',
+                  content.trim() ? 'cursor-pointer' : 'opacity-50'
+                )}
+              >
+                완료
+              </button>
+            </div>
           ) : (
             <>
               {isInputVisible && (
@@ -172,12 +207,12 @@ export default function Comments({
 
               <div
                 className={clsx(
-                  'fixed inset-x-0 bottom-0 z-100 bg-white border-t border-gray-200 px-6 py-4',
+                  'fixed inset-x-0 bottom-0 z-100 bg-white',
                   'transition-transform duration-300 ease-in-out',
                   isInputVisible ? 'translate-y-0' : 'translate-y-full'
                 )}
               >
-                <div className='flex gap-3 items-end'>
+                <div className='flex gap-3 items-end border-t border-gray-200 px-6 py-4'>
                   <textarea
                     ref={textareaRef}
                     value={content}
@@ -188,7 +223,7 @@ export default function Comments({
                     }}
                     placeholder='댓글을 입력하세요'
                     className={clsx(
-                      'max-h-36 flex-1 min-w-0 p-3 outline-none resize-none bg-gray-50 border rounded-lg',
+                      'max-h-36 flex-1 min-w-0 p-3 outline-none resize-none border rounded-lg',
                       'border-gray-200 hover:border-blue-500 focus:border-blue-500',
                       !content && 'bg-gray-50'
                     )}
