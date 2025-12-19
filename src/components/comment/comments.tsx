@@ -1,11 +1,12 @@
 'use client';
 
 import CommentItem from '@/components/comment/commentItem';
+import CommentPanel from '@/components/comment/commentPanel';
 import CommentPasswordDialog from '@/components/comment/commentPasswordDialog';
-import CommentsPanel from '@/components/comment/commentsPanel';
 import ProfileIcon from '@/components/user/profileIcon';
 import useComments from '@/features/comment/hooks/useComments';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import useMediaQuery from '@/hooks/useMediaQuery';
 import { ApiError } from '@/lib/api';
 import { remToPx } from '@/lib/dom';
 import { setAreCommentsVisible } from '@/lib/redux/post/postViewerSlice';
@@ -38,6 +39,7 @@ export default function Comments({
   const [content, setContent] = useState('');
   const [isInputVisible, setIsInputVisible] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  const isLargerThanXl = useMediaQuery('(min-width: 1280px)');
 
   const handleClickWrite = () => {
     setIsInputVisible(true);
@@ -88,137 +90,146 @@ export default function Comments({
     [content, createCommentMutation, isLoggedIn, isPasswordDialogOpen, postId]
   );
 
+  if (!comments) return null;
+
   return (
-    !!comments && (
-      <>
-        <button
-          ref={commentsPreview}
-          onClick={() => setIsPanelOpen(true)}
-          className='w-full p-4 mb-12 bg-gray-50 rounded-lg text-left cursor-pointer hover:bg-gray-100'
-        >
-          <div className='mb-2 text-sm font-medium text-gray-700'>
-            {`댓글 ${comments.length}개`}
+    <>
+      <button
+        ref={commentsPreview}
+        onClick={() => setIsPanelOpen(true)}
+        className='w-full p-4 mb-12 bg-gray-50 rounded-lg text-left cursor-pointer hover:bg-gray-100'
+      >
+        <div className='mb-2 text-sm font-medium text-gray-700'>
+          {`댓글 ${comments.length}개`}
+        </div>
+        {comments.length === 0 ? (
+          <div className='text-sm text-gray-500'>
+            첫 번째 댓글을 작성해보세요
           </div>
-          {comments.length === 0 ? (
-            <div className='text-sm text-gray-500'>
-              첫 번째 댓글을 작성해보세요
-            </div>
-          ) : (
-            <div className='flex gap-3'>
-              <ProfileIcon
-                nickname={comments[0].authorName}
-                isActive={comments[0].userStatus === 'ACTIVE'}
-                size='sm'
-              />
-              <div className='flex-1 min-w-0 text-sm text-gray-600 line-clamp-3'>
-                {comments[0].content}
-              </div>
-            </div>
-          )}
-        </button>
-
-        <CommentsPanel
-          open={isPanelOpen}
-          onOpenChange={setIsPanelOpen}
-          title={`댓글 ${comments.length}개`}
-          onClickWrite={handleClickWrite}
-        >
-          <div className='flex flex-col h-full min-h-0'>
-            <div ref={commentsListRef} className='flex-1 overflow-y-auto'>
-              {comments.length === 0 ? (
-                <div className='flex items-center justify-center bg-gray-50 h-full text-gray-500 text-sm'>
-                  아직 댓글이 없습니다
-                </div>
-              ) : (
-                comments.map((comment, idx) => (
-                  <div key={comment.id}>
-                    <CommentItem
-                      isLoggedIn={isLoggedIn}
-                      userId={userId}
-                      comment={comment}
-                      closePanel={() => setIsPanelOpen(false)}
-                    />
-                    {idx !== comments.length - 1 && (
-                      <div className='w-full h-px bg-gray-200' />
-                    )}
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-
-          {isInputVisible && (
-            <div
-              className='fixed inset-0 z-90'
-              onClick={() => {
-                if (createCommentMutation.isPending) return;
-                textareaRef.current?.blur();
-              }}
-              onTouchStart={() => {
-                if (createCommentMutation.isPending) return;
-                textareaRef.current?.blur();
-              }}
+        ) : (
+          <div className='flex gap-3'>
+            <ProfileIcon
+              nickname={comments[0].authorName}
+              isActive={comments[0].userStatus === 'ACTIVE'}
+              size='sm'
             />
-          )}
+            <div className='flex-1 min-w-0 text-sm text-gray-600 line-clamp-3'>
+              {comments[0].content}
+            </div>
+          </div>
+        )}
+      </button>
 
+      <CommentPanel
+        open={isPanelOpen}
+        onOpenChange={setIsPanelOpen}
+        title={`댓글 ${comments.length}개`}
+        onClickWrite={handleClickWrite}
+        comments={
           <div
-            className={clsx(
-              'fixed inset-x-0 bottom-0 z-100 bg-white border-t border-gray-200 px-6 py-4',
-              'transition-transform duration-300 ease-in-out',
-              isInputVisible ? 'translate-y-0' : 'translate-y-full'
-            )}
+            ref={commentsListRef}
+            className='flex flex-col h-full min-h-0 overflow-y-auto'
           >
-            <div className='flex gap-3 items-end'>
-              <textarea
-                ref={textareaRef}
-                value={content}
-                onChange={e => setContent(e.target.value)}
-                onBlur={() => {
-                  if (createCommentMutation.isPending) return;
-                  setIsInputVisible(false);
-                }}
-                placeholder='댓글을 입력하세요'
-                className={clsx(
-                  'max-h-36 flex-1 min-w-0 p-3 outline-none resize-none bg-gray-50 border rounded-lg',
-                  'border-gray-200 hover:border-blue-500 focus:border-blue-500',
-                  !content && 'bg-gray-50'
-                )}
-                rows={1}
-                onInput={e => {
-                  const target = e.target as HTMLTextAreaElement;
-                  target.style.height = 'auto';
-                  target.style.height = `${Math.min(
-                    target.scrollHeight,
-                    remToPx(9)
-                  )}px`;
-                }}
-              />
+            {comments.length === 0 ? (
+              <div className='flex items-center justify-center bg-gray-50 h-full text-gray-500 text-sm'>
+                아직 댓글이 없습니다
+              </div>
+            ) : (
+              comments.map((comment, idx) => (
+                <div key={comment.id}>
+                  <CommentItem
+                    isLoggedIn={isLoggedIn}
+                    userId={userId}
+                    comment={comment}
+                    closePanel={() => setIsPanelOpen(false)}
+                  />
+                  {idx !== comments.length - 1 && (
+                    <div className='w-full h-px bg-gray-200' />
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        }
+        commentInput={
+          isLargerThanXl ? (
+            <></>
+          ) : (
+            <>
+              {isInputVisible && (
+                <div
+                  className='fixed inset-0 z-90'
+                  onClick={() => {
+                    if (createCommentMutation.isPending) return;
+                    textareaRef.current?.blur();
+                  }}
+                  onTouchStart={() => {
+                    if (createCommentMutation.isPending) return;
+                    textareaRef.current?.blur();
+                  }}
+                />
+              )}
 
-              <button
-                onMouseDown={e => e.preventDefault()} // prevent keyboard from closing
-                onTouchStart={e => e.preventDefault()} // prevent keyboard from closing
-                onClick={() => {
-                  if (!content.trim()) return;
-                  handleSubmit();
-                }}
+              <div
                 className={clsx(
-                  'shrink-0 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 py-2 px-4 rounded-full',
-                  content.trim() ? 'cursor-pointer' : 'opacity-50'
+                  'fixed inset-x-0 bottom-0 z-100 bg-white border-t border-gray-200 px-6 py-4',
+                  'transition-transform duration-300 ease-in-out',
+                  isInputVisible ? 'translate-y-0' : 'translate-y-full'
                 )}
               >
-                완료
-              </button>
-            </div>
-          </div>
-        </CommentsPanel>
+                <div className='flex gap-3 items-end'>
+                  <textarea
+                    ref={textareaRef}
+                    value={content}
+                    onChange={e => setContent(e.target.value)}
+                    onBlur={() => {
+                      if (createCommentMutation.isPending) return;
+                      setIsInputVisible(false);
+                    }}
+                    placeholder='댓글을 입력하세요'
+                    className={clsx(
+                      'max-h-36 flex-1 min-w-0 p-3 outline-none resize-none bg-gray-50 border rounded-lg',
+                      'border-gray-200 hover:border-blue-500 focus:border-blue-500',
+                      !content && 'bg-gray-50'
+                    )}
+                    rows={1}
+                    onInput={e => {
+                      const target = e.target as HTMLTextAreaElement;
+                      target.style.height = 'auto';
+                      target.style.height = `${Math.min(
+                        target.scrollHeight,
+                        remToPx(9)
+                      )}px`;
+                    }}
+                  />
 
-        <CommentPasswordDialog
-          isOpen={isPasswordDialogOpen}
-          setIsOpen={setIsPasswordDialogOpen}
-          onSubmit={handleSubmit}
-          isLoading={createCommentMutation.isPending}
-        />
-      </>
-    )
+                  <button
+                    onMouseDown={e => e.preventDefault()} // prevent keyboard from closing
+                    onTouchStart={e => e.preventDefault()} // prevent keyboard from closing
+                    onClick={() => {
+                      if (!content.trim()) return;
+                      handleSubmit();
+                    }}
+                    className={clsx(
+                      'shrink-0 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 py-2 px-4 rounded-full',
+                      content.trim() ? 'cursor-pointer' : 'opacity-50'
+                    )}
+                  >
+                    완료
+                  </button>
+                </div>
+              </div>
+            </>
+          )
+        }
+      />
+
+      <CommentPasswordDialog
+        isOpen={isPasswordDialogOpen}
+        setIsOpen={setIsPasswordDialogOpen}
+        onSubmit={handleSubmit}
+        isLoading={createCommentMutation.isPending}
+      />
+    </>
   );
 }

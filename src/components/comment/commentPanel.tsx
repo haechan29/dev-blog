@@ -17,18 +17,20 @@ import useMediaQuery from '@/hooks/useMediaQuery';
 import { XIcon } from 'lucide-react';
 import { ReactNode } from 'react';
 
-export default function CommentsPanel({
+export default function CommentPanel({
   open,
   onOpenChange,
   title,
   onClickWrite,
-  children,
+  comments,
+  commentInput,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
   onClickWrite: () => void;
-  children: ReactNode;
+  comments: ReactNode;
+  commentInput: ReactNode;
 }) {
   const isLargerThanXl = useMediaQuery('(min-width: 1280px)');
 
@@ -49,7 +51,9 @@ export default function CommentsPanel({
             </button>
           </SheetClose>
         </SheetHeader>
-        {children}
+
+        {comments}
+        {commentInput}
       </SheetContent>
     </Sheet>
   ) : (
@@ -74,7 +78,8 @@ export default function CommentsPanel({
           </div>
         </DrawerHeader>
 
-        {children}
+        {comments}
+        {commentInput}
       </DrawerContent>
     </Drawer>
   );
