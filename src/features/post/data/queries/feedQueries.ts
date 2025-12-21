@@ -5,10 +5,12 @@ import 'server-only';
 export async function fetchFeedPosts({
   limit,
   excludeIds = [],
+  excludeUserId,
   cursor,
 }: {
   limit: number;
   excludeIds?: string[];
+  excludeUserId?: string;
   cursor: string | null;
 }) {
   let query = supabase
@@ -34,6 +36,10 @@ export async function fetchFeedPosts({
 
   if (excludeIds.length > 0) {
     query = query.not('id', 'in', `(${excludeIds.join(',')})`);
+  }
+
+  if (excludeUserId) {
+    query = query.neq('user_id', excludeUserId);
   }
 
   if (cursor) {

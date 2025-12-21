@@ -44,6 +44,7 @@ export async function getFeedPosts(
   const fetchedPosts = await FeedQueries.fetchFeedPosts({
     limit: FEED_LIMIT + 1,
     excludeIds: excludeId ? [...viewedPostIds, excludeId] : viewedPostIds,
+    excludeUserId: userId,
     cursor,
   });
 
