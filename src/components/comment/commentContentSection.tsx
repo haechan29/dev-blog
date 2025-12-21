@@ -6,7 +6,13 @@ import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
 import { ApiError } from '@/lib/api';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import toast from 'react-hot-toast';
 
 export default function CommentContentSection({
@@ -27,7 +33,7 @@ export default function CommentContentSection({
   const [isContentValid, setIsContentValid] = useState(true);
   const { updateCommentMutation } = useComments({ postId: comment.postId });
 
-  const [splitIndex, setSecondLineEndIndex] = useState<number | null>(null);
+  const [splitIndex, setSplitIndex] = useState<number | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const [firstTwoLines, restLines] = splitIndex
@@ -43,10 +49,10 @@ export default function CommentContentSection({
     }
   }, [isEditing, comment.content]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (contentRef.current) {
       const index = getSecondLineEndIndex(contentRef.current);
-      setSecondLineEndIndex(index);
+      setSplitIndex(index);
     }
   }, [comment.content]);
 
@@ -188,8 +194,11 @@ function getSecondLineEndIndex(element: HTMLElement): number | null {
   const text = textNode.textContent || '';
   if (!text) return null;
 
-  const lineHeight = parseFloat(getComputedStyle(element).lineHeight);
-  const twoLineHeight = lineHeight * 2;
+  const computedStyle = getComputedStyle(element);
+  const lineHeight = parseFloat(computedStyle.lineHeight) + 1;
+  const totalHeight = parseFloat(computedStyle.height);
+
+  if (totalHeight <= lineHeight * 2) return null;
 
   const range = document.createRange();
 
@@ -205,7 +214,7 @@ function getSecondLineEndIndex(element: HTMLElement): number | null {
 
     const height = range.getBoundingClientRect().height;
 
-    if (height <= twoLineHeight) {
+    if (height <= lineHeight * 2) {
       result = mid;
       left = mid + 1;
     } else {
