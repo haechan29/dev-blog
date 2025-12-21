@@ -27,6 +27,7 @@ export default function CommentContentSection({
   setIsEditing: (isEditing: boolean) => void;
 }) {
   const contentRef = useRef<HTMLDivElement>(null);
+  const restLinesRef = useRef<HTMLDivElement>(null);
   const [password, setPassword] = useState('');
   const [content, setContent] = useState(comment.content);
   const [isPasswordValid, setIsPasswordValid] = useState(true);
@@ -35,6 +36,7 @@ export default function CommentContentSection({
 
   const [splitIndex, setSplitIndex] = useState<number | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [hasOverflow, setHasOverflow] = useState(false);
 
   const [firstTwoLines, restLines] = splitIndex
     ? [comment.content.slice(0, splitIndex), comment.content.slice(splitIndex)]
@@ -55,6 +57,12 @@ export default function CommentContentSection({
       setSplitIndex(index);
     }
   }, [comment.content]);
+
+  useLayoutEffect(() => {
+    if (!restLinesRef.current) return;
+    const restLines = restLinesRef.current;
+    setHasOverflow(restLines.scrollWidth > restLines.clientWidth);
+  }, [restLines]);
 
   const updateComment = useCallback(
     (params: {
@@ -165,19 +173,24 @@ export default function CommentContentSection({
   ) : (
     <>
       <div className='mb-3'>
-        <div ref={contentRef} className='text-gray-800'>
+        <div ref={contentRef} className='text-gray-800 wrap-break-word'>
           {isExpanded ? comment.content : firstTwoLines}
         </div>
 
         {!isExpanded && restLines && (
-          <div className='flex items-center gap-2'>
-            <div className='flex-1 min-w-0 truncate'>{restLines}</div>
-            <button
-              onClick={() => setIsExpanded(true)}
-              className='cursor-pointer text-sm text-gray-500 hover:text-gray-400'
-            >
-              더보기
-            </button>
+          <div className='flex items-center gap-2 wrap-break-word'>
+            <div ref={restLinesRef} className='flex-1 min-w-0 truncate'>
+              {restLines}
+            </div>
+
+            {hasOverflow && (
+              <button
+                onClick={() => setIsExpanded(true)}
+                className='cursor-pointer text-sm text-gray-500 hover:text-gray-400'
+              >
+                더보기
+              </button>
+            )}
           </div>
         )}
       </div>
