@@ -1,7 +1,6 @@
 import { Page } from '@/features/postViewer/domain/types/page';
 
 export default interface PostViewerProps {
-  isButtonVisible: boolean;
   isViewerMode: boolean;
   areBarsVisible: boolean;
   isToolbarExpanded: boolean;

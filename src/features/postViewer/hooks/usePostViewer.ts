@@ -26,7 +26,6 @@ function createProps({
   postViewer: PostViewer;
 }): PostViewerProps {
   return {
-    isButtonVisible: !postViewer.areCommentsVisible && !postViewer.isViewerMode,
     areBarsVisible:
       postViewer.isMouseOnToolbar ||
       postViewer.isMouseOnControlBar ||

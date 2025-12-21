@@ -9,12 +9,9 @@ import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { ApiError } from '@/lib/api';
 import { remToPx } from '@/lib/dom';
-import { setAreCommentsVisible } from '@/lib/redux/post/postViewerSlice';
-import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useDispatch } from 'react-redux';
 
 export default function Comments({
   isLoggedIn,
@@ -27,7 +24,6 @@ export default function Comments({
   postId: string;
   initialComments: CommentItemProps[];
 }) {
-  const dispatch = useDispatch<AppDispatch>();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const commentsPreviewRef = useRef<HTMLButtonElement | null>(null);
   const commentsListRef = useRef<HTMLDivElement | null>(null);
@@ -47,17 +43,6 @@ export default function Comments({
       textareaRef.current?.focus();
     });
   };
-
-  useEffect(() => {
-    if (!commentsPreviewRef.current) return;
-    const commentsObserver = new IntersectionObserver(entries => {
-      dispatch(setAreCommentsVisible(entries[0].isIntersecting));
-    });
-    commentsObserver.observe(commentsPreviewRef.current);
-    return () => {
-      commentsObserver.disconnect();
-    };
-  }, [dispatch]);
 
   const handleSubmit = useCallback(
     (password?: string) => {
