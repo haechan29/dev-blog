@@ -126,7 +126,8 @@ export default function Comments({
             e.preventDefault();
           }
         }}
-        comments={
+      >
+        <>
           <div className='flex-1 min-h-0 overflow-hidden'>
             {comments.length === 0 ? (
               <div className='h-full flex items-center justify-center bg-gray-50 text-gray-500 text-sm'>
@@ -154,9 +155,8 @@ export default function Comments({
               </SimpleBar>
             )}
           </div>
-        }
-        commentInput={
-          showSheet ? (
+
+          {showSheet ? (
             <div className='flex gap-3 items-end border-t border-gray-200 p-4'>
               <textarea
                 ref={textareaRef}
@@ -259,16 +259,16 @@ export default function Comments({
                 </div>
               </div>
             </>
-          )
-        }
-      />
+          )}
 
-      <CommentPasswordDialog
-        isOpen={isPasswordDialogOpen}
-        setIsOpen={setIsPasswordDialogOpen}
-        onSubmit={handleSubmit}
-        isLoading={createCommentMutation.isPending}
-      />
+          <CommentPasswordDialog
+            isOpen={isPasswordDialogOpen}
+            setIsOpen={setIsPasswordDialogOpen}
+            onSubmit={handleSubmit}
+            isLoading={createCommentMutation.isPending}
+          />
+        </>
+      </CommentPanel>
     </>
   );
 }

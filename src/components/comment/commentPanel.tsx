@@ -26,8 +26,7 @@ export default function CommentPanel({
   title,
   onClickWrite,
   onInteractOutside,
-  comments,
-  commentInput,
+  children,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -35,8 +34,7 @@ export default function CommentPanel({
   title: string;
   onClickWrite: () => void;
   onInteractOutside: SheetContentProps['onInteractOutside'];
-  comments: ReactNode;
-  commentInput: ReactNode;
+  children: ReactNode;
 }) {
   if (showSheet === undefined) return null;
 
@@ -57,8 +55,7 @@ export default function CommentPanel({
           </SheetClose>
         </SheetHeader>
 
-        {comments}
-        {commentInput}
+        {children}
       </SheetContent>
     </Sheet>
   ) : (
@@ -83,8 +80,7 @@ export default function CommentPanel({
           </div>
         </DrawerHeader>
 
-        {comments}
-        {commentInput}
+        {children}
       </DrawerContent>
     </Drawer>
   );
