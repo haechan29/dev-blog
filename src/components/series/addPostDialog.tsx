@@ -14,10 +14,9 @@ import {
   DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
-import * as PostClientService from '@/features/post/domain/service/postClientService';
+import usePosts from '@/features/post/hooks/usePosts';
 import useSeries from '@/features/series/domain/hooks/useSeries';
 import { SeriesProps } from '@/features/series/ui/seriesProps';
-import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
 import { useCallback, useMemo } from 'react';
@@ -31,11 +30,7 @@ export default function AddPostDialog({
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }) {
-  const { data: posts } = useQuery({
-    queryKey: ['posts', initialSeries.userId],
-    queryFn: () => PostClientService.fetchPosts(initialSeries.userId),
-  });
-
+  const { posts } = usePosts(initialSeries.userId);
   const { series, addPostMutation } = useSeries(initialSeries);
   const existingPosts = useMemo(() => series.posts, [series.posts]);
   const existingPostIds = useMemo(() => {

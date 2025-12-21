@@ -2,12 +2,29 @@ import { PostDto } from '@/features/post/data/dto/postDto';
 import Post from '@/features/post/domain/model/post';
 import { api } from '@/lib/api';
 
-export async function fetchPost(postId: string): Promise<PostDto> {
+export async function getPost(postId: string): Promise<PostDto> {
   const response = await api.get(`/api/posts/${postId}`);
   return response.data;
 }
 
-export async function fetchPosts(userId: string): Promise<PostDto[]> {
+export async function getFeedPosts(
+  cursor: string | null,
+  excludeId?: string
+): Promise<{
+  posts: PostDto[];
+  nextCursor: string | null;
+}> {
+  const params = new URLSearchParams({
+    type: 'feed',
+    ...(cursor && { cursor }),
+    ...(excludeId && { excludeId }),
+  });
+
+  const response = await api.get(`/api/posts?${params}`);
+  return response.data;
+}
+
+export async function getPosts(userId: string): Promise<PostDto[]> {
   const response = await api.get(`/api/posts?userId=${userId}`);
   return response.data;
 }

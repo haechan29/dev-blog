@@ -3,7 +3,6 @@ import { Page } from '@/features/postViewer/domain/types/page';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: PostViewer = {
-  areCommentsVisible: false,
   isViewerMode: false,
   isToolbarExpanded: false,
   isMouseOnToolbar: false,
@@ -21,9 +20,6 @@ const postViewerSlice = createSlice({
   name: 'postViewer',
   initialState,
   reducers: {
-    setAreCommentsVisible: (state, action: PayloadAction<boolean>) => {
-      state.areCommentsVisible = action.payload;
-    },
     setIsViewerMode: (state, action: PayloadAction<boolean>) => {
       state.isViewerMode = action.payload;
       if (!action.payload) {
@@ -80,7 +76,6 @@ const postViewerSlice = createSlice({
 
 export default postViewerSlice.reducer;
 export const {
-  setAreCommentsVisible,
   setIsViewerMode,
   setIsToolbarExpanded,
   setIsMouseOnToolbar,

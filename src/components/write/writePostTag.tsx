@@ -91,7 +91,7 @@ export default function WritePostTag() {
           <div
             key={tag}
             className={clsx(
-              'shrink-0 text-sm',
+              'shrink-0',
               index < maxTagsLength ? 'text-blue-500' : 'text-red-500'
             )}
           >
@@ -101,7 +101,7 @@ export default function WritePostTag() {
 
         <div
           className={clsx(
-            'w-fit shrink-0 relative text-sm',
+            'w-fit shrink-0 relative',
             !isFocused && tagsInner.length > 0 && 'opacity-0'
           )}
         >

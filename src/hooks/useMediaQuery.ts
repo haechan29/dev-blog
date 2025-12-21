@@ -1,11 +1,14 @@
 import { useLayoutEffect, useState } from 'react';
 
-export default function useMediaQuery(query: string) {
-  const [matches, setMatches] = useState(false);
+export const TOUCH_QUERY = '(pointer: coarse)';
+export const DESKTOP_QUERY = '(min-width: 1280px)';
+
+type MediaQuery = typeof TOUCH_QUERY | typeof DESKTOP_QUERY;
+
+export default function useMediaQuery(query: MediaQuery) {
+  const [matches, setMatches] = useState<boolean | undefined>();
 
   useLayoutEffect(() => {
-    if (typeof window === 'undefined') return;
-
     const media = window.matchMedia(query);
     const updateMatch = () => setMatches(media.matches);
     updateMatch();

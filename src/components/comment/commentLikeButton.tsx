@@ -57,11 +57,6 @@ export default function CommentLikeButton({
         );
       }
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['posts', comment.postId, 'comments'],
-      });
-    },
   });
 
   const decrementLikeCount = useMutation({
@@ -99,11 +94,6 @@ export default function CommentLikeButton({
           context.previousComments
         );
       }
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['posts', comment.postId, 'comments'],
-      });
     },
   });
 

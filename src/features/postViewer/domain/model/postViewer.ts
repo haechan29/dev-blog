@@ -1,7 +1,6 @@
 import { Page } from '@/features/postViewer/domain/types/page';
 
 export interface PostViewer {
-  areCommentsVisible: boolean;
   isViewerMode: boolean;
   isToolbarExpanded: boolean;
   isMouseOnToolbar: boolean;

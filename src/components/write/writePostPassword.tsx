@@ -67,7 +67,7 @@ export default function WritePostPassword() {
         value={passwordInner}
         onChange={onChange}
         placeholder='비밀번호'
-        className='flex-1 min-w-0 text-sm outline-none'
+        className='flex-1 min-w-0 outline-none'
       />
 
       <div

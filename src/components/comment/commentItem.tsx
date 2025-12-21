@@ -20,48 +20,49 @@ export default function CommentItem({
   const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <div className='py-4 border-b border-b-gray-200'>
-      <div className='flex justify-between items-start mb-6'>
-        <div className='flex items-center space-x-3'>
-          <ProfileIcon
-            nickname={comment.authorName}
-            isActive={comment.userStatus === 'ACTIVE'}
-          />
+    <div className='px-6 md:px-12 xl:px-4 my-4 flex space-x-2'>
+      <ProfileIcon
+        nickname={comment.authorName}
+        isActive={comment.userStatus === 'ACTIVE'}
+        size='sm'
+      />
 
-          <div>
+      <div className='flex-1 min-w-0'>
+        <div className='flex justify-between gap-2 items-center mb-2'>
+          <div className='flex gap-2 flex-1 min-w-0 items-center'>
             <Link
               href={`/@${comment.userId}/posts`}
-              className='text-gray-900 hover:underline'
+              className='text-gray-700 font-medium truncate hover:underline'
             >
               {comment.authorName}
             </Link>
 
-            <p className='text-sm text-gray-500'>
+            <div className='flex gap-1 items-center shrink-0 text-xs text-gray-500'>
               {comment.createdAt}
               {comment.isUpdated && (
-                <span className='ml-1 text-gray-400'>(수정됨)</span>
+                <div className='text-gray-400'>(수정됨)</div>
               )}
-            </p>
+            </div>
           </div>
+
+          {comment.userId === userId && (
+            <CommentSettingsDropdown
+              isLoggedIn={isLoggedIn}
+              comment={comment}
+              onEdit={() => setIsEditing(prev => !prev)}
+            >
+              <MoreVertical className='w-8 h-8 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2' />
+            </CommentSettingsDropdown>
+          )}
         </div>
 
-        {comment.userId === userId && (
-          <CommentSettingsDropdown
-            isLoggedIn={isLoggedIn}
-            comment={comment}
-            onEdit={() => setIsEditing(prev => !prev)}
-          >
-            <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2' />
-          </CommentSettingsDropdown>
-        )}
+        <CommentContentSection
+          comment={comment}
+          isLoggedIn={isLoggedIn}
+          isEditing={isEditing}
+          setIsEditing={setIsEditing}
+        />
       </div>
-
-      <CommentContentSection
-        comment={comment}
-        isLoggedIn={isLoggedIn}
-        isEditing={isEditing}
-        setIsEditing={setIsEditing}
-      />
     </div>
   );
 }

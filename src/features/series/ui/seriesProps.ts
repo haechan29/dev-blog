@@ -12,7 +12,13 @@ export interface SeriesProps {
   authorName: string;
   posts: Pick<
     PostProps,
-    'id' | 'title' | 'createdAt' | 'seriesId' | 'seriesOrder'
+    | 'id'
+    | 'title'
+    | 'createdAt'
+    | 'seriesId'
+    | 'seriesOrder'
+    | 'likeCount'
+    | 'viewCount'
   >[];
   postCount: number;
 }

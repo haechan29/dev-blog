@@ -1,21 +1,25 @@
-import { auth } from '@/auth';
+'use client';
+
 import PostInfo from '@/components/post/postInfo';
 import PostSettingsDropdown from '@/components/post/postSettingsDropdown';
 import { PostProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
 import { MoreVertical } from 'lucide-react';
-import { cookies } from 'next/headers';
 import Link from 'next/link';
 
 const SCALE_ANIMATION_DELAY = 0.5;
 const SCROLL_ANIMATION_DELAY = 1;
 const MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION = 200;
 
-export default async function PostPreview({ post }: { post: PostProps }) {
-  const session = await auth();
-  const userId =
-    session?.user?.user_id ?? (await cookies()).get('userId')?.value;
-
+export default function PostPreview({
+  isLoggedIn,
+  post,
+  userId,
+}: {
+  isLoggedIn: boolean;
+  post: PostProps;
+  userId?: string;
+}) {
   const { id, title, plainText, tags } = post;
   const isScrollAnimationEnabled =
     plainText.length >= MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION;
@@ -40,7 +44,7 @@ export default async function PostPreview({ post }: { post: PostProps }) {
       {post.userId === userId && (
         <div className='absolute top-0 right-0 z-10'>
           <PostSettingsDropdown
-            isLoggedIn={!!session}
+            isLoggedIn={isLoggedIn}
             userId={userId}
             post={post}
             showRawContent={false}
@@ -52,7 +56,7 @@ export default async function PostPreview({ post }: { post: PostProps }) {
 
       <div className='w-full flex flex-col gap-4'>
         <Link
-          href={`/read/${id}`}
+          href={`/read/${id}?from=feed`}
           className='w-full flex flex-col gap-4 text-gray-900'
         >
           <div

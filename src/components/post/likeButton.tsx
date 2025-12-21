@@ -1,101 +1,72 @@
 'use client';
 
-import usePostStat from '@/features/postStat/hooks/usePostStat';
+import useLike from '@/features/post-interaction/hooks/useLike';
 import useThrottle from '@/hooks/useThrottle';
 import clsx from 'clsx';
 import { Heart } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 
-export default function LikeButton({ postId }: { postId: string }) {
-  const [heartFilled, setHeartFilled] = useState(false);
+export default function LikeButton({
+  postId,
+  likeCount,
+}: {
+  postId: string;
+  likeCount: number;
+}) {
   const throttle = useThrottle();
 
-  const { stat, incrementLikeCount } = usePostStat({ postId });
+  const { isLiked, toggleLike } = useLike({ postId });
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const handleClick = useCallback(() => {
     throttle(() => {
-      setHeartFilled(true);
-      incrementLikeCount.mutate();
+      toggleLike.mutate();
+      setIsAnimating(true);
+      setTimeout(() => setIsAnimating(false), 300);
     }, 1000);
-  }, [incrementLikeCount, throttle]);
-
-  const handleFillingHeart = useCallback(() => {
-    if (heartFilled) {
-      setTimeout(() => setHeartFilled(false), 300);
-    }
-  }, [heartFilled]);
+  }, [throttle, toggleLike]);
 
   return (
     <div className='flex justify-center mb-20'>
       <button
         onClick={handleClick}
         className={clsx(
-          'flex items-center gap-2 px-6 py-3 rounded-lg border transition-all duration-300 hover:scale-105',
-          heartFilled
-            ? 'border-red-300 bg-red-50 shadow-lg shadow-red-200/50'
+          'flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300',
+          isLiked && isAnimating && 'scale-105',
+          isLiked
+            ? 'border-red-300 bg-red-50'
             : 'border-gray-200 hover:bg-gray-50 hover:border-gray-300'
         )}
-        onTransitionEnd={handleFillingHeart}
       >
         <Heart
           size={20}
           className={clsx(
             'transition-color duration-300 ease-out',
-            heartFilled ? 'text-red-500 fill-red-500' : 'text-gray-400'
+            isLiked ? 'text-red-500 fill-red-500' : 'text-gray-400'
           )}
         />
 
-        <RollingCounter heartFilled={heartFilled} count={stat.likeCount} />
+        <div
+          className={clsx(
+            'relative text-sm overflow-hidden',
+            isLiked ? 'text-red-600' : 'text-gray-600'
+          )}
+        >
+          <div className={clsx(isAnimating && 'invisible')}>
+            {isLiked ? likeCount + 1 : likeCount}
+          </div>
+          <div
+            className={clsx(
+              'absolute top-0 inset-x-0 mx-auto transition-transform duration-300 ease-out',
+              isLiked && '-translate-y-[50%]',
+              !isAnimating && 'invisible'
+            )}
+          >
+            <div>{likeCount}</div>
+            <div>{likeCount + 1}</div>
+          </div>
+        </div>
       </button>
-    </div>
-  );
-}
-
-function RollingCounter({
-  heartFilled,
-  count,
-}: {
-  heartFilled: boolean;
-  count: number;
-}) {
-  const [prevCount, setPrevCount] = useState(0);
-  const isRolling = useMemo(() => count !== prevCount, [count, prevCount]);
-
-  return (
-    <div className='relative w-6 h-6 font-medium overflow-hidden flex items-center justify-center'>
-      <span
-        className={clsx(
-          'absolute h-6 flex items-center justify-center',
-          heartFilled ? 'text-red-600' : 'text-gray-600',
-          isRolling && 'hidden'
-        )}
-      >
-        {count}
-      </span>
-      <div
-        className={clsx(
-          'absolute flex flex-col font-medium transition-transform duration-300 ease-out',
-          isRolling ? '-translate-y-3 visible' : 'translate-y-3 invisible'
-        )}
-        onTransitionEnd={() => setPrevCount(count)}
-      >
-        <span
-          className={clsx(
-            'h-6 flex items-center justify-center',
-            heartFilled ? 'text-red-600' : 'text-gray-600'
-          )}
-        >
-          {prevCount}
-        </span>
-        <span
-          className={clsx(
-            'h-6 flex items-center justify-center',
-            heartFilled ? 'text-red-600' : 'text-gray-600'
-          )}
-        >
-          {count}
-        </span>
-      </div>
     </div>
   );
 }

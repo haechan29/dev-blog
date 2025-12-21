@@ -19,6 +19,8 @@ export type PostProps = {
   seriesId: string | null;
   seriesOrder: number | null;
   seriesTitle: string | null;
+  likeCount: number;
+  viewCount: number;
 };
 
 export function createProps(post: Post): PostProps {
@@ -37,5 +39,7 @@ export function createProps(post: Post): PostProps {
     seriesId: post.seriesId,
     seriesOrder: post.seriesOrder,
     seriesTitle: post.seriesTitle,
+    likeCount: post.likeCount,
+    viewCount: post.viewCount,
   };
 }

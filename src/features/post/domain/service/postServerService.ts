@@ -3,17 +3,28 @@ import { toDomain } from '@/features/post/domain/mapper/postMapper';
 import Post from '@/features/post/domain/model/post';
 import 'server-only';
 
-export async function fetchPosts() {
-  const dtos = await PostServerRepository.fetchPosts();
+export async function getFeedPosts(
+  cursor: string | null,
+  userId?: string,
+  excludeId?: string
+) {
+  const result = await PostServerRepository.getFeedPosts(
+    cursor,
+    userId,
+    excludeId
+  );
+  return {
+    posts: result.posts.map(toDomain),
+    nextCursor: result.nextCursor,
+  };
+}
+
+export async function getPostsByUserId(userId: string) {
+  const dtos = await PostServerRepository.getPostsByUserId(userId);
   return dtos.map(toDomain);
 }
 
-export async function fetchPostsByUserId(userId: string) {
-  const dtos = await PostServerRepository.fetchPostsByUserId(userId);
-  return dtos.map(toDomain);
-}
-
-export async function fetchPost(postId: string): Promise<Post> {
-  const dto = await PostServerRepository.fetchPost(postId);
+export async function getPost(postId: string): Promise<Post> {
+  const dto = await PostServerRepository.getPost(postId);
   return toDomain(dto);
 }

@@ -1,5 +1,6 @@
 import { auth } from '@/auth';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
+import * as FeedUsecase from '@/features/post/data/usecases/feedUsecase';
 import { PostStatCreationError } from '@/features/postStat/data/errors/postStatErrors';
 import * as PostStatQueries from '@/features/postStat/data/queries/postStatQueries';
 import {
@@ -14,6 +15,16 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
+    const type = searchParams.get('type');
+
+    if (type === 'feed') {
+      const userId = await getUserId();
+      const cursor = searchParams.get('cursor');
+      const excludeId = searchParams.get('excludeId') ?? undefined;
+      const data = await FeedUsecase.getFeedPosts(cursor, userId, excludeId);
+      return NextResponse.json({ data });
+    }
+
     const userId = searchParams.get('userId');
 
     if (!userId) {

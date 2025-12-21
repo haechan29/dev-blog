@@ -13,17 +13,21 @@ export async function GET(
 ) {
   try {
     const { postId } = await params;
-    const data = await CommentQueries.fetchComments(postId);
+    const userId = await getUserId();
+    const { searchParams } = new URL(request.url);
+    const timestamp = searchParams.get('timestamp') ?? undefined;
+
+    const data = await CommentQueries.fetchComments(postId, userId, timestamp);
     return NextResponse.json({ data });
   } catch (error) {
-    console.error('게시글 조회 실패:', error);
+    console.error('댓글 조회 요청이 실패했습니다', error);
 
     if (error instanceof PostNotFoundError) {
       return NextResponse.json({ error: error.message }, { status: 404 });
     }
 
     return NextResponse.json(
-      { error: '댓글 조회 요청이 실패했습니다.' },
+      { error: '댓글 조회 요청이 실패했습니다' },
       { status: 500 }
     );
   }

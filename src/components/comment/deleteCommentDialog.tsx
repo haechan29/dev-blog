@@ -39,10 +39,11 @@ export default function DeleteCommentDialog({
 
   const { deleteCommentMutation } = useComments({ postId });
   const deleteComment = useCallback(
-    (params: { postId: string; commentId: number; password: string }) => {
+    (params: { postId: string; commentId: number; password?: string }) => {
       deleteCommentMutation.mutate(params, {
         onSuccess: () => {
           setIsOpen(false);
+          toast.success('댓글이 삭제되었습니다');
         },
         onError: error => {
           const message =
@@ -56,14 +57,18 @@ export default function DeleteCommentDialog({
     [deleteCommentMutation, setIsOpen]
   );
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     if (!isLoggedIn && !password.trim()) {
       setIsPasswordValid(false);
       return;
     }
 
-    deleteComment({ postId, commentId, password });
-  };
+    deleteComment({
+      postId,
+      commentId,
+      ...(!isLoggedIn && { password: password!.trim() }),
+    });
+  }, [commentId, deleteComment, isLoggedIn, password, postId]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
