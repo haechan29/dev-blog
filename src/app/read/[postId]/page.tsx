@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic';
-
 import { auth } from '@/auth';
 import PostPageClient from '@/components/post/postPageClient';
 import PostParsedContent from '@/components/post/postParsedContent';
