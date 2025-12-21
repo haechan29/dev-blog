@@ -1,10 +1,9 @@
 'use client';
 
 import CommentLikeButton from '@/components/comment/commentLikeButton';
-import { updateComment } from '@/features/comment/domain/service/commentClientService';
+import useComments from '@/features/comment/hooks/useComments';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
 import { ApiError } from '@/lib/api';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -21,7 +20,6 @@ export default function CommentContentSection({
   isEditing: boolean;
   setIsEditing: (isEditing: boolean) => void;
 }) {
-  const queryClient = useQueryClient();
   const contentRef = useRef<HTMLDivElement>(null);
   const [password, setPassword] = useState('');
   const [content, setContent] = useState(comment.content);
@@ -29,6 +27,7 @@ export default function CommentContentSection({
   const [isContentValid, setIsContentValid] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isOverflow, setIsOverflow] = useState(false);
+  const { updateCommentMutation } = useComments({ postId: comment.postId });
 
   useEffect(() => {
     if (!isEditing) {
@@ -47,26 +46,28 @@ export default function CommentContentSection({
     }
   }, [comment.content]);
 
-  const editComment = useMutation({
-    mutationKey: ['posts', comment.postId, 'comments', comment.id],
-    mutationFn: (params: {
+  const updateComment = useCallback(
+    (params: {
       postId: string;
       commentId: number;
       content: string;
       password?: string;
-    }) => updateComment(params),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['posts', comment.postId, 'comments'],
+    }) => {
+      updateCommentMutation.mutate(params, {
+        onSuccess: () => {
+          setIsEditing(false);
+        },
+        onError: error => {
+          const message =
+            error instanceof ApiError
+              ? error.message
+              : '댓글 수정에 실패했습니다';
+          toast.error(message);
+        },
       });
-      setIsEditing(false);
     },
-    onError: error => {
-      const message =
-        error instanceof ApiError ? error.message : '댓글 수정에 실패했습니다';
-      toast.error(message);
-    },
-  });
+    [setIsEditing, updateCommentMutation]
+  );
 
   const handleEdit = useCallback(() => {
     if (!isLoggedIn && !password.trim()) {
@@ -81,13 +82,20 @@ export default function CommentContentSection({
       return;
     }
 
-    editComment.mutate({
+    updateComment({
       postId: comment.postId,
       commentId: comment.id,
       content: content.trim(),
       ...(!isLoggedIn && { password: password.trim() }),
     });
-  }, [comment.id, comment.postId, content, editComment, isLoggedIn, password]);
+  }, [
+    comment.id,
+    comment.postId,
+    content,
+    isLoggedIn,
+    password,
+    updateComment,
+  ]);
 
   return isEditing ? (
     <div className='space-y-3'>
@@ -127,10 +135,10 @@ export default function CommentContentSection({
           onClick={handleEdit}
           className={clsx(
             'h-9 flex justify-center items-center px-4 text-white rounded-lg hover:bg-blue-500',
-            editComment.isPending ? 'bg-blue-500' : 'bg-blue-600'
+            updateCommentMutation.isPending ? 'bg-blue-500' : 'bg-blue-600'
           )}
         >
-          {editComment.isPending ? (
+          {updateCommentMutation.isPending ? (
             <Loader2 size={18} strokeWidth={2} className='animate-spin' />
           ) : (
             '댓글 수정'

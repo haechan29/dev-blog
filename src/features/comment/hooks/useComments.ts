@@ -39,6 +39,27 @@ export default function useComments({
     },
   });
 
+  const updateCommentMutation = useMutation({
+    mutationFn: (params: {
+      postId: string;
+      commentId: number;
+      content: string;
+      password?: string;
+    }) => CommentClientService.updateComment(params),
+    onSuccess: updatedComment => {
+      queryClient.setQueryData(
+        ['posts', postId, 'comments'],
+        (old: CommentItemProps[]) => {
+          return old.map(comment =>
+            comment.id === updatedComment.id
+              ? updatedComment.toProps()
+              : comment
+          );
+        }
+      );
+    },
+  });
+
   const deleteCommentMutation = useMutation({
     mutationFn: ({
       postId,
@@ -56,5 +77,10 @@ export default function useComments({
     },
   });
 
-  return { comments, createCommentMutation, deleteCommentMutation } as const;
+  return {
+    comments,
+    createCommentMutation,
+    updateCommentMutation,
+    deleteCommentMutation,
+  } as const;
 }
