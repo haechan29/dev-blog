@@ -13,7 +13,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import useMediaQuery from '@/hooks/useMediaQuery';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import { XIcon } from 'lucide-react';
 import { ReactNode } from 'react';
@@ -23,6 +22,7 @@ type SheetContentProps = React.ComponentProps<typeof SheetPrimitive.Content>;
 export default function CommentPanel({
   open,
   onOpenChange,
+  showSheet,
   title,
   onClickWrite,
   onInteractOutside,
@@ -31,17 +31,16 @@ export default function CommentPanel({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  showSheet?: boolean;
   title: string;
   onClickWrite: () => void;
   onInteractOutside: SheetContentProps['onInteractOutside'];
   comments: ReactNode;
   commentInput: ReactNode;
 }) {
-  const isLargerThanXl = useMediaQuery('(min-width: 1280px)');
+  if (showSheet === undefined) return null;
 
-  if (isLargerThanXl === undefined) return null;
-
-  return isLargerThanXl ? (
+  return showSheet ? (
     <Sheet open={open} onOpenChange={onOpenChange} modal={false}>
       <SheetContent
         side='right'

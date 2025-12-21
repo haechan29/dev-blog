@@ -6,7 +6,10 @@ import CommentPasswordDialog from '@/components/comment/commentPasswordDialog';
 import ProfileIcon from '@/components/user/profileIcon';
 import useComments from '@/features/comment/hooks/useComments';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
-import useMediaQuery from '@/hooks/useMediaQuery';
+import useMediaQuery, {
+  DESKTOP_QUERY,
+  TOUCH_QUERY,
+} from '@/hooks/useMediaQuery';
 import { ApiError } from '@/lib/api';
 import { remToPx } from '@/lib/dom';
 import clsx from 'clsx';
@@ -37,7 +40,10 @@ export default function Comments({
   const [content, setContent] = useState('');
   const [isInputVisible, setIsInputVisible] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
-  const isLargerThanXl = useMediaQuery('(min-width: 1280px)');
+
+  const isDesktop = useMediaQuery(DESKTOP_QUERY);
+  const isTouch = useMediaQuery(TOUCH_QUERY);
+  const showSheet = isDesktop && !isTouch;
 
   const handleClickWrite = () => {
     setIsInputVisible(true);
@@ -112,6 +118,7 @@ export default function Comments({
       <CommentPanel
         open={isPanelOpen}
         onOpenChange={setIsPanelOpen}
+        showSheet={showSheet}
         title={`댓글 ${comments.length}개`}
         onClickWrite={handleClickWrite}
         onInteractOutside={e => {
@@ -149,7 +156,7 @@ export default function Comments({
           </div>
         }
         commentInput={
-          isLargerThanXl ? (
+          showSheet ? (
             <div className='flex gap-3 items-end border-t border-gray-200 p-4'>
               <textarea
                 ref={textareaRef}
