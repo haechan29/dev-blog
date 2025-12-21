@@ -29,7 +29,7 @@ export default function Comments({
 }) {
   const dispatch = useDispatch<AppDispatch>();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const commentsPreview = useRef<HTMLButtonElement | null>(null);
+  const commentsPreviewRef = useRef<HTMLButtonElement | null>(null);
   const commentsListRef = useRef<HTMLDivElement | null>(null);
   const { comments, createCommentMutation } = useComments({
     postId,
@@ -49,11 +49,11 @@ export default function Comments({
   };
 
   useEffect(() => {
-    if (!commentsPreview.current) return;
+    if (!commentsPreviewRef.current) return;
     const commentsObserver = new IntersectionObserver(entries => {
       dispatch(setAreCommentsVisible(entries[0].isIntersecting));
     });
-    commentsObserver.observe(commentsPreview.current);
+    commentsObserver.observe(commentsPreviewRef.current);
     return () => {
       commentsObserver.disconnect();
     };
@@ -95,8 +95,10 @@ export default function Comments({
   return (
     <>
       <button
-        ref={commentsPreview}
-        onClick={() => setIsPanelOpen(true)}
+        ref={commentsPreviewRef}
+        onClick={() => {
+          setIsPanelOpen(isPanelOpen => !isPanelOpen);
+        }}
         className='w-full p-4 mb-12 bg-gray-50 rounded-lg text-left cursor-pointer hover:bg-gray-100'
       >
         <div className='mb-2 text-sm font-medium text-gray-700'>
@@ -125,6 +127,11 @@ export default function Comments({
         onOpenChange={setIsPanelOpen}
         title={`댓글 ${comments.length}개`}
         onClickWrite={handleClickWrite}
+        onInteractOutside={e => {
+          if (commentsPreviewRef.current?.contains(e.target as Node)) {
+            e.preventDefault();
+          }
+        }}
         comments={
           <div
             ref={commentsListRef}
