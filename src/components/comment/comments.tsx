@@ -227,7 +227,7 @@ export default function Comments({
                     }}
                     placeholder='댓글을 입력하세요'
                     className={clsx(
-                      'max-h-36 flex-1 min-w-0 p-3 outline-none resize-none border rounded-lg',
+                      'max-h-36 flex-1 min-w-0 p-3 outline-none resize-none border rounded-lg scrollbar-hide',
                       'border-gray-200 hover:border-blue-500 focus:border-blue-500',
                       !content && 'bg-gray-50'
                     )}

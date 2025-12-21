@@ -120,7 +120,7 @@ export default function SeriesFormDialog({
         />
 
         <textarea
-          className='w-full border border-gray-200 hover:border-blue-500 focus:border-blue-500 p-3 mb-8 rounded-sm outline-none resize-none'
+          className='w-full border border-gray-200 hover:border-blue-500 focus:border-blue-500 scrollbar-hide p-3 mb-8 rounded-sm outline-none resize-none'
           value={description}
           onChange={e => setDescription(e.target.value)}
           placeholder='설명 (선택사항)'

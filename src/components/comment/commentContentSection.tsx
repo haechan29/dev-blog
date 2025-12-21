@@ -140,7 +140,7 @@ export default function CommentContentSection({
         onChange={e => setContent(e.target.value)}
         placeholder='댓글을 작성해주세요'
         className={clsx(
-          'w-full p-3 resize-none outline-none border rounded-lg overflow-y-hidden',
+          'w-full p-3 resize-none outline-none border rounded-lg overflow-y-hidden scrollbar-hide',
           isContentValid
             ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
             : 'border-red-400 animate-shake',

@@ -107,7 +107,7 @@ export default function WritePostContentEditor() {
         onScroll={onScroll}
         placeholder='본문을 입력하세요'
         className={clsx(
-          'flex-1 min-h-0 p-4 resize-none outline-none border',
+          'flex-1 min-h-0 p-4 resize-none outline-none border scrollbar-hide',
           shouldAttachToolbarToBottom ? 'rounded-lg' : 'rounded-b-lg',
           isValid && !isParseError && !isContentTooLong
             ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
