@@ -29,6 +29,16 @@
   display: none !important;
 }
 
+.simplebar-scrollbar::before {
+  opacity: 0;
+  transition: none !important;
+}
+
+.simplebar-hover:hover .simplebar-scrollbar::before,
+.simplebar-scrollbar.simplebar-visible::before {
+  opacity: 0.5;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
