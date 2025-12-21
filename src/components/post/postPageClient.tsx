@@ -19,6 +19,7 @@ import useRecordView from '@/features/post/hooks/useRecordView';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { AppDispatch } from '@/lib/redux/store';
+import { postsKeys } from '@/queries/keys';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
@@ -53,7 +54,7 @@ export default function PostPageClient({
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ['posts', { excludeId: initialPost.id }],
+    queryKey: postsKeys.list(initialPost.id),
     queryFn: async ({ pageParam }) => {
       const result = await PostClientService.getFeedPosts(
         pageParam,
@@ -73,7 +74,7 @@ export default function PostPageClient({
   });
 
   const { data: post } = useQuery({
-    queryKey: ['posts', initialPost.id],
+    queryKey: postsKeys.detail(initialPost.id),
     queryFn: () => PostClientService.getPost(initialPost.id).then(createProps),
     initialData: initialPost,
   });

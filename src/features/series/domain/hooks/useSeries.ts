@@ -4,6 +4,7 @@ import * as PostClientService from '@/features/post/domain/service/postClientSer
 import * as SeriesClientService from '@/features/series/domain/service/seriesClientService';
 import { createProps, SeriesProps } from '@/features/series/ui/seriesProps';
 import { ApiError } from '@/lib/api';
+import { usersKeys } from '@/queries/keys';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 
@@ -13,7 +14,7 @@ export default function useSeries(initialSeries: SeriesProps) {
   const queryClient = useQueryClient();
 
   const { data: series } = useQuery({
-    queryKey: ['user', userId, 'series', seriesId],
+    queryKey: usersKeys.series(userId, seriesId),
     queryFn: async () => {
       const series = await SeriesClientService.fetchSeries(userId, seriesId);
       return createProps(series);
@@ -31,7 +32,7 @@ export default function useSeries(initialSeries: SeriesProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['user', userId, 'series'],
+        queryKey: usersKeys.seriesList(userId),
       });
     },
     onError: error => {
@@ -60,7 +61,7 @@ export default function useSeries(initialSeries: SeriesProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['user', userId, 'series'],
+        queryKey: usersKeys.seriesList(userId),
       });
     },
     onError: error => {

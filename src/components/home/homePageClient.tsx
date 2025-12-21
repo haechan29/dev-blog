@@ -5,6 +5,7 @@ import HomeToolbar from '@/components/home/homeToolbar';
 import PostPreview from '@/components/post/postPreview';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
+import { postsKeys } from '@/queries/keys';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
@@ -30,7 +31,7 @@ export default function HomePageClient({
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ['posts'],
+    queryKey: postsKeys.list(),
     queryFn: async ({ pageParam }) => {
       const result = await PostClientService.getFeedPosts(pageParam);
       return {
