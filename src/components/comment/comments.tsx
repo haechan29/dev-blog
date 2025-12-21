@@ -128,17 +128,17 @@ export default function Comments({
         }}
         comments={
           <div className='flex-1 min-h-0 overflow-hidden'>
-            <SimpleBar
-              scrollableNodeProps={{ ref: commentsListRef }}
-              className='h-full simplebar-hover'
-            >
-              <div className='flex flex-col'>
-                {comments.length === 0 ? (
-                  <div className='flex items-center justify-center bg-gray-50 h-full text-gray-500 text-sm'>
-                    아직 댓글이 없습니다
-                  </div>
-                ) : (
-                  comments.map((comment, idx) => (
+            {comments.length === 0 ? (
+              <div className='h-full flex items-center justify-center bg-gray-50 text-gray-500 text-sm'>
+                아직 댓글이 없습니다
+              </div>
+            ) : (
+              <SimpleBar
+                scrollableNodeProps={{ ref: commentsListRef }}
+                className='h-full simplebar-hover'
+              >
+                <div className='flex flex-col'>
+                  {comments.map((comment, idx) => (
                     <div key={comment.id}>
                       <CommentItem
                         isLoggedIn={isLoggedIn}
@@ -149,10 +149,10 @@ export default function Comments({
                         <div className='w-full h-px bg-gray-200' />
                       )}
                     </div>
-                  ))
-                )}
-              </div>
-            </SimpleBar>
+                  ))}
+                </div>
+              </SimpleBar>
+            )}
           </div>
         }
         commentInput={
