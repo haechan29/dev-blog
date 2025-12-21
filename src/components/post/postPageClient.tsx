@@ -140,16 +140,14 @@ export default function PostPageClient({
         />
 
         <div className='flex flex-col'>
-          {recommendedPosts.map((post, index) => (
-            <div key={post.id} className='mb-8'>
+          {recommendedPosts.map(post => (
+            <div key={post.id}>
+              <div className='h-px bg-gray-200 mb-8' />
               <PostPreview
                 isLoggedIn={isLoggedIn}
                 post={post}
                 userId={userId}
               />
-              {index !== recommendedPosts.length - 1 && (
-                <div className='h-px bg-gray-200' />
-              )}
             </div>
           ))}
 
