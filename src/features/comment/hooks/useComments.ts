@@ -70,10 +70,13 @@ export default function useComments({
       commentId: number;
       password?: string;
     }) => CommentClientService.deleteComment(postId, commentId, password),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['posts', postId, 'comments'],
-      });
+    onSuccess: (_, variables) => {
+      queryClient.setQueryData(
+        ['posts', postId, 'comments'],
+        (old: CommentItemProps[]) => {
+          return old.filter(comment => comment.id !== variables.commentId);
+        }
+      );
     },
   });
 

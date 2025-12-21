@@ -141,7 +141,6 @@ export default function Comments({
                     isLoggedIn={isLoggedIn}
                     userId={userId}
                     comment={comment}
-                    closePanel={() => setIsPanelOpen(false)}
                   />
                   {idx !== comments.length - 1 && (
                     <div className='w-full h-px bg-gray-200' />
