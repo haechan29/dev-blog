@@ -25,9 +25,14 @@ export default function CommentContentSection({
   const [content, setContent] = useState(comment.content);
   const [isPasswordValid, setIsPasswordValid] = useState(true);
   const [isContentValid, setIsContentValid] = useState(true);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isOverflow, setIsOverflow] = useState(false);
   const { updateCommentMutation } = useComments({ postId: comment.postId });
+
+  const [splitIndex, setSecondLineEndIndex] = useState<number | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const [firstTwoLines, restLines] = splitIndex
+    ? [comment.content.slice(0, splitIndex), comment.content.slice(splitIndex)]
+    : [comment.content, ''];
 
   useEffect(() => {
     if (!isEditing) {
@@ -40,9 +45,8 @@ export default function CommentContentSection({
 
   useEffect(() => {
     if (contentRef.current) {
-      setIsOverflow(
-        contentRef.current.scrollHeight > contentRef.current.clientHeight
-      );
+      const index = getSecondLineEndIndex(contentRef.current);
+      setSecondLineEndIndex(index);
     }
   }, [comment.content]);
 
@@ -154,22 +158,17 @@ export default function CommentContentSection({
     </div>
   ) : (
     <>
-      <div className='relative'>
-        <div
-          ref={contentRef}
-          className={clsx(
-            'text-gray-800 mb-3',
-            !isExpanded && 'max-h-18 overflow-hidden'
-          )}
-        >
-          {comment.content}
+      <div className='mb-3'>
+        <div ref={contentRef} className='text-gray-800'>
+          {isExpanded ? comment.content : firstTwoLines}
         </div>
 
-        {!isExpanded && isOverflow && (
-          <div className='h-6 absolute bottom-0 right-0 pl-8 bg-linear-to-l from-white from-60% to-transparent'>
+        {!isExpanded && restLines && (
+          <div className='flex items-center gap-2'>
+            <div className='flex-1 min-w-0 truncate'>{restLines}</div>
             <button
               onClick={() => setIsExpanded(true)}
-              className='cursor-pointer text-sm text-gray-400 hover:text-gray-500'
+              className='cursor-pointer text-sm text-gray-500 hover:text-gray-400'
             >
               더보기
             </button>
@@ -180,4 +179,39 @@ export default function CommentContentSection({
       <CommentLikeButton comment={comment} />
     </>
   );
+}
+
+function getSecondLineEndIndex(element: HTMLElement): number | null {
+  const textNode = element.firstChild;
+  if (!textNode || textNode.nodeType !== Node.TEXT_NODE) return null;
+
+  const text = textNode.textContent || '';
+  if (!text) return null;
+
+  const lineHeight = parseFloat(getComputedStyle(element).lineHeight);
+  const twoLineHeight = lineHeight * 2;
+
+  const range = document.createRange();
+
+  let left = 0;
+  let right = text.length;
+  let result = text.length;
+
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+
+    range.setStart(textNode, 0);
+    range.setEnd(textNode, mid);
+
+    const height = range.getBoundingClientRect().height;
+
+    if (height <= twoLineHeight) {
+      result = mid;
+      left = mid + 1;
+    } else {
+      right = mid - 1;
+    }
+  }
+
+  return result;
 }
