@@ -1,9 +1,14 @@
-import { PostEntity } from '@/features/post/data/entities/postEntities';
+import {
+  PostEntity,
+  PostEntityFlat,
+} from '@/features/post/data/entities/postEntities';
 import { PostNotFoundError } from '@/features/post/data/errors/postErrors';
-import { toDto } from '@/features/post/data/mapper/postMapper';
+import { toDto, toFlatDto } from '@/features/post/data/mapper/postMapper';
 import Post from '@/features/post/domain/model/post';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
+
+const SEARCH_POST_LIMIT = 20;
 
 export async function fetchPostsByUserId(userId: string) {
   const { data, error } = await supabase
@@ -96,6 +101,22 @@ export async function fetchPostForAuth(postId: string) {
   }
 
   return data as Pick<PostEntity, 'user_id' | 'password_hash'>;
+}
+
+export async function searchPosts(
+  query: string,
+  limit: number = SEARCH_POST_LIMIT
+) {
+  const { data, error } = await supabase.rpc('search_posts', {
+    search_query: query,
+    result_limit: limit,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data as PostEntityFlat[]).map(toFlatDto);
 }
 
 export async function createPost({
