@@ -1,8 +1,8 @@
 'use client';
 
 import Logo from '@/components/logo';
-import SearchCommand from '@/components/post/searchCommand';
 import ToolbarProfileIcon from '@/components/post/toolbarProfileIcon';
+import SearchCommand from '@/components/search/searchCommand';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { cn } from '@/lib/utils';
