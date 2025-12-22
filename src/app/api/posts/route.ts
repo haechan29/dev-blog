@@ -25,6 +25,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ data });
     }
 
+    if (type === 'search') {
+      const query = searchParams.get('q');
+
+      if (!query) {
+        throw new ValidationError('검색어를 찾을 수 없습니다');
+      }
+
+      const data = await PostQueries.searchPosts(query);
+      return NextResponse.json({ data });
+    }
+
     const userId = searchParams.get('userId');
 
     if (!userId) {

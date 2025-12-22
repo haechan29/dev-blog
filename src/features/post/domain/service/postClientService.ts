@@ -20,6 +20,11 @@ export async function getPosts(userId: string) {
   return dtos.map(toDomain);
 }
 
+export async function searchPosts(query: string): Promise<Post[]> {
+  const dtos = await PostClientRepository.searchPosts(query);
+  return dtos.map(toDomain);
+}
+
 export async function createPost(params: {
   title: string;
   content: string;

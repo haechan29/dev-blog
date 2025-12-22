@@ -29,6 +29,12 @@ export async function getPosts(userId: string): Promise<PostDto[]> {
   return response.data;
 }
 
+export async function searchPosts(query: string): Promise<PostDto[]> {
+  const params = new URLSearchParams({ type: 'search', q: query });
+  const response = await api.get(`/api/posts?${params}`);
+  return response.data;
+}
+
 export async function createPost(requestDto: {
   title: string;
   content: string;
