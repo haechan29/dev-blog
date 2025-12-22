@@ -40,7 +40,8 @@ export default function SearchAutocomplete() {
           >
             <ChevronLeft className='w-7 h-7 text-gray-500' />
           </button>
-          <div className='flex-1 flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full'>
+
+          <div className='flex-1 flex items-center gap-2 px-4 py-1 bg-gray-100 rounded-full'>
             <input
               type='text'
               inputMode='search'

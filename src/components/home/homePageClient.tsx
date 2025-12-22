@@ -9,7 +9,7 @@ import { postsKeys } from '@/queries/keys';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
-import { Suspense, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 
 export default function HomePageClient({
@@ -57,9 +57,7 @@ export default function HomePageClient({
 
   return (
     <>
-      <Suspense>
-        <HomeToolbar isLoggedIn={isLoggedIn} />
-      </Suspense>
+      <HomeToolbar isLoggedIn={isLoggedIn} />
 
       {userId && (
         <div className='max-xl:hidden'>

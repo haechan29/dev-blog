@@ -23,7 +23,7 @@ import { postsKeys } from '@/queries/keys';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
-import { ReactNode, Suspense, useEffect, useMemo } from 'react';
+import { ReactNode, useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useDispatch } from 'react-redux';
 
@@ -100,10 +100,8 @@ export default function PostPageClient({
 
   return (
     <>
-      <Suspense>
-        <HomeToolbar isLoggedIn={isLoggedIn} className='max-xl:hidden' />
-        <PostToolbar className='xl:hidden' />
-      </Suspense>
+      <HomeToolbar isLoggedIn={isLoggedIn} className='max-xl:hidden' />
+      <PostToolbar className='xl:hidden' />
 
       <PostSidebar userId={post.userId} currentPostId={post.id} />
 
