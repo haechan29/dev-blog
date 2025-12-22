@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 import clsx from 'clsx';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 
 export default function HomeToolbar({
@@ -20,7 +20,7 @@ export default function HomeToolbar({
   className?: string;
 }) {
   const dispatch = useDispatch<AppDispatch>();
-  const [query, setQuery] = useState('');
+  const router = useRouter();
 
   return (
     <div
@@ -34,7 +34,7 @@ export default function HomeToolbar({
 
       <div className='flex flex-1 min-w-0 justify-center'>
         <div className='max-md:hidden w-1/2'>
-          <SearchCommand onSelect={() => {}} />
+          <SearchCommand />
         </div>
       </div>
 
@@ -51,7 +51,7 @@ export default function HomeToolbar({
 
         <button
           className='md:hidden shrink-0 p-2 -m-2 cursor-pointer'
-          onClick={() => {}}
+          onClick={() => router.push('/search')}
           aria-label='검색'
         >
           <Search className='w-5 h-5' />
