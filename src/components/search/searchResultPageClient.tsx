@@ -5,7 +5,7 @@ import HomeToolbar from '@/components/home/homeToolbar';
 import PostPreview from '@/components/post/postPreview';
 import ToolbarProfileIcon from '@/components/post/toolbarProfileIcon';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
-import { createProps } from '@/features/post/ui/postProps';
+import { createProps, PostProps } from '@/features/post/ui/postProps';
 import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
@@ -17,37 +17,46 @@ import { useInView } from 'react-intersection-observer';
 export default function SearchResultPageClient({
   isLoggedIn,
   query,
+  initialPosts,
+  initialCursor,
   userId,
 }: {
   isLoggedIn: boolean;
   query: string;
+  initialPosts: PostProps[];
+  initialCursor: { score: number; id: string } | null;
   userId?: string;
 }) {
   const { ref, inView } = useInView();
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteQuery({
-      queryKey: ['searchPostsInfinite', query],
-      queryFn: async ({ pageParam }) => {
-        const result = await PostClientService.searchPosts(
-          query,
-          20,
-          pageParam?.score,
-          pageParam?.id
-        );
-        return {
-          posts: result.posts.map(createProps),
-          nextCursor: result.nextCursor,
-        };
-      },
-      initialPageParam: null as { score: number; id: string } | null,
-      getNextPageParam: lastPage => lastPage.nextCursor,
-    });
+  const {
+    data: { pages },
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['searchPostsInfinite', query],
+    queryFn: async ({ pageParam }) => {
+      const result = await PostClientService.searchPosts(
+        query,
+        20,
+        pageParam?.score,
+        pageParam?.id
+      );
+      return {
+        posts: result.posts.map(createProps),
+        nextCursor: result.nextCursor,
+      };
+    },
+    initialPageParam: null as { score: number; id: string } | null,
+    getNextPageParam: lastPage => lastPage.nextCursor,
+    initialData: {
+      pages: [{ posts: initialPosts, nextCursor: initialCursor }],
+      pageParams: [null],
+    },
+  });
 
-  const posts = useMemo(
-    () => data?.pages.flatMap(page => page.posts) ?? [],
-    [data]
-  );
+  const posts = useMemo(() => pages.flatMap(page => page.posts) ?? [], [pages]);
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
@@ -78,37 +87,31 @@ export default function SearchResultPageClient({
           'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
         )}
       >
-        {isLoading ? (
-          <div className='flex justify-center py-8'>
-            <Loader2 className='w-6 h-6 animate-spin text-gray-400' />
-          </div>
-        ) : (
-          posts.length > 0 && (
-            <div className='flex flex-col mt-8'>
-              {posts.map((post, index) => (
-                <div key={post.id} className='mb-8'>
-                  <PostPreview
-                    isLoggedIn={isLoggedIn}
-                    post={post}
-                    userId={userId}
-                  />
-                  {index !== posts.length - 1 && (
-                    <div className='h-px bg-gray-200' />
-                  )}
-                </div>
-              ))}
+        {posts.length > 0 && (
+          <div className='flex flex-col mt-8'>
+            {posts.map((post, index) => (
+              <div key={post.id} className='mb-8'>
+                <PostPreview
+                  isLoggedIn={isLoggedIn}
+                  post={post}
+                  userId={userId}
+                />
+                {index !== posts.length - 1 && (
+                  <div className='h-px bg-gray-200' />
+                )}
+              </div>
+            ))}
 
-              <div ref={ref} />
-              {isFetchingNextPage && (
-                <div className='flex justify-center py-4'>
-                  <Loader2
-                    strokeWidth={3}
-                    className='animate-spin text-gray-400'
-                  />
-                </div>
-              )}
-            </div>
-          )
+            <div ref={ref} />
+            {isFetchingNextPage && (
+              <div className='flex justify-center py-4'>
+                <Loader2
+                  strokeWidth={3}
+                  className='animate-spin text-gray-400'
+                />
+              </div>
+            )}
+          </div>
         )}
       </div>
     </>
