@@ -33,6 +33,7 @@ export default function SearchCommand({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [query, setQuery] = useState(initialQuery ?? '');
   const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [selectedValue, setSelectedValue] = useState('-');
   const isTouch = useMediaQuery(TOUCH_QUERY);
 
   const { data: posts = [], isLoading } = useQuery({
@@ -51,7 +52,12 @@ export default function SearchCommand({
   }, [query, debounce]);
 
   return (
-    <Command className='relative' shouldFilter={false}>
+    <Command
+      value={selectedValue}
+      onValueChange={setSelectedValue}
+      shouldFilter={false}
+      className='relative'
+    >
       <Popover open={shouldShowDropdown} onOpenChange={setIsDropdownOpen}>
         <PopoverAnchor asChild>
           <div className='relative flex items-center px-4 py-2 border border-gray-200 rounded-full hover:border-blue-500 focus-within:border-blue-500'>
@@ -62,7 +68,9 @@ export default function SearchCommand({
               onFocus={() => setIsDropdownOpen(true)}
               onKeyDown={e => {
                 if (e.key === 'Enter' && query.trim()) {
-                  router.push(`/search?q=${encodeURIComponent(query.trim())}`);
+                  router.push(
+                    `/search/result?q=${encodeURIComponent(query.trim())}`
+                  );
                 }
               }}
               className='flex-1 min-w-0 text-sm text-gray-900 bg-transparent outline-none placeholder:text-gray-400'
@@ -85,7 +93,7 @@ export default function SearchCommand({
           sideOffset={8}
           onOpenAutoFocus={e => e.preventDefault()}
         >
-          <CommandList>
+          <CommandList onMouseLeave={() => setSelectedValue('-')}>
             {isLoading ? (
               <div className='py-6 flex justify-center'>
                 <Loader2
@@ -97,6 +105,7 @@ export default function SearchCommand({
               <CommandEmpty>검색 결과가 없습니다</CommandEmpty>
             ) : (
               <CommandGroup>
+                <CommandItem value='-' className='hidden' aria-hidden='true' />
                 {posts.map(post => (
                   <CommandItem
                     key={post.id}
