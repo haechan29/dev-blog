@@ -32,4 +32,5 @@ export interface PostEntityFlat {
   series_title: string | null;
   like_count: number | null;
   view_count: number | null;
+  relevance_score: number;
 }

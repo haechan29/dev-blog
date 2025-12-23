@@ -29,8 +29,23 @@ export async function getPosts(userId: string): Promise<PostDto[]> {
   return response.data;
 }
 
-export async function searchPosts(query: string): Promise<PostDto[]> {
-  const params = new URLSearchParams({ type: 'search', q: query });
+export async function searchPosts(
+  query: string,
+  limit: number,
+  cursorScore?: number,
+  cursorId?: string
+): Promise<{
+  posts: PostDto[];
+  nextCursor: { score: number; id: string } | null;
+}> {
+  const params = new URLSearchParams({
+    type: 'search',
+    q: query,
+    limit: limit.toString(),
+    ...(cursorScore !== undefined && { cursorScore: cursorScore.toString() }),
+    ...(cursorId && { cursorId }),
+  });
+
   const response = await api.get(`/api/posts?${params}`);
   return response.data;
 }
