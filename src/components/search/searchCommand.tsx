@@ -38,8 +38,8 @@ export default function SearchCommand({
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ['searchPosts', debouncedQuery],
     queryFn: () =>
-      PostClientService.searchPosts(debouncedQuery).then(posts =>
-        posts.map(createProps)
+      PostClientService.searchPosts(debouncedQuery, 10).then(result =>
+        result.posts.map(createProps)
       ),
     enabled: debouncedQuery.length > 0,
   });
