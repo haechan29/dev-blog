@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils';
 import clsx from 'clsx';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 
 export default function HomeToolbar({
@@ -22,7 +21,6 @@ export default function HomeToolbar({
   className?: string;
 }) {
   const dispatch = useDispatch<AppDispatch>();
-  const router = useRouter();
 
   return (
     <div
@@ -51,13 +49,13 @@ export default function HomeToolbar({
           {'글 쓰기'}
         </Link>
 
-        <button
+        <Link
+          href='/search'
           className='md:hidden shrink-0 p-2 -m-2 cursor-pointer'
-          onClick={() => router.push('/search')}
           aria-label='검색'
         >
           <Search className='w-5 h-5' />
-        </button>
+        </Link>
 
         <ToolbarProfileIcon isLoggedIn={isLoggedIn} />
       </div>

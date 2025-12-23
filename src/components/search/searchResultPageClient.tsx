@@ -9,6 +9,7 @@ import { createProps } from '@/features/post/ui/postProps';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { ChevronLeft, Loader2, Search } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function SearchResultPageClient({
@@ -93,13 +94,13 @@ function SearchToolbarMobile({
         <ChevronLeft className='w-7 h-7 text-gray-500' />
       </button>
 
-      <button
-        onClick={() => router.push(`/search?q=${encodeURIComponent(query)}`)}
+      <Link
+        href={`/search?q=${encodeURIComponent(query)}`}
         className='flex-1 flex items-center px-4 py-1 bg-gray-100 rounded-full mr-1'
       >
         <span className='flex-1 text-left truncate'>{query}</span>
         <Search className='w-5 h-5 shrink-0' />
-      </button>
+      </Link>
 
       <ToolbarProfileIcon isLoggedIn={isLoggedIn} />
     </div>

@@ -7,6 +7,7 @@ import useMediaQuery, { TOUCH_QUERY } from '@/hooks/useMediaQuery';
 import { createRipple } from '@/lib/dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowUpRight, ChevronLeft, Loader2, Search } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -102,13 +103,14 @@ export default function SearchPageClient({
             posts.length > 0 && (
               <ul>
                 {posts.map(post => (
-                  <li
-                    key={post.id}
-                    onClick={() => router.push(`/read/${post.id}`)}
-                    className='flex justify-between items-center py-3 cursor-pointer'
-                  >
-                    <span className='line-clamp-1'>{post.title}</span>
-                    <ArrowUpRight className='w-4 h-4 shrink-0 text-gray-400' />
+                  <li key={post.id}>
+                    <Link
+                      href={`/read/${post.id}`}
+                      className='flex justify-between items-center py-3'
+                    >
+                      <span className='line-clamp-1'>{post.title}</span>
+                      <ArrowUpRight className='w-4 h-4 shrink-0 text-gray-400' />
+                    </Link>
                   </li>
                 ))}
               </ul>
