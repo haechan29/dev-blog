@@ -22,6 +22,7 @@ import { Command as CommandPrimitive } from 'cmdk';
 import { ArrowUpRight, Loader2, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import SimpleBar from 'simplebar-react';
 
 export default function SearchCommand({
   initialQuery,
@@ -93,7 +94,10 @@ export default function SearchCommand({
           sideOffset={8}
           onOpenAutoFocus={e => e.preventDefault()}
         >
-          <CommandList onMouseLeave={() => setSelectedValue('-')}>
+          <CommandList
+            className='max-h-none overflow-hidden'
+            onMouseLeave={() => setSelectedValue('-')}
+          >
             {isLoading ? (
               <div className='py-6 flex justify-center'>
                 <Loader2
@@ -105,24 +109,30 @@ export default function SearchCommand({
               <CommandEmpty>검색 결과가 없습니다</CommandEmpty>
             ) : (
               <CommandGroup>
-                <CommandItem value='-' className='hidden' aria-hidden='true' />
-                {posts.map(post => (
+                <SimpleBar className='max-h-[310px] simplebar-hover'>
                   <CommandItem
-                    key={post.id}
-                    value={post.title}
-                    onSelect={() => {
-                      router.push(`/read/${post.id}`);
-                      setIsDropdownOpen(false);
-                      setQuery('');
-                    }}
-                    className='px-3 py-2 cursor-pointer'
-                  >
-                    <div className='flex justify-between items-center w-full'>
-                      <span className='line-clamp-1'>{post.title}</span>
-                      <ArrowUpRight className='w-4 h-4 shrink-0 text-gray-400' />
-                    </div>
-                  </CommandItem>
-                ))}
+                    value='-'
+                    className='hidden'
+                    aria-hidden='true'
+                  />
+                  {posts.map(post => (
+                    <CommandItem
+                      key={post.id}
+                      value={post.title}
+                      onSelect={() => {
+                        router.push(`/read/${post.id}`);
+                        setIsDropdownOpen(false);
+                        setQuery('');
+                      }}
+                      className='px-3 py-2 cursor-pointer'
+                    >
+                      <div className='flex justify-between items-center w-full'>
+                        <span className='line-clamp-1'>{post.title}</span>
+                        <ArrowUpRight className='w-4 h-4 shrink-0 text-gray-400' />
+                      </div>
+                    </CommandItem>
+                  ))}
+                </SimpleBar>
               </CommandGroup>
             )}
           </CommandList>
