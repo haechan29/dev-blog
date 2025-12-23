@@ -98,23 +98,21 @@ export default function SearchPageClient({
             <div className='py-8 flex justify-center'>
               <Loader2 className='w-6 h-6 animate-spin text-gray-400' />
             </div>
-          ) : posts.length === 0 ? (
-            <div className='py-8 text-center text-gray-500 text-sm'>
-              검색 결과가 없습니다
-            </div>
           ) : (
-            <ul>
-              {posts.map(post => (
-                <li
-                  key={post.id}
-                  onClick={() => router.push(`/read/${post.id}`)}
-                  className='flex justify-between items-center py-3 cursor-pointer'
-                >
-                  <span className='line-clamp-1'>{post.title}</span>
-                  <ArrowUpRight className='w-4 h-4 shrink-0 text-gray-400' />
-                </li>
-              ))}
-            </ul>
+            posts.length > 0 && (
+              <ul>
+                {posts.map(post => (
+                  <li
+                    key={post.id}
+                    onClick={() => router.push(`/read/${post.id}`)}
+                    className='flex justify-between items-center py-3 cursor-pointer'
+                  >
+                    <span className='line-clamp-1'>{post.title}</span>
+                    <ArrowUpRight className='w-4 h-4 shrink-0 text-gray-400' />
+                  </li>
+                ))}
+              </ul>
+            )
           )}
         </div>
       )}

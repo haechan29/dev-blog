@@ -55,25 +55,23 @@ export default function SearchResultPageClient({
           <div className='flex justify-center py-8'>
             <Loader2 className='w-6 h-6 animate-spin text-gray-400' />
           </div>
-        ) : posts.length === 0 ? (
-          <div className='py-8 text-center text-gray-500'>
-            검색 결과가 없습니다
-          </div>
         ) : (
-          <div className='flex flex-col mt-8'>
-            {posts.map((post, index) => (
-              <div key={post.id} className='mb-8'>
-                <PostPreview
-                  isLoggedIn={isLoggedIn}
-                  post={post}
-                  userId={userId}
-                />
-                {index !== posts.length - 1 && (
-                  <div className='h-px bg-gray-200' />
-                )}
-              </div>
-            ))}
-          </div>
+          posts.length > 0 && (
+            <div className='flex flex-col mt-8'>
+              {posts.map((post, index) => (
+                <div key={post.id} className='mb-8'>
+                  <PostPreview
+                    isLoggedIn={isLoggedIn}
+                    post={post}
+                    userId={userId}
+                  />
+                  {index !== posts.length - 1 && (
+                    <div className='h-px bg-gray-200' />
+                  )}
+                </div>
+              ))}
+            </div>
+          )
         )}
       </div>
     </>
