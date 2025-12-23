@@ -8,9 +8,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import useSeriesList from '@/features/series/domain/hooks/useSeriesList';
+import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 
 export default function DeleteSeriesDialog({
@@ -24,7 +24,7 @@ export default function DeleteSeriesDialog({
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }) {
-  const router = useRouter();
+  const router = useRouterWithProgress();
   const { deleteSeriesMutation } = useSeriesList(userId);
 
   const deleteSeries = useCallback(

@@ -9,10 +9,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import DeleteAccountDialog from '@/components/user/deleteAccountDialog';
 import ProfileIcon from '@/components/user/profileIcon';
+import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { createRipple } from '@/lib/dom';
 import { LogIn, LogOut, UserX } from 'lucide-react';
 import { signIn, signOut } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { MouseEvent, ReactNode, useCallback, useState } from 'react';
 
 export default function ProfileDropdown({
@@ -26,7 +26,7 @@ export default function ProfileDropdown({
   nickname: string;
   children: ReactNode;
 }) {
-  const router = useRouter();
+  const router = useRouterWithProgress();
   const [isDeleteDialogVisible, setIsDeleteDialogVisible] = useState(false);
 
   const handleAction = useCallback(

@@ -2,11 +2,11 @@
 
 import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
 import useUser from '@/features/user/domain/hooks/useUser';
+import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { ApiError } from '@/lib/api';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 
@@ -18,7 +18,7 @@ const nicknameErrorMessages = {
 } as const;
 
 export default function SignupPage() {
-  const router = useRouter();
+  const router = useRouterWithProgress();
   const { updateUserMutation } = useUser();
   const [nickname, setNickname] = useState('');
   const [nicknameError, setNicknameError] = useState<NicknameError>(null);

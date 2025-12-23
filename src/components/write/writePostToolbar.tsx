@@ -4,13 +4,13 @@ import { PostProps } from '@/features/post/ui/postProps';
 import { writePostSteps } from '@/features/write/constants/writePostStep';
 import { validate } from '@/features/write/domain/model/writePostForm';
 import useNavigationWithParams from '@/hooks/useNavigationWithParams';
+import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { ApiError } from '@/lib/api';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { setInvalidField } from '@/lib/redux/write/writePostFormSlice';
 import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { ChevronRight } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import nProgress from 'nprogress';
 import { Fragment, useCallback, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
@@ -27,7 +27,7 @@ export default function WritePostToolbar({
 }) {
   const dispatch = useDispatch<AppDispatch>();
   const queryClient = useQueryClient();
-  const router = useRouter();
+  const router = useRouterWithProgress();
   const { currentStepId } = useSelector((state: RootState) => state.writePost);
   const writePostForm = useSelector((state: RootState) => state.writePostForm);
   const { toolbarTexts, actionButtonText } = useMemo(() => {

@@ -6,11 +6,11 @@ import PostPreview from '@/components/post/postPreview';
 import ToolbarProfileIcon from '@/components/post/toolbarProfileIcon';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { createProps } from '@/features/post/ui/postProps';
+import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { ChevronLeft, Loader2, Search } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 export default function SearchResultPageClient({
   isLoggedIn,
@@ -86,7 +86,7 @@ function SearchToolbarMobile({
   query: string;
   isLoggedIn: boolean;
 }) {
-  const router = useRouter();
+  const router = useRouterWithProgress();
 
   return (
     <div className='fixed top-0 z-40 w-full flex items-center py-2 px-4 gap-2 bg-white/80 backdrop-blur-md'>

@@ -4,11 +4,11 @@ import * as PostClientService from '@/features/post/domain/service/postClientSer
 import { createProps } from '@/features/post/ui/postProps';
 import useDebounce from '@/hooks/useDebounce';
 import useMediaQuery, { TOUCH_QUERY } from '@/hooks/useMediaQuery';
+import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { createRipple } from '@/lib/dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowUpRight, ChevronLeft, Loader2, Search } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function SearchPageClient({
@@ -16,7 +16,7 @@ export default function SearchPageClient({
 }: {
   initialQuery?: string;
 }) {
-  const router = useRouter();
+  const router = useRouterWithProgress();
   const debounce = useDebounce();
 
   const isTouch = useMediaQuery(TOUCH_QUERY);

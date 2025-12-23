@@ -1,6 +1,7 @@
 'use client';
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import useRouterWithProgress from '@/hooks/useRouterWithProgress';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { ReactNode, useEffect, useMemo } from 'react';
 
 /**
@@ -22,7 +23,7 @@ export default function QueryParamsValidator({
 }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const router = useRouterWithProgress();
   const value = searchParams.get(queryKey);
   const isValid = useMemo(() => isValidValue(value), [isValidValue, value]);
 
