@@ -9,11 +9,15 @@ import { ChevronLeft, Loader2, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-export default function SearchAutocomplete() {
+export default function SearchAutocomplete({
+  initialQuery,
+}: {
+  initialQuery?: string;
+}) {
   const router = useRouter();
   const debounce = useDebounce();
 
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(initialQuery ?? '');
   const [debouncedQuery, setDebouncedQuery] = useState(query);
 
   const { data: posts = [], isLoading } = useQuery({

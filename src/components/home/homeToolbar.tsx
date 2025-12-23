@@ -14,9 +14,11 @@ import { useDispatch } from 'react-redux';
 
 export default function HomeToolbar({
   isLoggedIn,
+  initialQuery,
   className,
 }: {
   isLoggedIn: boolean;
+  initialQuery?: string;
   className?: string;
 }) {
   const dispatch = useDispatch<AppDispatch>();
@@ -34,7 +36,7 @@ export default function HomeToolbar({
 
       <div className='flex flex-1 min-w-0 justify-center'>
         <div className='max-md:hidden w-1/2'>
-          <SearchCommand />
+          <SearchCommand initialQuery={initialQuery} />
         </div>
       </div>
 

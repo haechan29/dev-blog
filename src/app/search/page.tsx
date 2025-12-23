@@ -13,7 +13,5 @@ export default async function SearchPage({
 
   const { q } = await searchParams;
 
-  return (
-    <SearchPageClient isLoggedIn={!!session} initialQuery={q} userId={userId} />
-  );
+  return <SearchPageClient isLoggedIn={!!session} query={q} userId={userId} />;
 }
