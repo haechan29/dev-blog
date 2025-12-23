@@ -15,9 +15,11 @@ import {
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { createProps } from '@/features/post/ui/postProps';
 import useDebounce from '@/hooks/useDebounce';
+import useMediaQuery, { TOUCH_QUERY } from '@/hooks/useMediaQuery';
 import { useQuery } from '@tanstack/react-query';
 import { Command as CommandPrimitive } from 'cmdk';
 import { ArrowUpRight, Loader2, Search } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -31,6 +33,7 @@ export default function SearchCommand({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [query, setQuery] = useState(initialQuery ?? '');
   const [debouncedQuery, setDebouncedQuery] = useState('');
+  const isTouch = useMediaQuery(TOUCH_QUERY);
 
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ['searchPosts', debouncedQuery],
@@ -51,7 +54,7 @@ export default function SearchCommand({
     <Command className='relative' shouldFilter={false}>
       <Popover open={shouldShowDropdown} onOpenChange={setIsDropdownOpen}>
         <PopoverAnchor asChild>
-          <div className='flex items-center px-4 py-2 border border-gray-200 rounded-full hover:border-blue-500 focus-within:border-blue-500'>
+          <div className='relative flex items-center px-4 py-2 border border-gray-200 rounded-full hover:border-blue-500 focus-within:border-blue-500'>
             <CommandPrimitive.Input
               placeholder='검색'
               value={query}
@@ -65,6 +68,14 @@ export default function SearchCommand({
               className='flex-1 min-w-0 text-sm text-gray-900 bg-transparent outline-none placeholder:text-gray-400'
             />
             <Search className='w-5 h-5 shrink-0' />
+
+            {isTouch && (
+              <Link
+                href='/search'
+                aria-label='검색 페이지로 이동'
+                className='absolute inset-0'
+              />
+            )}
           </div>
         </PopoverAnchor>
 

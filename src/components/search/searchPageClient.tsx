@@ -3,7 +3,7 @@
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { createProps } from '@/features/post/ui/postProps';
 import useDebounce from '@/hooks/useDebounce';
-import useMediaQuery, { MOBILE_QUERY } from '@/hooks/useMediaQuery';
+import useMediaQuery, { TOUCH_QUERY } from '@/hooks/useMediaQuery';
 import { createRipple } from '@/lib/dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowUpRight, ChevronLeft, Loader2, Search } from 'lucide-react';
@@ -18,7 +18,7 @@ export default function SearchPageClient({
   const router = useRouter();
   const debounce = useDebounce();
 
-  const isMobile = useMediaQuery(MOBILE_QUERY);
+  const isTouch = useMediaQuery(TOUCH_QUERY);
   const [query, setQuery] = useState(initialQuery ?? '');
   const [debouncedQuery, setDebouncedQuery] = useState(query);
 
@@ -32,14 +32,14 @@ export default function SearchPageClient({
   });
 
   useEffect(() => {
-    if (isMobile === false) {
+    if (isTouch === false) {
       if (initialQuery?.trim()) {
         router.replace(`/search/result?q=${encodeURIComponent(initialQuery)}`);
       } else {
         router.back();
       }
     }
-  }, [initialQuery, isMobile, router]);
+  }, [initialQuery, isTouch, router]);
 
   useEffect(() => {
     debounce(() => setDebouncedQuery(query), 300);
