@@ -6,7 +6,7 @@ import useDebounce from '@/hooks/useDebounce';
 import useMediaQuery, { MOBILE_QUERY } from '@/hooks/useMediaQuery';
 import { createRipple } from '@/lib/dom';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronLeft, Loader2, Search } from 'lucide-react';
+import { ArrowUpRight, ChevronLeft, Loader2, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -47,7 +47,7 @@ export default function SearchPageClient({
 
   return (
     <div className='min-h-screen bg-white'>
-      <div className='sticky top-0 z-10 px-4 py-2'>
+      <div className='sticky top-0 z-10 px-4 md:px-6 py-2 md:py-3'>
         <div className='flex items-center gap-2'>
           <button
             onClick={() => router.back()}
@@ -93,7 +93,7 @@ export default function SearchPageClient({
       </div>
 
       {debouncedQuery.length > 0 && (
-        <div className='px-4 py-2'>
+        <div className='px-6 md:px-12 py-2'>
           {isLoading ? (
             <div className='py-8 flex justify-center'>
               <Loader2 className='w-6 h-6 animate-spin text-gray-400' />
@@ -108,12 +108,10 @@ export default function SearchPageClient({
                 <li
                   key={post.id}
                   onClick={() => router.push(`/read/${post.id}`)}
-                  className='py-3 border-b border-gray-100 cursor-pointer'
+                  className='flex justify-between items-center py-3 cursor-pointer'
                 >
-                  <div className='font-medium'>{post.title}</div>
-                  <div className='text-xs text-gray-500 mt-1'>
-                    {post.authorName} · {post.createdAt}
-                  </div>
+                  <span className='line-clamp-1'>{post.title}</span>
+                  <ArrowUpRight className='w-4 h-4 shrink-0 text-gray-400' />
                 </li>
               ))}
             </ul>

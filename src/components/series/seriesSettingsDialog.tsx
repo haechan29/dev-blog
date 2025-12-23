@@ -160,7 +160,7 @@ export default function SeriesSettingsDialog({
                             setSelectedSeriesId(id);
                             setOpen(false);
                           }}
-                          className='flex justify-between px-3 py-2 gap-1'
+                          className='flex justify-between px-3 py-2 gap-1 cursor-pointer'
                         >
                           <span>{title}</span>
                           {selectedSeriesId === id && (

@@ -17,7 +17,7 @@ import { createProps } from '@/features/post/ui/postProps';
 import useDebounce from '@/hooks/useDebounce';
 import { useQuery } from '@tanstack/react-query';
 import { Command as CommandPrimitive } from 'cmdk';
-import { Loader2, Search } from 'lucide-react';
+import { ArrowUpRight, Loader2, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -95,13 +95,11 @@ export default function SearchCommand({
                       setIsDropdownOpen(false);
                       setQuery('');
                     }}
-                    className='px-3 py-2'
+                    className='px-3 py-2 cursor-pointer'
                   >
-                    <div className='flex flex-col gap-1'>
-                      <span className='font-medium'>{post.title}</span>
-                      <span className='text-xs text-gray-500'>
-                        {post.authorName} · {post.createdAt}
-                      </span>
+                    <div className='flex justify-between items-center w-full'>
+                      <span className='line-clamp-1'>{post.title}</span>
+                      <ArrowUpRight className='w-4 h-4 shrink-0 text-gray-400' />
                     </div>
                   </CommandItem>
                 ))}
