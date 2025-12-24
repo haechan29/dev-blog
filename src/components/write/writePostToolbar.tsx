@@ -8,6 +8,7 @@ import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { ApiError } from '@/lib/api';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { setInvalidField } from '@/lib/redux/write/writePostFormSlice';
+import { postKeys } from '@/queries/keys';
 import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { ChevronRight } from 'lucide-react';
@@ -60,7 +61,7 @@ export default function WritePostToolbar({
       case 'publish': {
         try {
           const post = await publishPost();
-          queryClient.setQueryData(['posts', post.id], post);
+          queryClient.setQueryData(postKeys.detail(post.id), post);
           navigate({ pathname: `/read/${post.id}` });
           removeDraft();
         } catch (error) {

@@ -6,6 +6,7 @@ import usePosts from '@/features/post/hooks/usePosts';
 import useScrollLock from '@/hooks/useScrollLock';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
+import { postKeys } from '@/queries/keys';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -30,7 +31,7 @@ export default function PostSidebar({
   useEffect(() => {
     if (posts) {
       posts.forEach(post => {
-        queryClient.setQueryData(['posts', post.id], post);
+        queryClient.setQueryData(postKeys.detail(post.id), post);
       });
     }
   }, [posts, queryClient]);

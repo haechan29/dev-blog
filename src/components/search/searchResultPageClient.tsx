@@ -7,7 +7,7 @@ import ToolbarProfileIcon from '@/components/post/toolbarProfileIcon';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
 import useRouterWithProgress from '@/hooks/useRouterWithProgress';
-import { postsKeys } from '@/queries/keys';
+import { postKeys } from '@/queries/keys';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { ChevronLeft, Loader2, Search } from 'lucide-react';
@@ -36,7 +36,7 @@ export default function SearchResultPageClient({
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: postsKeys.search(query, 20, true),
+    queryKey: postKeys.search(query, 20, true),
     queryFn: async ({ pageParam }) => {
       const result = await PostClientService.searchPosts(
         query,

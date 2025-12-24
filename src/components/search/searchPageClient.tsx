@@ -6,7 +6,7 @@ import useDebounce from '@/hooks/useDebounce';
 import useMediaQuery, { TOUCH_QUERY } from '@/hooks/useMediaQuery';
 import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { createRipple } from '@/lib/dom';
-import { postsKeys } from '@/queries/keys';
+import { postKeys } from '@/queries/keys';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowUpRight, ChevronLeft, Loader2, Search } from 'lucide-react';
 import Link from 'next/link';
@@ -25,7 +25,7 @@ export default function SearchPageClient({
   const [debouncedQuery, setDebouncedQuery] = useState(query);
 
   const { data: posts = [], isLoading } = useQuery({
-    queryKey: postsKeys.search(debouncedQuery, 10),
+    queryKey: postKeys.search(debouncedQuery, 10),
     queryFn: () =>
       PostClientService.searchPosts(debouncedQuery, 10).then(result =>
         result.posts.map(createProps)

@@ -22,6 +22,7 @@ import * as PostClientService from '@/features/post/domain/service/postClientSer
 import { PostProps } from '@/features/post/ui/postProps';
 import useSeriesList from '@/features/series/domain/hooks/useSeriesList';
 import { ApiError } from '@/lib/api';
+import { postKeys, userKeys } from '@/queries/keys';
 import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Check, ChevronsUpDown, Loader2, X } from 'lucide-react';
@@ -65,9 +66,9 @@ export default function SeriesSettingsDialog({
 
       setIsOpen(false);
 
-      queryClient.invalidateQueries({ queryKey: ['user', userId, 'series'] });
-      queryClient.invalidateQueries({ queryKey: ['posts', post.id] });
-      queryClient.invalidateQueries({ queryKey: ['user', userId, 'posts'] });
+      queryClient.invalidateQueries({ queryKey: userKeys.seriesList(userId) });
+      queryClient.invalidateQueries({ queryKey: postKeys.detail(post.id) });
+      queryClient.invalidateQueries({ queryKey: userKeys.posts(userId) });
     } catch (error) {
       const message =
         error instanceof ApiError

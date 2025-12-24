@@ -1,13 +1,14 @@
 'use client';
 
 import * as InteractionRepository from '@/features/post-interaction/data/repository/interactionRepository';
+import { postKeys } from '@/queries/keys';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export default function useLike({ postId }: { postId: string }) {
   const queryClient = useQueryClient();
 
   const { data: isLiked } = useQuery({
-    queryKey: ['posts', postId, 'like'],
+    queryKey: postKeys.like(postId),
     queryFn: () => InteractionRepository.getIsLiked(postId),
   });
 
@@ -17,15 +18,15 @@ export default function useLike({ postId }: { postId: string }) {
         ? InteractionRepository.removeLike(postId)
         : InteractionRepository.addLike(postId),
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ['posts', postId, 'like'] });
-      const previous = queryClient.getQueryData(['posts', postId, 'like']);
+      await queryClient.cancelQueries({ queryKey: postKeys.like(postId) });
+      const previous = queryClient.getQueryData(postKeys.like(postId));
 
-      queryClient.setQueryData(['posts', postId, 'like'], !isLiked);
+      queryClient.setQueryData(postKeys.like(postId), !isLiked);
 
       return { previous };
     },
     onError: (_error, _variables, context) => {
-      queryClient.setQueryData(['posts', postId, 'like'], context?.previous);
+      queryClient.setQueryData(postKeys.like(postId), context?.previous);
     },
   });
 

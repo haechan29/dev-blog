@@ -3,13 +3,14 @@
 import Sidebar from '@/components/sidebar';
 import ProfileIcon from '@/components/user/profileIcon';
 import * as SubscriptionClientRepository from '@/features/subscription/data/repository/subscriptionClientRepository';
+import { subscriptionKeys } from '@/queries/keys';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useMemo } from 'react';
 
 export default function HomeSidebar({ userId }: { userId: string }) {
   const { data: following, isLoading } = useQuery({
-    queryKey: ['following', userId],
+    queryKey: subscriptionKeys.following(userId),
     queryFn: () => SubscriptionClientRepository.getFollowing(userId),
   });
 
