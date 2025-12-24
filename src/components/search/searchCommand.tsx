@@ -17,6 +17,7 @@ import { createProps } from '@/features/post/ui/postProps';
 import useDebounce from '@/hooks/useDebounce';
 import useMediaQuery, { TOUCH_QUERY } from '@/hooks/useMediaQuery';
 import useRouterWithProgress from '@/hooks/useRouterWithProgress';
+import { postsKeys } from '@/queries/keys';
 import { useQuery } from '@tanstack/react-query';
 import { Command as CommandPrimitive } from 'cmdk';
 import { ArrowUpRight, Loader2, Search } from 'lucide-react';
@@ -38,7 +39,7 @@ export default function SearchCommand({
   const isTouch = useMediaQuery(TOUCH_QUERY);
 
   const { data: posts = [], isLoading } = useQuery({
-    queryKey: ['searchPosts', debouncedQuery],
+    queryKey: postsKeys.search(debouncedQuery, 10),
     queryFn: () =>
       PostClientService.searchPosts(debouncedQuery, 10).then(result =>
         result.posts.map(createProps)
