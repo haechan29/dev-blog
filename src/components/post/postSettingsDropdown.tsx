@@ -11,11 +11,11 @@ import {
 import PostReader from '@/features/post/domain/model/postReader';
 import { PostProps } from '@/features/post/ui/postProps';
 import useDebounce from '@/hooks/useDebounce';
+import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { createRipple } from '@/lib/dom';
 import { setMode } from '@/lib/redux/post/postReaderSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { Code2, Edit2, FileText, Layers, Trash2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { MouseEvent, ReactNode, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -34,7 +34,7 @@ export default function PostSettingsDropdown({
 }) {
   const dispatch = useDispatch<AppDispatch>();
   const debounce = useDebounce();
-  const router = useRouter();
+  const router = useRouterWithProgress();
 
   const { mode } = useSelector((state: RootState) => state.postReader);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);

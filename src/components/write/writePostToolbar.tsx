@@ -4,14 +4,14 @@ import { PostProps } from '@/features/post/ui/postProps';
 import { writePostSteps } from '@/features/write/constants/writePostStep';
 import { validate } from '@/features/write/domain/model/writePostForm';
 import useNavigationWithParams from '@/hooks/useNavigationWithParams';
+import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { ApiError } from '@/lib/api';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { setInvalidField } from '@/lib/redux/write/writePostFormSlice';
+import { postKeys } from '@/queries/keys';
 import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { ChevronRight } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import nProgress from 'nprogress';
 import { Fragment, useCallback, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,7 +27,7 @@ export default function WritePostToolbar({
 }) {
   const dispatch = useDispatch<AppDispatch>();
   const queryClient = useQueryClient();
-  const router = useRouter();
+  const router = useRouterWithProgress();
   const { currentStepId } = useSelector((state: RootState) => state.writePost);
   const writePostForm = useSelector((state: RootState) => state.writePostForm);
   const { toolbarTexts, actionButtonText } = useMemo(() => {
@@ -60,9 +60,8 @@ export default function WritePostToolbar({
       }
       case 'publish': {
         try {
-          nProgress.start();
           const post = await publishPost();
-          queryClient.setQueryData(['posts', post.id], post);
+          queryClient.setQueryData(postKeys.detail(post.id), post);
           navigate({ pathname: `/read/${post.id}` });
           removeDraft();
         } catch (error) {
@@ -71,8 +70,6 @@ export default function WritePostToolbar({
               ? error.message
               : '게시글 생성에 실패했습니다';
           toast.error(message);
-        } finally {
-          nProgress.done();
         }
         break;
       }

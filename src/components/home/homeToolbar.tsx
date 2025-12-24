@@ -2,24 +2,25 @@
 
 import Logo from '@/components/logo';
 import ToolbarProfileIcon from '@/components/post/toolbarProfileIcon';
+import SearchCommand from '@/components/search/searchCommand';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { cn } from '@/lib/utils';
 import clsx from 'clsx';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function HomeToolbar({
   isLoggedIn,
+  initialQuery,
   className,
 }: {
   isLoggedIn: boolean;
+  initialQuery?: string;
   className?: string;
 }) {
   const dispatch = useDispatch<AppDispatch>();
-  const [query, setQuery] = useState('');
 
   return (
     <div
@@ -32,22 +33,8 @@ export default function HomeToolbar({
       <Logo onClick={() => dispatch(setIsVisible(false))} />
 
       <div className='flex flex-1 min-w-0 justify-center'>
-        <div className='max-md:hidden flex w-1/2 px-4 py-2 border border-gray-200 rounded-full'>
-          <input
-            type='text'
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            placeholder='검색'
-            className='text-sm flex-1 min-w-0 text-gray-900 outline-none'
-          />
-
-          <button
-            className='shrink-0 p-2 -m-2 cursor-pointer'
-            onClick={() => {}}
-            aria-label='검색'
-          >
-            <Search className='w-5 h-5' />
-          </button>
+        <div className='max-md:hidden w-1/2'>
+          <SearchCommand initialQuery={initialQuery} />
         </div>
       </div>
 
@@ -62,13 +49,13 @@ export default function HomeToolbar({
           {'글 쓰기'}
         </Link>
 
-        <button
+        <Link
+          href='/search'
           className='md:hidden shrink-0 p-2 -m-2 cursor-pointer'
-          onClick={() => {}}
           aria-label='검색'
         >
           <Search className='w-5 h-5' />
-        </button>
+        </Link>
 
         <ToolbarProfileIcon isLoggedIn={isLoggedIn} />
       </div>

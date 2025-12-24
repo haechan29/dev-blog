@@ -1,6 +1,7 @@
 import { auth } from '@/auth';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as FeedUsecase from '@/features/post/data/usecases/feedUsecase';
+import * as SearchUsecase from '@/features/post/data/usecases/searchUsecase';
 import { PostStatCreationError } from '@/features/postStat/data/errors/postStatErrors';
 import * as PostStatQueries from '@/features/postStat/data/queries/postStatQueries';
 import {
@@ -22,6 +23,30 @@ export async function GET(request: NextRequest) {
       const cursor = searchParams.get('cursor');
       const excludeId = searchParams.get('excludeId') ?? undefined;
       const data = await FeedUsecase.getFeedPosts(cursor, userId, excludeId);
+      return NextResponse.json({ data });
+    }
+
+    if (type === 'search') {
+      const query = searchParams.get('q');
+      const limit = searchParams.get('limit');
+      const cursorScore = searchParams.get('cursorScore');
+      const cursorId = searchParams.get('cursorId');
+
+      if (!query) {
+        throw new ValidationError('검색어를 찾을 수 없습니다');
+      }
+
+      if (!limit) {
+        throw new ValidationError('검색 갯수를 찾을 수 없습니다');
+      }
+
+      const data = await SearchUsecase.searchPosts(
+        query,
+        parseInt(limit),
+        cursorScore ? parseInt(cursorScore) : undefined,
+        cursorId ?? undefined
+      );
+
       return NextResponse.json({ data });
     }
 

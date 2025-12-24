@@ -4,6 +4,7 @@ import * as CommentClientService from '@/features/comment/domain/service/comment
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import useThrottle from '@/hooks/useThrottle';
+import { postKeys } from '@/queries/keys';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Heart } from 'lucide-react';
@@ -26,16 +27,14 @@ export default function CommentLikeButton({
       CommentClientService.incrementLikeCount(comment.postId, comment.id),
     onMutate: async () => {
       await queryClient.cancelQueries({
-        queryKey: ['posts', comment.postId, 'comments'],
+        queryKey: postKeys.comments(comment.postId),
       });
-      const previousComments = queryClient.getQueryData([
-        'posts',
-        comment.postId,
-        'comments',
-      ]);
+      const previousComments = queryClient.getQueryData(
+        postKeys.comments(comment.postId)
+      );
 
       queryClient.setQueryData(
-        ['posts', comment.postId, 'comments'],
+        postKeys.comments(comment.postId),
         (prev: CommentItemProps[] | undefined) =>
           prev?.map(item =>
             item.id === comment.id
@@ -52,7 +51,7 @@ export default function CommentLikeButton({
     onError: (_error, _variables, context) => {
       if (context?.previousComments) {
         queryClient.setQueryData(
-          ['posts', comment.postId, 'comments'],
+          postKeys.comments(comment.postId),
           context.previousComments
         );
       }
@@ -64,16 +63,14 @@ export default function CommentLikeButton({
       CommentClientService.decrementLikeCount(comment.postId, comment.id),
     onMutate: async () => {
       await queryClient.cancelQueries({
-        queryKey: ['posts', comment.postId, 'comments'],
+        queryKey: postKeys.comments(comment.postId),
       });
-      const previousComments = queryClient.getQueryData([
-        'posts',
-        comment.postId,
-        'comments',
-      ]);
+      const previousComments = queryClient.getQueryData(
+        postKeys.comments(comment.postId)
+      );
 
       queryClient.setQueryData(
-        ['posts', comment.postId, 'comments'],
+        postKeys.comments(comment.postId),
         (prev: CommentItemProps[] | undefined) =>
           prev?.map(item =>
             item.id === comment.id
@@ -90,7 +87,7 @@ export default function CommentLikeButton({
     onError: (_error, _variables, context) => {
       if (context?.previousComments) {
         queryClient.setQueryData(
-          ['posts', comment.postId, 'comments'],
+          postKeys.comments(comment.postId),
           context.previousComments
         );
       }

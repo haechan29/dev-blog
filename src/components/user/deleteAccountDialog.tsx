@@ -8,11 +8,11 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import useUser from '@/features/user/domain/hooks/useUser';
+import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { ApiError } from '@/lib/api';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
 import { signOut } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
 
@@ -23,7 +23,7 @@ export default function DeleteAccountDialog({
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }) {
-  const router = useRouter();
+  const router = useRouterWithProgress();
   const { deleteUserMutation } = useUser();
 
   useEffect(() => {

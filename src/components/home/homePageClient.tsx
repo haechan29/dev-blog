@@ -5,11 +5,11 @@ import HomeToolbar from '@/components/home/homeToolbar';
 import PostPreview from '@/components/post/postPreview';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
-import { postsKeys } from '@/queries/keys';
+import { postKeys } from '@/queries/keys';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
-import { Suspense, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 
 export default function HomePageClient({
@@ -31,7 +31,7 @@ export default function HomePageClient({
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: postsKeys.list(),
+    queryKey: postKeys.list(),
     queryFn: async ({ pageParam }) => {
       const result = await PostClientService.getFeedPosts(pageParam);
       return {
@@ -57,9 +57,7 @@ export default function HomePageClient({
 
   return (
     <>
-      <Suspense>
-        <HomeToolbar isLoggedIn={isLoggedIn} />
-      </Suspense>
+      <HomeToolbar isLoggedIn={isLoggedIn} />
 
       {userId && (
         <div className='max-xl:hidden'>

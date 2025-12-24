@@ -1,4 +1,7 @@
-import { PostEntity } from '@/features/post/data/entities/postEntities';
+import {
+  PostEntity,
+  PostEntityFlat,
+} from '@/features/post/data/entities/postEntities';
 import { PostNotFoundError } from '@/features/post/data/errors/postErrors';
 import { toDto } from '@/features/post/data/mapper/postMapper';
 import Post from '@/features/post/domain/model/post';
@@ -96,6 +99,26 @@ export async function fetchPostForAuth(postId: string) {
   }
 
   return data as Pick<PostEntity, 'user_id' | 'password_hash'>;
+}
+
+export async function searchPosts(
+  query: string,
+  limit: number,
+  cursorScore?: number,
+  cursorId?: string
+) {
+  const { data, error } = await supabase.rpc('search_posts', {
+    search_query: query,
+    result_limit: limit,
+    cursor_score: cursorScore ?? null,
+    cursor_id: cursorId ?? null,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data as PostEntityFlat[];
 }
 
 export async function createPost({

@@ -6,6 +6,7 @@ import { SubscriptionDto } from '@/features/subscription/data/dto/subscriptionDt
 import * as SubscriptionClientRepository from '@/features/subscription/data/repository/subscriptionClientRepository';
 import { UserStatus } from '@/features/user/domain/model/user';
 import { cn } from '@/lib/utils';
+import { subscriptionKeys } from '@/queries/keys';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import Link from 'next/link';
@@ -28,7 +29,7 @@ export default function UserProfile({
   className?: string;
 }) {
   const { data } = useQuery({
-    queryKey: ['subscription', userId],
+    queryKey: subscriptionKeys.info(userId),
     queryFn: () => SubscriptionClientRepository.getSubscriptionInfo(userId),
     enabled: currentUserId !== userId,
     initialData,

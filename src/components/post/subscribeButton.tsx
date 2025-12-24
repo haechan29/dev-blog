@@ -2,6 +2,7 @@
 
 import { SubscriptionDto } from '@/features/subscription/data/dto/subscriptionDto';
 import * as SubscriptionClientRepository from '@/features/subscription/data/repository/subscriptionClientRepository';
+import { subscriptionKeys } from '@/queries/keys';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { useCallback } from 'react';
@@ -19,7 +20,7 @@ export default function SubscribeButton({
     mutationFn: () => SubscriptionClientRepository.subscribe(userId),
     onSuccess: () => {
       queryClient.setQueryData<SubscriptionDto>(
-        ['subscription', userId],
+        subscriptionKeys.info(userId),
         prev =>
           prev && {
             isSubscribed: true,
@@ -33,7 +34,7 @@ export default function SubscribeButton({
     mutationFn: () => SubscriptionClientRepository.unsubscribe(userId),
     onSuccess: () => {
       queryClient.setQueryData<SubscriptionDto>(
-        ['subscription', userId],
+        subscriptionKeys.info(userId),
         prev =>
           prev && {
             isSubscribed: false,

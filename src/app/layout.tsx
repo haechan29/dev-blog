@@ -9,6 +9,7 @@ import 'nprogress/nprogress.css';
 import 'pretendard/dist/web/variable/pretendardvariable.css';
 import { ReactNode } from 'react';
 import { Toaster } from 'react-hot-toast';
+import 'simplebar-react/dist/simplebar.min.css';
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',

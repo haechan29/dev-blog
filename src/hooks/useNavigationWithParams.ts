@@ -1,10 +1,11 @@
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import useRouterWithProgress from '@/hooks/useRouterWithProgress';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
 
 export default function useNavigationWithParams() {
   const prevPathname = usePathname();
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const router = useRouterWithProgress();
 
   const navigate = useCallback(
     ({

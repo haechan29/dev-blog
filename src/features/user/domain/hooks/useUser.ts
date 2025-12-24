@@ -2,13 +2,14 @@
 
 import * as UserAction from '@/features/user/domain/action/userAction';
 import * as UserClientService from '@/features/user/domain/service/userClientService';
+import { userKeys } from '@/queries/keys';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export default function useUser() {
   const queryClient = useQueryClient();
 
   const { data: user } = useQuery({
-    queryKey: ['user'],
+    queryKey: userKeys.me(),
     queryFn: () => UserClientService.fetchUser(),
   });
 
@@ -16,7 +17,7 @@ export default function useUser() {
     mutationFn: () => UserAction.createUser(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['user'],
+        queryKey: userKeys.me(),
       });
     },
   });
@@ -26,7 +27,7 @@ export default function useUser() {
       UserClientService.updateUser(params),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['user'],
+        queryKey: userKeys.me(),
       });
     },
   });
@@ -35,7 +36,7 @@ export default function useUser() {
     mutationFn: () => UserClientService.deleteUser(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['user'],
+        queryKey: userKeys.me(),
       });
     },
   });

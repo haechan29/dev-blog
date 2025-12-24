@@ -16,7 +16,6 @@ import clsx from 'clsx';
 import { useCallback, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import SimpleBar from 'simplebar-react';
-import 'simplebar-react/dist/simplebar.min.css';
 
 export default function Comments({
   isLoggedIn,

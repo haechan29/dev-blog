@@ -1,5 +1,6 @@
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as FeedUsecase from '@/features/post/data/usecases/feedUsecase';
+import * as SearchUsecase from '@/features/post/data/usecases/searchUsecase';
 import 'server-only';
 
 export async function getFeedPosts(
@@ -16,4 +17,13 @@ export async function getPostsByUserId(userId: string) {
 
 export async function getPost(postId: string) {
   return await PostQueries.fetchPost(postId);
+}
+
+export async function searchPosts(
+  query: string,
+  limit: number,
+  cursorScore?: number,
+  cursorId?: string
+) {
+  return await SearchUsecase.searchPosts(query, limit, cursorScore, cursorId);
 }

@@ -3,6 +3,7 @@
 import * as SeriesClientService from '@/features/series/domain/service/seriesClientService';
 import { createProps, SeriesProps } from '@/features/series/ui/seriesProps';
 import { ApiError } from '@/lib/api';
+import { userKeys } from '@/queries/keys';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 
@@ -13,7 +14,7 @@ export default function useSeriesList(
   const queryClient = useQueryClient();
 
   const { data: seriesList } = useQuery({
-    queryKey: ['user', userId, 'series'],
+    queryKey: userKeys.seriesList(userId),
     queryFn: async () => {
       const seriesList = await SeriesClientService.fetchSeriesByUserId(userId);
       return seriesList.map(createProps);
@@ -26,7 +27,7 @@ export default function useSeriesList(
       SeriesClientService.createSeries({ userId, ...params }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['user', userId, 'series'],
+        queryKey: userKeys.seriesList(userId),
       });
     },
     onError: error => {
@@ -46,7 +47,7 @@ export default function useSeriesList(
     }) => SeriesClientService.updateSeries({ userId, ...params }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['user', userId, 'series'],
+        queryKey: userKeys.seriesList(userId),
       });
     },
     onError: error => {
@@ -63,7 +64,7 @@ export default function useSeriesList(
       SeriesClientService.deleteSeries({ userId, seriesId }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['user', userId, 'series'],
+        queryKey: userKeys.seriesList(userId),
       });
     },
     onError: error => {

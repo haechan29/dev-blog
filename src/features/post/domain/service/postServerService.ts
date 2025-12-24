@@ -28,3 +28,21 @@ export async function getPost(postId: string): Promise<Post> {
   const dto = await PostServerRepository.getPost(postId);
   return toDomain(dto);
 }
+
+export async function searchPosts(
+  query: string,
+  limit: number,
+  cursorScore?: number,
+  cursorId?: string
+) {
+  const result = await PostServerRepository.searchPosts(
+    query,
+    limit,
+    cursorScore,
+    cursorId
+  );
+  return {
+    posts: result.posts.map(toDomain),
+    nextCursor: result.nextCursor,
+  };
+}

@@ -20,6 +20,24 @@ export async function getPosts(userId: string) {
   return dtos.map(toDomain);
 }
 
+export async function searchPosts(
+  query: string,
+  limit: number,
+  cursorScore?: number,
+  cursorId?: string
+) {
+  const result = await PostClientRepository.searchPosts(
+    query,
+    limit,
+    cursorScore,
+    cursorId
+  );
+  return {
+    posts: result.posts.map(toDomain),
+    nextCursor: result.nextCursor,
+  };
+}
+
 export async function createPost(params: {
   title: string;
   content: string;
