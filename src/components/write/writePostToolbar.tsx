@@ -11,7 +11,6 @@ import { setInvalidField } from '@/lib/redux/write/writePostFormSlice';
 import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { ChevronRight } from 'lucide-react';
-import nProgress from 'nprogress';
 import { Fragment, useCallback, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
@@ -60,7 +59,6 @@ export default function WritePostToolbar({
       }
       case 'publish': {
         try {
-          nProgress.start();
           const post = await publishPost();
           queryClient.setQueryData(['posts', post.id], post);
           navigate({ pathname: `/read/${post.id}` });
@@ -71,8 +69,6 @@ export default function WritePostToolbar({
               ? error.message
               : '게시글 생성에 실패했습니다';
           toast.error(message);
-        } finally {
-          nProgress.done();
         }
         break;
       }

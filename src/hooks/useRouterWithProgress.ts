@@ -7,6 +7,9 @@ export default function useRouterWithProgress() {
 
   const push = useCallback(
     (href: string) => {
+      const currentUrl = window.location.pathname + window.location.search;
+      if (href === currentUrl) return;
+
       nProgress.start();
       router.push(href);
     },
@@ -15,6 +18,9 @@ export default function useRouterWithProgress() {
 
   const replace = useCallback(
     (href: string) => {
+      const currentUrl = window.location.pathname + window.location.search;
+      if (href === currentUrl) return;
+
       nProgress.start();
       router.replace(href);
     },
