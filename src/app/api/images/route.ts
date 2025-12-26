@@ -7,8 +7,9 @@ import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { nanoid } from 'nanoid';
 import { NextRequest, NextResponse } from 'next/server';
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+const LIMIT_PER_MINUTE = 50 * 1024 * 1024; // 50MB
+const LIMIT_30_DAYS = 1024 * 1024 * 1024; // 1GB
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,8 +29,19 @@ export async function POST(request: NextRequest) {
       throw new ValidationError('허용되지 않는 파일 형식입니다');
     }
 
-    if (file.size > MAX_FILE_SIZE) {
-      throw new ValidationError('파일 크기는 2MB 이하여야 합니다');
+    const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+    const [usageLastMinute, usageLast30Days] = await Promise.all([
+      ImageQueries.getUsageSince(userId, oneMinuteAgo),
+      ImageQueries.getUsageSince(userId, thirtyDaysAgo),
+    ]);
+
+    if (
+      usageLastMinute + file.size > LIMIT_PER_MINUTE ||
+      usageLast30Days + file.size > LIMIT_30_DAYS
+    ) {
+      throw new ValidationError('업로드 한도를 초과했습니다');
     }
 
     const ext = file.type.split('/')[1];
