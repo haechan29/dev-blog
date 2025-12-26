@@ -3,6 +3,7 @@ import { insertMarkdown } from '@/features/write/domain/lib/insertMarkdown';
 import { ApiError } from '@/lib/api';
 import { AppDispatch } from '@/lib/redux/store';
 import { setContent } from '@/lib/redux/write/writePostFormSlice';
+import imageCompression from 'browser-image-compression';
 import { useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
@@ -18,7 +19,16 @@ export default function useImageUpload() {
       if (!contentEditor) return;
 
       try {
-        const url = await ImageClientRepository.uploadImage(file);
+        const compressedFile =
+          file.type === 'image/gif'
+            ? file
+            : await imageCompression(file, {
+                maxSizeMB: 1,
+                initialQuality: 0.8,
+                maxWidthOrHeight: 1920,
+                useWebWorker: true,
+              });
+        const url = await ImageClientRepository.uploadImage(compressedFile);
 
         const content = contentEditor.value;
         const cursorPosition = contentEditor.selectionStart;

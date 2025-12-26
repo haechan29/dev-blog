@@ -4,6 +4,7 @@ import useImageUpload from '@/features/write/hooks/useImageUpload';
 import { RootState } from '@/lib/redux/store';
 import { ReactNode } from 'react';
 import { useDropzone } from 'react-dropzone';
+import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 
 export default function ImageDropzone({ children }: { children: ReactNode }) {
@@ -13,7 +14,12 @@ export default function ImageDropzone({ children }: { children: ReactNode }) {
   const { uploadAndInsert } = useImageUpload();
 
   const { getRootProps, isDragActive } = useDropzone({
-    accept: { 'image/*': [] },
+    accept: {
+      'image/jpeg': [],
+      'image/png': [],
+      'image/gif': [],
+      'image/webp': [],
+    },
     noClick: true,
     noKeyboard: true,
     disabled: currentStepId !== 'write',
@@ -21,6 +27,9 @@ export default function ImageDropzone({ children }: { children: ReactNode }) {
       const file = files[0];
       if (!file) return;
       await uploadAndInsert(file);
+    },
+    onDropRejected: () => {
+      toast.error('지원하지 않는 이미지 형식입니다');
     },
   });
 
