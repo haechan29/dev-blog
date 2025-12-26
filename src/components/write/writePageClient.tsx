@@ -4,11 +4,11 @@ import QueryParamsValidator from '@/components/queryParamsValidator';
 import RestoreDraftDialog from '@/components/write/restoreDraftDialog';
 import WritePostForm from '@/components/write/writePostForm';
 import WritePostToolbar from '@/components/write/writePostToolbar';
-import * as ImageClientRepository from '@/features/image/data/repository/imageClientRepository';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { createProps } from '@/features/post/ui/postProps';
 import { writePostSteps } from '@/features/write/constants/writePostStep';
 import useAutoSave from '@/features/write/hooks/useAutoSave';
+import useImageUpload from '@/features/write/hooks/useImageUpload';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { setCurrentStepId } from '@/lib/redux/write/writePostSlice';
 import { useSearchParams } from 'next/navigation';
@@ -30,6 +30,7 @@ export default function WritePageClient({
   const writePostForm = useSelector((state: RootState) => state.writePostForm);
   const { draft, removeDraft } = useAutoSave();
   const [isOpen, setIsOpen] = useState(false);
+  const { uploadAndInsert } = useImageUpload();
 
   const { getRootProps, isDragActive } = useDropzone({
     accept: { 'image/*': [] },
@@ -39,13 +40,7 @@ export default function WritePageClient({
     onDrop: async files => {
       const file = files[0];
       if (!file) return;
-
-      try {
-        const url = await ImageClientRepository.uploadImage(file);
-        console.log('uploaded:', url);
-      } catch (error) {
-        console.error('업로드 실패:', error);
-      }
+      await uploadAndInsert(file);
     },
   });
 
