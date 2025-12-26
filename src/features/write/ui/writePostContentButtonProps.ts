@@ -1,132 +1,31 @@
 import { WritePostContentButton } from '@/features/write/domain/model/writePostContentButton';
 
-export type ButtonContent = {
-  type:
-    | 'text'
-    | 'link'
-    | 'table'
-    | 'code'
-    | 'blockquote'
-    | 'horizontalRule'
-    | 'image'
-    | 'imageLarge'
-    | 'imageSmall'
-    | 'imageCaption'
-    | 'imageSubtitle'
-    | 'addRow'
-    | 'addColumn'
-    | 'bgm'
-    | 'bgmStartTime';
+export type ButtonIcon =
+  | 'text'
+  | 'link'
+  | 'table'
+  | 'code'
+  | 'blockquote'
+  | 'horizontalRule'
+  | 'image'
+  | 'imageLarge'
+  | 'imageSmall'
+  | 'imageCaption'
+  | 'imageSubtitle'
+  | 'addRow'
+  | 'addColumn'
+  | 'bgm'
+  | 'bgmStartTime';
+
+export interface ButtonContent {
+  icon: ButtonIcon;
   style: string;
   value?: string;
-};
-
-const buttonContents: Record<WritePostContentButton['id'], ButtonContent> = {
-  heading1: {
-    type: 'text',
-    style: 'text-sm font-semibold',
-    value: 'H1',
-  },
-  heading2: {
-    type: 'text',
-    style: 'text-xs font-semibold',
-    value: 'H2',
-  },
-  heading3: {
-    type: 'text',
-    style: 'text-xs',
-    value: 'H3',
-  },
-  bold: {
-    type: 'text',
-    style: 'font-bold',
-    value: 'B',
-  },
-  italic: {
-    type: 'text',
-    style: 'italic',
-    value: 'I',
-  },
-  strikethrough: {
-    type: 'text',
-    style: 'line-through',
-    value: 'T',
-  },
-  link: {
-    type: 'link',
-    style: 'w-4 h-4',
-  },
-  code: {
-    type: 'code',
-    style: 'w-4 h-4',
-  },
-  table: {
-    type: 'table',
-    style: 'w-4 h-4',
-  },
-  unorderedList: {
-    type: 'text',
-    style: 'text-xl',
-    value: '•',
-  },
-  orderedList: {
-    type: 'text',
-    style: 'text-sm font-bold',
-    value: '1.',
-  },
-  blockquote: {
-    type: 'blockquote',
-    style: 'w-4 h-4 fill-gray-900',
-  },
-  horizontalRule: {
-    type: 'horizontalRule',
-    style: 'w-5 h-5',
-  },
-  image: {
-    type: 'image',
-    style: 'w-4 h-4',
-  },
-  imageLarge: {
-    type: 'imageLarge',
-    style: 'w-4 h-4',
-  },
-  imageSmall: {
-    type: 'imageSmall',
-    style: 'w-4 h-4',
-  },
-  imageCaption: {
-    type: 'imageCaption',
-    style: 'w-4 h-4',
-  },
-  imageSubtitle: {
-    type: 'imageSubtitle',
-    style: 'w-5 h-5',
-  },
-  addRow: {
-    type: 'addRow',
-    style: 'w-4 h-4',
-  },
-  addColumn: {
-    type: 'addColumn',
-    style: 'w-4 h-4',
-  },
-  bgm: {
-    type: 'bgm',
-    style: 'w-4 h-4',
-  },
-  bgmStartTime: {
-    type: 'bgmStartTime',
-    style: 'w-5 h-5',
-  },
-  codeLanguage: {
-    type: 'text',
-    style: 'text-sm font-semibold',
-    value: 'JS',
-  },
-};
+}
 
 export interface MarkdownButtonProps {
-  type: 'markdown';
+  action: 'markdown';
+  category: 'default';
   label: string;
   content: ButtonContent;
   isBlock: boolean;
@@ -135,21 +34,24 @@ export interface MarkdownButtonProps {
 }
 
 export interface TableButtonProps {
-  type: 'table';
+  action: 'table';
+  category: 'table';
   label: string;
   content: ButtonContent;
   direction: 'row' | 'column';
 }
 
 export interface CodeButtonProps {
-  type: 'code';
+  action: 'code';
+  category: 'code';
   label: string;
   content: ButtonContent;
   field: 'language';
 }
 
 export interface DirectiveButtonProps {
-  type: 'image' | 'bgm';
+  action: 'directive';
+  category: 'image' | 'bgm';
   label: string;
   content: ButtonContent;
   position: 'attribute' | 'content';
@@ -157,191 +59,222 @@ export interface DirectiveButtonProps {
   value: string;
 }
 
+export interface UploadButtonProps {
+  action: 'upload';
+  category: 'default';
+  label: string;
+  content: ButtonContent;
+}
+
 export type WritePostContentButtonProps =
   | MarkdownButtonProps
   | TableButtonProps
   | CodeButtonProps
-  | DirectiveButtonProps;
+  | DirectiveButtonProps
+  | UploadButtonProps;
 
-const writePostContentButtonProps: Record<
+export type ButtonAction = WritePostContentButtonProps['action'];
+export type ButtonCategory = WritePostContentButtonProps['category'];
+
+const buttonProps: Record<
   WritePostContentButton['id'],
   WritePostContentButtonProps
 > = {
   heading1: {
-    type: 'markdown',
+    action: 'markdown',
+    category: 'default',
     label: '큰 제목',
-    content: buttonContents['heading1'],
+    content: { icon: 'text', style: 'text-sm font-semibold', value: 'H1' },
     isBlock: true,
     markdownBefore: '# 제목',
   },
   heading2: {
-    type: 'markdown',
+    action: 'markdown',
+    category: 'default',
     label: '중간 제목',
-    content: buttonContents['heading2'],
+    content: { icon: 'text', style: 'text-xs font-semibold', value: 'H2' },
     isBlock: true,
     markdownBefore: '## 제목',
   },
   heading3: {
-    type: 'markdown',
+    action: 'markdown',
+    category: 'default',
     label: '작은 제목',
-    content: buttonContents['heading3'],
+    content: { icon: 'text', style: 'text-xs', value: 'H3' },
     isBlock: true,
     markdownBefore: '### 제목',
   },
   bold: {
-    type: 'markdown',
+    action: 'markdown',
+    category: 'default',
     label: '굵게',
-    content: buttonContents['bold'],
+    content: { icon: 'text', style: 'font-bold', value: 'B' },
     isBlock: false,
     markdownBefore: '**',
     markdownAfter: '**',
   },
   italic: {
-    type: 'markdown',
+    action: 'markdown',
+    category: 'default',
     label: '기울이기',
-    content: buttonContents['italic'],
+    content: { icon: 'text', style: 'italic', value: 'I' },
     isBlock: false,
     markdownBefore: '*',
     markdownAfter: '*',
   },
   strikethrough: {
-    type: 'markdown',
+    action: 'markdown',
+    category: 'default',
     label: '취소선',
-    content: buttonContents['strikethrough'],
+    content: { icon: 'text', style: 'line-through', value: 'T' },
     isBlock: false,
     markdownBefore: '~~',
     markdownAfter: '~~',
   },
   link: {
-    type: 'markdown',
+    action: 'markdown',
+    category: 'default',
     label: '링크 추가',
-    content: buttonContents['link'],
+    content: { icon: 'link', style: 'w-4 h-4' },
     isBlock: false,
     markdownBefore: '[링크',
     markdownAfter: '](url)',
   },
   code: {
-    type: 'markdown',
+    action: 'markdown',
+    category: 'default',
     label: '코드 블록 추가',
-    content: buttonContents['code'],
+    content: { icon: 'code', style: 'w-4 h-4' },
     isBlock: true,
     markdownBefore: '```\n코드를 입력해주세요.',
     markdownAfter: '\n```',
   },
   table: {
-    type: 'markdown',
+    action: 'markdown',
+    category: 'default',
     label: '표 만들기',
-    content: buttonContents['table'],
+    content: { icon: 'table', style: 'w-4 h-4' },
     isBlock: true,
     markdownBefore: '| 제목1',
     markdownAfter: ' | 제목2 |\n|-------|-------|\n| 내용1 | 내용2 |',
   },
   addRow: {
-    type: 'table',
+    action: 'table',
+    category: 'table',
     label: '행 추가하기',
-    content: buttonContents['addRow'],
+    content: { icon: 'addRow', style: 'w-4 h-4' },
     direction: 'row',
   },
   addColumn: {
-    type: 'table',
+    action: 'table',
+    category: 'table',
     label: '열 추가하기',
-    content: buttonContents['addColumn'],
+    content: { icon: 'addColumn', style: 'w-4 h-4' },
     direction: 'column',
   },
   unorderedList: {
-    type: 'markdown',
+    action: 'markdown',
+    category: 'default',
     label: '순서 없는 목록',
-    content: buttonContents['unorderedList'],
+    content: { icon: 'text', style: 'text-xl', value: '•' },
     isBlock: true,
     markdownBefore: '- 항목 1',
     markdownAfter: '\n- 항목 2\n- 항목 3',
   },
   orderedList: {
-    type: 'markdown',
+    action: 'markdown',
+    category: 'default',
     label: '순서 있는 목록',
-    content: buttonContents['orderedList'],
+    content: { icon: 'text', style: 'text-sm font-bold', value: '1.' },
     isBlock: true,
     markdownBefore: '1. 항목 1',
     markdownAfter: '\n2. 항목 2\n3. 항목 3',
   },
   blockquote: {
-    type: 'markdown',
+    action: 'markdown',
+    category: 'default',
     label: '인용문',
-    content: buttonContents['blockquote'],
+    content: { icon: 'blockquote', style: 'w-4 h-4 fill-gray-900' },
     isBlock: true,
     markdownBefore: '> 내용',
   },
   horizontalRule: {
-    type: 'markdown',
+    action: 'markdown',
+    category: 'default',
     label: '구분선',
-    content: buttonContents['horizontalRule'],
+    content: { icon: 'horizontalRule', style: 'w-5 h-5' },
     isBlock: true,
     markdownBefore: '---',
   },
   image: {
-    type: 'markdown',
+    action: 'upload',
+    category: 'default',
     label: '이미지',
-    content: buttonContents['image'],
-    isBlock: true,
-    markdownBefore: ':::img{url="',
-    markdownAfter: '" size="medium"}\n:::',
+    content: { icon: 'image', style: 'w-4 h-4' },
   },
   imageLarge: {
-    type: 'image',
+    action: 'directive',
+    category: 'image',
     label: '이미지 크게',
-    content: buttonContents['imageLarge'],
+    content: { icon: 'imageLarge', style: 'w-4 h-4' },
     position: 'attribute',
     key: 'size',
     value: 'large',
   },
   imageSmall: {
-    type: 'image',
+    action: 'directive',
+    category: 'image',
     label: '이미지 작게',
-    content: buttonContents['imageSmall'],
+    content: { icon: 'imageSmall', style: 'w-4 h-4' },
     position: 'attribute',
     key: 'size',
     value: 'medium',
   },
   imageCaption: {
-    type: 'image',
+    action: 'directive',
+    category: 'image',
     label: '이미지 설명 추가',
-    content: buttonContents['imageCaption'],
+    content: { icon: 'imageCaption', style: 'w-4 h-4' },
     position: 'content',
     value: '이미지를 설명해주세요.',
   },
   imageSubtitle: {
-    type: 'image',
+    action: 'directive',
+    category: 'image',
     label: '이미지 자막 추가',
-    content: buttonContents['imageSubtitle'],
+    content: { icon: 'imageSubtitle', style: 'w-5 h-5' },
     position: 'content',
     value: '#자막은 전체화면에서 한 문장씩 표시됩니다.',
   },
   bgm: {
-    type: 'markdown',
+    action: 'markdown',
+    category: 'default',
     label: 'BGM',
-    content: buttonContents['bgm'],
+    content: { icon: 'bgm', style: 'w-4 h-4' },
     isBlock: true,
     markdownBefore: '::bgm{youtubeUrl="',
     markdownAfter: '"}\n',
   },
   bgmStartTime: {
-    type: 'bgm',
+    action: 'directive',
+    category: 'bgm',
     label: '시작시간 설정',
-    content: buttonContents['bgmStartTime'],
+    content: { icon: 'bgmStartTime', style: 'w-5 h-5' },
     position: 'attribute',
     key: 'startTime',
     value: '5',
   },
   codeLanguage: {
-    type: 'code',
+    action: 'code',
+    category: 'code',
     label: '언어 설정',
-    content: buttonContents['codeLanguage'],
+    content: { icon: 'text', style: 'text-sm font-semibold', value: 'JS' },
     field: 'language',
   },
 };
 
 export function createProps(
-  writePostContentButton: WritePostContentButton
+  button: WritePostContentButton
 ): WritePostContentButtonProps {
-  return writePostContentButtonProps[writePostContentButton.id];
+  return buttonProps[button.id];
 }

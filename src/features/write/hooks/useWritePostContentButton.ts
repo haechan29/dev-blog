@@ -11,6 +11,7 @@ import {
 import { writePostContentButtons } from '@/features/write/domain/model/writePostContentButton';
 import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import {
+  ButtonCategory,
   CodeButtonProps,
   createProps,
   DirectiveButtonProps,
@@ -25,7 +26,11 @@ import { useDispatch } from 'react-redux';
 
 const CURSOR_MARKER = '__NEW_CURSOR_POSITION__';
 
-export default function useWritePostContentButton() {
+export default function useWritePostContentButton({
+  onUpload,
+}: {
+  onUpload: () => void;
+}) {
   const {
     writePostForm: {
       content: { value: content },
@@ -33,7 +38,8 @@ export default function useWritePostContentButton() {
   } = useWritePostForm();
   const dispatch = useDispatch<AppDispatch>();
   const [contentButtons] = useState(writePostContentButtons);
-  const [activeType, setActiveType] = useState('markdown');
+  const [activeCategory, setActiveCategory] =
+    useState<ButtonCategory>('default');
   const contentButtonProps = useMemo(() => {
     return contentButtons.map(createProps);
   }, [contentButtons]);
@@ -83,13 +89,13 @@ export default function useWritePostContentButton() {
   );
 
   const handleDirectiveAction = useCallback(
-    ({ type, position, key, value }: DirectiveButtonProps) => {
+    ({ category, position, key, value }: DirectiveButtonProps) => {
       const contentEditor = document.querySelector(
         '[data-content-editor]'
       ) as HTMLTextAreaElement;
       if (!contentEditor) return;
       const { selectionStart, selectionEnd, value: content } = contentEditor;
-      const ranges = parseDirectiveRanges(content, type);
+      const ranges = parseDirectiveRanges(content, category);
 
       const range = ranges.find(([directiveStart, directiveEnd]) => {
         return selectionStart >= directiveStart && selectionEnd <= directiveEnd;
@@ -235,14 +241,16 @@ export default function useWritePostContentButton() {
 
   const onAction = useCallback(
     (contentButtonProps: WritePostContentButtonProps) => {
-      const { type } = contentButtonProps;
-      if (type === 'markdown') {
+      const { action } = contentButtonProps;
+      if (action === 'upload') {
+        onUpload();
+      } else if (action === 'markdown') {
         handleMarkdownAction(contentButtonProps);
-      } else if (type === 'image' || type === 'bgm') {
+      } else if (action === 'directive') {
         handleDirectiveAction(contentButtonProps);
-      } else if (type === 'table') {
+      } else if (action === 'table') {
         handleTableAction(contentButtonProps);
-      } else if (type === 'code') {
+      } else if (action === 'code') {
         handleCodeAction(contentButtonProps);
       }
     },
@@ -251,6 +259,7 @@ export default function useWritePostContentButton() {
       handleDirectiveAction,
       handleMarkdownAction,
       handleTableAction,
+      onUpload,
     ]
   );
 
@@ -266,23 +275,23 @@ export default function useWritePostContentButton() {
       const { selectionStart, selectionEnd } = contentEditor;
       const text = contentEditor.value;
 
-      const types = contentButtonProps
-        .map(button => button.type)
-        .filter(type => type !== 'markdown');
+      const categories = contentButtonProps
+        .map(button => button.category)
+        .filter(category => category !== 'default');
 
-      let activeType = 'markdown';
-      for (const type of types) {
-        const ranges = parseRanges(text, type);
+      let newActiveCategory: ButtonCategory = 'default';
+      for (const category of categories) {
+        const ranges = parseRanges(text, category);
         if (!ranges) continue;
-        const isType = ranges.some(([start, end]) => {
+        const isInRange = ranges.some(([start, end]) => {
           return selectionStart >= start && selectionEnd <= end;
         });
-        if (isType) {
-          activeType = type;
+        if (isInRange) {
+          newActiveCategory = category;
           break;
         }
       }
-      setActiveType(activeType);
+      setActiveCategory(newActiveCategory);
     };
 
     document.addEventListener('selectionchange', onSelectionChange);
@@ -293,7 +302,7 @@ export default function useWritePostContentButton() {
 
   return {
     contentButtons: contentButtonProps,
-    activeType,
+    activeCategory,
     onAction,
   } as const;
 }

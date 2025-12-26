@@ -2,6 +2,7 @@
 
 import Tooltip from '@/components/tooltip';
 import useContentToolbar from '@/features/write/hooks/useContentToolbar';
+import useImageUpload from '@/features/write/hooks/useImageUpload';
 import useWritePostContentButton from '@/features/write/hooks/useWritePostContentButton';
 import { ButtonContent } from '@/features/write/ui/writePostContentButtonProps';
 import clsx from 'clsx';
@@ -21,51 +22,72 @@ import {
   Shrink,
   Timer,
 } from 'lucide-react';
+import { useRef } from 'react';
 
 export default function WritePostContentToolbar() {
-  const { contentButtons, activeType, onAction } = useWritePostContentButton();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const { uploadAndInsert } = useImageUpload();
+
+  const { contentButtons, activeCategory, onAction } =
+    useWritePostContentButton({
+      onUpload: () => fileInputRef.current?.click(),
+    });
   const {
     contentToolbar: { shouldAttachToolbarToBottom, toolbarTranslateY },
   } = useContentToolbar();
 
   return (
-    <div
-      onMouseDown={e => e.preventDefault()} // prevent keyboard from closing
-      onTouchStart={e => e.preventDefault()} // prevent keyboard from closing
-      className={clsx(
-        'w-full flex px-2 py-1 gap-1 overflow-x-auto scrollbar-hide border-gray-200',
-        'transition-transform duration-300 ease-in-out',
-        'translate-y-(--toolbar-translate-y)',
-        shouldAttachToolbarToBottom
-          ? 'fixed inset-x-0 z-50 w-screen top-full bg-white/80 backdrop-blur-md touch-pan-x'
-          : 'rounded-t-lg border-t border-x'
-      )}
-      style={{
-        '--toolbar-translate-y': toolbarTranslateY,
-      }}
-    >
-      {contentButtons
-        .filter(button => activeType === button.type)
-        .map(button => (
-          <Tooltip key={button.label} text={button.label} direction='top'>
-            <button
-              onClick={() => onAction(button)}
-              className='min-w-10 h-10 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer'
-            >
-              <ContentButton buttonContent={button.content} />
-            </button>
-          </Tooltip>
-        ))}
-    </div>
+    <>
+      <input
+        ref={fileInputRef}
+        type='file'
+        accept='image/*'
+        hidden
+        onChange={e => {
+          const file = e.target.files?.[0];
+          if (file) uploadAndInsert(file);
+          e.target.value = '';
+        }}
+      />
+
+      <div
+        onMouseDown={e => e.preventDefault()} // prevent keyboard from closing
+        onTouchStart={e => e.preventDefault()} // prevent keyboard from closing
+        className={clsx(
+          'w-full flex px-2 py-1 gap-1 overflow-x-auto scrollbar-hide border-gray-200',
+          'transition-transform duration-300 ease-in-out',
+          'translate-y-(--toolbar-translate-y)',
+          shouldAttachToolbarToBottom
+            ? 'fixed inset-x-0 z-50 w-screen top-full bg-white/80 backdrop-blur-md touch-pan-x'
+            : 'rounded-t-lg border-t border-x'
+        )}
+        style={{
+          '--toolbar-translate-y': toolbarTranslateY,
+        }}
+      >
+        {contentButtons
+          .filter(button => button.category === activeCategory)
+          .map(button => (
+            <Tooltip key={button.label} text={button.label} direction='top'>
+              <button
+                onClick={() => onAction(button)}
+                className='min-w-10 h-10 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer'
+              >
+                <ContentButton buttonContent={button.content} />
+              </button>
+            </Tooltip>
+          ))}
+      </div>
+    </>
   );
 }
 
 function ContentButton({
-  buttonContent: { type, style, value },
+  buttonContent: { icon, style, value },
 }: {
   buttonContent: ButtonContent;
 }) {
-  switch (type) {
+  switch (icon) {
     case 'text':
       return <div className={style}>{value}</div>;
     case 'link':
