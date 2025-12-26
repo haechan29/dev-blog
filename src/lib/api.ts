@@ -5,13 +5,15 @@ export const api = {
   get: (url: string, options?: RequestInit) =>
     fetchWithErrorHandling(url, options),
 
-  post: (url: string, body?: unknown, options?: RequestInit) =>
-    fetchWithErrorHandling(url, {
+  post: (url: string, body?: unknown, options?: RequestInit) => {
+    const isFormData = body instanceof FormData;
+    return fetchWithErrorHandling(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      ...(!isFormData && { headers: { 'Content-Type': 'application/json' } }),
+      body: isFormData ? body : JSON.stringify(body),
       ...options,
-    }),
+    });
+  },
 
   put: (url: string, body: unknown, options?: RequestInit) =>
     fetchWithErrorHandling(url, {
