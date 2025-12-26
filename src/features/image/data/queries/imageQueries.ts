@@ -14,6 +14,22 @@ export async function getImagesByPostId(postId: string) {
   return data;
 }
 
+export async function getOrphanImages() {
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+  const { data, error } = await supabase
+    .from('images')
+    .select('id, url')
+    .is('post_id', null)
+    .lt('created_at', oneDayAgo);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
 export async function createImage({
   url,
   sizeBytes,
@@ -58,6 +74,16 @@ export async function unlinkImagesFromPost(postId: string) {
     .from('images')
     .update({ post_id: null })
     .eq('post_id', postId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function deleteImagesByIds(ids: string[]) {
+  if (ids.length === 0) return;
+
+  const { error } = await supabase.from('images').delete().in('id', ids);
 
   if (error) {
     throw new Error(error.message);
