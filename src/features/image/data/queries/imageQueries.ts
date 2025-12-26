@@ -26,3 +26,16 @@ export async function createImage({
 
   return data.id;
 }
+
+export async function linkImagesToPost(postId: string, urls: string[]) {
+  if (urls.length === 0) return;
+
+  const { error } = await supabase
+    .from('images')
+    .update({ post_id: postId })
+    .in('url', urls);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}

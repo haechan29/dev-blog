@@ -1,7 +1,9 @@
 import { auth } from '@/auth';
+import * as ImageQueries from '@/features/image/data/queries/imageQueries';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as FeedUsecase from '@/features/post/data/usecases/feedUsecase';
 import * as SearchUsecase from '@/features/post/data/usecases/searchUsecase';
+import { extractImageUrls } from '@/features/post/domain/lib/url';
 import { PostStatCreationError } from '@/features/postStat/data/errors/postStatErrors';
 import * as PostStatQueries from '@/features/postStat/data/queries/postStatQueries';
 import {
@@ -101,7 +103,12 @@ export async function POST(request: NextRequest) {
       userId,
     });
 
-    await PostStatQueries.createPostStat(post.id);
+    const imageUrls = extractImageUrls(content);
+
+    await Promise.all([
+      PostStatQueries.createPostStat(post.id),
+      ImageQueries.linkImagesToPost(post.id, imageUrls),
+    ]);
 
     return NextResponse.json({ data: post });
   } catch (error) {
