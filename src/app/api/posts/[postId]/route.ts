@@ -1,13 +1,16 @@
 import { auth } from '@/auth';
+import * as ImageQueries from '@/features/image/data/queries/imageQueries';
 import { PostNotFoundError } from '@/features/post/data/errors/postErrors';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
-import * as PostStatQueries from '@/features/postStat/data/queries/postStatQueries';
+import { extractImageUrls } from '@/features/post/domain/lib/url';
 import {
   UnauthorizedError,
   ValidationError,
 } from '@/features/user/data/errors/userErrors';
 import { ApiError } from '@/lib/api';
+import { r2Client } from '@/lib/r2';
 import { getUserId } from '@/lib/user';
+import { DeleteObjectCommand } from '@aws-sdk/client-s3';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -69,6 +72,11 @@ export async function PATCH(
       }
     }
 
+    await ImageQueries.unlinkImagesFromPost(postId);
+
+    const imageUrls = extractImageUrls(content);
+    await ImageQueries.linkImagesToPost(postId, imageUrls);
+
     const updated = await PostQueries.updatePost({
       postId,
       title,
@@ -129,12 +137,27 @@ export async function DELETE(
       }
     }
 
-    await PostStatQueries.deletePostStat(postId);
+    const images = await ImageQueries.getImagesByPostId(postId);
+
+    await Promise.all(
+      images.map(async image => {
+        const key = image.url.split('/').pop();
+        if (key) {
+          await r2Client.send(
+            new DeleteObjectCommand({
+              Bucket: process.env.R2_BUCKET_NAME,
+              Key: key,
+            })
+          );
+        }
+      })
+    );
+
     await PostQueries.deletePost(postId);
 
     return NextResponse.json({ data: null });
   } catch (error) {
-    console.error('게시글 삭제 요청이 실패했습니다');
+    console.error('게시글 삭제 요청이 실패했습니다', error);
 
     if (error instanceof ApiError) {
       return error.toResponse();
