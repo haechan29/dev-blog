@@ -18,6 +18,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
+import ImageDropzone from '@/components/image/ImageDropzone';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { RootState } from '@/lib/redux/store';
 import { useCallback } from 'react';
@@ -78,7 +79,7 @@ export default function EditPageClient({
       fallbackOption={{ type: 'defaultValue', value: 'write' }}
     >
       <RestoreDraftDialog draft={draft} isOpen={isOpen} setIsOpen={setIsOpen} />
-      <div className='w-screen h-dvh flex flex-col'>
+      <ImageDropzone>
         <WritePostToolbar
           isLoggedIn={isLoggedIn}
           publishPost={async () => updatePost(post.id)}
@@ -87,7 +88,7 @@ export default function EditPageClient({
         <div className='flex-1 min-h-0'>
           <WritePostForm isLoggedIn={isLoggedIn} />
         </div>
-      </div>
+      </ImageDropzone>
     </QueryParamsValidator>
   );
 }

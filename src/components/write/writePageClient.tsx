@@ -1,5 +1,6 @@
 'use client';
 
+import ImageDropzone from '@/components/image/ImageDropzone';
 import QueryParamsValidator from '@/components/queryParamsValidator';
 import RestoreDraftDialog from '@/components/write/restoreDraftDialog';
 import WritePostForm from '@/components/write/writePostForm';
@@ -8,12 +9,10 @@ import * as PostClientService from '@/features/post/domain/service/postClientSer
 import { createProps } from '@/features/post/ui/postProps';
 import { writePostSteps } from '@/features/write/constants/writePostStep';
 import useAutoSave from '@/features/write/hooks/useAutoSave';
-import useImageUpload from '@/features/write/hooks/useImageUpload';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { setCurrentStepId } from '@/lib/redux/write/writePostSlice';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import { useDropzone } from 'react-dropzone';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function WritePageClient({
@@ -24,25 +23,9 @@ export default function WritePageClient({
   const searchParams = useSearchParams();
   const step = searchParams.get('step') as keyof typeof writePostSteps;
   const dispatch = useDispatch<AppDispatch>();
-  const currentStepId = useSelector(
-    (state: RootState) => state.writePost.currentStepId
-  );
   const writePostForm = useSelector((state: RootState) => state.writePostForm);
   const { draft, removeDraft } = useAutoSave();
   const [isOpen, setIsOpen] = useState(false);
-  const { uploadAndInsert } = useImageUpload();
-
-  const { getRootProps, isDragActive } = useDropzone({
-    accept: { 'image/*': [] },
-    noClick: true,
-    noKeyboard: true,
-    disabled: currentStepId !== 'write',
-    onDrop: async files => {
-      const file = files[0];
-      if (!file) return;
-      await uploadAndInsert(file);
-    },
-  });
 
   const createPost = useCallback(async () => {
     const { title, content, tags, password } = writePostForm;
@@ -72,14 +55,7 @@ export default function WritePageClient({
       fallbackOption={{ type: 'defaultValue', value: 'write' }}
     >
       <RestoreDraftDialog draft={draft} isOpen={isOpen} setIsOpen={setIsOpen} />
-      <div {...getRootProps()} className='w-screen h-dvh flex flex-col'>
-        {isDragActive && (
-          <div className='fixed inset-0 z-50 flex items-center justify-center bg-blue-500/10'>
-            <p className='text-lg font-medium text-blue-600'>
-              이미지를 놓아주세요
-            </p>
-          </div>
-        )}
+      <ImageDropzone>
         <WritePostToolbar
           isLoggedIn={isLoggedIn}
           publishPost={createPost}
@@ -88,7 +64,7 @@ export default function WritePageClient({
         <div className='flex-1 min-h-0'>
           <WritePostForm isLoggedIn={isLoggedIn} />
         </div>
-      </div>
+      </ImageDropzone>
     </QueryParamsValidator>
   );
 }
