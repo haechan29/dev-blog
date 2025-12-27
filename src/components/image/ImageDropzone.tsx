@@ -45,10 +45,11 @@ export default function ImageDropzone({ children }: { children: ReactNode }) {
     <>
       <div {...getRootProps()} className='w-screen h-dvh flex flex-col'>
         {isDragActive && (
-          <div className='fixed inset-0 z-50 flex items-center justify-center bg-blue-500/10'>
-            <p className='text-lg font-medium text-blue-600'>
+          <div className='fixed inset-0 z-50 flex flex-col items-center justify-center gap-2 bg-blue-500/10'>
+            <p className='text-xl text-blue-600 font-semibold'>
               이미지를 놓아주세요
             </p>
+            <p className='text-sm text-blue-600/70'>{`(JPG, PNG, GIF, WebP)`}</p>
           </div>
         )}
         {children}
