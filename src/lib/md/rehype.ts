@@ -10,6 +10,7 @@ export const schema: Options = {
     img: [
       ...(defaultSchema.attributes?.img ?? []),
       ['data-size', 'large', 'medium'],
+      ['data-status', 'loading', 'failed'],
       'data-caption',
     ],
     div: [

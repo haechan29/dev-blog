@@ -105,7 +105,7 @@ export function remarkImg() {
       if (index === undefined || !parent) return;
       if (!isDirectiveNode(node) || node.name !== 'img') return;
 
-      const { url, alt = '', size = 'medium' } = node.attributes || {};
+      const { url, alt = '', size = 'medium', status } = node.attributes || {};
       if (!url) return;
 
       const caption = node.children
@@ -131,6 +131,7 @@ export function remarkImg() {
             ...(node.data?.hProperties ?? {}),
             'data-size': size,
             'data-caption': caption,
+            ...(status && { 'data-status': status }),
           },
         },
       };

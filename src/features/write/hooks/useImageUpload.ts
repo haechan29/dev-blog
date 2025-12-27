@@ -9,6 +9,8 @@ import { useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 
+const LOADING_IMAGE_PATTERN = /:::img\{[^}]*status="loading"[^}]*\}/;
+
 export default function useImageUpload() {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -21,8 +23,22 @@ export default function useImageUpload() {
       ) as HTMLTextAreaElement;
       if (!contentEditor) return;
 
-      const results = await Promise.allSettled(
-        files.map(async file => {
+      let cursorPosition = contentEditor.selectionStart;
+
+      for (const file of files) {
+        const blobUrl = URL.createObjectURL(file);
+
+        const content = contentEditor.value;
+        const { newText, newCursorPosition } = insertMarkdown({
+          content,
+          cursorPosition,
+          markdown: `:::img{url="${blobUrl}" status="loading" size="medium"}\n:::\n\n`,
+        });
+
+        dispatch(setContent({ value: newText, isUserInput: false }));
+        cursorPosition = newCursorPosition;
+
+        try {
           const compressedFile =
             file.type === 'image/gif'
               ? file
@@ -32,49 +48,43 @@ export default function useImageUpload() {
                   maxWidthOrHeight: 1920,
                   useWebWorker: true,
                 });
-          return ImageClientRepository.uploadImage(compressedFile);
-        })
-      );
 
-      for (const result of results) {
-        if (result.status !== 'rejected') continue;
+          const uploadedUrl = await ImageClientRepository.uploadImage(
+            compressedFile
+          );
+          URL.revokeObjectURL(blobUrl);
 
-        const error = result.reason;
-        if (error instanceof DailyQuotaExhaustedError) {
-          throw error;
+          const currentContent = contentEditor.value;
+          const updatedContent = currentContent.replace(
+            LOADING_IMAGE_PATTERN,
+            `:::img{url="${uploadedUrl}" size="medium"}`
+          );
+          dispatch(setContent({ value: updatedContent, isUserInput: false }));
+        } catch (error) {
+          const currentContent = contentEditor.value;
+          const updatedContent = currentContent.replace(
+            LOADING_IMAGE_PATTERN,
+            `:::img{url="${blobUrl}" status="failed" size="medium"}`
+          );
+          dispatch(setContent({ value: updatedContent, isUserInput: false }));
+
+          if (error instanceof DailyQuotaExhaustedError) {
+            throw error;
+          }
+
+          const message =
+            error instanceof ApiError
+              ? error.message
+              : '이미지 업로드에 실패했습니다';
+          toast.error(message);
         }
 
-        const message =
-          error instanceof ApiError
-            ? error.message
-            : '이미지 업로드에 실패했습니다';
-        toast.error(message);
-        break;
+        await new Promise(resolve => setTimeout(resolve, 300));
       }
-
-      const content = contentEditor.value;
-      const cursorPosition = contentEditor.selectionStart;
-      const markdown = results
-        .map((result, index) => {
-          return `:::img{url="${
-            result.status === 'fulfilled'
-              ? result.value
-              : URL.createObjectURL(files[index])
-          }" size="medium"}\n:::`;
-        })
-        .join('\n\n');
-
-      const { newText, newCursorPosition } = insertMarkdown({
-        content,
-        cursorPosition,
-        markdown,
-      });
-
-      dispatch(setContent({ value: newText, isUserInput: false }));
 
       setTimeout(() => {
         contentEditor.focus();
-        contentEditor.setSelectionRange(newCursorPosition, newCursorPosition);
+        contentEditor.setSelectionRange(cursorPosition, cursorPosition);
       }, 100);
     },
     [dispatch]
