@@ -1,4 +1,7 @@
-import { RateLimitError } from '@/features/image/data/errors/imageErrors';
+import {
+  DailyQuotaExhaustedError,
+  RateLimitError,
+} from '@/features/image/data/errors/imageErrors';
 import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
 import { ErrorCode } from '@/types/errorCode';
 import { NextResponse } from 'next/server';
@@ -56,6 +59,8 @@ function createApiError(
   switch (code) {
     case ErrorCode.RATE_LIMIT_EXCEEDED:
       return new RateLimitError(message);
+    case ErrorCode.DAILY_QUOTA_EXHAUSTED:
+      return new DailyQuotaExhaustedError(message);
     case ErrorCode.DUPLICATE_NICKNAME:
       return new DuplicateNicknameError(message);
     default:

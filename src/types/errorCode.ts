@@ -5,6 +5,7 @@ export const ErrorCode = {
   POST_NOT_FOUND: 'POST_NOT_FOUND',
   COMMENT_NOT_FOUND: 'COMMENT_NOT_FOUND',
   RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
+  DAILY_QUOTA_EXHAUSTED: 'DAILY_QUOTA_EXHAUSTED',
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];

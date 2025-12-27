@@ -1,4 +1,7 @@
-import { RateLimitError } from '@/features/image/data/errors/imageErrors';
+import {
+  DailyQuotaExhaustedError,
+  RateLimitError,
+} from '@/features/image/data/errors/imageErrors';
 import * as ImageQueries from '@/features/image/data/queries/imageQueries';
 import { ValidationError } from '@/features/user/data/errors/userErrors';
 import { ApiError } from '@/lib/api';
@@ -9,8 +12,8 @@ import { nanoid } from 'nanoid';
 import { NextRequest, NextResponse } from 'next/server';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-const LIMIT_PER_MINUTE = 50 * 1024 * 1024; // 50MB
-const LIMIT_30_DAYS = 1024 * 1024 * 1024; // 1GB
+const LIMIT_PER_MINUTE = 100 * 1024 * 1024; // 100MB
+const DAILY_QUOTA = 1024 * 1024 * 1024; // 1GB
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,18 +34,19 @@ export async function POST(request: NextRequest) {
     }
 
     const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-    const [usageLastMinute, usageLast30Days] = await Promise.all([
+    const [usageLastMinute, usageLastDay] = await Promise.all([
       ImageQueries.getUsageSince(userId, oneMinuteAgo),
-      ImageQueries.getUsageSince(userId, thirtyDaysAgo),
+      ImageQueries.getUsageSince(userId, oneDayAgo),
     ]);
 
-    if (
-      usageLastMinute + file.size > LIMIT_PER_MINUTE ||
-      usageLast30Days + file.size > LIMIT_30_DAYS
-    ) {
+    if (usageLastMinute + file.size > LIMIT_PER_MINUTE) {
       throw new RateLimitError('업로드 한도를 초과했습니다');
+    }
+
+    if (usageLastDay + file.size > DAILY_QUOTA) {
+      throw new DailyQuotaExhaustedError('오늘 사용량을 모두 사용했습니다');
     }
 
     const ext = file.type.split('/')[1];
