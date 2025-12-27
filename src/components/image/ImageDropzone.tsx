@@ -1,8 +1,10 @@
 'use client';
 
+import DailyQuotaExhaustedDialog from '@/components/image/DailyQuotaExhaustedDialog';
+import { DailyQuotaExhaustedError } from '@/features/image/data/errors/imageErrors';
 import useImageUpload from '@/features/write/hooks/useImageUpload';
 import { RootState } from '@/lib/redux/store';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
@@ -12,6 +14,7 @@ export default function ImageDropzone({ children }: { children: ReactNode }) {
     (state: RootState) => state.writePost.currentStepId
   );
   const { uploadAndInsert } = useImageUpload();
+  const [isQuotaDialogOpen, setIsQuotaDialogOpen] = useState(false);
 
   const { getRootProps, isDragActive } = useDropzone({
     accept: {
@@ -25,7 +28,13 @@ export default function ImageDropzone({ children }: { children: ReactNode }) {
     disabled: currentStepId !== 'write',
     onDrop: async files => {
       if (files.length === 0) return;
-      await uploadAndInsert(files);
+      try {
+        await uploadAndInsert(files);
+      } catch (error) {
+        if (error instanceof DailyQuotaExhaustedError) {
+          setIsQuotaDialogOpen(true);
+        }
+      }
     },
     onDropRejected: () => {
       toast.error('지원하지 않는 이미지 형식입니다');
@@ -33,15 +42,22 @@ export default function ImageDropzone({ children }: { children: ReactNode }) {
   });
 
   return (
-    <div {...getRootProps()} className='w-screen h-dvh flex flex-col'>
-      {isDragActive && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-blue-500/10'>
-          <p className='text-lg font-medium text-blue-600'>
-            이미지를 놓아주세요
-          </p>
-        </div>
-      )}
-      {children}
-    </div>
+    <>
+      <div {...getRootProps()} className='w-screen h-dvh flex flex-col'>
+        {isDragActive && (
+          <div className='fixed inset-0 z-50 flex items-center justify-center bg-blue-500/10'>
+            <p className='text-lg font-medium text-blue-600'>
+              이미지를 놓아주세요
+            </p>
+          </div>
+        )}
+        {children}
+      </div>
+
+      <DailyQuotaExhaustedDialog
+        isOpen={isQuotaDialogOpen}
+        setIsOpen={setIsQuotaDialogOpen}
+      />
+    </>
   );
 }

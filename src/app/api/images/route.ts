@@ -41,10 +41,11 @@ export async function POST(request: NextRequest) {
     ]);
 
     if (usageLastMinute + file.size > LIMIT_PER_MINUTE) {
-      throw new RateLimitError('업로드 한도를 초과했습니다');
+      throw new RateLimitError('1분 후에 다시 시도해주세요');
     }
 
     if (usageLastDay + file.size > DAILY_QUOTA) {
+      console.log('일일 사용량 초과', userId);
       throw new DailyQuotaExhaustedError('오늘 사용량을 모두 사용했습니다');
     }
 

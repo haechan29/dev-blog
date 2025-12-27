@@ -26,7 +26,7 @@ export default function ImageWithCaption({
 
   useEffect(() => setIsError(false), [src]);
 
-  return isError ? (
+  return !src || isError ? (
     <div
       className='flex items-center justify-center p-4 rounded-xl bg-gray-200 text-gray-700 m-4'
       aria-label='이미지를 불러올 수 없습니다'

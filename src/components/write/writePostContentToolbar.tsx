@@ -1,6 +1,8 @@
 'use client';
 
+import DailyQuotaExhaustedDialog from '@/components/image/DailyQuotaExhaustedDialog';
 import Tooltip from '@/components/tooltip';
+import { DailyQuotaExhaustedError } from '@/features/image/data/errors/imageErrors';
 import useContentToolbar from '@/features/write/hooks/useContentToolbar';
 import useImageUpload from '@/features/write/hooks/useImageUpload';
 import useWritePostContentButton from '@/features/write/hooks/useWritePostContentButton';
@@ -22,11 +24,12 @@ import {
   Shrink,
   Timer,
 } from 'lucide-react';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 export default function WritePostContentToolbar() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { uploadAndInsert } = useImageUpload();
+  const [isQuotaDialogOpen, setIsQuotaDialogOpen] = useState(false);
 
   const { contentButtons, activeCategory, onAction } =
     useWritePostContentButton({
@@ -44,12 +47,18 @@ export default function WritePostContentToolbar() {
         accept='image/*'
         multiple
         hidden
-        onChange={e => {
+        onChange={async e => {
           const files = Array.from(e.target.files || []);
-          if (files.length > 0) {
-            uploadAndInsert(files);
-            e.target.value = '';
+          if (files.length === 0) return;
+
+          try {
+            await uploadAndInsert(files);
+          } catch (error) {
+            if (error instanceof DailyQuotaExhaustedError) {
+              setIsQuotaDialogOpen(true);
+            }
           }
+          e.target.value = '';
         }}
       />
 
@@ -81,6 +90,11 @@ export default function WritePostContentToolbar() {
             </Tooltip>
           ))}
       </div>
+
+      <DailyQuotaExhaustedDialog
+        isOpen={isQuotaDialogOpen}
+        setIsOpen={setIsQuotaDialogOpen}
+      />
     </>
   );
 }

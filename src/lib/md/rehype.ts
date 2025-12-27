@@ -20,6 +20,10 @@ export const schema: Options = {
       'data-lines',
     ],
   },
+  protocols: {
+    ...defaultSchema.protocols,
+    src: [...(defaultSchema.protocols?.src ?? []), 'blob'],
+  },
 };
 
 export function rehypeStyle() {

@@ -1,5 +1,5 @@
 import { ApiError } from '@/errors/errors';
-import { RateLimitError } from '@/features/image/data/errors/imageErrors';
+import { DailyQuotaExhaustedError } from '@/features/image/data/errors/imageErrors';
 import * as ImageClientRepository from '@/features/image/data/repository/imageClientRepository';
 import { insertMarkdown } from '@/features/write/domain/lib/insertMarkdown';
 import { AppDispatch } from '@/lib/redux/store';
@@ -40,7 +40,7 @@ export default function useImageUpload() {
         if (result.status !== 'rejected') continue;
 
         const error = result.reason;
-        if (error instanceof RateLimitError) {
+        if (error instanceof DailyQuotaExhaustedError) {
           throw error;
         }
 
