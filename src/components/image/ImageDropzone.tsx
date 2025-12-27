@@ -24,9 +24,8 @@ export default function ImageDropzone({ children }: { children: ReactNode }) {
     noKeyboard: true,
     disabled: currentStepId !== 'write',
     onDrop: async files => {
-      const file = files[0];
-      if (!file) return;
-      await uploadAndInsert(file);
+      if (files.length === 0) return;
+      await uploadAndInsert(files);
     },
     onDropRejected: () => {
       toast.error('지원하지 않는 이미지 형식입니다');

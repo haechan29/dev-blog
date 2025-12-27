@@ -42,11 +42,14 @@ export default function WritePostContentToolbar() {
         ref={fileInputRef}
         type='file'
         accept='image/*'
+        multiple
         hidden
         onChange={e => {
-          const file = e.target.files?.[0];
-          if (file) uploadAndInsert(file);
-          e.target.value = '';
+          const files = Array.from(e.target.files || []);
+          if (files.length > 0) {
+            uploadAndInsert(files);
+            e.target.value = '';
+          }
         }}
       />
 
