@@ -1,13 +1,9 @@
 import { auth } from '@/auth';
+import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as ImageQueries from '@/features/image/data/queries/imageQueries';
 import { PostNotFoundError } from '@/features/post/data/errors/postErrors';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 import { extractImageUrls } from '@/features/post/domain/lib/url';
-import {
-  UnauthorizedError,
-  ValidationError,
-} from '@/features/user/data/errors/userErrors';
-import { ApiError } from '@/lib/api';
 import { r2Client } from '@/lib/r2';
 import { getUserId } from '@/lib/user';
 import { DeleteObjectCommand } from '@aws-sdk/client-s3';

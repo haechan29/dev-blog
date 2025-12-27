@@ -1,9 +1,9 @@
 'use client';
 
+import { ApiError } from '@/errors/errors';
 import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
 import useUser from '@/features/user/domain/hooks/useUser';
 import useRouterWithProgress from '@/hooks/useRouterWithProgress';
-import { ApiError } from '@/lib/api';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';

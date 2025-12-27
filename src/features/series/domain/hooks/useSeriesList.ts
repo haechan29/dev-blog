@@ -1,8 +1,8 @@
 'use client';
 
+import { ApiError } from '@/errors/errors';
 import * as SeriesClientService from '@/features/series/domain/service/seriesClientService';
 import { createProps, SeriesProps } from '@/features/series/ui/seriesProps';
-import { ApiError } from '@/lib/api';
 import { userKeys } from '@/queries/keys';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';

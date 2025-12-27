@@ -4,13 +4,13 @@ import CommentItem from '@/components/comment/commentItem';
 import CommentPanel from '@/components/comment/commentPanel';
 import CommentPasswordDialog from '@/components/comment/commentPasswordDialog';
 import ProfileIcon from '@/components/user/profileIcon';
+import { ApiError } from '@/errors/errors';
 import useComments from '@/features/comment/hooks/useComments';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
 import useMediaQuery, {
   DESKTOP_QUERY,
   TOUCH_QUERY,
 } from '@/hooks/useMediaQuery';
-import { ApiError } from '@/lib/api';
 import { remToPx } from '@/lib/dom';
 import clsx from 'clsx';
 import { useCallback, useRef, useState } from 'react';

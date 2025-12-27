@@ -1,9 +1,9 @@
 'use client';
 
 import CommentLikeButton from '@/components/comment/commentLikeButton';
+import { ApiError } from '@/errors/errors';
 import useComments from '@/features/comment/hooks/useComments';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
-import { ApiError } from '@/lib/api';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
 import {

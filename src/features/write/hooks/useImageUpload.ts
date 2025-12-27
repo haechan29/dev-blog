@@ -1,7 +1,7 @@
+import { ApiError } from '@/errors/errors';
 import { RateLimitError } from '@/features/image/data/errors/imageErrors';
 import * as ImageClientRepository from '@/features/image/data/repository/imageClientRepository';
 import { insertMarkdown } from '@/features/write/domain/lib/insertMarkdown';
-import { ApiError } from '@/lib/api';
 import { AppDispatch } from '@/lib/redux/store';
 import { setContent } from '@/lib/redux/write/writePostFormSlice';
 import imageCompression from 'browser-image-compression';

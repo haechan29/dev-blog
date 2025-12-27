@@ -1,10 +1,9 @@
+import { ApiError, ValidationError } from '@/errors/errors';
 import {
   DailyQuotaExhaustedError,
   RateLimitError,
 } from '@/features/image/data/errors/imageErrors';
 import * as ImageQueries from '@/features/image/data/queries/imageQueries';
-import { ValidationError } from '@/features/user/data/errors/userErrors';
-import { ApiError } from '@/lib/api';
 import { r2Client } from '@/lib/r2';
 import { getUserId } from '@/lib/user';
 import { PutObjectCommand } from '@aws-sdk/client-s3';

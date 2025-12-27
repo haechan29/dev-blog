@@ -1,9 +1,7 @@
 import { auth } from '@/auth';
+import { UnauthorizedError } from '@/errors/errors';
 import { UserEntity } from '@/features/user/data/entities/userEntities';
-import {
-  DuplicateNicknameError,
-  UnauthorizedError,
-} from '@/features/user/data/errors/userErrors';
+import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
 import { toDto } from '@/features/user/data/mapper/userMapper';
 import { supabase, supabaseNextAuth } from '@/lib/supabase';
 import { cookies } from 'next/headers';

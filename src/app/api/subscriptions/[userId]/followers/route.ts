@@ -1,5 +1,5 @@
+import { ApiError } from '@/errors/errors';
 import * as SubscriptionQueries from '@/features/subscription/data/queries/subscriptionQueries';
-import { ApiError } from '@/lib/api';
 import { NextRequest, NextResponse } from 'next/server';
 import 'server-only';
 

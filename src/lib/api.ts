@@ -1,10 +1,10 @@
+import { ApiError } from '@/errors/errors';
 import {
   DailyQuotaExhaustedError,
   RateLimitError,
 } from '@/features/image/data/errors/imageErrors';
 import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
 import { ErrorCode } from '@/types/errorCode';
-import { NextResponse } from 'next/server';
 
 export const api = {
   get: (url: string, options?: RequestInit) =>
@@ -65,26 +65,5 @@ function createApiError(
       return new DuplicateNicknameError(message);
     default:
       return new ApiError(message, code, status);
-  }
-}
-
-export class ApiError extends Error {
-  constructor(
-    message: string,
-    public readonly code: ErrorCode,
-    public readonly statusCode: number = 500
-  ) {
-    super(message);
-    this.name = this.constructor.name;
-  }
-
-  toResponse() {
-    return NextResponse.json(
-      {
-        error: this.message,
-        code: this.code,
-      },
-      { status: this.statusCode }
-    );
   }
 }

@@ -1,11 +1,11 @@
 'use client';
 
+import { ApiError } from '@/errors/errors';
 import { PostProps } from '@/features/post/ui/postProps';
 import { writePostSteps } from '@/features/write/constants/writePostStep';
 import { validate } from '@/features/write/domain/model/writePostForm';
 import useNavigationWithParams from '@/hooks/useNavigationWithParams';
 import useRouterWithProgress from '@/hooks/useRouterWithProgress';
-import { ApiError } from '@/lib/api';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { setInvalidField } from '@/lib/redux/write/writePostFormSlice';
 import { postKeys } from '@/queries/keys';

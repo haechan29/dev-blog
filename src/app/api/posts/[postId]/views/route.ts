@@ -1,5 +1,5 @@
+import { ApiError } from '@/errors/errors';
 import * as InteractionUsecase from '@/features/post-interaction/data/usecases/interactionUsecase';
-import { ApiError } from '@/lib/api';
 import { getUserId } from '@/lib/user';
 import { NextRequest, NextResponse } from 'next/server';
 

@@ -1,10 +1,6 @@
 import { auth } from '@/auth';
+import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as CommentQueries from '@/features/comment/data/queries/commentQueries';
-import {
-  UnauthorizedError,
-  ValidationError,
-} from '@/features/user/data/errors/userErrors';
-import { ApiError } from '@/lib/api';
 import { getUserId } from '@/lib/user';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';

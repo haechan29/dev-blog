@@ -18,10 +18,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { ApiError } from '@/errors/errors';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { PostProps } from '@/features/post/ui/postProps';
 import useSeriesList from '@/features/series/domain/hooks/useSeriesList';
-import { ApiError } from '@/lib/api';
 import { postKeys, userKeys } from '@/queries/keys';
 import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
