@@ -1,3 +1,4 @@
+import { RateLimitError } from '@/features/image/data/errors/imageErrors';
 import * as ImageQueries from '@/features/image/data/queries/imageQueries';
 import { ValidationError } from '@/features/user/data/errors/userErrors';
 import { ApiError } from '@/lib/api';
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
       usageLastMinute + file.size > LIMIT_PER_MINUTE ||
       usageLast30Days + file.size > LIMIT_30_DAYS
     ) {
-      throw new ValidationError('업로드 한도를 초과했습니다');
+      throw new RateLimitError('업로드 한도를 초과했습니다');
     }
 
     const ext = file.type.split('/')[1];

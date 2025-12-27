@@ -1,3 +1,5 @@
+import { RateLimitError } from '@/features/image/data/errors/imageErrors';
+import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
 import { ErrorCode } from '@/types/errorCode';
 import { NextResponse } from 'next/server';
 
@@ -40,10 +42,25 @@ async function fetchWithErrorHandling(url: string, options?: RequestInit) {
 
   if (!response.ok) {
     const { error, code } = await response.json();
-    throw new ApiError(error, code);
+    throw createApiError(error, code, response.status);
   }
 
   return response.json();
+}
+
+function createApiError(
+  message: string,
+  code: ErrorCode,
+  status: number
+): ApiError {
+  switch (code) {
+    case ErrorCode.RATE_LIMIT_EXCEEDED:
+      return new RateLimitError(message);
+    case ErrorCode.DUPLICATE_NICKNAME:
+      return new DuplicateNicknameError(message);
+    default:
+      return new ApiError(message, code, status);
+  }
 }
 
 export class ApiError extends Error {

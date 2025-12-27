@@ -4,6 +4,7 @@ export const ErrorCode = {
   VALIDATION_ERROR: 'VALIDATION_ERROR',
   POST_NOT_FOUND: 'POST_NOT_FOUND',
   COMMENT_NOT_FOUND: 'COMMENT_NOT_FOUND',
+  RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
