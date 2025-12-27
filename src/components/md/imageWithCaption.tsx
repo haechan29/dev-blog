@@ -1,6 +1,7 @@
 'use client';
 
 import clsx from 'clsx';
+import { AlertCircle } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
@@ -56,18 +57,30 @@ export default function ImageWithCaption({
       data-size={size}
       className='flex flex-col gap-4'
     >
-      <Image
-        src={src}
-        alt={alt}
-        width={1000}
-        height={1000}
-        onError={() => setIsError(true)}
-        onLoad={() => setIsError(false)}
+      <div
         className={clsx(
-          'h-auto',
+          'relative',
           size === 'large' ? 'w-full' : 'min-w-56 w-1/2'
         )}
-      />
+      >
+        <Image
+          src={src}
+          alt={alt}
+          width={1000}
+          height={1000}
+          onError={() => setIsError(true)}
+          onLoad={() => setIsError(false)}
+          className='h-auto w-full'
+        />
+        {src.startsWith('blob:') && (
+          <div className='absolute inset-0 flex items-center justify-center bg-black/50 rounded'>
+            <div className='flex flex-col items-center gap-2 text-white drop-shadow-md'>
+              <AlertCircle className='w-6 h-6' />
+              <span className='text-sm font-medium'>업로드 실패</span>
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className='whitespace-pre-wrap'>
         {caption

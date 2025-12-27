@@ -56,11 +56,11 @@ export default function useImageUpload() {
       const cursorPosition = contentEditor.selectionStart;
       const markdown = results
         .map((result, index) => {
-          return result.status === 'fulfilled'
-            ? `:::img{url="${result.value}" size="medium" error="false"}\n:::`
-            : `:::img{url="${URL.createObjectURL(
-                files[index]
-              )}" size="medium" error="true"}\n:::`;
+          return `:::img{url="${
+            result.status === 'fulfilled'
+              ? result.value
+              : URL.createObjectURL(files[index])
+          }" size="medium"}\n:::`;
         })
         .join('\n\n');
 
