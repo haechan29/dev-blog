@@ -173,12 +173,15 @@ export default function CommentContentSection({
   ) : (
     <>
       <div className='mb-3'>
-        <div ref={contentRef} className='text-gray-800 wrap-break-word'>
+        <div
+          ref={contentRef}
+          className='text-gray-800 break-keep wrap-anywhere'
+        >
           {isExpanded ? comment.content : firstTwoLines}
         </div>
 
         {!isExpanded && restLines && (
-          <div className='flex items-center gap-2 wrap-break-word'>
+          <div className='flex items-center gap-2 break-keep wrap-anywhere'>
             <div ref={restLinesRef} className='flex-1 min-w-0 truncate'>
               {restLines}
             </div>

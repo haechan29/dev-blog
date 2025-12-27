@@ -19,7 +19,7 @@ export default function Error({
 
       {process.env.NODE_ENV === 'development' && (
         <div className='w-full max-w-2xl mt-10 rounded bg-gray-50 p-4 text-left overflow-auto'>
-          <p className='text-sm font-semibold text-gray-900 wrap-break-word'>
+          <p className='text-sm font-semibold text-gray-900 break-keep wrap-anywhere'>
             {error.message}
           </p>
           {error.digest && (
