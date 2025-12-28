@@ -1,0 +1,64 @@
+'use client';
+
+import DailyQuotaExhaustedDialog from '@/components/image/DailyQuotaExhaustedDialog';
+import { DailyQuotaExhaustedError } from '@/features/image/data/errors/imageErrors';
+import useImageUpload from '@/features/write/hooks/useImageUpload';
+import { RootState } from '@/lib/redux/store';
+import { ReactNode, useState } from 'react';
+import { useDropzone } from 'react-dropzone';
+import toast from 'react-hot-toast';
+import { useSelector } from 'react-redux';
+
+export default function ImageDropzone({ children }: { children: ReactNode }) {
+  const currentStepId = useSelector(
+    (state: RootState) => state.writePost.currentStepId
+  );
+  const { uploadAndInsert } = useImageUpload();
+  const [isQuotaDialogOpen, setIsQuotaDialogOpen] = useState(false);
+
+  const { getRootProps, isDragActive } = useDropzone({
+    accept: {
+      'image/jpeg': [],
+      'image/png': [],
+      'image/gif': [],
+      'image/webp': [],
+    },
+    noClick: true,
+    noKeyboard: true,
+    disabled: currentStepId !== 'write',
+    onDrop: async files => {
+      if (files.length === 0) return;
+      try {
+        await uploadAndInsert(files);
+      } catch (error) {
+        if (error instanceof DailyQuotaExhaustedError) {
+          setIsQuotaDialogOpen(true);
+        }
+      }
+    },
+    onDropRejected: () => {
+      toast.error('지원하지 않는 이미지 형식입니다');
+    },
+  });
+
+  return (
+    <>
+      <div {...getRootProps()} className='w-screen h-dvh flex flex-col'>
+        {isDragActive && (
+          <div className='fixed inset-0 z-50 flex flex-col items-center justify-center gap-2 bg-blue-500/10'>
+            <p className='text-xl text-blue-600 font-semibold'>
+              이미지를 놓아주세요
+            </p>
+            <p className='text-sm text-blue-600/70'>{`(JPG, PNG, GIF, WebP)`}</p>
+          </div>
+        )}
+        {children}
+      </div>
+
+      <DailyQuotaExhaustedDialog
+        isOpen={isQuotaDialogOpen}
+        setIsOpen={setIsQuotaDialogOpen}
+      />
+    </>
+  );
+}

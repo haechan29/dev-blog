@@ -392,6 +392,12 @@ body {
   }
 }
 
+@property --reveal-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
 @utility animate-shake {
   animation: shake 0.3s ease-in-out;
 }

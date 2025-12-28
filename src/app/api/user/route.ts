@@ -1,6 +1,5 @@
-import { ValidationError } from '@/features/user/data/errors/userErrors';
+import { ApiError, ValidationError } from '@/errors/errors';
 import * as UserQueries from '@/features/user/data/queries/userQueries';
-import { ApiError } from '@/lib/api';
 import { getUserId } from '@/lib/user';
 import { NextRequest, NextResponse } from 'next/server';
 import 'server-only';

@@ -1,7 +1,4 @@
-import {
-  UnauthorizedError,
-  ValidationError,
-} from '@/features/user/data/errors/userErrors';
+import { UnauthorizedError, ValidationError } from '@/errors/errors';
 import { supabase } from '@/lib/supabase';
 import { getUserId } from '@/lib/user';
 import 'server-only';

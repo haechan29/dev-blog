@@ -34,7 +34,7 @@ export default function SeriesPageClient({
         </div>
 
         {series.description && (
-          <div className='text-gray-600 whitespace-pre-wrap break-keep'>
+          <div className='text-gray-600 whitespace-pre-wrap break-keep wrap-anywhere'>
             {series.description}
           </div>
         )}

@@ -1,9 +1,5 @@
+import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as SeriesQueries from '@/features/series/data/queries/seriesQueries';
-import {
-  UnauthorizedError,
-  ValidationError,
-} from '@/features/user/data/errors/userErrors';
-import { ApiError } from '@/lib/api';
 import { getUserId } from '@/lib/user';
 import { NextRequest, NextResponse } from 'next/server';
 

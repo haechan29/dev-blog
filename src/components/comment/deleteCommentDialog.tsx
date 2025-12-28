@@ -7,8 +7,8 @@ import {
   DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { ApiError } from '@/errors/errors';
 import useComments from '@/features/comment/hooks/useComments';
-import { ApiError } from '@/lib/api';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';

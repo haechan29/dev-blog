@@ -1,4 +1,4 @@
-import { ApiError } from '@/lib/api';
+import { ApiError } from '@/errors/errors';
 import { ErrorCode } from '@/types/errorCode';
 
 export class CommentNotFoundError extends ApiError {

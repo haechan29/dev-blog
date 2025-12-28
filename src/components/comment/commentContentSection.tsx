@@ -1,9 +1,9 @@
 'use client';
 
 import CommentLikeButton from '@/components/comment/commentLikeButton';
+import { ApiError } from '@/errors/errors';
 import useComments from '@/features/comment/hooks/useComments';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
-import { ApiError } from '@/lib/api';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
 import {
@@ -173,12 +173,15 @@ export default function CommentContentSection({
   ) : (
     <>
       <div className='mb-3'>
-        <div ref={contentRef} className='text-gray-800 wrap-break-word'>
+        <div
+          ref={contentRef}
+          className='text-gray-800 break-keep wrap-anywhere'
+        >
           {isExpanded ? comment.content : firstTwoLines}
         </div>
 
         {!isExpanded && restLines && (
-          <div className='flex items-center gap-2 wrap-break-word'>
+          <div className='flex items-center gap-2 break-keep wrap-anywhere'>
             <div ref={restLinesRef} className='flex-1 min-w-0 truncate'>
               {restLines}
             </div>

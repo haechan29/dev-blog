@@ -1,6 +1,5 @@
+import { ApiError, UnauthorizedError } from '@/errors/errors';
 import * as InteractionQueries from '@/features/post-interaction/data/queries/interactionQueries';
-import { UnauthorizedError } from '@/features/user/data/errors/userErrors';
-import { ApiError } from '@/lib/api';
 import { getUserId } from '@/lib/user';
 import { NextRequest, NextResponse } from 'next/server';
 

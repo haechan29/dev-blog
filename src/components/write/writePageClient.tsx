@@ -1,5 +1,6 @@
 'use client';
 
+import ImageDropzone from '@/components/image/ImageDropzone';
 import QueryParamsValidator from '@/components/queryParamsValidator';
 import RestoreDraftDialog from '@/components/write/restoreDraftDialog';
 import WritePostForm from '@/components/write/writePostForm';
@@ -54,7 +55,7 @@ export default function WritePageClient({
       fallbackOption={{ type: 'defaultValue', value: 'write' }}
     >
       <RestoreDraftDialog draft={draft} isOpen={isOpen} setIsOpen={setIsOpen} />
-      <div className='w-screen h-dvh flex flex-col'>
+      <ImageDropzone>
         <WritePostToolbar
           isLoggedIn={isLoggedIn}
           publishPost={createPost}
@@ -63,7 +64,7 @@ export default function WritePageClient({
         <div className='flex-1 min-h-0'>
           <WritePostForm isLoggedIn={isLoggedIn} />
         </div>
-      </div>
+      </ImageDropzone>
     </QueryParamsValidator>
   );
 }

@@ -23,7 +23,7 @@ export default function SeriesPreview({ series }: { series: SeriesProps }) {
         </div>
 
         {series.description && (
-          <div className='text-gray-600 line-clamp-3 whitespace-pre-wrap break-keep'>
+          <div className='text-gray-600 line-clamp-3 whitespace-pre-wrap break-keep wrap-anywhere'>
             {series.description}
           </div>
         )}

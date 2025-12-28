@@ -10,6 +10,7 @@ export const schema: Options = {
     img: [
       ...(defaultSchema.attributes?.img ?? []),
       ['data-size', 'large', 'medium'],
+      ['data-status', 'loading', 'failed'],
       'data-caption',
     ],
     div: [
@@ -19,6 +20,10 @@ export const schema: Options = {
       'data-start-time',
       'data-lines',
     ],
+  },
+  protocols: {
+    ...defaultSchema.protocols,
+    src: [...(defaultSchema.protocols?.src ?? []), 'blob'],
   },
 };
 

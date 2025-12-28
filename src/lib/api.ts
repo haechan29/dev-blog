@@ -1,17 +1,21 @@
+import { ApiError } from '@/errors/errors';
+import { DailyQuotaExhaustedError } from '@/features/image/data/errors/imageErrors';
+import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
 import { ErrorCode } from '@/types/errorCode';
-import { NextResponse } from 'next/server';
 
 export const api = {
   get: (url: string, options?: RequestInit) =>
     fetchWithErrorHandling(url, options),
 
-  post: (url: string, body?: unknown, options?: RequestInit) =>
-    fetchWithErrorHandling(url, {
+  post: (url: string, body?: unknown, options?: RequestInit) => {
+    const isFormData = body instanceof FormData;
+    return fetchWithErrorHandling(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      ...(!isFormData && { headers: { 'Content-Type': 'application/json' } }),
+      body: isFormData ? body : JSON.stringify(body),
       ...options,
-    }),
+    });
+  },
 
   put: (url: string, body: unknown, options?: RequestInit) =>
     fetchWithErrorHandling(url, {
@@ -38,29 +42,23 @@ async function fetchWithErrorHandling(url: string, options?: RequestInit) {
 
   if (!response.ok) {
     const { error, code } = await response.json();
-    throw new ApiError(error, code);
+    throw createApiError(error, code, response.status);
   }
 
   return response.json();
 }
 
-export class ApiError extends Error {
-  constructor(
-    message: string,
-    public readonly code: ErrorCode,
-    public readonly statusCode: number = 500
-  ) {
-    super(message);
-    this.name = this.constructor.name;
-  }
-
-  toResponse() {
-    return NextResponse.json(
-      {
-        error: this.message,
-        code: this.code,
-      },
-      { status: this.statusCode }
-    );
+function createApiError(
+  message: string,
+  code: ErrorCode,
+  status: number
+): ApiError {
+  switch (code) {
+    case ErrorCode.DAILY_QUOTA_EXHAUSTED:
+      return new DailyQuotaExhaustedError(message);
+    case ErrorCode.DUPLICATE_NICKNAME:
+      return new DuplicateNicknameError(message);
+    default:
+      return new ApiError(message, code, status);
   }
 }
