@@ -49,7 +49,7 @@ export default function TableOfContentsItem({
                 currentHeading?.id === heading.id
                   ? 'xl:text-blue-500'
                   : 'xl:text-gray-500',
-                heading.level == 1 ? '' : heading.level == 2 ? 'ml-2' : 'ml-4'
+                heading.level == 1 ? '' : heading.level == 2 ? 'pl-2' : 'pl-4'
               )}
             >
               {heading.text}
