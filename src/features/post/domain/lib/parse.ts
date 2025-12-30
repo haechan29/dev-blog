@@ -1,7 +1,10 @@
 import Heading from '@/features/post/domain/model/heading';
+import GithubSlugger from 'github-slugger';
 import remarkParse from 'remark-parse';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
+
+const slugger = new GithubSlugger();
 
 export function extractHeadings(content: string): Heading[] {
   const headings: Heading[] = [];
@@ -14,10 +17,7 @@ export function extractHeadings(content: string): Heading[] {
       .map(child => child.value)
       .join('');
 
-    const id = text
-      .toLowerCase()
-      .replace(/[^\w\s가-힣]/g, '')
-      .replace(/\s+/g, '-');
+    const id = slugger.slug(text);
 
     headings.push({
       id,

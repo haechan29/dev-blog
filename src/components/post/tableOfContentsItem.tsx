@@ -19,7 +19,7 @@ export default function TableOfContentsItem({
 
   const handleClick = (heading: Heading) => {
     const postContent = document.querySelector('[data-post-content]');
-    const element = postContent?.querySelector(`#${heading.id}`);
+    const element = postContent?.querySelector(`[id="${heading.id}"]`);
     if (element) {
       scrollIntoElement(
         element,

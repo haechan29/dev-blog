@@ -32,7 +32,7 @@ export default function PostToolbar({ className }: { className?: string }) {
       }
       if (postToolbar.mode === 'expanded') {
         const postContent = document.querySelector('[data-post-content]');
-        const element = postContent?.querySelector(`#${heading.id}`);
+        const element = postContent?.querySelector(`[id="${heading.id}"]`);
         if (element) {
           scrollIntoElement(
             element,
