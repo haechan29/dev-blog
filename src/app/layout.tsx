@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: '임해찬',
-  description: '개발자 임해찬의 블로그',
+  title: 'ShareText',
+  description: '누구나 글을 쓰고 읽을 수 있는 텍스트 콘텐츠 플랫폼',
 };
 
 export default async function RootLayout({
