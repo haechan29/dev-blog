@@ -164,10 +164,7 @@ export default function Comments({
                 onInput={e => {
                   const target = e.target as HTMLTextAreaElement;
                   target.style.height = 'auto';
-                  target.style.height = `${Math.min(
-                    target.scrollHeight,
-                    remToPx(9)
-                  )}px`;
+                  target.style.height = `${target.scrollHeight}px`;
                 }}
                 placeholder='댓글을 입력하세요'
                 className={clsx(
