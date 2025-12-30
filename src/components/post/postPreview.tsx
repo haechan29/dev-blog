@@ -15,10 +15,14 @@ export default function PostPreview({
   isLoggedIn,
   post,
   userId,
+  showSettings = false,
+  onDeleteSuccess,
 }: {
   isLoggedIn: boolean;
   post: PostProps;
   userId?: string;
+  showSettings?: boolean;
+  onDeleteSuccess?: () => void;
 }) {
   const { id, title, plainText, tags } = post;
   const isScrollAnimationEnabled =
@@ -41,13 +45,14 @@ export default function PostPreview({
         )}
       />
 
-      {post.userId === userId && (
+      {showSettings && post.userId === userId && (
         <div className='absolute top-0 right-0 z-10'>
           <PostSettingsDropdown
             isLoggedIn={isLoggedIn}
             userId={userId}
             post={post}
             showRawContent={false}
+            onDeleteSuccess={onDeleteSuccess}
           >
             <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 hover:bg-gray-200 rounded-full p-2 -m-2 cursor-pointer' />
           </PostSettingsDropdown>
@@ -62,7 +67,9 @@ export default function PostPreview({
           <div
             className={clsx(
               'text-2xl font-semibold line-clamp-2',
-              post.userId === userId ? 'w-[calc(100%-3rem)]' : 'w-full'
+              showSettings && post.userId === userId
+                ? 'w-[calc(100%-3rem)]'
+                : 'w-full'
             )}
           >
             {title}

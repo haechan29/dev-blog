@@ -1,5 +1,5 @@
 import { auth } from '@/auth';
-import PostPreview from '@/components/post/postPreview';
+import PostsPageClient from '@/components/series/postsPageClient';
 import * as PostServerService from '@/features/post/domain/service/postServerService';
 import { createProps } from '@/features/post/ui/postProps';
 import { cookies } from 'next/headers';
@@ -19,20 +19,12 @@ export default async function PostsPage({
     posts.map(createProps)
   );
 
-  return posts.length === 0 ? (
-    <div className='text-center py-20 text-gray-500'>작성한 글이 없습니다.</div>
-  ) : (
-    <div className='flex flex-col'>
-      {posts.map((post, index) => (
-        <div key={post.id} className='mb-8'>
-          <PostPreview
-            isLoggedIn={!!session}
-            post={post}
-            userId={currentUserId}
-          />
-          {index !== posts.length - 1 && <div className='h-px bg-gray-200' />}
-        </div>
-      ))}
-    </div>
+  return (
+    <PostsPageClient
+      userId={userId}
+      currentUserId={currentUserId}
+      isLoggedIn={!!session}
+      initialPosts={posts}
+    />
   );
 }

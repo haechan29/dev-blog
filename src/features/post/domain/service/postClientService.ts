@@ -15,8 +15,8 @@ export async function getFeedPosts(cursor: string | null, excludeId?: string) {
   };
 }
 
-export async function getPosts(userId: string) {
-  const dtos = await PostClientRepository.getPosts(userId);
+export async function getPostsByUserId(userId: string) {
+  const dtos = await PostClientRepository.getPostsByUserId(userId);
   return dtos.map(toDomain);
 }
 

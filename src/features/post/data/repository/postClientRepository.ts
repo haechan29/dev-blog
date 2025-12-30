@@ -24,7 +24,7 @@ export async function getFeedPosts(
   return response.data;
 }
 
-export async function getPosts(userId: string): Promise<PostDto[]> {
+export async function getPostsByUserId(userId: string): Promise<PostDto[]> {
   const response = await api.get(`/api/posts?userId=${userId}`);
   return response.data;
 }
