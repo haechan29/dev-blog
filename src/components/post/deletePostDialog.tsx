@@ -8,7 +8,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
-import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
@@ -19,13 +18,14 @@ export default function DeletePostDialog({
   postId,
   isOpen,
   setIsOpen,
+  onDeleteSuccess,
 }: {
   isLoggedIn: boolean;
   postId: string;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  onDeleteSuccess?: () => void;
 }) {
-  const router = useRouterWithProgress();
   const [isLoading, setIsLoading] = useState(false);
   const [password, setPassword] = useState('');
   const [isPasswordValid, setIsPasswordValid] = useState(true);
@@ -41,7 +41,7 @@ export default function DeletePostDialog({
       try {
         await PostClientService.deletePost(postId, password);
         setIsOpen(false);
-        router.push('/');
+        onDeleteSuccess?.();
         toast.success('게시글이 삭제되었습니다');
       } catch (error) {
         const message =
@@ -50,7 +50,7 @@ export default function DeletePostDialog({
       }
       setIsLoading(false);
     },
-    [isLoggedIn, router, setIsOpen]
+    [isLoggedIn, onDeleteSuccess, setIsOpen]
   );
 
   useEffect(() => {

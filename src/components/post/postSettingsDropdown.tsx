@@ -24,12 +24,14 @@ export default function PostSettingsDropdown({
   userId,
   post,
   showRawContent,
+  onDeleteSuccess,
   children,
 }: {
   isLoggedIn: boolean;
   userId: string;
   post: PostProps;
   showRawContent: boolean;
+  onDeleteSuccess?: () => void;
   children: ReactNode;
 }) {
   const dispatch = useDispatch<AppDispatch>();
@@ -81,6 +83,7 @@ export default function PostSettingsDropdown({
         postId={post.id}
         isOpen={isDeleteDialogOpen}
         setIsOpen={setIsDeleteDialogOpen}
+        onDeleteSuccess={onDeleteSuccess}
       />
 
       <SeriesSettingsDialog

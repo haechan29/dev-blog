@@ -3,6 +3,7 @@
 import PostInfo from '@/components/post/postInfo';
 import PostSettingsDropdown from '@/components/post/postSettingsDropdown';
 import { PostProps } from '@/features/post/ui/postProps';
+import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { setIsHeaderVisible } from '@/lib/redux/post/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
@@ -20,6 +21,7 @@ export default function PostHeader({
   userId?: string;
   post: PostProps;
 }) {
+  const router = useRouterWithProgress();
   const dispatch = useDispatch<AppDispatch>();
   const { title, tags } = post;
   const headerRef = useRef<HTMLDivElement | null>(null);
@@ -83,6 +85,7 @@ export default function PostHeader({
             userId={userId}
             post={post}
             showRawContent={true}
+            onDeleteSuccess={() => router.push('/')}
           >
             <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2 cursor-pointer' />
           </PostSettingsDropdown>
