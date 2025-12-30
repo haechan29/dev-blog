@@ -1,5 +1,6 @@
 'use client';
 
+import SeriesFormDialog from '@/components/series/seriesFormDialog';
 import {
   Command,
   CommandEmpty,
@@ -47,6 +48,7 @@ export default function SeriesSettingsDialog({
     string | null | undefined
   >(post.seriesId ?? undefined);
   const [open, setOpen] = useState(false);
+  const [isCreateSeriesOpen, setIsCreateSeriesOpen] = useState(false);
 
   const { seriesList } = useSeriesList(userId);
   const selectedSeries = useMemo(
@@ -171,6 +173,19 @@ export default function SeriesSettingsDialog({
                       ))}
                     </CommandGroup>
                   )}
+
+                  <div className='border-t border-gray-100' />
+                  <CommandGroup>
+                    <CommandItem
+                      onSelect={() => {
+                        setOpen(false);
+                        setIsCreateSeriesOpen(true);
+                      }}
+                      className='flex items-center px-3 py-2 gap-2 cursor-pointer text-blue-600 data-[selected=true]:text-blue-600'
+                    >
+                      <span>+ 새 시리즈 만들기</span>
+                    </CommandItem>
+                  </CommandGroup>
                 </>
               )}
             </Command>
@@ -197,6 +212,14 @@ export default function SeriesSettingsDialog({
           </DialogClose>
         </div>
       </DialogContent>
+
+      <SeriesFormDialog
+        mode='create'
+        userId={userId}
+        isOpen={isCreateSeriesOpen}
+        setIsOpen={setIsCreateSeriesOpen}
+        onSuccess={seriesId => setSelectedSeriesId(seriesId)}
+      />
     </Dialog>
   );
 }

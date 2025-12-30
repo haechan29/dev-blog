@@ -63,15 +63,21 @@ export async function createSeries({
   description: string | null;
   userId: string;
 }) {
-  const { error } = await supabase.from('series').insert({
-    title,
-    description,
-    user_id: userId,
-  });
+  const { data, error } = await supabase
+    .from('series')
+    .insert({
+      title,
+      description,
+      user_id: userId,
+    })
+    .select('id')
+    .single();
 
   if (error) {
     throw new Error(error.message);
   }
+
+  return { id: data.id };
 }
 
 export async function updateSeries({

@@ -11,7 +11,7 @@ import useSeriesList from '@/features/series/domain/hooks/useSeriesList';
 import { SeriesProps } from '@/features/series/ui/seriesProps';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface DialogTexts {
   dialogTitle: string;
@@ -37,12 +37,14 @@ export default function SeriesFormDialog({
   series,
   isOpen,
   setIsOpen,
+  onSuccess,
 }: {
   mode: 'create' | 'edit';
   userId: string;
   series?: SeriesProps;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  onSuccess?: (seriesId: string) => void;
 }) {
   const [title, setTitle] = useState(series?.title ?? '');
   const [description, setDescription] = useState(series?.description ?? '');
@@ -57,7 +59,7 @@ export default function SeriesFormDialog({
       ? createSeriesMutation.isPending
       : updateSeriesMutation.isPending;
 
-  const handleCreate = () => {
+  const handleSubmit = useCallback(() => {
     if (!title.trim()) {
       setIsTitleValid(false);
       return;
@@ -67,8 +69,9 @@ export default function SeriesFormDialog({
 
     if (mode === 'create') {
       createSeriesMutation.mutate(params, {
-        onSuccess: () => {
+        onSuccess: seriesId => {
           setIsOpen(false);
+          onSuccess?.(seriesId);
         },
       });
     } else {
@@ -82,7 +85,16 @@ export default function SeriesFormDialog({
         }
       );
     }
-  };
+  }, [
+    createSeriesMutation,
+    description,
+    mode,
+    onSuccess,
+    series,
+    setIsOpen,
+    title,
+    updateSeriesMutation,
+  ]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -133,7 +145,7 @@ export default function SeriesFormDialog({
               'flex justify-center items-center px-6 h-10 rounded-sm font-bold text-white hover:bg-blue-500',
               isPending ? 'bg-blue-500' : 'bg-blue-600'
             )}
-            onClick={handleCreate}
+            onClick={handleSubmit}
           >
             {isPending ? (
               <Loader2 size={18} strokeWidth={3} className='animate-spin' />

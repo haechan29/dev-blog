@@ -24,8 +24,12 @@ export async function createSeries({
   userId: string;
   title: string;
   description: string | null;
-}): Promise<void> {
-  await api.post(`/api/user/${userId}/series`, { title, description });
+}): Promise<string> {
+  const response = await api.post(`/api/user/${userId}/series`, {
+    title,
+    description,
+  });
+  return response.data;
 }
 
 export async function updateSeries({

@@ -20,7 +20,11 @@ export async function createSeries({
   title: string;
   description: string | null;
 }) {
-  await SeriesClientRepository.createSeries({ userId, title, description });
+  return await SeriesClientRepository.createSeries({
+    userId,
+    title,
+    description,
+  });
 }
 
 export async function updateSeries({

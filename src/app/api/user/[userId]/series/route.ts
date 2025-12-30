@@ -43,13 +43,13 @@ export async function POST(
       throw new ValidationError('제목을 찾을 수 없습니다');
     }
 
-    await SeriesQueries.createSeries({
+    const series = await SeriesQueries.createSeries({
       title,
       description: description ?? null,
       userId,
     });
 
-    return NextResponse.json({ success: true }, { status: 201 });
+    return NextResponse.json({ data: series.id }, { status: 201 });
   } catch (error) {
     console.error('시리즈 생성 요청이 실패했습니다', error);
 
