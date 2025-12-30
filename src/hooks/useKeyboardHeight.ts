@@ -29,7 +29,7 @@ export default function useKeyboardHeight() {
     window.addEventListener('scroll', updateKeyboardHeight);
     visualViewport.addEventListener('resize', updateKeyboardHeight);
     return () => {
-      window.addEventListener('scroll', updateKeyboardHeight);
+      window.removeEventListener('scroll', updateKeyboardHeight);
       visualViewport.removeEventListener('resize', updateKeyboardHeight);
     };
   }, [throttle]);

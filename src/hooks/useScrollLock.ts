@@ -47,6 +47,11 @@ export default function useScrollLock({
         e.preventDefault();
       }
     };
+
+    const onTouchEnd = () => {
+      firstTouchRef.current = null;
+    };
+
     const option: AddEventListenerOptions = {
       passive: false,
     };
@@ -56,6 +61,7 @@ export default function useScrollLock({
       document.documentElement.style.overflow = 'hidden';
       document.addEventListener('touchstart', onTouchStart, option);
       document.addEventListener('touchmove', onTouchMove, option);
+      document.addEventListener('touchend', onTouchEnd, option);
       allowedElements.forEach(element => {
         element.style.overscrollBehavior = 'contain';
       });
@@ -66,6 +72,7 @@ export default function useScrollLock({
       document.documentElement.style.overflow = '';
       document.removeEventListener('touchstart', onTouchStart, option);
       document.removeEventListener('touchmove', onTouchMove, option);
+      document.removeEventListener('touchend', onTouchEnd, option);
       allowedElements.forEach(
         element => (element.style.overscrollBehavior = 'auto')
       );
