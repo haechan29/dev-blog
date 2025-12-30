@@ -1,5 +1,6 @@
 'use client';
 
+import InquiryDialog from '@/components/inquiry/inquiryDialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +12,7 @@ import DeleteAccountDialog from '@/components/user/deleteAccountDialog';
 import ProfileIcon from '@/components/user/profileIcon';
 import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { createRipple } from '@/lib/dom';
-import { LogIn, LogOut, UserX } from 'lucide-react';
+import { LogIn, LogOut, MessageSquare, UserX } from 'lucide-react';
 import { signIn, signOut } from 'next-auth/react';
 import { MouseEvent, ReactNode, useCallback, useState } from 'react';
 
@@ -28,6 +29,7 @@ export default function ProfileDropdown({
 }) {
   const router = useRouterWithProgress();
   const [isDeleteDialogVisible, setIsDeleteDialogVisible] = useState(false);
+  const [isInquiryDialogVisible, setIsInquiryDialogVisible] = useState(false);
 
   const handleAction = useCallback(
     async (e: MouseEvent<HTMLElement>) => {
@@ -46,6 +48,10 @@ export default function ProfileDropdown({
           setIsDeleteDialogVisible(true);
           break;
         }
+        case 'inquiry': {
+          setIsInquiryDialogVisible(true);
+          break;
+        }
       }
     },
     [router]
@@ -57,6 +63,12 @@ export default function ProfileDropdown({
         isOpen={isDeleteDialogVisible}
         setIsOpen={setIsDeleteDialogVisible}
       />
+
+      <InquiryDialog
+        isOpen={isInquiryDialogVisible}
+        setIsOpen={setIsInquiryDialogVisible}
+      />
+
       <DropdownMenu>
         <DropdownMenuTrigger
           onTouchStart={e => {
@@ -96,6 +108,17 @@ export default function ProfileDropdown({
           {isLoggedIn ? (
             <>
               <DropdownMenuItem
+                data-action='inquiry'
+                onClick={handleAction}
+                className='w-full flex items-center gap-2 cursor-pointer'
+              >
+                <MessageSquare className='w-4 h-4 text-gray-500' />
+                <div className='whitespace-nowrap text-gray-900'>문의하기</div>
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem
                 data-action='logout'
                 onClick={handleAction}
                 className='w-full flex items-center gap-2 cursor-pointer'
@@ -113,14 +136,24 @@ export default function ProfileDropdown({
               </DropdownMenuItem>
             </>
           ) : (
-            <DropdownMenuItem
-              data-action='login'
-              onClick={handleAction}
-              className='w-full flex items-center gap-2 cursor-pointer'
-            >
-              <LogIn className='w-4 h-4 text-gray-500' />
-              <div className='whitespace-nowrap text-gray-900'>로그인</div>
-            </DropdownMenuItem>
+            <>
+              <DropdownMenuItem
+                data-action='login'
+                onClick={handleAction}
+                className='w-full flex items-center gap-2 cursor-pointer'
+              >
+                <LogIn className='w-4 h-4 text-gray-500' />
+                <div className='whitespace-nowrap text-gray-900'>로그인</div>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                data-action='inquiry'
+                onClick={handleAction}
+                className='w-full flex items-center gap-2 cursor-pointer'
+              >
+                <MessageSquare className='w-4 h-4 text-gray-500' />
+                <div className='whitespace-nowrap text-gray-900'>문의하기</div>
+              </DropdownMenuItem>
+            </>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
