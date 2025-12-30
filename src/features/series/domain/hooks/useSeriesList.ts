@@ -62,7 +62,10 @@ export default function useSeriesList(
   const deleteSeriesMutation = useMutation({
     mutationFn: (seriesId: string) =>
       SeriesClientService.deleteSeries({ userId, seriesId }),
-    onSuccess: () => {
+    onSuccess: (_, seriesId) => {
+      queryClient.removeQueries({
+        queryKey: userKeys.series(userId, seriesId),
+      });
       queryClient.invalidateQueries({
         queryKey: userKeys.seriesList(userId),
       });

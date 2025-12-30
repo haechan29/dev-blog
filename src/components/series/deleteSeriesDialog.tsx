@@ -32,11 +32,11 @@ export default function DeleteSeriesDialog({
       deleteSeriesMutation.mutate(seriesId, {
         onSuccess: () => {
           setIsOpen(false);
-          router.push('/');
+          router.push(`/@${userId}/series`);
         },
       });
     },
-    [deleteSeriesMutation, router, setIsOpen]
+    [deleteSeriesMutation, router, setIsOpen, userId]
   );
 
   return (

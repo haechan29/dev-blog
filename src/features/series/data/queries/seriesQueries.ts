@@ -1,4 +1,5 @@
 import { SeriesEntity } from '@/features/series/data/entities/seriesEntities';
+import { SeriesNotFoundError } from '@/features/series/data/errors/seriesErrors';
 import { toDto } from '@/features/series/data/mapper/seriesMapper';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
@@ -20,10 +21,14 @@ export async function fetchSeries(seriesId: string) {
     )
     .eq('id', seriesId)
     .order('series_order', { referencedTable: 'posts', ascending: true })
-    .single();
+    .maybeSingle();
 
   if (error) {
     throw new Error(error.message);
+  }
+
+  if (!data) {
+    throw new SeriesNotFoundError('시리즈를 찾을 수 없습니다');
   }
 
   return toDto(data as unknown as SeriesEntity);
