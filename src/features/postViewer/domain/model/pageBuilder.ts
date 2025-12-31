@@ -65,7 +65,15 @@ export class PageBuilder {
     this.flushCurrentPage();
 
     const dataCaption = element.dataset.caption;
-    if (dataCaption === undefined) return;
+    if (!dataCaption) {
+      this.pages.push({
+        startOffset: Number(element.dataset.startOffset),
+        endOffset: Number(element.dataset.endOffset),
+        heading: this.pendingHeading,
+        bgm: this.pendingBgm,
+      });
+      return;
+    }
 
     dataCaption
       .split(/(?<!\\)#/)
