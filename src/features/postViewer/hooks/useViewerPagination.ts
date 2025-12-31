@@ -1,9 +1,6 @@
 'use client';
 
-import { parseYouTubeUrl } from '@/features/post/domain/lib/bgm';
-import Heading from '@/features/post/domain/model/heading';
-import { Bgm } from '@/features/post/domain/types/bgm';
-import { Page } from '@/features/postViewer/domain/types/page';
+import { PageBuilder } from '@/features/postViewer/domain/model/pageBuilder';
 import useDebounce from '@/hooks/useDebounce';
 import {
   setCurrentPageIndex,
@@ -19,11 +16,15 @@ export default function useViewerPagination() {
 
   useEffect(() => {
     const viewer = document.querySelector('[data-viewer]');
-    if (!viewer) return;
+    const viewerMeasure = document.querySelector('[data-viewer-measurement]');
+    if (!viewer || !viewerMeasure) return;
 
     const observer = new ResizeObserver(() => {
       debounce(() => {
-        const pages = measure();
+        const containerHeight = (viewerMeasure as HTMLElement).offsetHeight;
+        const elements = Array.from(viewerMeasure.children) as HTMLElement[];
+
+        const pages = new PageBuilder(containerHeight).build(elements);
         if (pages && pages.length > 0) {
           dispatch(setPages(pages));
           dispatch(setCurrentPageIndex(0));
@@ -34,231 +35,4 @@ export default function useViewerPagination() {
 
     return () => observer.disconnect();
   }, [debounce, dispatch]);
-}
-
-function measure() {
-  const viewerMeasure = document.querySelector('[data-viewer-measurement]');
-  if (!viewerMeasure) return;
-
-  const containerHeight = (viewerMeasure as HTMLElement).offsetHeight;
-  const elements = Array.from(viewerMeasure.children) as HTMLElement[];
-
-  const totalPages: Page[] = [];
-  let currentPageElements: HTMLElement[] = [];
-  let currentHeight = 0;
-  let pendingHeading: Heading | null = null;
-  let pendingBgm: Bgm | null = null;
-
-  elements.forEach(element => {
-    if (currentPageElements.length === 0 && isEmptyContent(element)) return;
-
-    if (element.matches('h1, h2, h3, h4, h5, h6')) {
-      if (currentPageElements.length > 0) {
-        totalPages.push({
-          startOffset: Number(currentPageElements[0].dataset.startOffset),
-          endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
-          heading: pendingHeading,
-          bgm: pendingBgm,
-        });
-      }
-
-      currentPageElements = [];
-      currentHeight = 0;
-
-      pendingHeading = {
-        id: element.id,
-        text: element.textContent || '',
-        level: parseInt(element.tagName.substring(1)),
-      };
-      return;
-    }
-
-    if (element.matches('[data-bgm]')) {
-      if (currentPageElements.length > 0) {
-        totalPages.push({
-          startOffset: Number(currentPageElements[0].dataset.startOffset),
-          endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
-          heading: pendingHeading,
-          bgm: pendingBgm,
-        });
-      }
-
-      currentPageElements = [];
-      currentHeight = 0;
-
-      const youtubeUrl = element.dataset.youtubeUrl;
-      if (youtubeUrl === undefined) return;
-      const startTime = element.dataset.startTime ?? null;
-      const bgm = parseYouTubeUrl(youtubeUrl, startTime);
-      pendingBgm = bgm;
-      return;
-    }
-
-    const { marginTop, marginBottom } = window.getComputedStyle(element);
-    const height =
-      element.offsetHeight +
-      (parseFloat(marginTop) || 0) +
-      (parseFloat(marginBottom) || 0);
-
-    if (element.matches('[data-image-with-caption]')) {
-      if (currentPageElements.length > 0) {
-        totalPages.push({
-          startOffset: Number(currentPageElements[0].dataset.startOffset),
-          endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
-          heading: pendingHeading,
-          bgm: pendingBgm,
-        });
-
-        currentPageElements = [];
-        currentHeight = 0;
-      }
-
-      const dataCaption = element.dataset.caption;
-      if (dataCaption === undefined) return;
-
-      dataCaption
-        .split(/(?<!\\)#/)
-        .map(s => s.replace(/\\#/g, '#'))
-        .filter(Boolean)
-        .forEach(caption => {
-          totalPages.push({
-            startOffset: Number(element.dataset.startOffset),
-            endOffset: Number(element.dataset.endOffset),
-            heading: pendingHeading,
-            bgm: pendingBgm,
-            caption,
-          });
-        });
-      return;
-    }
-
-    if (element.matches('p')) {
-      const { chunks, remainingElements, remainingHeight } = splitParagraph(
-        element,
-        containerHeight,
-        currentHeight
-      );
-
-      for (const { startOffset, endOffset } of chunks) {
-        totalPages.push({
-          startOffset: Number(
-            currentPageElements[0]?.dataset.startOffset ?? startOffset
-          ),
-          endOffset,
-          heading: pendingHeading,
-          bgm: pendingBgm,
-        });
-
-        currentPageElements = [];
-        currentHeight = 0;
-      }
-
-      currentPageElements.push(...remainingElements);
-      currentHeight = remainingHeight;
-      return;
-    }
-
-    if (height > containerHeight) {
-      if (currentPageElements.length > 0) {
-        totalPages.push({
-          startOffset: Number(currentPageElements[0].dataset.startOffset),
-          endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
-          heading: pendingHeading,
-          bgm: pendingBgm,
-        });
-      }
-
-      currentPageElements = [];
-      currentHeight = 0;
-
-      totalPages.push({
-        startOffset: Number(element.dataset.startOffset),
-        endOffset: Number(element.dataset.endOffset),
-        heading: pendingHeading,
-        bgm: pendingBgm,
-      });
-    } else if (height > containerHeight - currentHeight) {
-      totalPages.push({
-        startOffset: Number(currentPageElements[0].dataset.startOffset),
-        endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
-        heading: pendingHeading,
-        bgm: pendingBgm,
-      });
-
-      currentPageElements = [element];
-      currentHeight = height;
-    } else {
-      currentPageElements.push(element);
-      currentHeight += height;
-    }
-  });
-
-  if (
-    currentPageElements.length > 0 &&
-    currentPageElements.some(element => !isEmptyContent(element))
-  ) {
-    totalPages.push({
-      startOffset: Number(currentPageElements[0].dataset.startOffset),
-      endOffset: Number(currentPageElements.at(-1)!.dataset.endOffset),
-      heading: pendingHeading,
-      bgm: pendingBgm,
-    });
-  }
-
-  return totalPages;
-}
-
-function isEmptyContent(element: Element) {
-  if (element.matches('br')) return true;
-
-  if (
-    element.matches('div, span, p') &&
-    element.textContent.trim() === '' &&
-    element.children.length === 0
-  ) {
-    return true;
-  }
-
-  return false;
-}
-
-function splitParagraph(
-  paragraph: HTMLElement,
-  containerHeight: number,
-  currentHeight: number
-): {
-  chunks: { startOffset: number; endOffset: number }[];
-  remainingElements: HTMLElement[];
-  remainingHeight: number;
-} {
-  const leaves = Array.from(
-    paragraph.querySelectorAll(
-      '[data-start-offset]:not(:has([data-start-offset]))'
-    )
-  ) as HTMLElement[];
-
-  const chunks: { startOffset: number; endOffset: number }[] = [];
-  let chunkStartIndex = 0;
-
-  leaves.forEach((leaf, index) => {
-    const leafHeight = leaf.offsetHeight;
-
-    if (currentHeight + leafHeight > containerHeight) {
-      if (index > 0) {
-        chunks.push({
-          startOffset: Number(leaves[chunkStartIndex].dataset.startOffset),
-          endOffset: Number(leaves[index - 1].dataset.endOffset),
-        });
-        chunkStartIndex = index;
-      }
-      currentHeight = 0;
-    }
-    currentHeight += leafHeight;
-  });
-
-  return {
-    chunks,
-    remainingElements: leaves.slice(chunkStartIndex),
-    remainingHeight: currentHeight,
-  };
 }
