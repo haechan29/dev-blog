@@ -132,6 +132,32 @@ function measure() {
       return;
     }
 
+    if (element.matches('p')) {
+      const { chunks, remainingElements, remainingHeight } = splitParagraph(
+        element,
+        containerHeight,
+        currentHeight
+      );
+
+      for (const { startOffset, endOffset } of chunks) {
+        totalPages.push({
+          startOffset: Number(
+            currentPageElements[0]?.dataset.startOffset ?? startOffset
+          ),
+          endOffset,
+          heading: pendingHeading,
+          bgm: pendingBgm,
+        });
+
+        currentPageElements = [];
+        currentHeight = 0;
+      }
+
+      currentPageElements.push(...remainingElements);
+      currentHeight = remainingHeight;
+      return;
+    }
+
     if (height > containerHeight) {
       if (currentPageElements.length > 0) {
         totalPages.push({
@@ -194,4 +220,45 @@ function isEmptyContent(element: Element) {
   }
 
   return false;
+}
+
+function splitParagraph(
+  paragraph: HTMLElement,
+  containerHeight: number,
+  currentHeight: number
+): {
+  chunks: { startOffset: number; endOffset: number }[];
+  remainingElements: HTMLElement[];
+  remainingHeight: number;
+} {
+  const leaves = Array.from(
+    paragraph.querySelectorAll(
+      '[data-start-offset]:not(:has([data-start-offset]))'
+    )
+  ) as HTMLElement[];
+
+  const chunks: { startOffset: number; endOffset: number }[] = [];
+  let chunkStartIndex = 0;
+
+  leaves.forEach((leaf, index) => {
+    const leafHeight = leaf.offsetHeight;
+
+    if (currentHeight + leafHeight > containerHeight) {
+      if (index > 0) {
+        chunks.push({
+          startOffset: Number(leaves[chunkStartIndex].dataset.startOffset),
+          endOffset: Number(leaves[index - 1].dataset.endOffset),
+        });
+        chunkStartIndex = index;
+      }
+      currentHeight = 0;
+    }
+    currentHeight += leafHeight;
+  });
+
+  return {
+    chunks,
+    remainingElements: leaves.slice(chunkStartIndex),
+    remainingHeight: currentHeight,
+  };
 }
