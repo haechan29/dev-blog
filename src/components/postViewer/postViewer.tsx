@@ -75,8 +75,6 @@ export default function PostViewer({ post }: { post: PostProps }) {
     if (isViewerMode) {
       if (viewer.requestFullscreen) {
         viewer.requestFullscreen();
-      } else {
-        setSupportsFullscreen(false);
       }
     } else {
       if (document.fullscreenElement) {
@@ -84,6 +82,10 @@ export default function PostViewer({ post }: { post: PostProps }) {
       }
     }
   }, [isViewerMode]);
+
+  useEffect(() => {
+    setSupportsFullscreen(!!document.exitFullscreen);
+  }, []);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -137,7 +139,10 @@ export default function PostViewer({ post }: { post: PostProps }) {
       <Toaster toasterId='viewer' />
 
       <PostViewerToolbar {...post} />
-      <PostViewerContainer {...post} />
+      <PostViewerContainer
+        content={post.content}
+        supportsFullscreen={supportsFullscreen}
+      />
       <PostViewerControlBar />
     </div>
   );

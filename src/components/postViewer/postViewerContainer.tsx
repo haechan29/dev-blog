@@ -8,6 +8,7 @@ import useViewerPagination from '@/features/postViewer/hooks/useViewerPagination
 import { processMd } from '@/lib/md/md';
 import clsx from 'clsx';
 import { JSX, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface ContainerProps {
   result: JSX.Element;
@@ -15,11 +16,19 @@ interface ContainerProps {
   caption?: string;
 }
 
-export default function PostViewerContainer({ content }: { content: string }) {
+export default function PostViewerContainer({
+  content,
+  supportsFullscreen,
+}: {
+  content: string;
+  supportsFullscreen: boolean;
+}) {
   const { page } = usePostViewer();
   const [result, setResult] = useState<JSX.Element | null>(null);
   const [container, setContainer] = useState<ContainerProps>();
-  useViewerPagination();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useViewerPagination(result);
   useKeyboardWheelNavigation();
 
   useEffect(() => {
@@ -49,6 +58,10 @@ export default function PostViewerContainer({ content }: { content: string }) {
     };
     updateViewer();
   }, [content, page]);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <div className='w-full h-full relative'>
@@ -92,16 +105,22 @@ export default function PostViewerContainer({ content }: { content: string }) {
         </div>
       )}
 
-      <div
-        data-viewer-measurement
-        className={clsx(
-          'prose w-[calc(100%/var(--container-scale))] h-[calc(100%/var(--container-scale))]',
-          'absolute top-0 left-[200%]'
+      {isMounted &&
+        createPortal(
+          <div
+            data-viewer-measurement
+            className={clsx(
+              'prose fixed top-0 left-[200%]',
+              supportsFullscreen
+                ? 'w-[calc((100dvw-2*var(--container-padding))/var(--container-scale))] h-[calc((100dvh-2*var(--container-padding))/var(--container-scale))]'
+                : 'w-[calc((100dvh-2*var(--container-padding))/var(--container-scale))] h-[calc((100dvw-2*var(--container-padding))/var(--container-scale))]'
+            )}
+            aria-hidden='true'
+          >
+            {result}
+          </div>,
+          document.body
         )}
-        aria-hidden='true'
-      >
-        {result}
-      </div>
     </div>
   );
 }
