@@ -5,6 +5,9 @@ import { AlertCircle } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
+const SCREEN_RATIO = 16 / 9;
+const OVERSIZE_THRESHOLD = 3;
+
 export default function ImageWithCaption({
   src,
   'data-size': size,
@@ -26,6 +29,7 @@ export default function ImageWithCaption({
   alt?: string;
 }) {
   const [isError, setIsError] = useState(false);
+  const [isOversized, setIsOversized] = useState(false);
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => setIsError(false), [src]);
@@ -80,10 +84,9 @@ export default function ImageWithCaption({
         alt={alt}
         width={1000}
         height={1000}
-        objectFit='contain'
         onError={() => setIsError(true)}
         onLoad={() => setIsError(false)}
-        className='h-full'
+        className='w-full h-full object-contain'
       />
     );
   }
@@ -141,7 +144,15 @@ export default function ImageWithCaption({
           width={1000}
           height={1000}
           onError={() => setIsError(true)}
-          onLoad={() => setIsError(false)}
+          onLoad={e => {
+            setIsError(false);
+            const { naturalWidth, naturalHeight } = e.currentTarget;
+            const ratio = naturalWidth / naturalHeight;
+            setIsOversized(
+              ratio / SCREEN_RATIO > OVERSIZE_THRESHOLD ||
+                ratio / SCREEN_RATIO < 1 / OVERSIZE_THRESHOLD
+            );
+          }}
           className='h-auto w-full'
         />
         {(status === 'loading' || status === 'success') && (
@@ -168,6 +179,12 @@ export default function ImageWithCaption({
               <AlertCircle className='w-6 h-6' />
               <span className='text-sm font-medium'>업로드 실패</span>
             </div>
+          </div>
+        )}
+        {isOversized && (
+          <div className='absolute top-6 right-2 bg-amber-500/50 backdrop-blur-xs text-white text-xs px-2 py-1 rounded flex items-center gap-1 shadow-sm'>
+            <AlertCircle className='w-4 h-4' />
+            <span className=''>이미지가 길어서 전체화면에서 작게 보여요</span>
           </div>
         )}
       </div>
