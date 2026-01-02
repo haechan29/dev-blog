@@ -67,6 +67,7 @@ export default function PostViewerContainer({
     <div className='w-full h-full relative'>
       <div
         data-viewer-container
+        data-supports-fullscreen={supportsFullscreen}
         className={clsx(
           'prose w-full h-full relative flex justify-center',
           'absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 '
@@ -112,8 +113,8 @@ export default function PostViewerContainer({
             className={clsx(
               'prose fixed top-0 left-[200%]',
               supportsFullscreen
-                ? 'w-[calc((100dvw-2*var(--container-padding))/var(--container-scale))] h-[calc((100dvh-2*var(--container-padding))/var(--container-scale))]'
-                : 'w-[calc((100dvh-2*var(--container-padding))/var(--container-scale))] h-[calc((100dvw-2*var(--container-padding))/var(--container-scale))]'
+                ? 'w-(--container-width) h-(--container-height)'
+                : 'w-(--container-height) h-(--container-width)'
             )}
             aria-hidden='true'
           >
