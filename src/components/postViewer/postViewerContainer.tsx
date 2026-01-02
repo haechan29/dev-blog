@@ -28,7 +28,7 @@ export default function PostViewerContainer({
   const [container, setContainer] = useState<ContainerProps>();
   const [isMounted, setIsMounted] = useState(false);
 
-  useViewerPagination(result);
+  useViewerPagination(supportsFullscreen, result);
   useKeyboardWheelNavigation();
 
   useEffect(() => {
