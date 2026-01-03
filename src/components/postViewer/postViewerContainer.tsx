@@ -2,13 +2,21 @@
 
 import { BgmInner, VIEWER_BGM_CONTAINER_ID } from '@/components/md/bgm';
 import { Bgm } from '@/features/post/domain/types/bgm';
-import useKeyboardWheelNavigation from '@/features/postViewer/hooks/useKeyboardWheelNavigation';
+import { PageBuilder } from '@/features/postViewer/domain/model/pageBuilder';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
-import useViewerPagination from '@/features/postViewer/hooks/useViewerPagination';
+import useDebounce from '@/hooks/useDebounce';
 import { processMd } from '@/lib/md/md';
+import {
+  nextPage,
+  previousPage,
+  setCurrentPageIndex,
+  setPages,
+} from '@/lib/redux/post/postViewerSlice';
+import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { JSX, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useDispatch } from 'react-redux';
 
 interface ContainerProps {
   result: JSX.Element;
@@ -23,13 +31,63 @@ export default function PostViewerContainer({
   content: string;
   supportsFullscreen: boolean;
 }) {
+  const dispatch = useDispatch<AppDispatch>();
+  const debounce = useDebounce();
   const { page } = usePostViewer();
   const [result, setResult] = useState<JSX.Element | null>(null);
   const [container, setContainer] = useState<ContainerProps>();
   const [isMounted, setIsMounted] = useState(false);
+  const { isViewerMode } = usePostViewer();
 
-  useViewerPagination(supportsFullscreen, result);
-  useKeyboardWheelNavigation();
+  useEffect(() => {
+    const viewerMeasure = document.querySelector('[data-viewer-measurement]');
+    if (!result || !viewerMeasure) return;
+
+    const measure = () =>
+      debounce(() => {
+        const containerHeight = (viewerMeasure as HTMLElement).offsetHeight;
+        const elements = Array.from(viewerMeasure.children) as HTMLElement[];
+
+        const pages = new PageBuilder(containerHeight).build(elements);
+        if (pages && pages.length > 0) {
+          dispatch(setPages(pages));
+          dispatch(setCurrentPageIndex(0));
+        }
+      }, 100);
+
+    measure();
+
+    if (supportsFullscreen) {
+      window.addEventListener('resize', measure);
+      return () => window.removeEventListener('resize', measure);
+    }
+  }, [debounce, dispatch, result, supportsFullscreen]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        // don't handle keydown on input and text area
+        event.target instanceof HTMLInputElement ||
+        event.target instanceof HTMLTextAreaElement
+      ) {
+        return;
+      }
+
+      if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
+        dispatch(previousPage());
+      } else if (
+        event.key === 'ArrowRight' ||
+        event.key.toLowerCase() === 'd'
+      ) {
+        dispatch(nextPage());
+      }
+    };
+
+    if (isViewerMode) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [dispatch, isViewerMode]);
 
   useEffect(() => {
     const render = async () => {
