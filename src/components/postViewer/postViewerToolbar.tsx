@@ -83,6 +83,7 @@ export default function PostViewerToolbar({
       className={clsx(
         'w-full absolute top-0 left-0 z-50',
         'max-md:pb-(--gradient-padding-bottom) max-md:from-black/50 max-md:to-transparent max-md:bg-linear-to-b',
+        'md:bg-white/80 md:backdrop-blur-md',
         'transition-opacity|discrete duration-300 ease-in-out',
         !areBarsVisible && 'opacity-0 pointer-events-none'
       )}
@@ -96,42 +97,41 @@ export default function PostViewerToolbar({
         onMouseLeave={onMouseLeave}
         className='flex flex-col p-2 md:p-4 lg:p-6'
       >
-        <Title title={title} heading={page?.heading ?? null} />
-
+        {headings.length > 0 && page?.heading ? (
+          <div className='w-full truncate hidden md:block md:text-sm lg:text-base text-gray-400 px-2'>
+            {title}
+          </div>
+        ) : (
+          <div className='w-full text-base md:text-lg lg:text-xl text-left text-white md:text-gray-900 font-bold px-2'>
+            {title}
+          </div>
+        )}
         <div className='flex w-full items-start'>
           <Content
             isExpanded={isExpanded}
-            heading={page?.heading ?? null}
+            heading={page?.heading ?? undefined}
             headings={headings}
             onContentClick={onContentClick}
           />
 
-          <button
-            onClick={() => {
-              dispatch(setIsToolbarExpanded(!isExpanded));
-            }}
-            className='flex shrink-0 px-2 items-center justify-center cursor-pointer'
-          >
-            <ChevronDown
-              className={clsx(
-                'w-6 h-6 text-white md:text-gray-500 stroke-1 transition-transform duration-300 ease-in-out',
-                isExpanded && '-rotate-180'
-              )}
-            />
-          </button>
+          {headings.length > 0 && (
+            <button
+              onClick={() => {
+                dispatch(setIsToolbarExpanded(!isExpanded));
+              }}
+              className='flex shrink-0 px-2 items-center justify-center cursor-pointer'
+            >
+              <ChevronDown
+                className={clsx(
+                  'w-6 h-6 text-white md:text-gray-500 stroke-1 transition-transform duration-300 ease-in-out',
+                  isExpanded && '-rotate-180'
+                )}
+              />
+            </button>
+          )}
         </div>
       </div>
     </div>
-  );
-}
-
-function Title({ title, heading }: { title: string; heading: Heading | null }) {
-  return (
-    heading !== null && (
-      <div className='w-full truncate hidden md:block md:text-sm lg:text-base text-gray-400 px-2'>
-        {title}
-      </div>
-    )
   );
 }
 
@@ -142,7 +142,7 @@ function Content({
   onContentClick,
 }: {
   isExpanded: boolean;
-  heading: Heading | null;
+  heading?: Heading;
   headings: Heading[];
   onContentClick: (heading: Heading) => void;
 }) {

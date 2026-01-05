@@ -58,6 +58,8 @@ export default function PostToolbar({ className }: { className?: string }) {
   useEffect(() => {
     const handleScroll = () => {
       throttle(() => {
+        if (postToolbar.mode === 'expanded') return;
+
         const currentScrollY = window.scrollY;
         const lastScrollY = lastScrollYRef.current;
         dispatch(setIsScrollingDown(currentScrollY > lastScrollY));
