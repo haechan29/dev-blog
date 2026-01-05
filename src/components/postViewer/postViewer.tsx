@@ -65,7 +65,10 @@ export default function PostViewer({ post }: { post: PostProps }) {
 
   useScrollLock({
     isLocked: isViewerMode,
-    allowedSelectors: ['[data-viewer-toolbar-content]'],
+    allowedSelectors: [
+      '[data-viewer-toolbar-content]',
+      '[data-image-container]',
+    ],
   });
 
   useEffect(() => {

@@ -88,7 +88,10 @@ export default function ImageWithCaption({
         data-end-offset={endOffset}
         className='w-full h-full relative'
       >
-        <div className={clsx('w-full h-full', isExpanded && 'overflow-auto')}>
+        <div
+          data-image-container
+          className={clsx('w-full h-full', isExpanded && 'overflow-auto')}
+        >
           <Image
             src={src}
             alt={alt}
