@@ -4,7 +4,6 @@ import clsx from 'clsx';
 import { AlertCircle, Maximize2, Minimize2 } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 
 const SCREEN_RATIO = 16 / 9;
 const OVERSIZE_THRESHOLD = 3;
@@ -33,9 +32,13 @@ export default function ImageWithCaption({
   const [expandedSize, setExpandedSize] = useState({ width: 0, height: 0 });
   const [isError, setIsError] = useState(false);
   const [isOversized, setIsOversized] = useState(false);
+  const naturalSizeRef = useRef<{ width: number; height: number } | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => setIsError(false), [src]);
+  useEffect(() => {
+    setIsError(false);
+    setIsExpanded(false);
+  }, [src]);
 
   useEffect(() => {
     if (!overlayRef.current) return;
@@ -78,14 +81,14 @@ export default function ImageWithCaption({
 
   if (mode === 'viewer') {
     return (
-      <>
-        <div
-          data-image-with-caption
-          data-caption={caption}
-          data-start-offset={startOffset}
-          data-end-offset={endOffset}
-          className='w-full h-full relative'
-        >
+      <div
+        data-image-with-caption
+        data-caption={caption}
+        data-start-offset={startOffset}
+        data-end-offset={endOffset}
+        className='w-full h-full relative'
+      >
+        <div className={clsx('w-full h-full', isExpanded && 'overflow-auto')}>
           <Image
             src={src}
             alt={alt}
@@ -94,66 +97,57 @@ export default function ImageWithCaption({
             onError={() => setIsError(true)}
             onLoad={e => {
               setIsError(false);
-              const { naturalWidth, naturalHeight } = e.currentTarget;
+              naturalSizeRef.current = {
+                width: e.currentTarget.naturalWidth,
+                height: e.currentTarget.naturalHeight,
+              };
+            }}
+            className={clsx(
+              'max-w-none!',
+              isExpanded ? 'min-w-full min-h-full' : 'object-contain'
+            )}
+            style={{
+              width: isExpanded ? expandedSize.width : '100%',
+              height: isExpanded ? expandedSize.height : '100%',
+            }}
+          />
+        </div>
+
+        <button
+          type='button'
+          aria-label={isExpanded ? '이미지 축소' : '이미지 확대'}
+          onClick={e => {
+            e.stopPropagation();
+
+            if (!isExpanded) {
+              const container =
+                e.currentTarget.parentElement?.querySelector('div');
+              if (!container || !naturalSizeRef.current) return;
+
+              const { width: naturalWidth, height: naturalHeight } =
+                naturalSizeRef.current;
+
               const scale =
                 Math.max(
-                  window.innerWidth / naturalWidth,
-                  window.innerHeight / naturalHeight
+                  container.offsetWidth / naturalWidth,
+                  container.offsetHeight / naturalHeight
                 ) * 0.9;
               setExpandedSize({
                 width: naturalWidth * scale,
                 height: naturalHeight * scale,
               });
-            }}
-            className='w-full h-full object-contain'
-          />
-          <button
-            type='button'
-            aria-label='이미지 확대'
-            onClick={e => {
-              e.stopPropagation();
-              setIsExpanded(true);
-            }}
-            className='absolute top-2 right-2 p-2 bg-black/40 hover:bg-black/30 cursor-pointer rounded-lg text-white'
-          >
+            }
+            setIsExpanded(isExpanded => !isExpanded);
+          }}
+          className='absolute top-2 right-3 p-2 bg-black/40 hover:bg-black/30 cursor-pointer rounded-lg text-white'
+        >
+          {isExpanded ? (
+            <Minimize2 className='w-4 h-4 hover:animate-pop hover:[--scale:0.8]' />
+          ) : (
             <Maximize2 className='w-4 h-4 hover:animate-pop' />
-          </button>
-        </div>
-
-        {isExpanded &&
-          document.querySelector('[data-viewer]') &&
-          createPortal(
-            <div
-              className='fixed inset-0 z-50 overflow-auto'
-              onClick={e => {
-                e.stopPropagation();
-                setIsExpanded(false);
-              }}
-            >
-              <button
-                type='button'
-                aria-label='닫기'
-                onClick={e => {
-                  e.stopPropagation();
-                  setIsExpanded(false);
-                }}
-                className='fixed top-4 right-4 p-2 bg-black/40 hover:bg-black/30 cursor-pointer rounded-lg text-white z-10'
-              >
-                <Minimize2 className='w-5 h-5' />
-              </button>
-
-              <Image
-                src={src}
-                alt={alt}
-                width={1000}
-                height={1000}
-                className='min-w-full min-h-full max-w-none!'
-                style={expandedSize}
-              />
-            </div>,
-            document.querySelector('[data-viewer]')!
           )}
-      </>
+        </button>
+      </div>
     );
   }
 
