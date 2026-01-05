@@ -24,8 +24,7 @@ export default function PostViewerToolbar({
   title: string;
   headings: Heading[];
 }) {
-  const { areBarsVisible } = usePostViewer();
-  const { page, isViewerMode } = usePostViewer();
+  const { page, isViewerMode, areBarsVisible } = usePostViewer();
   const pages = useSelector((state: RootState) => state.postViewer.pages);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -51,11 +50,12 @@ export default function PostViewerToolbar({
         if (pageIndex >= 0) {
           dispatch(setCurrentPageIndex(pageIndex));
         }
-      }
-      dispatch(setIsToolbarExpanded(!isExpanded));
 
-      dispatch(setIsToolbarTouched(true));
-      debounce(() => dispatch(setIsToolbarTouched(false)), 2000);
+        dispatch(setIsToolbarTouched(true));
+        debounce(() => dispatch(setIsToolbarTouched(false)), 2000);
+      }
+
+      dispatch(setIsToolbarExpanded(!isExpanded));
     },
     [debounce, dispatch, isExpanded, pages]
   );
