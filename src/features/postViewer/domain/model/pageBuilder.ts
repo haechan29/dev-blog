@@ -12,7 +12,7 @@ export class PageBuilder {
   private pages: Page[] = [];
   private pageRanges: OffsetRange[] = [];
   private isPageEmpty = true;
-  private pageHeight = 0;
+  private baseTop: number | null = null;
   private pendingHeading: Heading | null = null;
   private pendingBgm: Bgm | null = null;
 
@@ -94,30 +94,32 @@ export class PageBuilder {
   }
 
   private handleParagraph(paragraph: HTMLElement) {
-    const leaves = Array.from(
-      paragraph.querySelectorAll(
-        '[data-start-offset]:not(:has([data-start-offset]))'
-      )
-    ) as HTMLElement[];
+    const children = Array.from(paragraph.children) as HTMLElement[];
 
-    leaves.forEach(leaf => {
+    children.forEach(child => {
       const isText =
-        leaf.matches('span') && leaf.firstChild?.nodeType === Node.TEXT_NODE;
+        child.matches('span') && child.firstChild?.nodeType === Node.TEXT_NODE;
 
       if (!isText) {
-        this.handleGenericElement(leaf);
+        this.handleGenericElement(child);
         return;
       }
 
-      const leafStartOffset = Number(leaf.dataset.startOffset);
-      const leafEndOffset = Number(leaf.dataset.endOffset);
-      let leafHeight = this.calculateElementHeight(leaf);
+      const { top, bottom } = child.getBoundingClientRect();
+      const leafStartOffset = Number(child.dataset.startOffset);
+      const leafEndOffset = Number(child.dataset.endOffset);
+      const textNode = child.firstChild as Text;
+
+      if (this.baseTop === null) {
+        this.baseTop = top;
+      }
+
+      let currentTop = top;
       let textStartIndex = 0;
 
-      const textNode = leaf.firstChild as Text;
-
-      while (this.pageHeight + leafHeight > this.containerHeight) {
-        const availableHeight = this.containerHeight - this.pageHeight;
+      while (bottom - this.baseTop > this.containerHeight) {
+        const availableHeight =
+          this.containerHeight - (currentTop - this.baseTop);
         const splitIndex = this.findSplitIndex(
           textNode,
           availableHeight,
@@ -126,6 +128,7 @@ export class PageBuilder {
 
         if (splitIndex === textStartIndex) {
           this.flushCurrentPage();
+          this.baseTop = currentTop;
           continue;
         }
 
@@ -138,10 +141,10 @@ export class PageBuilder {
         });
 
         this.pageRanges = [];
-        this.pageHeight = 0;
         this.isPageEmpty = true;
+        currentTop += availableHeight;
+        this.baseTop = currentTop;
         textStartIndex = splitIndex;
-        leafHeight -= availableHeight;
       }
 
       if (leafStartOffset + textStartIndex < leafEndOffset) {
@@ -149,34 +152,40 @@ export class PageBuilder {
           startOffset: leafStartOffset + textStartIndex,
           endOffset: leafEndOffset,
         });
-        this.pageHeight += leafHeight;
         this.isPageEmpty = false;
       }
     });
   }
 
   private handleGenericElement(element: HTMLElement) {
-    const height = this.calculateElementHeight(element);
+    if (this.pageRanges.length === 0 && this.isEmptyContent(element)) return;
+
+    const { top, bottom, height } = element.getBoundingClientRect();
     const range: OffsetRange = {
       startOffset: Number(element.dataset.startOffset),
       endOffset: Number(element.dataset.endOffset),
     };
 
-    if (height > this.containerHeight) {
+    if (this.baseTop === null) {
+      this.baseTop = top;
+    }
+
+    if (bottom - this.baseTop > this.containerHeight) {
       this.flushCurrentPage();
-      this.pages.push({
-        ...range,
-        heading: this.pendingHeading,
-        bgm: this.pendingBgm,
-      });
-    } else if (height > this.containerHeight - this.pageHeight) {
-      this.flushCurrentPage();
-      this.pageRanges = [range];
-      this.pageHeight = height;
-      this.isPageEmpty = this.isEmptyContent(element);
+
+      if (height > this.containerHeight) {
+        this.pages.push({
+          ...range,
+          heading: this.pendingHeading,
+          bgm: this.pendingBgm,
+        });
+      } else {
+        this.pageRanges = [range];
+        this.isPageEmpty = this.isEmptyContent(element);
+        this.baseTop = top;
+      }
     } else {
       this.pageRanges.push(range);
-      this.pageHeight += height;
       if (!this.isEmptyContent(element)) {
         this.isPageEmpty = false;
       }
@@ -184,7 +193,7 @@ export class PageBuilder {
   }
 
   private flushCurrentPage() {
-    if (this.pageRanges.length === 0) return;
+    if (this.isPageEmpty) return;
 
     this.pages.push({
       startOffset: this.pageRanges[0].startOffset,
@@ -195,22 +204,13 @@ export class PageBuilder {
 
     this.pageRanges = [];
     this.isPageEmpty = true;
-    this.pageHeight = 0;
+    this.baseTop = null;
   }
 
   private flushRemaining() {
     if (!this.isPageEmpty) {
       this.flushCurrentPage();
     }
-  }
-
-  private calculateElementHeight(element: HTMLElement): number {
-    const { marginTop, marginBottom } = window.getComputedStyle(element);
-    return (
-      element.offsetHeight +
-      (parseFloat(marginTop) || 0) +
-      (parseFloat(marginBottom) || 0)
-    );
   }
 
   private isEmptyContent(element: Element): boolean {
