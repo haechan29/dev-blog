@@ -23,7 +23,7 @@ export default function EnterFullscreenButton() {
         !isViewerMode ? 'opacity-100' : 'opacity-0 pointer-events-none'
       )}
     >
-      <Maximize className='w-6 h-6 text-black stroke-2 hover:animate-pop' />
+      <Maximize className='w-6 h-6 text-black hover:animate-pop' />
     </button>
   );
 }

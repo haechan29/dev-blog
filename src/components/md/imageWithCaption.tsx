@@ -1,9 +1,10 @@
 'use client';
 
 import clsx from 'clsx';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Maximize2, Minimize2 } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 const SCREEN_RATIO = 16 / 9;
 const OVERSIZE_THRESHOLD = 3;
@@ -28,6 +29,8 @@ export default function ImageWithCaption({
   'data-status': 'loading' | 'failed' | 'success';
   alt?: string;
 }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [expandedSize, setExpandedSize] = useState({ width: 0, height: 0 });
   const [isError, setIsError] = useState(false);
   const [isOversized, setIsOversized] = useState(false);
   const overlayRef = useRef<HTMLDivElement | null>(null);
@@ -75,19 +78,82 @@ export default function ImageWithCaption({
 
   if (mode === 'viewer') {
     return (
-      <Image
-        data-image-with-caption
-        data-caption={caption}
-        data-start-offset={startOffset}
-        data-end-offset={endOffset}
-        src={src}
-        alt={alt}
-        width={1000}
-        height={1000}
-        onError={() => setIsError(true)}
-        onLoad={() => setIsError(false)}
-        className='w-full h-full object-contain'
-      />
+      <>
+        <div
+          data-image-with-caption
+          data-caption={caption}
+          data-start-offset={startOffset}
+          data-end-offset={endOffset}
+          className='w-full h-full relative'
+        >
+          <Image
+            src={src}
+            alt={alt}
+            width={1000}
+            height={1000}
+            onError={() => setIsError(true)}
+            onLoad={e => {
+              setIsError(false);
+              const { naturalWidth, naturalHeight } = e.currentTarget;
+              const scale =
+                Math.max(
+                  window.innerWidth / naturalWidth,
+                  window.innerHeight / naturalHeight
+                ) * 0.9;
+              setExpandedSize({
+                width: naturalWidth * scale,
+                height: naturalHeight * scale,
+              });
+            }}
+            className='w-full h-full object-contain'
+          />
+          <button
+            type='button'
+            aria-label='이미지 확대'
+            onClick={e => {
+              e.stopPropagation();
+              setIsExpanded(true);
+            }}
+            className='absolute top-2 right-2 p-2 bg-black/40 hover:bg-black/30 cursor-pointer rounded-lg text-white'
+          >
+            <Maximize2 className='w-4 h-4 hover:animate-pop' />
+          </button>
+        </div>
+
+        {isExpanded &&
+          document.querySelector('[data-viewer]') &&
+          createPortal(
+            <div
+              className='fixed inset-0 z-50 overflow-auto'
+              onClick={e => {
+                e.stopPropagation();
+                setIsExpanded(false);
+              }}
+            >
+              <button
+                type='button'
+                aria-label='닫기'
+                onClick={e => {
+                  e.stopPropagation();
+                  setIsExpanded(false);
+                }}
+                className='fixed top-4 right-4 p-2 bg-black/40 hover:bg-black/30 cursor-pointer rounded-lg text-white z-10'
+              >
+                <Minimize2 className='w-5 h-5' />
+              </button>
+
+              <Image
+                src={src}
+                alt={alt}
+                width={1000}
+                height={1000}
+                className='min-w-full min-h-full max-w-none!'
+                style={expandedSize}
+              />
+            </div>,
+            document.querySelector('[data-viewer]')!
+          )}
+      </>
     );
   }
 
