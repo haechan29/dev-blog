@@ -41,7 +41,8 @@ export default function useScrollLock({
 
       if (
         (!allowedElement ||
-          allowedElement.scrollHeight <= allowedElement.clientHeight) &&
+          (allowedElement.scrollHeight <= allowedElement.clientHeight &&
+            allowedElement.scrollWidth <= allowedElement.clientWidth)) &&
         scrollDirection === 'vertical'
       ) {
         e.preventDefault();

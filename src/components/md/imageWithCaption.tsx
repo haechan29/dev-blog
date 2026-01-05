@@ -1,9 +1,12 @@
 'use client';
 
 import clsx from 'clsx';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Maximize2, Minimize2 } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
+
+const SCREEN_RATIO = 16 / 9;
+const OVERSIZE_THRESHOLD = 3;
 
 export default function ImageWithCaption({
   src,
@@ -25,10 +28,17 @@ export default function ImageWithCaption({
   'data-status': 'loading' | 'failed' | 'success';
   alt?: string;
 }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [expandedSize, setExpandedSize] = useState({ width: 0, height: 0 });
   const [isError, setIsError] = useState(false);
+  const [isOversized, setIsOversized] = useState(false);
+  const naturalSizeRef = useRef<{ width: number; height: number } | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => setIsError(false), [src]);
+  useEffect(() => {
+    setIsError(false);
+    setIsExpanded(false);
+  }, [src]);
 
   useEffect(() => {
     if (!overlayRef.current) return;
@@ -71,20 +81,76 @@ export default function ImageWithCaption({
 
   if (mode === 'viewer') {
     return (
-      <Image
+      <div
         data-image-with-caption
         data-caption={caption}
         data-start-offset={startOffset}
         data-end-offset={endOffset}
-        src={src}
-        alt={alt}
-        width={1000}
-        height={1000}
-        objectFit='contain'
-        onError={() => setIsError(true)}
-        onLoad={() => setIsError(false)}
-        className='h-full'
-      />
+        className='w-full h-full relative'
+      >
+        <div
+          data-image-container
+          className={clsx('w-full h-full', isExpanded && 'overflow-auto')}
+        >
+          <Image
+            src={src}
+            alt={alt}
+            width={1000}
+            height={1000}
+            onError={() => setIsError(true)}
+            onLoad={e => {
+              setIsError(false);
+              naturalSizeRef.current = {
+                width: e.currentTarget.naturalWidth,
+                height: e.currentTarget.naturalHeight,
+              };
+            }}
+            className={clsx(
+              'max-w-none!',
+              isExpanded ? 'min-w-full min-h-full' : 'object-contain'
+            )}
+            style={{
+              width: isExpanded ? expandedSize.width : '100%',
+              height: isExpanded ? expandedSize.height : '100%',
+            }}
+          />
+        </div>
+
+        <button
+          type='button'
+          aria-label={isExpanded ? '이미지 축소' : '이미지 확대'}
+          onClick={e => {
+            e.stopPropagation();
+
+            if (!isExpanded) {
+              const container =
+                e.currentTarget.parentElement?.querySelector('div');
+              if (!container || !naturalSizeRef.current) return;
+
+              const { width: naturalWidth, height: naturalHeight } =
+                naturalSizeRef.current;
+
+              const scale =
+                Math.max(
+                  container.offsetWidth / naturalWidth,
+                  container.offsetHeight / naturalHeight
+                ) * 0.9;
+              setExpandedSize({
+                width: naturalWidth * scale,
+                height: naturalHeight * scale,
+              });
+            }
+            setIsExpanded(isExpanded => !isExpanded);
+          }}
+          className='absolute top-2 right-3 p-2 bg-black/40 hover:bg-black/30 cursor-pointer rounded-lg text-white'
+        >
+          {isExpanded ? (
+            <Minimize2 className='w-4 h-4 hover:animate-pop hover:[--scale:0.8]' />
+          ) : (
+            <Maximize2 className='w-4 h-4 hover:animate-pop' />
+          )}
+        </button>
+      </div>
     );
   }
 
@@ -141,7 +207,15 @@ export default function ImageWithCaption({
           width={1000}
           height={1000}
           onError={() => setIsError(true)}
-          onLoad={() => setIsError(false)}
+          onLoad={e => {
+            setIsError(false);
+            const { naturalWidth, naturalHeight } = e.currentTarget;
+            const ratio = naturalWidth / naturalHeight;
+            setIsOversized(
+              ratio / SCREEN_RATIO > OVERSIZE_THRESHOLD ||
+                ratio / SCREEN_RATIO < 1 / OVERSIZE_THRESHOLD
+            );
+          }}
           className='h-auto w-full'
         />
         {(status === 'loading' || status === 'success') && (
@@ -168,6 +242,12 @@ export default function ImageWithCaption({
               <AlertCircle className='w-6 h-6' />
               <span className='text-sm font-medium'>업로드 실패</span>
             </div>
+          </div>
+        )}
+        {isOversized && (
+          <div className='absolute top-6 right-2 bg-amber-500/50 backdrop-blur-xs text-white text-xs px-2 py-1 rounded flex items-center gap-1 shadow-sm'>
+            <AlertCircle className='w-4 h-4' />
+            <span className=''>이미지가 길어서 전체화면에서 작게 보여요</span>
           </div>
         )}
       </div>

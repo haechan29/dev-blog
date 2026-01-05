@@ -11,7 +11,6 @@ import useMediaQuery, {
   DESKTOP_QUERY,
   TOUCH_QUERY,
 } from '@/hooks/useMediaQuery';
-import { remToPx } from '@/lib/dom';
 import clsx from 'clsx';
 import { useCallback, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -231,10 +230,7 @@ export default function Comments({
                     onInput={e => {
                       const target = e.target as HTMLTextAreaElement;
                       target.style.height = 'auto';
-                      target.style.height = `${Math.min(
-                        target.scrollHeight,
-                        remToPx(9)
-                      )}px`;
+                      target.style.height = `${target.scrollHeight}px`;
                     }}
                   />
 

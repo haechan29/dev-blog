@@ -203,7 +203,7 @@ body {
   }
 
   .prose p {
-    @apply mb-4 text-base text-gray-900 leading-7;
+    @apply text-base text-gray-900 leading-7;
   }
 
   .prose strong {
@@ -243,28 +243,15 @@ body {
   }
 
   .prose ul {
-    @apply mb-4 pl-6 list-disc;
+    @apply pl-6 list-disc;
   }
 
   .prose ol {
-    @apply mb-4 pl-6 list-decimal;
-  }
-
-  .prose li {
-    @apply mb-2;
-  }
-
-  .prose li > ul,
-  .prose li > ol {
-    @apply mt-2 mb-0;
+    @apply pl-6 list-decimal;
   }
 
   .prose blockquote {
-    @apply border-l-4 border-gray-300 pl-4 italic text-gray-600 my-4 bg-gray-50 py-2;
-  }
-
-  .prose blockquote p {
-    @apply mb-0;
+    @apply border-l-4 border-gray-300 pl-4 italic text-gray-600 bg-gray-50 py-2;
   }
 
   .prose code {
@@ -272,7 +259,7 @@ body {
   }
 
   .prose pre {
-    @apply bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto my-4;
+    @apply bg-gray-900 text-gray-100 p-4 rounded-md overflow-x-auto;
   }
 
   .prose pre code {
@@ -280,7 +267,7 @@ body {
   }
 
   .prose table {
-    @apply w-full border-collapse my-4;
+    @apply w-full border-collapse;
   }
 
   .prose th {
@@ -300,27 +287,15 @@ body {
   }
 
   .prose hr {
-    @apply border-0 border-t border-gray-300 my-8;
+    @apply border-0 border-t border-gray-300;
   }
 
   .prose img {
-    @apply max-w-full h-auto rounded-lg my-4;
-  }
-
-  .prose .image-wrapper {
-    @apply my-4;
-  }
-
-  .prose .image-wrapper img {
-    @apply my-0;
-  }
-
-  .prose figure {
-    @apply my-4;
+    @apply max-w-full h-auto rounded-lg;
   }
 
   .prose figcaption {
-    @apply text-sm text-gray-600 text-center mt-2 italic;
+    @apply text-sm text-gray-600 text-center italic;
   }
 
   .prose kbd {
@@ -332,20 +307,42 @@ body {
   }
 
   .prose address {
-    @apply not-italic mb-4;
+    @apply not-italic;
   }
 
   .prose cite {
     @apply italic;
   }
 
-  .prose details {
-    @apply mb-4;
-  }
-
   .prose summary {
-    @apply cursor-pointer font-bold mb-2;
+    @apply cursor-pointer font-bold;
   }
+}
+
+[data-viewer-container][data-supports-fullscreen='true'] figure,
+[data-viewer-container][data-supports-fullscreen='true'] pre {
+  max-height: var(--container-height);
+}
+
+[data-viewer-container][data-supports-fullscreen='false'] figure,
+[data-viewer-container][data-supports-fullscreen='false'] pre {
+  max-height: var(--container-width);
+}
+
+[data-viewer-container] pre {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+[data-viewer-container] pre::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+}
+
+[data-viewer-container] pre::-webkit-scrollbar-thumb {
+  background: rgba(128, 128, 128, 0.5);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 @keyframes shake {
@@ -436,6 +433,13 @@ body {
   --container-scale: 1.1;
   --toolbar-height: 4rem;
   --scrollbar-width: 8px;
+
+  --container-height: calc(
+    (100dvh - 2 * var(--container-padding)) / var(--container-scale)
+  );
+  --container-width: calc(
+    (100dvw - 2 * var(--container-padding)) / var(--container-scale)
+  );
 }
 
 @media (width >= theme(--breakpoint-md)) {

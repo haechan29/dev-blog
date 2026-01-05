@@ -28,7 +28,7 @@ export default function PostSettingsDropdown({
   children,
 }: {
   isLoggedIn: boolean;
-  userId: string;
+  userId?: string;
   post: PostProps;
   showRawContent: boolean;
   onDeleteSuccess?: () => void;
@@ -86,12 +86,14 @@ export default function PostSettingsDropdown({
         onDeleteSuccess={onDeleteSuccess}
       />
 
-      <SeriesSettingsDialog
-        userId={userId}
-        post={post}
-        isOpen={isSeriesDialogOpen}
-        setIsOpen={setIsSeriesDialogOpen}
-      />
+      {userId && (
+        <SeriesSettingsDialog
+          userId={userId}
+          post={post}
+          isOpen={isSeriesDialogOpen}
+          setIsOpen={setIsSeriesDialogOpen}
+        />
+      )}
 
       <DropdownMenu>
         <DropdownMenuTrigger
@@ -132,34 +134,38 @@ export default function PostSettingsDropdown({
             </DropdownMenuItem>
           )}
 
-          {userId && (
-            <DropdownMenuItem
-              data-action='series-settings'
-              onClick={handleAction}
-              className='w-full flex items-center gap-2 cursor-pointer'
-            >
-              <Layers className='w-4 h-4 text-gray-500' />
-              <div className='whitespace-nowrap text-gray-900'>시리즈 설정</div>
-            </DropdownMenuItem>
+          {post.userId === userId && (
+            <>
+              <DropdownMenuItem
+                data-action='series-settings'
+                onClick={handleAction}
+                className='w-full flex items-center gap-2 cursor-pointer'
+              >
+                <Layers className='w-4 h-4 text-gray-500' />
+                <div className='whitespace-nowrap text-gray-900'>
+                  시리즈 설정
+                </div>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                data-action='edit'
+                onClick={handleAction}
+                className='w-full flex items-center gap-2 cursor-pointer'
+              >
+                <Edit2 className='w-4 h-4 text-gray-500' />
+                <div className='whitespace-nowrap text-gray-900'>수정</div>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                data-action='delete'
+                onClick={handleAction}
+                className='w-full flex items-center gap-2 cursor-pointer'
+              >
+                <Trash2 className='w-4 h-4 text-red-400' />
+                <div className='whitespace-nowrap text-red-600'>삭제</div>
+              </DropdownMenuItem>
+            </>
           )}
-
-          <DropdownMenuItem
-            data-action='edit'
-            onClick={handleAction}
-            className='w-full flex items-center gap-2 cursor-pointer'
-          >
-            <Edit2 className='w-4 h-4 text-gray-500' />
-            <div className='whitespace-nowrap text-gray-900'>수정</div>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem
-            data-action='delete'
-            onClick={handleAction}
-            className='w-full flex items-center gap-2 cursor-pointer'
-          >
-            <Trash2 className='w-4 h-4 text-red-400' />
-            <div className='whitespace-nowrap text-red-600'>삭제</div>
-          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </>

@@ -35,7 +35,9 @@ export default function PostViewer({ post }: { post: PostProps }) {
     return state.postViewer.isViewerMode;
   });
   const throttle = useThrottle();
-  const debounce = useDebounce();
+  const debounceTouch = useDebounce();
+  const debounceMouseMove = useDebounce();
+  const debounceRotation = useDebounce();
   const [supportsFullscreen, setSupportsFullscreen] = useState(true);
   const handleNavigation = useCallback(
     ({
@@ -65,7 +67,10 @@ export default function PostViewer({ post }: { post: PostProps }) {
 
   useScrollLock({
     isLocked: isViewerMode,
-    allowedSelectors: ['[data-viewer-toolbar-content]'],
+    allowedSelectors: [
+      '[data-viewer-toolbar-content]',
+      '[data-image-container]',
+    ],
   });
 
   useEffect(() => {
@@ -75,8 +80,6 @@ export default function PostViewer({ post }: { post: PostProps }) {
     if (isViewerMode) {
       if (viewer.requestFullscreen) {
         viewer.requestFullscreen();
-      } else {
-        setSupportsFullscreen(false);
       }
     } else {
       if (document.fullscreenElement) {
@@ -84,6 +87,10 @@ export default function PostViewer({ post }: { post: PostProps }) {
       }
     }
   }, [isViewerMode]);
+
+  useEffect(() => {
+    setSupportsFullscreen(!!document.exitFullscreen);
+  }, []);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -107,7 +114,7 @@ export default function PostViewer({ post }: { post: PostProps }) {
             rippleColor: 'rgba(0,0,0,0.1)',
           });
           dispatch(setIsTouched(true));
-          debounce(() => dispatch(setIsTouched(false)), 2000);
+          debounceTouch(() => dispatch(setIsTouched(false)), 2000);
         }
         handleNavigation(event);
       }}
@@ -115,14 +122,20 @@ export default function PostViewer({ post }: { post: PostProps }) {
         if (canTouch) return;
         throttle(() => {
           dispatch(setIsMouseMoved(true));
-          debounce(() => dispatch(setIsMouseMoved(false)), 2000);
+          debounceMouseMove(() => dispatch(setIsMouseMoved(false)), 2000);
         }, 100);
       }}
       onTransitionEnd={(event: TransitionEvent<HTMLElement>) => {
-        if (isViewerMode && event.propertyName === 'rotate') {
-          dispatch(setIsRotationFinished(true));
-          debounce(() => dispatch(setIsRotationFinished(false)), 2000);
+        if (
+          !isViewerMode ||
+          event.target !== event.currentTarget ||
+          event.propertyName !== 'rotate'
+        ) {
+          return;
         }
+
+        dispatch(setIsRotationFinished(true));
+        debounceRotation(() => dispatch(setIsRotationFinished(false)), 2000);
       }}
       className={clsx(
         'fixed inset-0 z-40 p-(--container-padding) bg-white',
@@ -137,7 +150,10 @@ export default function PostViewer({ post }: { post: PostProps }) {
       <Toaster toasterId='viewer' />
 
       <PostViewerToolbar {...post} />
-      <PostViewerContainer {...post} />
+      <PostViewerContainer
+        content={post.content}
+        supportsFullscreen={supportsFullscreen}
+      />
       <PostViewerControlBar />
     </div>
   );

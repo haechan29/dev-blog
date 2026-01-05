@@ -55,10 +55,21 @@ function createProps({
 }
 
 function getMode(postToolbar: PostToolbar): PostToolbarProps['mode'] {
-  if (postToolbar.isHeaderVisible) return 'empty';
-  else if (postToolbar.isContentVisible && postToolbar.isExpanded)
+  if (postToolbar.isHeaderVisible) {
+    return 'empty';
+  } else if (
+    postToolbar.isContentVisible &&
+    postToolbar.headings.length > 0 &&
+    postToolbar.isExpanded
+  ) {
     return 'expanded';
-  else if (postToolbar.isContentVisible && !postToolbar.isExpanded)
+  } else if (
+    postToolbar.isContentVisible &&
+    postToolbar.headings.length > 0 &&
+    !postToolbar.isExpanded
+  ) {
     return 'collapsed';
-  else return 'basic';
+  } else {
+    return 'basic';
+  }
 }

@@ -2,12 +2,21 @@
 
 import { BgmInner, VIEWER_BGM_CONTAINER_ID } from '@/components/md/bgm';
 import { Bgm } from '@/features/post/domain/types/bgm';
-import useKeyboardWheelNavigation from '@/features/postViewer/hooks/useKeyboardWheelNavigation';
+import { PageBuilder } from '@/features/postViewer/domain/model/pageBuilder';
 import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
-import useViewerPagination from '@/features/postViewer/hooks/useViewerPagination';
+import useDebounce from '@/hooks/useDebounce';
 import { processMd } from '@/lib/md/md';
+import {
+  nextPage,
+  previousPage,
+  setCurrentPageIndex,
+  setPages,
+} from '@/lib/redux/post/postViewerSlice';
+import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { JSX, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { useDispatch } from 'react-redux';
 
 interface ContainerProps {
   result: JSX.Element;
@@ -15,12 +24,70 @@ interface ContainerProps {
   caption?: string;
 }
 
-export default function PostViewerContainer({ content }: { content: string }) {
+export default function PostViewerContainer({
+  content,
+  supportsFullscreen,
+}: {
+  content: string;
+  supportsFullscreen: boolean;
+}) {
+  const dispatch = useDispatch<AppDispatch>();
+  const debounce = useDebounce();
   const { page } = usePostViewer();
   const [result, setResult] = useState<JSX.Element | null>(null);
   const [container, setContainer] = useState<ContainerProps>();
-  useViewerPagination();
-  useKeyboardWheelNavigation();
+  const [isMounted, setIsMounted] = useState(false);
+  const { isViewerMode } = usePostViewer();
+
+  useEffect(() => {
+    const viewerMeasure = document.querySelector('[data-viewer-measurement]');
+    if (!result || !viewerMeasure) return;
+
+    const measure = () =>
+      debounce(() => {
+        const containerHeight = (viewerMeasure as HTMLElement).offsetHeight;
+        const elements = Array.from(viewerMeasure.children) as HTMLElement[];
+
+        const pages = new PageBuilder(containerHeight).build(elements);
+        if (pages && pages.length > 0) {
+          dispatch(setPages(pages));
+          dispatch(setCurrentPageIndex(0));
+        }
+      }, 100);
+
+    measure();
+
+    if (supportsFullscreen) {
+      window.addEventListener('resize', measure);
+      return () => window.removeEventListener('resize', measure);
+    }
+  }, [debounce, dispatch, result, supportsFullscreen]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        // don't handle keydown on input and text area
+        event.target instanceof HTMLInputElement ||
+        event.target instanceof HTMLTextAreaElement
+      ) {
+        return;
+      }
+
+      if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
+        dispatch(previousPage());
+      } else if (
+        event.key === 'ArrowRight' ||
+        event.key.toLowerCase() === 'd'
+      ) {
+        dispatch(nextPage());
+      }
+    };
+
+    if (isViewerMode) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [dispatch, isViewerMode]);
 
   useEffect(() => {
     const render = async () => {
@@ -50,10 +117,15 @@ export default function PostViewerContainer({ content }: { content: string }) {
     updateViewer();
   }, [content, page]);
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   return (
     <div className='w-full h-full relative'>
       <div
         data-viewer-container
+        data-supports-fullscreen={supportsFullscreen}
         className={clsx(
           'prose w-full h-full relative flex justify-center',
           'absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 '
@@ -92,16 +164,22 @@ export default function PostViewerContainer({ content }: { content: string }) {
         </div>
       )}
 
-      <div
-        data-viewer-measurement
-        className={clsx(
-          'prose w-[calc(100%/var(--container-scale))] h-[calc(100%/var(--container-scale))]',
-          'absolute top-0 left-[200%]'
+      {isMounted &&
+        createPortal(
+          <div
+            data-viewer-measurement
+            className={clsx(
+              'prose fixed top-0 left-[200%]',
+              supportsFullscreen
+                ? 'w-(--container-width) h-(--container-height)'
+                : 'w-(--container-height) h-(--container-width)'
+            )}
+            aria-hidden='true'
+          >
+            {result}
+          </div>,
+          document.body
         )}
-        aria-hidden='true'
-      >
-        {result}
-      </div>
     </div>
   );
 }

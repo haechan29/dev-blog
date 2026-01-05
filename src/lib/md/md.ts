@@ -1,5 +1,6 @@
 import { Bgm } from '@/components/md/bgm';
 import ExternalLink from '@/components/md/externalLink';
+import Figure from '@/components/md/figure';
 import ImageWithCaption from '@/components/md/imageWithCaption';
 import Spacer from '@/components/md/spacer';
 import {
@@ -53,6 +54,7 @@ const processor = unified()
         a: ExternalLink,
         bgm: Bgm,
         img: ImageWithCaption,
+        figure: Figure,
         spacer: Spacer,
       },
     }
