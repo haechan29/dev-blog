@@ -45,7 +45,7 @@ export default function PostPreview({
         )}
       />
 
-      {showSettings && post.userId === userId && (
+      {showSettings && (
         <div className='absolute top-0 right-0 z-10'>
           <PostSettingsDropdown
             isLoggedIn={isLoggedIn}
