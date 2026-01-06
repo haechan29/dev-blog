@@ -12,6 +12,7 @@ import useMediaQuery, {
   TOUCH_QUERY,
 } from '@/hooks/useMediaQuery';
 import clsx from 'clsx';
+import { Loader2 } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import SimpleBar from 'simplebar-react';
@@ -180,12 +181,20 @@ export default function Comments({
                   if (!content.trim()) return;
                   handleSubmit();
                 }}
+                disabled={createCommentMutation.isPending}
                 className={clsx(
-                  'shrink-0 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 py-2 px-4 rounded-full',
-                  content.trim() ? 'cursor-pointer' : 'opacity-50'
+                  'shrink-0 text-sm font-medium text-white px-4 rounded-full',
+                  'h-9 flex items-center justify-center bg-blue-600',
+                  content.trim() && !createCommentMutation.isPending
+                    ? 'hover:bg-blue-500 cursor-pointer'
+                    : 'opacity-50'
                 )}
               >
-                완료
+                {createCommentMutation.isPending ? (
+                  <Loader2 size={16} className='animate-spin' />
+                ) : (
+                  '완료'
+                )}
               </button>
             </div>
           ) : (
@@ -241,12 +250,20 @@ export default function Comments({
                       if (!content.trim()) return;
                       handleSubmit();
                     }}
+                    disabled={createCommentMutation.isPending}
                     className={clsx(
-                      'shrink-0 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 py-2 px-4 rounded-full',
-                      content.trim() ? 'cursor-pointer' : 'opacity-50'
+                      'shrink-0 text-sm font-medium text-white px-4 rounded-full',
+                      'h-9 flex items-center justify-center bg-blue-600',
+                      content.trim() && !createCommentMutation.isPending
+                        ? 'hover:bg-blue-500 cursor-pointer'
+                        : 'opacity-50'
                     )}
                   >
-                    완료
+                    {createCommentMutation.isPending ? (
+                      <Loader2 size={16} className='animate-spin' />
+                    ) : (
+                      '완료'
+                    )}
                   </button>
                 </div>
               </div>
