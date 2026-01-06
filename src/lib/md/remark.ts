@@ -1,4 +1,4 @@
-import { Paragraph, PhrasingContent, Root } from 'mdast';
+import { Root, Text } from 'mdast';
 import type {
   ContainerDirective,
   LeafDirective,
@@ -14,52 +14,15 @@ export function remarkTextBreaks() {
   return (tree: Root, file: VFile) => {
     const source = String(file.value);
     const lineBreaks = findLineBreaks(source);
-    let lineBreakIndex = 0;
 
-    visit(tree, 'paragraph', (paragraph: Paragraph) => {
-      const newChildren: PhrasingContent[] = [];
-      paragraph.children.forEach(child => {
-        if (child.type === 'text') {
-          const { start: positionStart, end: positionEnd } = child.position!;
-          const nodeStart = positionStart!.offset!;
-          const nodeEnd = positionEnd!.offset!;
-          const currentLineBreaks: [number, number][] = [];
+    visit(tree, 'text', (node: Text, index?: number, parent?: Parent) => {
+      if (index === undefined || !parent) return;
 
-          while (lineBreakIndex < lineBreaks.length) {
-            const [breakStart, breakCount] = lineBreaks[lineBreakIndex];
-            if (breakStart >= nodeEnd) break;
-            if (breakStart > nodeStart) {
-              currentLineBreaks.push([breakStart, breakCount]);
-            }
-            lineBreakIndex++;
-          }
-          currentLineBreaks.unshift([nodeStart, 0]);
-          currentLineBreaks.push([nodeEnd, 0]);
+      const newNodes = splitTextByLineBreaks(node, source, lineBreaks);
 
-          for (let i = 0; i + 1 < currentLineBreaks.length; i++) {
-            const [prevBreakStart, prevBreakCount] = currentLineBreaks[i];
-            const [nextBreakStart, nextBreakCount] = currentLineBreaks[i + 1];
-            const textStart = prevBreakStart + prevBreakCount;
-            const textEnd = nextBreakStart;
-            const value = source.slice(textStart, textEnd);
-            if (value)
-              newChildren.push({
-                type: 'text',
-                value,
-                position: {
-                  start: { ...positionStart, offset: textStart },
-                  end: { ...positionEnd, offset: textEnd },
-                },
-              });
-            for (let j = 0; j < nextBreakCount; j++) {
-              newChildren.push({ type: 'break' });
-            }
-          }
-        } else {
-          newChildren.push(child);
-        }
-      });
-      paragraph.children = newChildren;
+      if (newNodes.length === 1 && newNodes[0] === node) return;
+
+      parent.children.splice(index, 1, ...newNodes);
     });
   };
 }
@@ -186,4 +149,61 @@ function isDirectiveNode(node: Node): node is DirectiveNode {
     node.type === 'leafDirective' ||
     node.type === 'textDirective'
   );
+}
+
+function splitTextByLineBreaks(
+  node: Text,
+  source: string,
+  lineBreaks: [number, number][]
+): (Text | { type: 'break' })[] {
+  const nodeStart = node.position?.start?.offset;
+  const nodeEnd = node.position?.end?.offset;
+  if (nodeStart === undefined || nodeEnd === undefined) {
+    return [node];
+  }
+
+  const relevantBreaks = lineBreaks.filter(
+    ([breakStart]) => breakStart >= nodeStart && breakStart < nodeEnd
+  );
+
+  if (relevantBreaks.length === 0) {
+    return [node];
+  }
+
+  const result: (Text | { type: 'break' })[] = [];
+  let currentStart = nodeStart;
+
+  for (const [breakStart, breakCount] of relevantBreaks) {
+    const textValue = source.slice(currentStart, breakStart);
+    if (textValue) {
+      result.push({
+        type: 'text',
+        value: textValue,
+        position: {
+          start: { ...node.position!.start, offset: currentStart },
+          end: { ...node.position!.end, offset: breakStart },
+        },
+      });
+    }
+
+    for (let i = 0; i < breakCount; i++) {
+      result.push({ type: 'break' });
+    }
+
+    currentStart = breakStart + breakCount;
+  }
+
+  const lastText = source.slice(currentStart, nodeEnd);
+  if (lastText) {
+    result.push({
+      type: 'text',
+      value: lastText,
+      position: {
+        start: { ...node.position!.start, offset: currentStart },
+        end: { ...node.position!.end, offset: nodeEnd },
+      },
+    });
+  }
+
+  return result;
 }
