@@ -108,7 +108,7 @@ const buttonProps: Record<
   bold: {
     action: 'markdown',
     category: 'default',
-    label: '굵게',
+    label: '굵게 (Ctrl+B)',
     content: { icon: 'text', style: 'font-bold', value: 'B' },
     isBlock: false,
     markdownBefore: '**',
@@ -117,7 +117,7 @@ const buttonProps: Record<
   italic: {
     action: 'markdown',
     category: 'default',
-    label: '기울이기',
+    label: '기울이기 (Ctrl+I)',
     content: { icon: 'text', style: 'italic', value: 'I' },
     isBlock: false,
     markdownBefore: '*',
@@ -126,7 +126,7 @@ const buttonProps: Record<
   underline: {
     action: 'markdown',
     category: 'default',
-    label: '밑줄',
+    label: '밑줄 (Ctrl+U)',
     content: { icon: 'underline', style: 'w-4 h-4' },
     isBlock: false,
     markdownBefore: '++',
@@ -135,7 +135,7 @@ const buttonProps: Record<
   strikethrough: {
     action: 'markdown',
     category: 'default',
-    label: '취소선',
+    label: '취소선 (Ctrl+Shift+S)',
     content: { icon: 'text', style: 'line-through', value: 'T' },
     isBlock: false,
     markdownBefore: '~~',
@@ -144,7 +144,7 @@ const buttonProps: Record<
   link: {
     action: 'markdown',
     category: 'default',
-    label: '링크 추가',
+    label: '링크 추가 (Ctrl+K)',
     content: { icon: 'link', style: 'w-4 h-4' },
     isBlock: false,
     markdownBefore: '[링크',

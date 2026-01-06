@@ -12,12 +12,14 @@ import { setContentEditorStatus } from '@/lib/redux/write/writePostSlice';
 import clsx from 'clsx';
 import {
   ChangeEvent,
+  KeyboardEvent,
   UIEvent,
   useCallback,
   useEffect,
   useMemo,
   useState,
 } from 'react';
+
 import { useDispatch } from 'react-redux';
 
 export default function WritePostContentEditor() {
@@ -38,6 +40,45 @@ export default function WritePostContentEditor() {
     () => contentInner.length > maxLength,
     [contentInner.length, maxLength]
   );
+
+  const onKeyDown = useCallback((e: KeyboardEvent<HTMLTextAreaElement>) => {
+    const isMod = e.metaKey || e.ctrlKey;
+    if (!isMod) return;
+
+    const shortcuts: Record<string, { before: string; after: string }> = {
+      b: { before: '**', after: '**' },
+      i: { before: '*', after: '*' },
+      u: { before: '++', after: '++' },
+      S: { before: '~~', after: '~~' },
+      k: { before: '[', after: '](url)' },
+    };
+
+    const key = e.shiftKey && e.key === 's' ? 'S' : e.key.toLowerCase();
+    const shortcut = shortcuts[key];
+    if (!shortcut) return;
+
+    e.preventDefault();
+
+    const textarea = e.currentTarget;
+    const { selectionStart, selectionEnd, value } = textarea;
+    const selected = value.substring(selectionStart, selectionEnd);
+
+    const newText =
+      value.substring(0, selectionStart) +
+      shortcut.before +
+      selected +
+      shortcut.after +
+      value.substring(selectionEnd);
+
+    setContentInner(newText);
+
+    const newCursorPos =
+      selectionStart + shortcut.before.length + selected.length;
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
+  }, []);
 
   const onChange = useCallback(
     (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -104,6 +145,7 @@ export default function WritePostContentEditor() {
         onFocus={onFocus}
         onBlur={onBlur}
         onChange={onChange}
+        onKeyDown={onKeyDown}
         onScroll={onScroll}
         placeholder='본문을 입력하세요'
         className={clsx(
