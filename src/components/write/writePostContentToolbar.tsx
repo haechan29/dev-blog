@@ -23,6 +23,7 @@ import {
   Rows,
   Shrink,
   Timer,
+  Underline,
 } from 'lucide-react';
 import { useRef, useState } from 'react';
 
@@ -135,5 +136,7 @@ function ContentButton({
       return <Music className={style} />;
     case 'bgmStartTime':
       return <Timer className={style} />;
+    case 'underline':
+      return <Underline className={style} />;
   }
 }

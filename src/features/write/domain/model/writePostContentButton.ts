@@ -8,6 +8,7 @@ export const writePostContentButtons: WritePostContentButton[] = [
   { id: 'heading3' },
   { id: 'bold' },
   { id: 'italic' },
+  { id: 'underline' },
   { id: 'strikethrough' },
   { id: 'unorderedList' },
   { id: 'orderedList' },

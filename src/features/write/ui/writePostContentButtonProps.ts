@@ -15,7 +15,8 @@ export type ButtonIcon =
   | 'addRow'
   | 'addColumn'
   | 'bgm'
-  | 'bgmStartTime';
+  | 'bgmStartTime'
+  | 'underline';
 
 export interface ButtonContent {
   icon: ButtonIcon;
@@ -121,6 +122,15 @@ const buttonProps: Record<
     isBlock: false,
     markdownBefore: '*',
     markdownAfter: '*',
+  },
+  underline: {
+    action: 'markdown',
+    category: 'default',
+    label: '밑줄',
+    content: { icon: 'underline', style: 'w-4 h-4' },
+    isBlock: false,
+    markdownBefore: '++',
+    markdownAfter: '++',
   },
   strikethrough: {
     action: 'markdown',
