@@ -58,9 +58,15 @@ export default function SearchCommand({
       value={selectedValue}
       onValueChange={setSelectedValue}
       shouldFilter={false}
-      className='relative'
+      className='relative bg-transparent'
     >
-      <Popover open={shouldShowDropdown} onOpenChange={setIsDropdownOpen}>
+      <Popover
+        open={shouldShowDropdown}
+        onOpenChange={open => {
+          if (!open && document.activeElement?.closest('[cmdk-input]')) return;
+          setIsDropdownOpen(open);
+        }}
+      >
         <PopoverAnchor asChild>
           <div className='relative flex items-center px-4 py-2 border border-gray-200 rounded-full hover:border-blue-500 focus-within:border-blue-500'>
             <CommandPrimitive.Input

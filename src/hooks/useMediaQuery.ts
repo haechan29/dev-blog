@@ -2,8 +2,9 @@ import { useLayoutEffect, useState } from 'react';
 
 export const TOUCH_QUERY = '(pointer: coarse)';
 export const DESKTOP_QUERY = '(min-width: 1280px)';
+export const MD_QUERY = '(min-width: 768px)';
 
-type MediaQuery = typeof TOUCH_QUERY | typeof DESKTOP_QUERY;
+type MediaQuery = typeof TOUCH_QUERY | typeof DESKTOP_QUERY | typeof MD_QUERY;
 
 export default function useMediaQuery(query: MediaQuery) {
   const [matches, setMatches] = useState<boolean | undefined>();

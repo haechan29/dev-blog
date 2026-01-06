@@ -3,7 +3,7 @@
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { createProps } from '@/features/post/ui/postProps';
 import useDebounce from '@/hooks/useDebounce';
-import useMediaQuery, { TOUCH_QUERY } from '@/hooks/useMediaQuery';
+import useMediaQuery, { MD_QUERY, TOUCH_QUERY } from '@/hooks/useMediaQuery';
 import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { createRipple } from '@/lib/dom';
 import { postKeys } from '@/queries/keys';
@@ -21,6 +21,7 @@ export default function SearchPageClient({
   const debounce = useDebounce();
 
   const isTouch = useMediaQuery(TOUCH_QUERY);
+  const isLargerThanMd = useMediaQuery(MD_QUERY);
   const [query, setQuery] = useState(initialQuery ?? '');
   const [debouncedQuery, setDebouncedQuery] = useState(query);
 
@@ -34,14 +35,14 @@ export default function SearchPageClient({
   });
 
   useEffect(() => {
-    if (isTouch === false) {
+    if (isTouch === false && isLargerThanMd === true) {
       if (initialQuery?.trim()) {
         router.replace(`/search/result?q=${encodeURIComponent(initialQuery)}`);
       } else {
         router.back();
       }
     }
-  }, [initialQuery, isTouch, router]);
+  }, [initialQuery, isLargerThanMd, isTouch, router]);
 
   useEffect(() => {
     debounce(() => setDebouncedQuery(query), 300);
