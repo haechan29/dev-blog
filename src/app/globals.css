@@ -47,6 +47,10 @@
   opacity: 1;
 }
 
+.simplebar-content {
+  height: 100%;
+}
+
 ::-webkit-scrollbar {
   width: var(--scrollbar-width);
 }
