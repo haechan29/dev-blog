@@ -15,6 +15,7 @@ import useWritePostContentButton from '@/features/write/hooks/useWritePostConten
 import {
   ButtonContent,
   buttonProps,
+  dropdownGroups,
   WritePostContentButtonProps,
 } from '@/features/write/ui/writePostContentButtonProps';
 import clsx from 'clsx';
@@ -38,7 +39,7 @@ import {
   Timer,
   Underline,
 } from 'lucide-react';
-import { ReactNode, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 const toolbarLayout = {
   default: [
@@ -59,18 +60,6 @@ const toolbarLayout = {
   code: ['codeLanguage'],
   image: ['imageLarge', 'imageSmall', 'imageCaption', 'imageSubtitle'],
   bgm: ['bgmStartTime'],
-};
-
-const dropdownIcons: Record<string, ReactNode> = {
-  heading: <div className='text-sm font-semibold'>H</div>,
-  list: <List className='w-4 h-4' />,
-  more: <MoreHorizontal className='w-4 h-4' />,
-};
-
-const dropdownLabels: Record<string, string> = {
-  heading: '제목',
-  list: '리스트',
-  more: '더보기',
 };
 
 export default function WritePostContentToolbar() {
@@ -167,6 +156,12 @@ function ContentButton({
       return <div className={style}>{value}</div>;
     case 'link':
       return <Link className={style} />;
+    case 'heading':
+      return <div className={style}>H</div>;
+    case 'list':
+      return <List className={style} />;
+    case 'more':
+      return <MoreHorizontal className={style} />;
     case 'code':
       return <Code2 className={style} />;
     case 'table':
@@ -207,19 +202,20 @@ function ToolbarDropdown({
   items: string[];
   onAction: (button: WritePostContentButtonProps) => void;
 }) {
-  const icon = dropdownIcons[group] ?? null;
-  const label = dropdownLabels[group] ?? '';
+  const groupProps = dropdownGroups[group];
+  if (!groupProps) return null;
 
   return (
     <DropdownMenu>
-      <Tooltip text={label} direction='top'>
+      <Tooltip text={groupProps.label} direction='top'>
         <DropdownMenuTrigger className='min-w-10 h-10 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer gap-0.5'>
-          {icon}
+          <ContentButton buttonContent={groupProps.content} />
           {group !== 'more' && (
             <ChevronDown className='w-3 h-3 text-gray-400' />
           )}
         </DropdownMenuTrigger>
       </Tooltip>
+
       <DropdownMenuContent>
         {items.map(id => {
           const button = buttonProps[id];

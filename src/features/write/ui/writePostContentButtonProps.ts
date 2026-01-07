@@ -14,12 +14,23 @@ export type ButtonIcon =
   | 'addColumn'
   | 'bgm'
   | 'bgmStartTime'
-  | 'underline';
+  | 'underline'
+  | 'heading'
+  | 'list'
+  | 'more';
 
 export interface ButtonContent {
   icon: ButtonIcon;
   style: string;
   value?: string;
+}
+
+export interface DropdownGroupProps {
+  id: string;
+  type: 'dropdown';
+  label: string;
+  content: ButtonContent;
+  items: string[];
 }
 
 export interface MarkdownButtonProps {
@@ -79,6 +90,30 @@ export type WritePostContentButtonProps =
 
 export type ButtonAction = WritePostContentButtonProps['action'];
 export type ButtonCategory = WritePostContentButtonProps['category'];
+
+export const dropdownGroups: Record<string, DropdownGroupProps> = {
+  heading: {
+    id: 'heading',
+    type: 'dropdown',
+    label: '제목',
+    content: { icon: 'heading', style: 'text-sm font-semibold' },
+    items: ['heading1', 'heading2', 'heading3'],
+  },
+  list: {
+    id: 'list',
+    type: 'dropdown',
+    label: '리스트',
+    content: { icon: 'list', style: 'w-4 h-4' },
+    items: ['unorderedList', 'orderedList'],
+  },
+  more: {
+    id: 'more',
+    type: 'dropdown',
+    label: '더보기',
+    content: { icon: 'more', style: 'w-4 h-4' },
+    items: ['bgm', 'code', 'table', 'horizontalRule', 'blockquote'],
+  },
+};
 
 export const buttonProps: Record<string, WritePostContentButtonProps> = {
   heading1: {
