@@ -2,12 +2,6 @@
 
 import DailyQuotaExhaustedDialog from '@/components/image/DailyQuotaExhaustedDialog';
 import Tooltip from '@/components/tooltip';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { DailyQuotaExhaustedError } from '@/features/image/data/errors/imageErrors';
 import useContentToolbar from '@/features/write/hooks/useContentToolbar';
 import useImageUpload from '@/features/write/hooks/useImageUpload';
@@ -39,7 +33,8 @@ import {
   Timer,
   Underline,
 } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 const toolbarLayout = {
   default: [
@@ -146,6 +141,115 @@ export default function WritePostContentToolbar() {
   );
 }
 
+function ToolbarDropdown({
+  group,
+  items,
+  onAction,
+}: {
+  group: string;
+  items: string[];
+  onAction: (button: WritePostContentButtonProps) => void;
+}) {
+  const groupProps = dropdownGroups[group];
+  const [isOpen, setIsOpen] = useState(false);
+  const [menuPosition, setMenuPosition] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const {
+    contentToolbar: { shouldAttachToolbarToBottom },
+  } = useContentToolbar();
+
+  useEffect(() => {
+    if (!triggerRef.current) return;
+
+    if (!isOpen) {
+      setMenuPosition(null);
+      return;
+    }
+
+    const rect = triggerRef.current.getBoundingClientRect();
+    setMenuPosition({
+      top: shouldAttachToolbarToBottom ? rect.top - 4 : rect.bottom + 4,
+      left: rect.left + rect.width / 2,
+    });
+  }, [isOpen, shouldAttachToolbarToBottom]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handlePointerDown = (e: PointerEvent) => {
+      const target = e.target as Node;
+      if (!menuRef.current?.contains(target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
+  }, [isOpen]);
+
+  if (!groupProps) return null;
+
+  return (
+    <>
+      <Tooltip text={groupProps.label} direction='top'>
+        <button
+          ref={triggerRef}
+          onPointerDown={e => e.preventDefault()}
+          onClick={() => setIsOpen(prev => !prev)}
+          className='min-w-10 h-10 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer gap-0.5'
+        >
+          <ContentButton buttonContent={groupProps.content} />
+          {group !== 'more' && (
+            <ChevronDown className='w-3 h-3 text-gray-400' />
+          )}
+        </button>
+      </Tooltip>
+
+      {isOpen &&
+        menuPosition &&
+        createPortal(
+          <div
+            ref={menuRef}
+            onPointerDown={e => e.preventDefault()}
+            className={clsx(
+              'fixed z-50 min-w-32 rounded-md border bg-white p-1 shadow-md -translate-x-1/2',
+              shouldAttachToolbarToBottom && '-translate-y-full'
+            )}
+            style={{
+              top: menuPosition.top,
+              left: menuPosition.left,
+            }}
+          >
+            {items.map(id => {
+              const button = buttonProps[id];
+              if (!button) return null;
+              return (
+                <button
+                  key={id}
+                  onPointerDown={e => e.preventDefault()}
+                  onClick={() => {
+                    onAction(button);
+                    setIsOpen(false);
+                  }}
+                  className='flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-gray-100 cursor-pointer'
+                >
+                  <ContentButton buttonContent={button.content} />
+                  <span>{button.label}</span>
+                </button>
+              );
+            })}
+          </div>,
+          document.body
+        )}
+    </>
+  );
+}
+
 function ContentButton({
   buttonContent: { icon, style, value },
 }: {
@@ -191,47 +295,4 @@ function ContentButton({
     case 'underline':
       return <Underline className={style} />;
   }
-}
-
-function ToolbarDropdown({
-  group,
-  items,
-  onAction,
-}: {
-  group: string;
-  items: string[];
-  onAction: (button: WritePostContentButtonProps) => void;
-}) {
-  const groupProps = dropdownGroups[group];
-  if (!groupProps) return null;
-
-  return (
-    <DropdownMenu>
-      <Tooltip text={groupProps.label} direction='top'>
-        <DropdownMenuTrigger className='min-w-10 h-10 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer gap-0.5'>
-          <ContentButton buttonContent={groupProps.content} />
-          {group !== 'more' && (
-            <ChevronDown className='w-3 h-3 text-gray-400' />
-          )}
-        </DropdownMenuTrigger>
-      </Tooltip>
-
-      <DropdownMenuContent>
-        {items.map(id => {
-          const button = buttonProps[id];
-          if (!button) return null;
-          return (
-            <DropdownMenuItem
-              key={id}
-              onClick={() => onAction(button)}
-              className='flex items-center gap-2 cursor-pointer'
-            >
-              <ContentButton buttonContent={button.content} />
-              <span>{button.label}</span>
-            </DropdownMenuItem>
-          );
-        })}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
 }
