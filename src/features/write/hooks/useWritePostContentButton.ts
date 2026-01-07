@@ -297,7 +297,6 @@ export default function useWritePostContentButton({
   }, [contentButtonProps]);
 
   return {
-    contentButtons: contentButtonProps,
     activeCategory,
     onAction,
   } as const;

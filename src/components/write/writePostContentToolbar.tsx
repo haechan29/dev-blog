@@ -55,6 +55,10 @@ const toolbarLayout = {
       items: ['bgm', 'code', 'table', 'horizontalRule', 'blockquote'],
     },
   ],
+  table: ['addRow', 'addColumn'],
+  code: ['codeLanguage'],
+  image: ['imageLarge', 'imageSmall', 'imageCaption', 'imageSubtitle'],
+  bgm: ['bgmStartTime'],
 };
 
 const dropdownIcons: Record<string, ReactNode> = {
@@ -74,10 +78,9 @@ export default function WritePostContentToolbar() {
   const { uploadAndInsert } = useImageUpload();
   const [isQuotaDialogOpen, setIsQuotaDialogOpen] = useState(false);
 
-  const { contentButtons, activeCategory, onAction } =
-    useWritePostContentButton({
-      onUpload: () => fileInputRef.current?.click(),
-    });
+  const { activeCategory, onAction } = useWritePostContentButton({
+    onUpload: () => fileInputRef.current?.click(),
+  });
   const {
     contentToolbar: { shouldAttachToolbarToBottom, toolbarTranslateY },
   } = useContentToolbar();
@@ -120,43 +123,30 @@ export default function WritePostContentToolbar() {
           '--toolbar-translate-y': toolbarTranslateY,
         }}
       >
-        {activeCategory === 'default'
-          ? toolbarLayout.default.map(item => {
-              if (typeof item === 'string') {
-                const button = buttonProps[item];
-                if (!button) return null;
-                return (
-                  <Tooltip key={item} text={button.label} direction='top'>
-                    <button
-                      onClick={() => onAction(button)}
-                      className='min-w-10 h-10 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer'
-                    >
-                      <ContentButton buttonContent={button.content} />
-                    </button>
-                  </Tooltip>
-                );
-              }
-              return (
-                <ToolbarDropdown
-                  key={item.group}
-                  group={item.group}
-                  items={item.items}
-                  onAction={onAction}
-                />
-              );
-            })
-          : contentButtons
-              .filter(button => button.category === activeCategory)
-              .map(button => (
-                <Tooltip key={button.label} text={button.label} direction='top'>
-                  <button
-                    onClick={() => onAction(button)}
-                    className='min-w-10 h-10 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer'
-                  >
-                    <ContentButton buttonContent={button.content} />
-                  </button>
-                </Tooltip>
-              ))}
+        {toolbarLayout[activeCategory].map(item => {
+          if (typeof item === 'string') {
+            const button = buttonProps[item];
+            if (!button) return null;
+            return (
+              <Tooltip key={item} text={button.label} direction='top'>
+                <button
+                  onClick={() => onAction(button)}
+                  className='min-w-10 h-10 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer'
+                >
+                  <ContentButton buttonContent={button.content} />
+                </button>
+              </Tooltip>
+            );
+          }
+          return (
+            <ToolbarDropdown
+              key={item.group}
+              group={item.group}
+              items={item.items}
+              onAction={onAction}
+            />
+          );
+        })}
       </div>
 
       <DailyQuotaExhaustedDialog
