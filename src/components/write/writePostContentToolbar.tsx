@@ -155,6 +155,7 @@ function ToolbarDropdown({
   const [menuPosition, setMenuPosition] = useState<{
     top: number;
     left: number;
+    positioned: boolean;
   } | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -164,26 +165,48 @@ function ToolbarDropdown({
   } = useContentToolbar();
 
   useEffect(() => {
-    if (!triggerRef.current) return;
-
-    if (!isOpen) {
+    if (!triggerRef.current || !isOpen) {
       setMenuPosition(null);
       return;
     }
 
-    const rect = triggerRef.current.getBoundingClientRect();
+    const triggerRect = triggerRef.current.getBoundingClientRect();
     setMenuPosition({
-      top: shouldAttachToolbarToBottom ? rect.top - 4 : rect.bottom + 4,
-      left: rect.left + rect.width / 2,
+      top: shouldAttachToolbarToBottom
+        ? triggerRect.top - 4
+        : triggerRect.bottom + 4,
+      left: triggerRect.left + triggerRect.width / 2,
+      positioned: false,
     });
   }, [isOpen, shouldAttachToolbarToBottom]);
+
+  useEffect(() => {
+    if (!menuPosition || menuPosition.positioned || !menuRef.current) return;
+
+    const menuWidth = menuRef.current.offsetWidth;
+    const padding = 8;
+
+    let left = menuPosition.left;
+    const minLeft = padding + menuWidth / 2;
+    const maxLeft = window.innerWidth - padding - menuWidth / 2;
+    left = Math.max(minLeft, Math.min(maxLeft, left));
+
+    setMenuPosition({
+      ...menuPosition,
+      left,
+      positioned: true,
+    });
+  }, [menuPosition]);
 
   useEffect(() => {
     if (!isOpen) return;
 
     const handlePointerDown = (e: PointerEvent) => {
       const target = e.target as Node;
-      if (!menuRef.current?.contains(target)) {
+      if (
+        !triggerRef.current?.contains(target) &&
+        !menuRef.current?.contains(target)
+      ) {
         setIsOpen(false);
       }
     };
@@ -218,7 +241,8 @@ function ToolbarDropdown({
             onPointerDown={e => e.preventDefault()}
             className={clsx(
               'fixed z-50 min-w-32 rounded-md border bg-white p-1 shadow-md -translate-x-1/2',
-              shouldAttachToolbarToBottom && '-translate-y-full'
+              shouldAttachToolbarToBottom && '-translate-y-full',
+              !menuPosition.positioned && 'invisible'
             )}
             style={{
               top: menuPosition.top,
