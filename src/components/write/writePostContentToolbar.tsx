@@ -2,22 +2,34 @@
 
 import DailyQuotaExhaustedDialog from '@/components/image/DailyQuotaExhaustedDialog';
 import Tooltip from '@/components/tooltip';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { DailyQuotaExhaustedError } from '@/features/image/data/errors/imageErrors';
 import useContentToolbar from '@/features/write/hooks/useContentToolbar';
 import useImageUpload from '@/features/write/hooks/useImageUpload';
 import useWritePostContentButton from '@/features/write/hooks/useWritePostContentButton';
-import { ButtonContent } from '@/features/write/ui/writePostContentButtonProps';
+import {
+  ButtonContent,
+  WritePostContentButtonProps,
+} from '@/features/write/ui/writePostContentButtonProps';
 import clsx from 'clsx';
 import {
   AlignCenter,
   Captions,
+  ChevronDown,
   Code2,
   Columns,
   Expand,
   Grid2x2,
   ImageIcon,
   Link,
+  List,
   Minus,
+  MoreHorizontal,
   Music,
   Quote,
   Rows,
@@ -26,6 +38,35 @@ import {
   Underline,
 } from 'lucide-react';
 import { useRef, useState } from 'react';
+
+const toolbarLayout = {
+  default: [
+    'bold',
+    'italic',
+    'underline',
+    'strikethrough',
+    'link',
+    'image',
+    { group: 'heading', items: ['heading1', 'heading2', 'heading3'] },
+    { group: 'list', items: ['unorderedList', 'orderedList'] },
+    {
+      group: 'more',
+      items: ['bgm', 'code', 'table', 'horizontalRule', 'blockquote'],
+    },
+  ],
+};
+
+const dropdownIcons: Record<string, React.ReactNode> = {
+  heading: <div className='text-sm font-semibold'>H</div>,
+  list: <List className='w-4 h-4' />,
+  more: <MoreHorizontal className='w-4 h-4' />,
+};
+
+const dropdownLabels: Record<string, string> = {
+  heading: '제목',
+  list: '리스트',
+  more: '더보기',
+};
 
 export default function WritePostContentToolbar() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -39,6 +80,9 @@ export default function WritePostContentToolbar() {
   const {
     contentToolbar: { shouldAttachToolbarToBottom, toolbarTranslateY },
   } = useContentToolbar();
+
+  const getButtonById = (id: string) =>
+    contentButtons.find(button => button.id === id);
 
   return (
     <>
@@ -78,18 +122,44 @@ export default function WritePostContentToolbar() {
           '--toolbar-translate-y': toolbarTranslateY,
         }}
       >
-        {contentButtons
-          .filter(button => button.category === activeCategory)
-          .map(button => (
-            <Tooltip key={button.label} text={button.label} direction='top'>
-              <button
-                onClick={() => onAction(button)}
-                className='min-w-10 h-10 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer'
-              >
-                <ContentButton buttonContent={button.content} />
-              </button>
-            </Tooltip>
-          ))}
+        {activeCategory === 'default'
+          ? toolbarLayout.default.map(item => {
+              if (typeof item === 'string') {
+                const button = getButtonById(item);
+                if (!button) return null;
+                return (
+                  <Tooltip key={item} text={button.label} direction='top'>
+                    <button
+                      onClick={() => onAction(button)}
+                      className='min-w-10 h-10 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer'
+                    >
+                      <ContentButton buttonContent={button.content} />
+                    </button>
+                  </Tooltip>
+                );
+              }
+              return (
+                <ToolbarDropdown
+                  key={item.group}
+                  group={item.group}
+                  items={item.items}
+                  onAction={onAction}
+                  getButtonById={getButtonById}
+                />
+              );
+            })
+          : contentButtons
+              .filter(button => button.category === activeCategory)
+              .map(button => (
+                <Tooltip key={button.label} text={button.label} direction='top'>
+                  <button
+                    onClick={() => onAction(button)}
+                    className='min-w-10 h-10 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer'
+                  >
+                    <ContentButton buttonContent={button.content} />
+                  </button>
+                </Tooltip>
+              ))}
       </div>
 
       <DailyQuotaExhaustedDialog
@@ -139,4 +209,50 @@ function ContentButton({
     case 'underline':
       return <Underline className={style} />;
   }
+}
+
+function ToolbarDropdown({
+  group,
+  items,
+  onAction,
+  getButtonById,
+}: {
+  group: string;
+  items: string[];
+  onAction: (button: WritePostContentButtonProps & { id: string }) => void;
+  getButtonById: (
+    id: string
+  ) => (WritePostContentButtonProps & { id: string }) | undefined;
+}) {
+  const icon = dropdownIcons[group] ?? null;
+  const label = dropdownLabels[group] ?? '';
+
+  return (
+    <DropdownMenu>
+      <Tooltip text={label} direction='top'>
+        <DropdownMenuTrigger className='min-w-10 h-10 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer gap-0.5'>
+          {icon}
+          {group !== 'more' && (
+            <ChevronDown className='w-3 h-3 text-gray-400' />
+          )}
+        </DropdownMenuTrigger>
+      </Tooltip>
+      <DropdownMenuContent>
+        {items.map(id => {
+          const button = getButtonById(id);
+          if (!button) return null;
+          return (
+            <DropdownMenuItem
+              key={id}
+              onClick={() => onAction(button)}
+              className='flex items-center gap-2 cursor-pointer'
+            >
+              <ContentButton buttonContent={button.content} />
+              <span>{button.label}</span>
+            </DropdownMenuItem>
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }

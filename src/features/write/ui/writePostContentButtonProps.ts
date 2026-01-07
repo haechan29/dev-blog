@@ -144,7 +144,7 @@ const buttonProps: Record<
   link: {
     action: 'markdown',
     category: 'default',
-    label: '링크 추가 (Ctrl+K)',
+    label: '링크 (Ctrl+K)',
     content: { icon: 'link', style: 'w-4 h-4' },
     isBlock: false,
     markdownBefore: '[링크',
@@ -153,7 +153,7 @@ const buttonProps: Record<
   code: {
     action: 'markdown',
     category: 'default',
-    label: '코드 블록 추가',
+    label: '코드 블록',
     content: { icon: 'code', style: 'w-4 h-4' },
     isBlock: true,
     markdownBefore: '```\n코드를 입력해주세요.',
@@ -162,7 +162,7 @@ const buttonProps: Record<
   table: {
     action: 'markdown',
     category: 'default',
-    label: '표 만들기',
+    label: '표',
     content: { icon: 'table', style: 'w-4 h-4' },
     isBlock: true,
     markdownBefore: '| 제목1',
@@ -285,6 +285,9 @@ const buttonProps: Record<
 
 export function createProps(
   button: WritePostContentButton
-): WritePostContentButtonProps {
-  return buttonProps[button.id];
+): WritePostContentButtonProps & { id: string } {
+  return {
+    id: button.id,
+    ...buttonProps[button.id],
+  };
 }
