@@ -215,6 +215,35 @@ function ToolbarDropdown({
     return () => document.removeEventListener('pointerdown', handlePointerDown);
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!isOpen || !triggerRef.current) return;
+
+    const trigger = triggerRef.current;
+    const rect = trigger.getBoundingClientRect();
+    const threshold = 5;
+
+    const rootMargin = [
+      -(rect.top - threshold), // top
+      -(window.innerWidth - rect.right - threshold), // right
+      -(window.innerHeight - rect.bottom - threshold), // bottom
+      -(rect.left - threshold), // left
+    ]
+      .map(v => `${v}px`)
+      .join(' ');
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) {
+          setIsOpen(false);
+        }
+      },
+      { rootMargin, threshold: 1 }
+    );
+
+    observer.observe(trigger);
+    return () => observer.disconnect();
+  }, [isOpen]);
+
   if (!groupProps) return null;
 
   return (
