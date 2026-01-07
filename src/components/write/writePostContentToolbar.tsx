@@ -14,6 +14,7 @@ import useImageUpload from '@/features/write/hooks/useImageUpload';
 import useWritePostContentButton from '@/features/write/hooks/useWritePostContentButton';
 import {
   ButtonContent,
+  buttonProps,
   WritePostContentButtonProps,
 } from '@/features/write/ui/writePostContentButtonProps';
 import clsx from 'clsx';
@@ -37,7 +38,7 @@ import {
   Timer,
   Underline,
 } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { ReactNode, useRef, useState } from 'react';
 
 const toolbarLayout = {
   default: [
@@ -56,7 +57,7 @@ const toolbarLayout = {
   ],
 };
 
-const dropdownIcons: Record<string, React.ReactNode> = {
+const dropdownIcons: Record<string, ReactNode> = {
   heading: <div className='text-sm font-semibold'>H</div>,
   list: <List className='w-4 h-4' />,
   more: <MoreHorizontal className='w-4 h-4' />,
@@ -80,9 +81,6 @@ export default function WritePostContentToolbar() {
   const {
     contentToolbar: { shouldAttachToolbarToBottom, toolbarTranslateY },
   } = useContentToolbar();
-
-  const getButtonById = (id: string) =>
-    contentButtons.find(button => button.id === id);
 
   return (
     <>
@@ -125,7 +123,7 @@ export default function WritePostContentToolbar() {
         {activeCategory === 'default'
           ? toolbarLayout.default.map(item => {
               if (typeof item === 'string') {
-                const button = getButtonById(item);
+                const button = buttonProps[item];
                 if (!button) return null;
                 return (
                   <Tooltip key={item} text={button.label} direction='top'>
@@ -144,7 +142,6 @@ export default function WritePostContentToolbar() {
                   group={item.group}
                   items={item.items}
                   onAction={onAction}
-                  getButtonById={getButtonById}
                 />
               );
             })
@@ -215,14 +212,10 @@ function ToolbarDropdown({
   group,
   items,
   onAction,
-  getButtonById,
 }: {
   group: string;
   items: string[];
-  onAction: (button: WritePostContentButtonProps & { id: string }) => void;
-  getButtonById: (
-    id: string
-  ) => (WritePostContentButtonProps & { id: string }) | undefined;
+  onAction: (button: WritePostContentButtonProps) => void;
 }) {
   const icon = dropdownIcons[group] ?? null;
   const label = dropdownLabels[group] ?? '';
@@ -239,7 +232,7 @@ function ToolbarDropdown({
       </Tooltip>
       <DropdownMenuContent>
         {items.map(id => {
-          const button = getButtonById(id);
+          const button = buttonProps[id];
           if (!button) return null;
           return (
             <DropdownMenuItem

@@ -8,12 +8,11 @@ import {
   parseRanges,
   parseTableRanges,
 } from '@/features/write/domain/lib/contentButton';
-import { writePostContentButtons } from '@/features/write/domain/model/writePostContentButton';
 import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import {
   ButtonCategory,
+  buttonProps,
   CodeButtonProps,
-  createProps,
   DirectiveButtonProps,
   MarkdownButtonProps,
   TableButtonProps,
@@ -37,12 +36,9 @@ export default function useWritePostContentButton({
     },
   } = useWritePostForm();
   const dispatch = useDispatch<AppDispatch>();
-  const [contentButtons] = useState(writePostContentButtons);
+  const contentButtonProps = useMemo(() => Object.values(buttonProps), []);
   const [activeCategory, setActiveCategory] =
     useState<ButtonCategory>('default');
-  const contentButtonProps = useMemo(() => {
-    return contentButtons.map(createProps);
-  }, [contentButtons]);
 
   const handleMarkdownAction = useCallback(
     ({ isBlock, markdownBefore, markdownAfter = '' }: MarkdownButtonProps) => {
