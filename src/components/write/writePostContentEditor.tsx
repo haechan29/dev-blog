@@ -1,6 +1,7 @@
 'use client';
 
 import useContentToolbar from '@/features/write/hooks/useContentToolbar';
+import useUndoHistory from '@/features/write/hooks/useUndoHistory';
 import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import useScrollLock from '@/hooks/useScrollLock';
 import { AppDispatch } from '@/lib/redux/store';
@@ -19,74 +20,114 @@ import {
   useMemo,
   useState,
 } from 'react';
-
 import { useDispatch } from 'react-redux';
 
+const shortcuts: Record<string, { before: string; after: string }> = {
+  b: { before: '**', after: '**' },
+  i: { before: '*', after: '*' },
+  u: { before: '++', after: '++' },
+  S: { before: '~~', after: '~~' },
+  k: { before: '[', after: '](url)' },
+};
+
 export default function WritePostContentEditor() {
+  const dispatch = useDispatch<AppDispatch>();
   const {
     writePostForm: {
       isParseError,
       content: { value: content, isUserInput, maxLength, isValid },
     },
   } = useWritePostForm();
-  const [contentInner, setContentInner] = useState('');
   const {
     contentToolbar: { shouldAttachToolbarToBottom },
   } = useContentToolbar();
+  const { pushHistory, pushHistoryDebounced, undo, redo } = useUndoHistory();
 
-  const dispatch = useDispatch<AppDispatch>();
+  const [contentInner, setContentInner] = useState('');
   const [isLocked, setIsLocked] = useState(false);
+
   const isContentTooLong = useMemo(
     () => contentInner.length > maxLength,
     [contentInner.length, maxLength]
   );
 
-  const onKeyDown = useCallback((e: KeyboardEvent<HTMLTextAreaElement>) => {
-    const isMod = e.metaKey || e.ctrlKey;
-    if (!isMod) return;
+  const onKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLTextAreaElement>) => {
+      const isMod = e.metaKey || e.ctrlKey;
+      if (!isMod) return;
 
-    const shortcuts: Record<string, { before: string; after: string }> = {
-      b: { before: '**', after: '**' },
-      i: { before: '*', after: '*' },
-      u: { before: '++', after: '++' },
-      S: { before: '~~', after: '~~' },
-      k: { before: '[', after: '](url)' },
-    };
+      const textarea = e.currentTarget;
+      const { selectionStart, selectionEnd, value } = textarea;
 
-    const key = e.shiftKey && e.key === 's' ? 'S' : e.key.toLowerCase();
-    const shortcut = shortcuts[key];
-    if (!shortcut) return;
+      if (e.key === 'z' && !e.shiftKey) {
+        const prev = undo({ content: value, selectionStart, selectionEnd });
+        if (!prev) return;
 
-    e.preventDefault();
+        e.preventDefault();
 
-    const textarea = e.currentTarget;
-    const { selectionStart, selectionEnd, value } = textarea;
-    const selected = value.substring(selectionStart, selectionEnd);
+        setContentInner(prev.content);
+        setTimeout(() => {
+          textarea.focus();
+          textarea.setSelectionRange(prev.selectionStart, prev.selectionEnd);
+        }, 0);
+        return;
+      }
 
-    const newText =
-      value.substring(0, selectionStart) +
-      shortcut.before +
-      selected +
-      shortcut.after +
-      value.substring(selectionEnd);
+      if (e.key === 'z' && e.shiftKey) {
+        const next = redo({ content: value, selectionStart, selectionEnd });
+        if (!next) return;
 
-    setContentInner(newText);
+        e.preventDefault();
 
-    const newCursorPos =
-      selectionStart + shortcut.before.length + selected.length;
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(newCursorPos, newCursorPos);
-    }, 0);
-  }, []);
+        setContentInner(next.content);
+        setTimeout(() => {
+          textarea.focus();
+          textarea.setSelectionRange(next.selectionStart, next.selectionEnd);
+        }, 0);
+        return;
+      }
+
+      const key = e.shiftKey && e.key === 's' ? 'S' : e.key.toLowerCase();
+      const shortcut = shortcuts[key];
+      if (!shortcut) return;
+
+      e.preventDefault();
+
+      pushHistory({ content: value, selectionStart, selectionEnd });
+
+      const newText =
+        value.substring(0, selectionStart) +
+        shortcut.before +
+        value.substring(selectionStart, selectionEnd) +
+        shortcut.after +
+        value.substring(selectionEnd);
+
+      setContentInner(newText);
+
+      const newCursorPos = selectionEnd + shortcut.before.length;
+
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(newCursorPos, newCursorPos);
+      }, 0);
+    },
+    [pushHistory, redo, undo]
+  );
 
   const onChange = useCallback(
     (e: ChangeEvent<HTMLTextAreaElement>) => {
       const textArea = e.currentTarget;
       dispatch(setInvalidField(null));
+
+      pushHistoryDebounced({
+        content: contentInner,
+        selectionStart: textArea.selectionStart,
+        selectionEnd: textArea.selectionEnd,
+      });
+
       setContentInner(textArea.value);
     },
-    [dispatch]
+    [contentInner, dispatch, pushHistoryDebounced]
   );
 
   const onScroll = useCallback(
@@ -116,10 +157,18 @@ export default function WritePostContentEditor() {
   }, [contentInner, dispatch]);
 
   useEffect(() => {
-    if (!isUserInput) {
-      setContentInner(content);
-    }
-  }, [content, isUserInput]);
+    const contentEditor = document.querySelector(
+      '[data-content-editor]'
+    ) as HTMLTextAreaElement;
+    if (isUserInput || !contentEditor) return;
+
+    pushHistory({
+      content: contentInner,
+      selectionStart: contentEditor.selectionStart,
+      selectionEnd: contentEditor.selectionEnd,
+    });
+    setContentInner(content);
+  }, [content, contentInner, isUserInput, pushHistory]);
 
   useEffect(() => {
     const onSelectionChange = () => {
