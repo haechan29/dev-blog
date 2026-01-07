@@ -103,12 +103,12 @@ export default function WritePostContentEditor() {
         value.substring(selectionEnd);
 
       setContentInner(newText);
-
-      const newCursorPos = selectionEnd + shortcut.before.length;
-
       setTimeout(() => {
         textarea.focus();
-        textarea.setSelectionRange(newCursorPos, newCursorPos);
+        textarea.setSelectionRange(
+          selectionStart + shortcut.before.length,
+          selectionEnd + shortcut.before.length
+        );
       }, 0);
     },
     [pushHistory, redo, undo]

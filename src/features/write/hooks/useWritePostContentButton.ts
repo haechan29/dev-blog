@@ -76,7 +76,7 @@ export default function useWritePostContentButton({
       setTimeout(() => {
         contentEditor.focus();
         contentEditor.setSelectionRange(
-          finalCursorPosition,
+          finalCursorPosition - selectedText.length,
           finalCursorPosition
         );
       }, 100);
