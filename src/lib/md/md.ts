@@ -13,6 +13,7 @@ import {
 import {
   remarkBgm,
   remarkImg,
+  remarkInsPosition,
   remarkSpacer,
   remarkTextBreaks,
 } from '@/lib/md/remark';
@@ -33,6 +34,7 @@ const processor = unified()
   .use(remarkParse) // parse markdown text into AST
   .use(remarkGfm) // support GitHub flavored markdown (tables, strikethrough, etc)
   .use(remarkIns) // support underline text
+  .use(remarkInsPosition) // add position to ins nodes (remarkIns doesn't provide it)
   .use(remarkTextBreaks) // convert line breaks within text content to break nodes
   .use(remarkSpacer) // convert line breaks between block elements to spacer nodes
   .use(remarkDirective) // support custom directives like :::bgm

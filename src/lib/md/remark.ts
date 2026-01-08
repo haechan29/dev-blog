@@ -8,7 +8,41 @@ import type { Node, Parent } from 'unist';
 import { visit } from 'unist-util-visit';
 import { VFile } from 'vfile';
 
+// unist Position requires line/column >= 1, but we only use offset values.
+// Setting to 1 as a placeholder to satisfy the type requirement.
+const UNUSED_LINE_COLUMN = 1;
+
+const INS_MARKER_LENGTH = 2;
+
 type DirectiveNode = ContainerDirective | LeafDirective | TextDirective;
+
+export function remarkInsPosition() {
+  return (tree: Root, file: VFile) => {
+    const source = String(file.value);
+    const insPositions = findAllInsPositions(source);
+
+    let insCount = 0;
+    visit(tree, 'insert', (node: Parent) => {
+      const pos = insPositions[insCount++];
+      if (!pos) return;
+
+      node.position = {
+        start: {
+          line: UNUSED_LINE_COLUMN,
+          column: UNUSED_LINE_COLUMN,
+          offset: pos.start,
+        },
+        end: {
+          line: UNUSED_LINE_COLUMN,
+          column: UNUSED_LINE_COLUMN,
+          offset: pos.end,
+        },
+      };
+
+      fillChildrenPositions(node, pos.start);
+    });
+  };
+}
 
 export function remarkTextBreaks() {
   return (tree: Root, file: VFile) => {
@@ -53,8 +87,16 @@ export function remarkSpacer() {
             spacers.push({
               type: 'spacer',
               position: {
-                start: { line: 0, column: 0, offset: offsetStart },
-                end: { line: 0, column: 0, offset: offsetEnd },
+                start: {
+                  line: UNUSED_LINE_COLUMN,
+                  column: UNUSED_LINE_COLUMN,
+                  offset: offsetStart,
+                },
+                end: {
+                  line: UNUSED_LINE_COLUMN,
+                  column: UNUSED_LINE_COLUMN,
+                  offset: offsetEnd,
+                },
               },
               data: {
                 hProperties: {
@@ -190,8 +232,16 @@ function splitTextByLineBreaks(
         type: 'text',
         value: textValue,
         position: {
-          start: { ...node.position!.start, offset: currentStart },
-          end: { ...node.position!.end, offset: breakStart },
+          start: {
+            line: UNUSED_LINE_COLUMN,
+            column: UNUSED_LINE_COLUMN,
+            offset: currentStart,
+          },
+          end: {
+            line: UNUSED_LINE_COLUMN,
+            column: UNUSED_LINE_COLUMN,
+            offset: breakStart,
+          },
         },
       });
     }
@@ -216,4 +266,51 @@ function splitTextByLineBreaks(
   }
 
   return result;
+}
+
+function findAllInsPositions(source: string): { start: number; end: number }[] {
+  const positions: { start: number; end: number }[] = [];
+  let pos = 0;
+
+  while (true) {
+    const start = source.indexOf('++', pos);
+    if (start === -1) break;
+
+    const end = source.indexOf('++', start + 2);
+    if (end === -1) break;
+
+    positions.push({ start, end: end + 2 });
+    pos = end + 2;
+  }
+
+  return positions;
+}
+
+function fillChildrenPositions(node: Parent, insStartOffset: number) {
+  let currentOffset = insStartOffset + INS_MARKER_LENGTH;
+
+  for (const child of node.children) {
+    if (child.position) {
+      currentOffset = child.position.end.offset!;
+      continue;
+    }
+
+    if (child.type === 'text' && 'value' in child) {
+      const textNode = child as Text;
+      const length = textNode.value.length;
+      textNode.position = {
+        start: {
+          line: UNUSED_LINE_COLUMN,
+          column: UNUSED_LINE_COLUMN,
+          offset: currentOffset,
+        },
+        end: {
+          line: UNUSED_LINE_COLUMN,
+          column: UNUSED_LINE_COLUMN,
+          offset: currentOffset + length,
+        },
+      };
+      currentOffset += length;
+    }
+  }
 }
