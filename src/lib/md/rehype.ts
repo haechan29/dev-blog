@@ -49,26 +49,36 @@ export function rehypeOffset() {
       if (index === undefined || !parent) return;
 
       const startOffset = node.position?.start.offset;
-      const endOffset = node.position?.end.offset;
+      let endOffset = node.position?.end.offset;
       if (startOffset === undefined || endOffset === undefined) return;
 
       if (node.type === 'element') {
         const element = node as Element;
         element.properties['data-start-offset'] = `${startOffset}`;
         element.properties['data-end-offset'] = `${endOffset}`;
-      } else {
-        const spanElement: ElementContent = {
-          type: 'element' as const,
-          tagName: 'span',
-          properties: {
-            'data-start-offset': `${startOffset}`,
-            'data-end-offset': `${endOffset}`,
-          },
-          children: [node as ElementContent],
-          position: node.position,
-        };
-        parent.children[index] = spanElement;
+        return;
       }
+
+      const parentEndOffset = parent.position?.end.offset;
+      if (
+        parent.type === 'element' &&
+        index === parent.children.length - 1 &&
+        parentEndOffset !== undefined
+      ) {
+        endOffset = parentEndOffset;
+      }
+
+      const spanElement: ElementContent = {
+        type: 'element' as const,
+        tagName: 'span',
+        properties: {
+          'data-start-offset': `${startOffset}`,
+          'data-end-offset': `${endOffset}`,
+        },
+        children: [node as ElementContent],
+        position: node.position,
+      };
+      parent.children[index] = spanElement;
     });
   };
 }
