@@ -44,6 +44,49 @@ export function remarkInsPosition() {
   };
 }
 
+export function remarkTextPosition() {
+  return (tree: Root) => {
+    visit(tree, 'text', (node: Text, index?: number, parent?: Parent) => {
+      if (index === undefined || !parent) return;
+      if (node.position) return;
+
+      const parentPosition = parent.position;
+      if (!parentPosition) return;
+
+      let startOffset: number;
+      if (index === 0) {
+        startOffset = parentPosition.start.offset!;
+      } else {
+        const prevSibling = parent.children[index - 1];
+        if (!prevSibling.position?.end.offset) return;
+        startOffset = prevSibling.position.end.offset;
+      }
+
+      let endOffset: number;
+      if (index === parent.children.length - 1) {
+        endOffset = parentPosition.end.offset!;
+      } else {
+        const nextSibling = parent.children[index + 1];
+        if (!nextSibling.position?.start.offset) return;
+        endOffset = nextSibling.position.start.offset;
+      }
+
+      node.position = {
+        start: {
+          line: UNUSED_LINE_COLUMN,
+          column: UNUSED_LINE_COLUMN,
+          offset: startOffset,
+        },
+        end: {
+          line: UNUSED_LINE_COLUMN,
+          column: UNUSED_LINE_COLUMN,
+          offset: endOffset,
+        },
+      };
+    });
+  };
+}
+
 export function remarkTextBreaks() {
   return (tree: Root, file: VFile) => {
     const source = String(file.value);

@@ -16,6 +16,7 @@ import {
   remarkInsPosition,
   remarkSpacer,
   remarkTextBreaks,
+  remarkTextPosition,
 } from '@/lib/md/remark';
 import { createElement, Fragment, JSX } from 'react';
 import rehypePrettyCode from 'rehype-pretty-code';
@@ -35,6 +36,7 @@ const processor = unified()
   .use(remarkGfm) // support GitHub flavored markdown (tables, strikethrough, etc)
   .use(remarkIns) // support underline text
   .use(remarkInsPosition) // add position to ins nodes (remarkIns doesn't provide it)
+  .use(remarkTextPosition) // fill missing position for text nodes (some plugins don't preserve it)
   .use(remarkTextBreaks) // convert line breaks within text content to break nodes
   .use(remarkSpacer) // convert line breaks between block elements to spacer nodes
   .use(remarkDirective) // support custom directives like :::bgm
