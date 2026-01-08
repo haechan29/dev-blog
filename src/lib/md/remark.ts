@@ -1,4 +1,4 @@
-import { Root, Text } from 'mdast';
+import { Root, RootContent, Text } from 'mdast';
 import type {
   ContainerDirective,
   LeafDirective,
@@ -35,26 +35,36 @@ export function remarkSpacer() {
 
     for (let i = tree.children.length - 1; i >= 0; i--) {
       const child = tree.children[i];
-      const { start: positionStart, end: positionEnd } = child.position!;
+      const { end: positionEnd } = child.position!;
       const nodeEnd = positionEnd.offset!;
 
       while (lineBreakIndex >= 0) {
         const [breakStart, breakCount] = lineBreaks[lineBreakIndex];
         if (breakStart < nodeEnd) break;
+
         if (breakStart === nodeEnd && breakCount >= 2) {
-          tree.children.splice(i + 1, 0, {
-            type: 'spacer',
-            position: {
-              start: { ...positionStart, offset: nodeEnd + 1 },
-              end: { ...positionEnd, offset: nodeEnd + breakCount - 1 },
-            },
-            data: {
-              hProperties: {
-                'data-tag-name': 'spacer',
-                'data-lines': `${breakCount - 1}`,
+          const spacerCount = breakCount - 1;
+          const spacers: RootContent[] = [];
+
+          for (let j = 0; j < spacerCount; j++) {
+            const offsetStart = nodeEnd + 1 + j;
+            const offsetEnd = offsetStart + 1;
+
+            spacers.push({
+              type: 'spacer',
+              position: {
+                start: { line: 0, column: 0, offset: offsetStart },
+                end: { line: 0, column: 0, offset: offsetEnd },
               },
-            },
-          });
+              data: {
+                hProperties: {
+                  'data-tag-name': 'spacer',
+                },
+              },
+            });
+          }
+
+          tree.children.splice(i + 1, 0, ...spacers);
         }
         lineBreakIndex--;
       }
