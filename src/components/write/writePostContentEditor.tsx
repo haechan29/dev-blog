@@ -133,7 +133,7 @@ export default function WritePostContentEditor() {
   const onScroll = useCallback(
     (e: UIEvent<HTMLTextAreaElement>) => {
       const textArea = e.currentTarget;
-      const cursorOffset = getCursorOffset(textArea);
+      const cursorOffset = getCaretOffsetTop(textArea) - textArea.scrollTop;
       dispatch(setContentEditorStatus({ cursorOffset }));
     },
     [dispatch]
@@ -177,7 +177,8 @@ export default function WritePostContentEditor() {
         activeElement?.hasAttribute('data-content-editor') ?? false;
       if (!isActive) return;
       const cursorPosition = activeElement.selectionStart;
-      const cursorOffset = getCursorOffset(activeElement);
+      const cursorOffset =
+        getCaretOffsetTop(activeElement) - activeElement.scrollTop;
       dispatch(setContentEditorStatus({ cursorPosition, cursorOffset }));
     };
     document.addEventListener('selectionchange', onSelectionChange);
@@ -221,39 +222,49 @@ export default function WritePostContentEditor() {
   );
 }
 
-function getCursorOffset(textarea: HTMLTextAreaElement) {
-  const { value, selectionStart, scrollTop } = textarea;
-  const textBeforeCursor = value.substring(0, selectionStart);
-  const lines = textBeforeCursor.split('\n').length - 1;
+function getCaretOffsetTop(textarea: HTMLTextAreaElement): number {
+  const mirror = document.createElement('div');
+  const style = getComputedStyle(textarea);
 
-  const { paddingTop } = getComputedStyle(textarea);
-  const lineHeight = getMeasuredLineHeight(textarea);
+  const properties = [
+    'fontFamily',
+    'fontSize',
+    'fontWeight',
+    'lineHeight',
+    'paddingTop',
+    'paddingRight',
+    'paddingBottom',
+    'paddingLeft',
+    'borderTopWidth',
+    'borderRightWidth',
+    'borderBottomWidth',
+    'borderLeftWidth',
+    'width',
+    'overflowWrap',
+    'wordWrap',
+    'wordBreak',
+    'boxSizing',
+  ] as const;
 
-  const cursorScrollTop = lines * lineHeight + parseInt(paddingTop);
-  const cursorOffset = cursorScrollTop - scrollTop;
-  return cursorOffset;
-}
-
-function getMeasuredLineHeight(textarea: HTMLTextAreaElement) {
-  const cacheLineHeight = textarea.getAttribute('data-measured-line-height');
-  if (cacheLineHeight) return parseInt(cacheLineHeight);
-
-  const clone = textarea.cloneNode(false) as HTMLTextAreaElement;
-  Object.assign(clone.style, {
-    position: 'absolute',
-    visibility: 'hidden',
-    display: 'block',
-    resize: 'none',
+  properties.forEach(prop => {
+    mirror.style[prop] = style[prop];
   });
 
-  document.body.appendChild(clone);
-  clone.rows = 1;
-  const singleLineHeight = clone.offsetHeight;
-  clone.rows = 2;
-  const doubleLineHeight = clone.offsetHeight;
-  document.body.removeChild(clone);
+  mirror.style.position = 'absolute';
+  mirror.style.visibility = 'hidden';
+  mirror.style.whiteSpace = 'pre-wrap';
 
-  const measuredLineHeight = doubleLineHeight - singleLineHeight;
-  textarea.setAttribute('data-measured-line-height', `${measuredLineHeight}`);
-  return measuredLineHeight;
+  mirror.textContent = textarea.value.substring(0, textarea.selectionStart);
+
+  const marker = document.createElement('span');
+  marker.textContent = '\u200b'; // zero-width space
+  mirror.appendChild(marker);
+
+  document.body.appendChild(mirror);
+
+  const caretTop = marker.offsetTop;
+
+  document.body.removeChild(mirror);
+
+  return caretTop;
 }
