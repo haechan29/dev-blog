@@ -41,15 +41,39 @@ export default function WritePostContentPreview() {
         const length = endOffset - startOffset;
 
         if (cursorPosition < startOffset || cursorPosition > endOffset) return;
-        if (minLength !== null && length >= minLength) return;
+        if (minLength !== null && length > minLength) return;
         minLength = length;
         targetElement = element;
       });
 
       if (!targetElement) return;
-      const previewOffsetTop = (contentPreview as HTMLElement).offsetTop;
-      const targetOffsetTop = (targetElement as HTMLElement).offsetTop;
-      const offsetTop = targetOffsetTop - previewOffsetTop;
+      const target = targetElement as HTMLElement;
+      const previewTop = contentPreview.getBoundingClientRect().top;
+
+      let targetTop: number;
+
+      const hasOnlyOneTextNode =
+        target.childNodes.length === 1 &&
+        target.childNodes[0].nodeType === Node.TEXT_NODE;
+
+      if (hasOnlyOneTextNode) {
+        const textNode = target.childNodes[0] as Text;
+        const startOffset = parseInt(target.getAttribute('data-start-offset')!);
+        const localOffset = Math.min(
+          cursorPosition - startOffset,
+          textNode.textContent.length
+        );
+
+        const range = document.createRange();
+        range.setStart(textNode, localOffset);
+        range.setEnd(textNode, localOffset);
+        targetTop = range.getBoundingClientRect().top;
+      } else {
+        targetTop = target.getBoundingClientRect().top;
+      }
+
+      const offsetTop = targetTop - previewTop + contentPreview.scrollTop;
+
       contentPreview.scrollTo({
         behavior: 'smooth',
         top: offsetTop - cursorOffset,
