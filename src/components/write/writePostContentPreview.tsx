@@ -28,26 +28,9 @@ export default function WritePostContentPreview() {
 
   const scrollToCursorPosition = useCallback(
     (contentPreview: Element, cursorPosition: number, cursorOffset: number) => {
-      let minLength: number | null = null;
-      let targetElement: Element | null = null;
+      const target = findScrollTarget(contentPreview, cursorPosition);
+      if (!target) return;
 
-      walkElements(contentPreview, (element: Element) => {
-        const startOffsetAttr = element.getAttribute('data-start-offset');
-        const endOffsetAttr = element.getAttribute('data-end-offset');
-        if (startOffsetAttr === null || endOffsetAttr === null) return;
-
-        const startOffset = parseInt(startOffsetAttr);
-        const endOffset = parseInt(endOffsetAttr);
-        const length = endOffset - startOffset;
-
-        if (cursorPosition < startOffset || cursorPosition > endOffset) return;
-        if (minLength !== null && length > minLength) return;
-        minLength = length;
-        targetElement = element;
-      });
-
-      if (!targetElement) return;
-      const target = targetElement as HTMLElement;
       const previewTop = contentPreview.getBoundingClientRect().top;
 
       let targetTop: number;
@@ -158,4 +141,63 @@ function walkElements(
     const result = callback(node as Element);
     if (result === false) break;
   }
+}
+
+function findScrollTarget(
+  root: Element,
+  cursorPosition: number
+): Element | null {
+  let closest: { element: Element; distance: number } | null = null;
+
+  walkElements(root, (element: Element) => {
+    const startOffsetAttr = element.getAttribute('data-start-offset');
+    const endOffsetAttr = element.getAttribute('data-end-offset');
+    if (startOffsetAttr === null || endOffsetAttr === null) return;
+
+    const startOffset = parseInt(startOffsetAttr);
+    const endOffset = parseInt(endOffsetAttr);
+    if (cursorPosition < startOffset || cursorPosition > endOffset) return;
+
+    const distance = endOffset - startOffset;
+
+    if (closest !== null && distance > closest.distance) return;
+    closest = { element, distance };
+  });
+
+  if (!closest) return null;
+  let target = (closest as { element: Element; distance: number }).element;
+
+  if (!isTextElement(target)) {
+    let closestBefore: { element: Element; distance: number } | null = null;
+
+    walkElements(target, (element: Element) => {
+      if (!isTextElement(element)) return;
+
+      const endOffsetAttr = element.getAttribute('data-end-offset');
+      if (endOffsetAttr === null) return;
+
+      const endOffset = parseInt(endOffsetAttr);
+      if (endOffset >= cursorPosition) return;
+
+      const distance = cursorPosition - endOffset;
+
+      if (closestBefore !== null && distance >= closestBefore.distance) return;
+      closestBefore = { element, distance };
+    });
+
+    if (closestBefore) {
+      target = (closestBefore as { element: Element; distance: number })
+        .element;
+    }
+  }
+
+  return target;
+}
+
+function isTextElement(element: Element) {
+  return (
+    element.matches('span') &&
+    element.childNodes.length === 1 &&
+    element.childNodes[0].nodeType === Node.TEXT_NODE
+  );
 }

@@ -49,7 +49,7 @@ export function rehypeOffset() {
       if (index === undefined || !parent) return;
 
       const startOffset = node.position?.start.offset;
-      let endOffset = node.position?.end.offset;
+      const endOffset = node.position?.end.offset;
       if (startOffset === undefined || endOffset === undefined) return;
 
       if (node.type === 'element') {
@@ -57,15 +57,6 @@ export function rehypeOffset() {
         element.properties['data-start-offset'] = `${startOffset}`;
         element.properties['data-end-offset'] = `${endOffset}`;
         return;
-      }
-
-      const parentEndOffset = parent.position?.end.offset;
-      if (
-        parent.type === 'element' &&
-        index === parent.children.length - 1 &&
-        parentEndOffset !== undefined
-      ) {
-        endOffset = parentEndOffset;
       }
 
       const spanElement: ElementContent = {
