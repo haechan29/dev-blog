@@ -55,6 +55,7 @@ export default function SubscribeButton({
   return (
     <button
       onClick={handleClick}
+      disabled={subscribe.isPending || unsubscribe.isPending}
       className={clsx(
         'px-4 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer',
         isSubscribed

@@ -108,6 +108,7 @@ export default function AddPostDialog({
                       <CommandItem
                         key={post.id}
                         value={post.title}
+                        disabled={addPostMutation.isPending}
                         onSelect={() => handleSelect(post.id)}
                         className='cursor-pointer'
                       >

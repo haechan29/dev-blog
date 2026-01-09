@@ -3,18 +3,14 @@ import ExternalLink from '@/components/md/externalLink';
 import Figure from '@/components/md/figure';
 import ImageWithCaption from '@/components/md/imageWithCaption';
 import Spacer from '@/components/md/spacer';
-import {
-  rehypeMode,
-  rehypeOffset,
-  rehypeStyle,
-  rehypeTagName,
-  schema,
-} from '@/lib/md/rehype';
+import { rehypeMode, rehypeOffset, rehypeStyle, schema } from '@/lib/md/rehype';
 import {
   remarkBgm,
   remarkImg,
+  remarkInsPosition,
   remarkSpacer,
   remarkTextBreaks,
+  remarkTextPosition,
 } from '@/lib/md/remark';
 import { createElement, Fragment, JSX } from 'react';
 import rehypePrettyCode from 'rehype-pretty-code';
@@ -23,6 +19,7 @@ import rehypeSanitize from 'rehype-sanitize';
 import rehypeSlug from 'rehype-slug';
 import remarkDirective from 'remark-directive';
 import remarkGfm from 'remark-gfm';
+import remarkIns from 'remark-ins';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { unified } from 'unified';
@@ -31,6 +28,9 @@ import { VFile } from 'vfile';
 const processor = unified()
   .use(remarkParse) // parse markdown text into AST
   .use(remarkGfm) // support GitHub flavored markdown (tables, strikethrough, etc)
+  .use(remarkIns) // support underline text
+  .use(remarkInsPosition) // add position to ins nodes (remarkIns doesn't provide it)
+  .use(remarkTextPosition) // fill missing position for text nodes (some plugins don't preserve it)
   .use(remarkTextBreaks) // convert line breaks within text content to break nodes
   .use(remarkSpacer) // convert line breaks between block elements to spacer nodes
   .use(remarkDirective) // support custom directives like :::bgm
@@ -43,7 +43,6 @@ const processor = unified()
   .use(rehypeSlug) // add id attributes to headings
   .use(rehypeOffset) // add offset attribute to element
   .use(rehypeMode) // add mode attribute to element
-  .use(rehypeTagName) // set tag name to custom elements
   .use(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     rehypeReact as any, // convert HTML AST to React components

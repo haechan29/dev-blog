@@ -9,8 +9,8 @@ declare module 'mdast' {
   interface SpacerNode extends Node {
     type: 'spacer';
     data?: {
+      hName?: string;
       hProperties?: {
-        'data-tag-name'?: string;
         'data-lines'?: string;
       };
     };
@@ -19,8 +19,8 @@ declare module 'mdast' {
   interface BgmNode extends Node {
     type: 'bgm';
     data?: {
+      hName?: string;
       hProperties?: {
-        'data-tag-name'?: string;
         'data-youtube-url'?: string;
         'data-start-time'?: string;
       };

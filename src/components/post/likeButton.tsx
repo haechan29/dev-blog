@@ -30,6 +30,7 @@ export default function LikeButton({
     <div className='flex justify-center mb-20'>
       <button
         onClick={handleClick}
+        disabled={toggleLike.isPending}
         className={clsx(
           'flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300',
           isLiked && isAnimating && 'scale-105',

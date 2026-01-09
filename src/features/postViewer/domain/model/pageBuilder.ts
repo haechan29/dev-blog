@@ -98,7 +98,9 @@ export class PageBuilder {
 
     children.forEach(child => {
       const isText =
-        child.matches('span') && child.firstChild?.nodeType === Node.TEXT_NODE;
+        child.matches('span') &&
+        child.childNodes.length === 1 &&
+        child.childNodes[0].nodeType === Node.TEXT_NODE;
 
       if (!isText) {
         this.handleGenericElement(child);

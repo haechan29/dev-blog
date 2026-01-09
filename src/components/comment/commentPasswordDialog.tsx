@@ -74,6 +74,7 @@ export default function CommentPasswordDialog({
               isLoading ? 'bg-blue-500' : 'bg-blue-600'
             )}
             onClick={handleClickConfirm}
+            disabled={isLoading}
           >
             {isLoading ? (
               <Loader2 size={18} strokeWidth={3} className='animate-spin' />

@@ -58,6 +58,7 @@ export default function DeleteSeriesDialog({
               deleteSeriesMutation.isPending ? 'bg-red-400' : 'bg-red-600'
             )}
             onClick={() => deleteSeries(seriesId)}
+            disabled={deleteSeriesMutation.isPending}
           >
             {deleteSeriesMutation.isPending ? (
               <Loader2 size={18} strokeWidth={3} className='animate-spin' />

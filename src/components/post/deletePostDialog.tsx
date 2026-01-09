@@ -98,6 +98,7 @@ export default function DeletePostDialog({
               isLoading ? 'bg-red-400' : 'bg-red-600'
             )}
             onClick={() => deletePost(postId, password)}
+            disabled={isLoading}
           >
             {isLoading ? (
               <Loader2 size={18} strokeWidth={3} className='animate-spin' />

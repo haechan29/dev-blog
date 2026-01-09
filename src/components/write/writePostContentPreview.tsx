@@ -28,28 +28,35 @@ export default function WritePostContentPreview() {
 
   const scrollToCursorPosition = useCallback(
     (contentPreview: Element, cursorPosition: number, cursorOffset: number) => {
-      let minLength: number | null = null;
-      let targetElement: Element | null = null;
+      const target = findScrollTarget(contentPreview, cursorPosition);
+      if (!target) return;
 
-      walkElements(contentPreview, (element: Element) => {
-        const startOffsetAttr = element.getAttribute('data-start-offset');
-        const endOffsetAttr = element.getAttribute('data-end-offset');
-        if (startOffsetAttr === null || endOffsetAttr === null) return;
+      const previewTop = contentPreview.getBoundingClientRect().top;
 
-        const startOffset = parseInt(startOffsetAttr);
-        const endOffset = parseInt(endOffsetAttr);
-        const length = endOffset - startOffset;
+      let targetTop: number;
 
-        if (cursorPosition < startOffset || cursorPosition > endOffset) return;
-        if (minLength !== null && length >= minLength) return;
-        minLength = length;
-        targetElement = element;
-      });
+      const hasOnlyOneTextNode =
+        target.childNodes.length === 1 &&
+        target.childNodes[0].nodeType === Node.TEXT_NODE;
 
-      if (!targetElement) return;
-      const previewOffsetTop = (contentPreview as HTMLElement).offsetTop;
-      const targetOffsetTop = (targetElement as HTMLElement).offsetTop;
-      const offsetTop = targetOffsetTop - previewOffsetTop;
+      if (hasOnlyOneTextNode) {
+        const textNode = target.childNodes[0] as Text;
+        const startOffset = parseInt(target.getAttribute('data-start-offset')!);
+        const localOffset = Math.min(
+          cursorPosition - startOffset,
+          textNode.textContent.length
+        );
+
+        const range = document.createRange();
+        range.setStart(textNode, localOffset);
+        range.setEnd(textNode, localOffset);
+        targetTop = range.getBoundingClientRect().top;
+      } else {
+        targetTop = target.getBoundingClientRect().top;
+      }
+
+      const offsetTop = targetTop - previewTop + contentPreview.scrollTop;
+
       contentPreview.scrollTo({
         behavior: 'smooth',
         top: offsetTop - cursorOffset,
@@ -134,4 +141,63 @@ function walkElements(
     const result = callback(node as Element);
     if (result === false) break;
   }
+}
+
+function findScrollTarget(
+  root: Element,
+  cursorPosition: number
+): Element | null {
+  let closest: { element: Element; distance: number } | null = null;
+
+  walkElements(root, (element: Element) => {
+    const startOffsetAttr = element.getAttribute('data-start-offset');
+    const endOffsetAttr = element.getAttribute('data-end-offset');
+    if (startOffsetAttr === null || endOffsetAttr === null) return;
+
+    const startOffset = parseInt(startOffsetAttr);
+    const endOffset = parseInt(endOffsetAttr);
+    if (cursorPosition < startOffset || cursorPosition > endOffset) return;
+
+    const distance = endOffset - startOffset;
+
+    if (closest !== null && distance > closest.distance) return;
+    closest = { element, distance };
+  });
+
+  if (!closest) return null;
+  let target = (closest as { element: Element; distance: number }).element;
+
+  if (!isTextElement(target)) {
+    let closestBefore: { element: Element; distance: number } | null = null;
+
+    walkElements(target, (element: Element) => {
+      if (!isTextElement(element)) return;
+
+      const endOffsetAttr = element.getAttribute('data-end-offset');
+      if (endOffsetAttr === null) return;
+
+      const endOffset = parseInt(endOffsetAttr);
+      if (endOffset >= cursorPosition) return;
+
+      const distance = cursorPosition - endOffset;
+
+      if (closestBefore !== null && distance >= closestBefore.distance) return;
+      closestBefore = { element, distance };
+    });
+
+    if (closestBefore) {
+      target = (closestBefore as { element: Element; distance: number })
+        .element;
+    }
+  }
+
+  return target;
+}
+
+function isTextElement(element: Element) {
+  return (
+    element.matches('span') &&
+    element.childNodes.length === 1 &&
+    element.childNodes[0].nodeType === Node.TEXT_NODE
+  );
 }

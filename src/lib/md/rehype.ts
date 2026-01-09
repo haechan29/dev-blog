@@ -5,6 +5,7 @@ import { VFile } from 'vfile';
 
 export const schema: Options = {
   ...defaultSchema,
+  tagNames: [...(defaultSchema.tagNames ?? []), 'spacer', 'bgm'],
   attributes: {
     ...defaultSchema.attributes,
     img: [
@@ -13,13 +14,8 @@ export const schema: Options = {
       ['data-status', 'loading', 'failed'],
       'data-caption',
     ],
-    div: [
-      ...(defaultSchema.attributes?.div ?? []),
-      ['data-tag-name', 'bgm', 'spacer'],
-      'data-youtube-url',
-      'data-start-time',
-      'data-lines',
-    ],
+    spacer: ['data-lines'],
+    bgm: ['data-youtube-url', 'data-start-time'],
   },
   protocols: {
     ...defaultSchema.protocols,
@@ -56,19 +52,20 @@ export function rehypeOffset() {
         const element = node as Element;
         element.properties['data-start-offset'] = `${startOffset}`;
         element.properties['data-end-offset'] = `${endOffset}`;
-      } else {
-        const spanElement: ElementContent = {
-          type: 'element' as const,
-          tagName: 'span',
-          properties: {
-            'data-start-offset': `${startOffset}`,
-            'data-end-offset': `${endOffset}`,
-          },
-          children: [node as ElementContent],
-          position: node.position,
-        };
-        parent.children[index] = spanElement;
+        return;
       }
+
+      const spanElement: ElementContent = {
+        type: 'element' as const,
+        tagName: 'span',
+        properties: {
+          'data-start-offset': `${startOffset}`,
+          'data-end-offset': `${endOffset}`,
+        },
+        children: [node as ElementContent],
+        position: node.position,
+      };
+      parent.children[index] = spanElement;
     });
   };
 }
@@ -79,16 +76,6 @@ export function rehypeMode() {
     if (typeof mode !== 'string') return;
     visit(tree, 'element', (element: Element) => {
       element.properties['data-mode'] = `${mode}`;
-    });
-  };
-}
-
-export function rehypeTagName() {
-  return (tree: Root) => {
-    visit(tree, 'element', (element: Element) => {
-      if (element.tagName === 'div' && 'data-tag-name' in element.properties) {
-        element.tagName = element.properties['data-tag-name'] as string;
-      }
     });
   };
 }
