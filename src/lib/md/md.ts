@@ -3,13 +3,7 @@ import ExternalLink from '@/components/md/externalLink';
 import Figure from '@/components/md/figure';
 import ImageWithCaption from '@/components/md/imageWithCaption';
 import Spacer from '@/components/md/spacer';
-import {
-  rehypeMode,
-  rehypeOffset,
-  rehypeStyle,
-  rehypeTagName,
-  schema,
-} from '@/lib/md/rehype';
+import { rehypeMode, rehypeOffset, rehypeStyle, schema } from '@/lib/md/rehype';
 import {
   remarkBgm,
   remarkImg,
@@ -49,7 +43,6 @@ const processor = unified()
   .use(rehypeSlug) // add id attributes to headings
   .use(rehypeOffset) // add offset attribute to element
   .use(rehypeMode) // add mode attribute to element
-  .use(rehypeTagName) // set tag name to custom elements
   .use(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     rehypeReact as any, // convert HTML AST to React components

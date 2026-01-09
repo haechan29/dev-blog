@@ -142,9 +142,7 @@ export function remarkSpacer() {
                 },
               },
               data: {
-                hProperties: {
-                  'data-tag-name': 'spacer',
-                },
+                hName: 'spacer',
               },
             });
           }
@@ -211,8 +209,8 @@ export function remarkBgm() {
         ...node,
         type: 'bgm',
         data: {
+          hName: 'bgm',
           hProperties: {
-            'data-tag-name': 'bgm',
             'data-youtube-url': youtubeUrl,
             'data-start-time': startTime ?? '0',
           },
