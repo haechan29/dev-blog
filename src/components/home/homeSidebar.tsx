@@ -51,13 +51,16 @@ export default function HomeSidebar({ userId }: { userId: string }) {
             </div>
 
             <div className='mt-auto py-4'>
-              <div className='flex gap-3 text-xs text-gray-400'>
-                <Link href='/privacy' className='hover:text-gray-600'>
+              <div className='flex gap-3 text-xs text-gray-500'>
+                <Link href='/privacy' className='hover:text-gray-700'>
                   개인정보처리방침
                 </Link>
-                <Link href='/terms' className='hover:text-gray-600'>
+                <Link href='/terms' className='hover:text-gray-700'>
                   이용약관
                 </Link>
+              </div>
+              <div className='text-xs text-gray-400 mt-2'>
+                누구나 글을 쓰고 읽는 곳 © ShareText
               </div>
             </div>
           </div>
