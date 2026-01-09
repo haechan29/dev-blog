@@ -13,6 +13,7 @@ export default function LoginPage() {
   const callbackUrl = searchParams.get('callbackUrl') || '/';
   const providers = ['google', 'kakao'];
   const [lastProvider, setLastProvider] = useState<string | null>(null);
+  const [isPending, setIsPending] = useState(false);
 
   useEffect(() => {
     setLastProvider(localStorage.getItem(LAST_LOGIN_PROVIDER_KEY));
@@ -30,8 +31,10 @@ export default function LoginPage() {
               onClick={e => {
                 if (canTouch) createRipple(e);
                 localStorage.setItem(LAST_LOGIN_PROVIDER_KEY, provider);
+                setIsPending(true);
                 signIn(provider, { callbackUrl });
               }}
+              disabled={isPending}
               className='w-full relative cursor-pointer'
               aria-label={`${provider} 로그인`}
             >

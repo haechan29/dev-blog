@@ -80,6 +80,7 @@ export default function SeriesPostList({
     >
       <SortableContext
         items={localPosts}
+        disabled={reorderPostsMutation.isPending}
         strategy={verticalListSortingStrategy}
       >
         <div className='flex flex-col gap-8'>

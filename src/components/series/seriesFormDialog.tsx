@@ -146,6 +146,7 @@ export default function SeriesFormDialog({
               isPending ? 'bg-blue-500' : 'bg-blue-600'
             )}
             onClick={handleSubmit}
+            disabled={isPending}
           >
             {isPending ? (
               <Loader2 size={18} strokeWidth={3} className='animate-spin' />

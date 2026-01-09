@@ -11,8 +11,8 @@ import { setInvalidField } from '@/lib/redux/write/writePostFormSlice';
 import { postKeys } from '@/queries/keys';
 import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { ChevronRight } from 'lucide-react';
-import { Fragment, useCallback, useEffect, useMemo } from 'react';
+import { ChevronRight, Loader2 } from 'lucide-react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -30,6 +30,7 @@ export default function WritePostToolbar({
   const router = useRouterWithProgress();
   const { currentStepId } = useSelector((state: RootState) => state.writePost);
   const writePostForm = useSelector((state: RootState) => state.writePostForm);
+  const [isPending, setIsPending] = useState(false);
   const { toolbarTexts, actionButtonText } = useMemo(() => {
     return {
       toolbarTexts: Object.values(writePostSteps).map(step => ({
@@ -59,6 +60,7 @@ export default function WritePostToolbar({
         break;
       }
       case 'publish': {
+        setIsPending(true);
         try {
           const post = await publishPost();
           queryClient.setQueryData(postKeys.detail(post.id), post);
@@ -70,6 +72,8 @@ export default function WritePostToolbar({
               ? error.message
               : '게시글 생성에 실패했습니다';
           toast.error(message);
+        } finally {
+          setIsPending(false);
         }
         break;
       }
@@ -108,6 +112,7 @@ export default function WritePostToolbar({
       <ActionButton
         actionButtonText={actionButtonText}
         onClick={onActionButtonClick}
+        isPending={isPending}
       />
     </div>
   );
@@ -145,19 +150,27 @@ function Texts({
 function ActionButton({
   actionButtonText,
   onClick,
+  isPending,
 }: {
   actionButtonText: string;
   onClick: () => void;
+  isPending: boolean;
 }) {
   return (
     <button
       onClick={onClick}
+      disabled={isPending}
       className={clsx(
-        'text-sm font-semibold py-2 px-4 mr-2 rounded-full',
-        'bg-blue-600 hover:bg-blue-500 text-white'
+        'h-9 text-sm font-semibold py-2 px-4 mr-2 rounded-full',
+        'bg-blue-600 text-white',
+        isPending ? 'opacity-50' : 'hover:bg-blue-500'
       )}
     >
-      {actionButtonText}
+      {isPending ? (
+        <Loader2 size={16} className='animate-spin' />
+      ) : (
+        actionButtonText
+      )}
     </button>
   );
 }

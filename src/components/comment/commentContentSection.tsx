@@ -151,6 +151,7 @@ export default function CommentContentSection({
       <div className='flex space-x-2 text-sm'>
         <button
           onClick={handleEdit}
+          disabled={updateCommentMutation.isPending}
           className={clsx(
             'h-9 flex justify-center items-center px-4 text-white rounded-lg hover:bg-blue-500',
             updateCommentMutation.isPending ? 'bg-blue-500' : 'bg-blue-600'

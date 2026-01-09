@@ -108,7 +108,11 @@ export default function CommentLikeButton({
 
   return (
     <div className='flex items-center space-x-4'>
-      <button onClick={toggleIsLiked} className='flex items-center space-x-1'>
+      <button
+        onClick={toggleIsLiked}
+        disabled={incrementLikeCount.isPending || decrementLikeCount.isPending}
+        className='flex items-center space-x-1'
+      >
         <Heart
           size={16}
           className={clsx(
