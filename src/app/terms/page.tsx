@@ -2,7 +2,7 @@ export default function TermsPage() {
   return (
     <div className='max-w-4xl mx-auto px-4 py-12'>
       <h1 className='text-3xl font-bold mb-2'>서비스 이용약관</h1>
-      <p className='text-sm text-gray-600 mb-8'>시행일: 2025년 1월 1일</p>
+      <p className='text-sm text-gray-600 mb-8'>시행일: 2026년 1월 1일</p>
 
       <div className='prose prose-gray max-w-none'>
         <h2 className='text-xl font-bold mt-8 mb-4'>제1조 (목적)</h2>
@@ -35,6 +35,7 @@ export default function TermsPage() {
           <li>
             본 약관은 서비스 화면에 게시하여 공지함으로써 효력이 발생합니다.
           </li>
+          <li>서비스를 이용하는 것은 본 약관에 동의한 것으로 간주합니다.</li>
           <li>
             서비스는 필요한 경우 본 약관을 변경할 수 있으며, 변경된 약관은 공지
             후 7일 뒤부터 효력이 발생합니다.
@@ -96,6 +97,10 @@ export default function TermsPage() {
               <li>음란물, 폭력적 콘텐츠 게시</li>
               <li>스팸, 광고성 게시물 무단 게시</li>
               <li>허위 정보 유포</li>
+              <li>
+                무단 크롤링, 스크래핑 또는 자동화된 방법으로 콘텐츠를 수집하는
+                행위
+              </li>
             </ul>
           </li>
           <li>
