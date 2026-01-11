@@ -5,6 +5,7 @@ import Providers from '@/providers';
 import clsx from 'clsx';
 import type { Metadata } from 'next';
 import { Geist_Mono } from 'next/font/google';
+import Script from 'next/script';
 import 'nprogress/nprogress.css';
 import 'pretendard/dist/web/variable/pretendardvariable.css';
 import { ReactNode } from 'react';
@@ -30,6 +31,12 @@ export default async function RootLayout({
 
   return (
     <html lang='ko'>
+      <Script
+        async
+        src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1208219641035715'
+        crossOrigin='anonymous'
+        strategy='afterInteractive'
+      />
       <body
         className={clsx(
           geistMono.variable,
