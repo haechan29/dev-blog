@@ -3,30 +3,29 @@
 import clsx from 'clsx';
 import { AlertCircle, Maximize2, Minimize2 } from 'lucide-react';
 import Image from 'next/image';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 
 const SCREEN_RATIO = 16 / 9;
 const OVERSIZE_THRESHOLD = 3;
 
 export default function ImageWithCaption({
   src,
+  alt = '',
   'data-size': size,
-  'data-caption': caption,
+  'data-mode': mode,
+  'data-status': status,
   'data-start-offset': startOffset,
   'data-end-offset': endOffset,
-  'data-mode': mode,
-  'data-status': status = 'success',
-  alt = '',
+  children,
 }: {
   src: string;
+  alt?: string;
   'data-size': 'medium' | 'large';
-  'data-caption': string;
-  'data-viewer-caption': string;
-  'data-start-offset': string;
-  'data-end-offset': string;
   'data-mode': 'preview' | 'reader' | 'viewer';
   'data-status': 'loading' | 'failed' | 'success';
-  alt?: string;
+  'data-start-offset': string;
+  'data-end-offset': string;
+  children: ReactNode;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [expandedSize, setExpandedSize] = useState({ width: 0, height: 0 });
@@ -36,13 +35,6 @@ export default function ImageWithCaption({
   const showErrorImage = useMemo(() => {
     return isError || !src || (mode !== 'preview' && src.startsWith('blob:'));
   }, [isError, mode, src]);
-  const parsedCaption = useMemo(() => {
-    return caption
-      .split(/(?<!\\)#/)
-      .map(s => s.replace(/\\#/g, '#'))
-      .filter(Boolean)
-      .join('');
-  }, [caption]);
   const naturalSizeRef = useRef<{ width: number; height: number } | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
@@ -83,7 +75,6 @@ export default function ImageWithCaption({
     return (
       <div
         data-image-with-caption
-        data-caption={caption}
         data-start-offset={startOffset}
         data-end-offset={endOffset}
         className='w-full h-full relative'
@@ -186,7 +177,7 @@ export default function ImageWithCaption({
           />
         )}
 
-        <div className='whitespace-pre-wrap'>{parsedCaption}</div>
+        <div>{children}</div>
       </div>
     );
   }
@@ -261,7 +252,7 @@ export default function ImageWithCaption({
         </div>
       )}
 
-      <div className='whitespace-pre-wrap'>{parsedCaption}</div>
+      <div>{children}</div>
     </div>
   );
 }

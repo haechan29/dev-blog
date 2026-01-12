@@ -1,4 +1,4 @@
-import { Root, RootContent, Text } from 'mdast';
+import { ImageWithCaptionNode, Root, RootContent, Text } from 'mdast';
 import type {
   ContainerDirective,
   LeafDirective,
@@ -161,33 +161,25 @@ export function remarkImg() {
       if (index === undefined || !parent) return;
       if (!isDirectiveNode(node) || node.name !== 'img') return;
 
-      const { url, alt = '', size = 'medium', status } = node.attributes || {};
+      const { url, alt, size, status } = node.attributes || {};
       if (!url) return;
+      const validSize = size === 'medium' || size === 'large' ? size : 'medium';
+      const validStatus =
+        status === 'failed' || status === 'success' || status === 'loading'
+          ? status
+          : 'success';
 
-      const caption = node.children
-        .filter(child => child.type === 'paragraph')
-        .map(p =>
-          p.children
-            .map(child => {
-              if (child.type === 'text') return child.value;
-              if (child.type === 'break') return '\n';
-              return '';
-            })
-            .join('')
-        )
-        .join('\n');
-
-      const newNode = {
+      const newNode: ImageWithCaptionNode = {
         ...node,
-        type: 'image',
-        url,
-        alt,
+        type: 'imageWithCaption',
         data: {
+          hName: 'imageWithCaption',
           hProperties: {
             ...(node.data?.hProperties ?? {}),
-            'data-size': size,
-            'data-caption': caption,
-            ...(status && { 'data-status': status }),
+            src: url,
+            alt: alt ?? '',
+            'data-size': validSize,
+            'data-status': validStatus,
           },
         },
       };

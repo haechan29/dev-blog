@@ -52,7 +52,7 @@ const processor = unified()
       components: {
         a: ExternalLink,
         bgm: Bgm,
-        img: ImageWithCaption,
+        imageWithCaption: ImageWithCaption,
         figure: Figure,
         spacer: Spacer,
       },

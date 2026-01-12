@@ -5,16 +5,20 @@ import { VFile } from 'vfile';
 
 export const schema: Options = {
   ...defaultSchema,
-  tagNames: [...(defaultSchema.tagNames ?? []), 'spacer', 'bgm'],
+  tagNames: [
+    ...(defaultSchema.tagNames ?? []),
+    'spacer',
+    'bgm',
+    'imageWithCaption',
+  ],
   attributes: {
     ...defaultSchema.attributes,
-    img: [
-      ...(defaultSchema.attributes?.img ?? []),
+    imageWithCaption: [
+      'src',
+      'alt',
       ['data-size', 'large', 'medium'],
-      ['data-status', 'loading', 'failed'],
-      'data-caption',
+      ['data-status', 'loading', 'failed', 'success'],
     ],
-    spacer: ['data-lines'],
     bgm: ['data-youtube-url', 'data-start-time'],
   },
   protocols: {
