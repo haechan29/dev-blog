@@ -163,6 +163,17 @@ export function remarkImg() {
 
       const { url, alt, size, status } = node.attributes || {};
       if (!url) return;
+
+      let caption = '';
+      visit(node, 'text', (textNode: Text) => {
+        caption += textNode.value;
+        textNode.value = textNode.value
+          .split(/(?<!\\)#/)
+          .map(s => s.replace(/\\#/g, '#'))
+          .filter(Boolean)
+          .join('');
+      });
+
       const validSize = size === 'medium' || size === 'large' ? size : 'medium';
       const validStatus =
         status === 'failed' || status === 'success' || status === 'loading'
@@ -180,6 +191,7 @@ export function remarkImg() {
             alt: alt ?? '',
             'data-size': validSize,
             'data-status': validStatus,
+            'data-caption': caption,
           },
         },
       };

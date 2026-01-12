@@ -14,6 +14,7 @@ export default function ImageWithCaption({
   'data-size': size,
   'data-mode': mode,
   'data-status': status,
+  'data-caption': caption,
   'data-start-offset': startOffset,
   'data-end-offset': endOffset,
   children,
@@ -23,6 +24,7 @@ export default function ImageWithCaption({
   'data-size': 'medium' | 'large';
   'data-mode': 'preview' | 'reader' | 'viewer';
   'data-status': 'loading' | 'failed' | 'success';
+  'data-caption': string;
   'data-start-offset': string;
   'data-end-offset': string;
   children: ReactNode;
@@ -75,6 +77,7 @@ export default function ImageWithCaption({
     return (
       <div
         data-image-with-caption
+        data-caption={caption}
         data-start-offset={startOffset}
         data-end-offset={endOffset}
         className='w-full h-full relative'

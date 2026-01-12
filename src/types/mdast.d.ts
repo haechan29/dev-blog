@@ -34,6 +34,7 @@ declare module 'mdast' {
         alt: string;
         'data-size': 'medium' | 'large';
         'data-status': 'failed' | 'success' | 'loading';
+        'data-caption': string;
       };
     };
   }

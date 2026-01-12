@@ -67,10 +67,8 @@ export class PageBuilder {
   private handleImageWithCaption(element: HTMLElement) {
     this.flushCurrentPage();
 
-    const captionElement = element.querySelector('div:last-child');
-    const caption = captionElement?.textContent?.trim() || '';
-
-    if (!caption) {
+    const dataCaption = element.dataset.caption;
+    if (!dataCaption) {
       this.pages.push({
         startOffset: Number(element.dataset.startOffset),
         endOffset: Number(element.dataset.endOffset),
@@ -80,7 +78,7 @@ export class PageBuilder {
       return;
     }
 
-    caption
+    dataCaption
       .split(/(?<!\\)#/)
       .map(s => s.replace(/\\#/g, '#'))
       .filter(Boolean)

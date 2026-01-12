@@ -18,6 +18,7 @@ export const schema: Options = {
       'alt',
       ['data-size', 'large', 'medium'],
       ['data-status', 'loading', 'failed', 'success'],
+      'data-caption',
     ],
     bgm: ['data-youtube-url', 'data-start-time'],
   },

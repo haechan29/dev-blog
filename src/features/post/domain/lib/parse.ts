@@ -42,6 +42,7 @@ export function extractPlainText(content: string): string {
     .replace(/\*(.*?)\*/g, '$1') // remove italic formatting
     .replace(/_(.*?)_/g, '$1') // remove italic formatting (underscore)
     .replace(/~~(.*?)~~/g, '$1') // remove strikethrough formatting
+    .replace(/\+\+(.*?)\+\+/g, '$1') // remove underline formatting
     .replace(/\[(.*?)\]\(.*?\)/g, '$1') // remove links and keep text
     .replace(/!\[.*?\]\(.*?\)/g, '') // remove images completely
     .replace(/^\s*\|.*\|$/gm, '') // remove table rows
