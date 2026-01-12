@@ -163,9 +163,16 @@ export class PageBuilder {
     if (this.pageRanges.length === 0 && this.isEmptyContent(element)) return;
 
     const { top, bottom, height } = element.getBoundingClientRect();
+    const startOffset = Number(element.dataset.startOffset);
+    const endOffset = Number(element.dataset.endOffset);
+
+    if (isNaN(startOffset) || isNaN(endOffset)) {
+      return;
+    }
+
     const range: OffsetRange = {
-      startOffset: Number(element.dataset.startOffset),
-      endOffset: Number(element.dataset.endOffset),
+      startOffset,
+      endOffset,
     };
 
     if (this.baseTop === null) {
@@ -182,8 +189,10 @@ export class PageBuilder {
           bgm: this.pendingBgm,
         });
       } else {
-        this.pageRanges = [range];
-        this.isPageEmpty = this.isEmptyContent(element);
+        if (!this.isEmptyContent(element)) {
+          this.pageRanges = [range];
+          this.isPageEmpty = false;
+        }
         this.baseTop = top;
       }
     } else {
