@@ -263,7 +263,7 @@ export const buttonProps: Record<string, WritePostContentButtonProps> = {
     action: 'markdown',
     category: 'default',
     label: '구분선',
-    content: { icon: 'horizontalRule', style: 'w-5 h-5' },
+    content: { icon: 'horizontalRule', style: 'w-4 h-4' },
     isBlock: true,
     markdownBefore: '---',
   },

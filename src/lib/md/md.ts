@@ -30,7 +30,7 @@ import { VFile } from 'vfile';
 
 const processor = unified()
   .use(remarkParse) // parse markdown text into AST
-  .use(remarkGfm) // support GitHub flavored markdown (tables, strikethrough, etc)
+  .use(remarkGfm, { singleTilde: false }) // support GitHub flavored markdown (tables, strikethrough, etc)
   .use(remarkIns) // support underline text
   .use(remarkSupersub) // support subscript and superscript
   .use(remarkInsPosition) // add position to ins nodes (remarkIns doesn't provide it)
