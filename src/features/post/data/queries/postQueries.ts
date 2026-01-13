@@ -8,8 +8,11 @@ import Post from '@/features/post/domain/model/post';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
-export async function fetchPostsByUserId(userId: string) {
-  const { data, error } = await supabase
+export async function fetchPostsByUserId(
+  userId: string,
+  currentUserId?: string
+) {
+  let query = supabase
     .from('posts')
     .select(
       `
@@ -28,14 +31,21 @@ export async function fetchPostsByUserId(userId: string) {
         post_stats(like_count, view_count)
       `
     )
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false });
+    .eq('user_id', userId);
+
+  if (currentUserId !== userId) {
+    query = query.eq('is_private', false);
+  }
+
+  query = query.order('created_at', { ascending: false });
+
+  const { data, error } = await query;
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return (data as unknown as PostEntity[]).map(toDto);
+  return data as unknown as PostEntity[];
 }
 
 export async function fetchPostsOwnership(postIds: string[]) {

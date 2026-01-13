@@ -13,3 +13,11 @@ export async function getPost(postId: string) {
 
   return toDto(post);
 }
+
+export async function getPostsByUserId(userId: string) {
+  const currentUserId = await getUserId();
+
+  const posts = await PostQueries.fetchPostsByUserId(userId, currentUserId);
+
+  return posts.map(toDto);
+}

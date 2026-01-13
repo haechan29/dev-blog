@@ -1,4 +1,3 @@
-import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as FeedUsecase from '@/features/post/data/usecases/feedUsecase';
 import * as PostUsecase from '@/features/post/data/usecases/postUsecase';
 import * as SearchUsecase from '@/features/post/data/usecases/searchUsecase';
@@ -13,7 +12,7 @@ export async function getFeedPosts(
 }
 
 export async function getPostsByUserId(userId: string) {
-  return await PostQueries.fetchPostsByUserId(userId);
+  return await PostUsecase.getPostsByUserId(userId);
 }
 
 export async function getPost(postId: string) {
