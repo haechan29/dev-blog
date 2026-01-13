@@ -1,5 +1,6 @@
 import { ApiError } from '@/errors/errors';
 import { DailyQuotaExhaustedError } from '@/features/image/data/errors/imageErrors';
+import { PostForbiddenError } from '@/features/post/data/errors/postErrors';
 import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
 import { ErrorCode } from '@/types/errorCode';
 
@@ -58,6 +59,8 @@ function createApiError(
       return new DailyQuotaExhaustedError(message);
     case ErrorCode.DUPLICATE_NICKNAME:
       return new DuplicateNicknameError(message);
+    case ErrorCode.POST_FORBIDDEN:
+      return new PostForbiddenError(message);
     default:
       return new ApiError(message, code, status);
   }

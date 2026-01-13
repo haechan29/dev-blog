@@ -1,8 +1,8 @@
 import { auth } from '@/auth';
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as ImageQueries from '@/features/image/data/queries/imageQueries';
-import { PostNotFoundError } from '@/features/post/data/errors/postErrors';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
+import * as PostUsecase from '@/features/post/data/usecases/postUsecase';
 import { extractImageUrls } from '@/features/post/domain/lib/url';
 import { r2Client } from '@/lib/r2';
 import { getUserId } from '@/lib/user';
@@ -16,13 +16,13 @@ export async function GET(
 ) {
   try {
     const { postId } = await params;
-    const data = await PostQueries.fetchPost(postId);
+    const data = await PostUsecase.getPost(postId);
     return NextResponse.json({ data });
   } catch (error) {
     console.error('게시글 조회에 실패했습니다', error);
 
-    if (error instanceof PostNotFoundError) {
-      return NextResponse.json({ error: error.message }, { status: 404 });
+    if (error instanceof ApiError) {
+      return error.toResponse();
     }
 
     return NextResponse.json(

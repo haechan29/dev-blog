@@ -82,7 +82,7 @@ export async function fetchPost(postId: string) {
     throw new PostNotFoundError(`게시물을 찾을 수 없습니다 (${postId})`);
   }
 
-  return toDto(data as unknown as PostEntity);
+  return data as unknown as PostEntity;
 }
 
 export async function fetchPostForAuth(postId: string) {

@@ -6,3 +6,9 @@ export class PostNotFoundError extends ApiError {
     super(message, ErrorCode.POST_NOT_FOUND, 404);
   }
 }
+
+export class PostForbiddenError extends ApiError {
+  constructor(message: string) {
+    super(message, ErrorCode.POST_FORBIDDEN, 403);
+  }
+}
