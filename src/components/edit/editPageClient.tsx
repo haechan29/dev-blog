@@ -40,13 +40,14 @@ export default function EditPageClient({
 
   const updatePost = useCallback(
     async (postId: string) => {
-      const { title, content, tags, password } = writePostForm;
+      const { title, content, tags, password, isPrivate } = writePostForm;
       const post = await PostClientService.updatePost({
         postId,
         title: title.value,
         content: content.value,
         tags: tags.value,
         password: password.value,
+        isPrivate,
       });
       return createProps(post);
     },

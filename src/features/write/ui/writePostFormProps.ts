@@ -3,6 +3,7 @@ import { writePostSteps } from '@/features/write/constants/writePostStep';
 export type WritePostFormProps = {
   currentStepId: keyof typeof writePostSteps;
   isParseError: boolean;
+  isPrivate: boolean;
   title: {
     value: string;
     isUserInput: boolean;

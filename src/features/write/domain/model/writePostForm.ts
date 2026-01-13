@@ -1,6 +1,7 @@
 export interface WritePostForm {
   invalidField: string | null;
   isParseError: boolean;
+  isPrivate: boolean;
   title: {
     value: string;
     isUserInput: boolean;

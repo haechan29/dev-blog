@@ -28,13 +28,13 @@ export default function WritePageClient({
   const [isOpen, setIsOpen] = useState(false);
 
   const createPost = useCallback(async () => {
-    const { title, content, tags, password } = writePostForm;
+    const { title, content, tags, password, isPrivate } = writePostForm;
     const post = await PostClientService.createPost({
       title: title.value,
       content: content.value,
       tags: tags.value,
       password: password.value,
-      isPrivate: false,
+      isPrivate: isPrivate,
     });
     return createProps(post);
   }, [writePostForm]);
