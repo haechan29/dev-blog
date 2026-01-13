@@ -1,10 +1,10 @@
-import * as SeriesQueries from '@/features/series/data/queries/seriesQueries';
+import * as SeriesUsecase from '@/features/series/data/usecases/seriesUsecase';
 import 'server-only';
 
 export async function fetchSeries(seriesId: string) {
-  return await SeriesQueries.fetchSeries(seriesId);
+  return await SeriesUsecase.getSeries(seriesId);
 }
 
 export async function fetchSeriesByUserId(userId: string) {
-  return await SeriesQueries.fetchSeriesByUserId(userId);
+  return await SeriesUsecase.getSeriesByUserId(userId);
 }

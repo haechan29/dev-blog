@@ -11,6 +11,12 @@ export interface SeriesEntity {
   users: Pick<UserEntity, 'nickname'>;
   posts: Pick<
     PostEntity,
-    'id' | 'title' | 'created_at' | 'series_id' | 'series_order' | 'post_stats'
+    | 'id'
+    | 'title'
+    | 'created_at'
+    | 'series_id'
+    | 'series_order'
+    | 'post_stats'
+    | 'is_private'
   >[];
 }

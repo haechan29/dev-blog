@@ -1,5 +1,6 @@
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as SeriesQueries from '@/features/series/data/queries/seriesQueries';
+import * as SeriesUsecase from '@/features/series/data/usecases/seriesUsecase';
 import { getUserId } from '@/lib/user';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -9,7 +10,7 @@ export async function GET(
 ) {
   try {
     const { seriesId } = await params;
-    const data = await SeriesQueries.fetchSeries(seriesId);
+    const data = await SeriesUsecase.getSeries(seriesId);
     return NextResponse.json({ data });
   } catch (error) {
     console.error('시리즈 조회 요청이 실패했습니다', error);
