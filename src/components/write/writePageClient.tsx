@@ -34,6 +34,7 @@ export default function WritePageClient({
       content: content.value,
       tags: tags.value,
       password: password.value,
+      isPrivate: false,
     });
     return createProps(post);
   }, [writePostForm]);

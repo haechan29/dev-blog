@@ -128,12 +128,14 @@ export async function createPost({
   content,
   tags,
   passwordHash,
+  isPrivate,
   userId,
 }: {
   title: string;
   content: string;
   tags: string[];
   passwordHash: string | null;
+  isPrivate: boolean;
   userId: string;
 }) {
   const { data, error } = await supabase
@@ -143,6 +145,7 @@ export async function createPost({
       content,
       tags,
       password_hash: passwordHash,
+      is_private: isPrivate,
       user_id: userId,
     })
     .select(
@@ -178,6 +181,7 @@ export async function updatePost({
   tags,
   seriesId,
   seriesOrder,
+  isPrivate,
 }: {
   postId: string;
   title?: string;
@@ -185,6 +189,7 @@ export async function updatePost({
   tags?: string[];
   seriesId?: string | null;
   seriesOrder?: number | null;
+  isPrivate?: boolean;
 }) {
   const updates: Partial<PostEntity> = {
     updated_at: new Date().toISOString(),
@@ -193,6 +198,7 @@ export async function updatePost({
     ...(tags !== undefined && { tags }),
     ...(seriesId !== undefined && { series_id: seriesId }),
     ...(seriesOrder !== undefined && { series_order: seriesOrder }),
+    ...(isPrivate !== undefined && { is_private: isPrivate }),
   };
 
   const { data, error } = await supabase

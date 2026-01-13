@@ -38,7 +38,7 @@ export async function PATCH(
 ) {
   try {
     const { postId } = await params;
-    const { title, content, tags, password, seriesId, seriesOrder } =
+    const { title, content, tags, password, seriesId, seriesOrder, isPrivate } =
       await request.json();
 
     const session = await auth();
@@ -80,6 +80,7 @@ export async function PATCH(
       tags,
       seriesId,
       seriesOrder,
+      isPrivate,
     });
 
     return NextResponse.json({ data: updated });

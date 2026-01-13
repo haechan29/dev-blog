@@ -43,6 +43,7 @@ export async function createPost(params: {
   content: string;
   tags: string[];
   password: string;
+  isPrivate: boolean;
 }) {
   const dto = await PostClientRepository.createPost(params);
   return toDomain(dto);
@@ -56,6 +57,7 @@ export async function updatePost(params: {
   password?: string;
   seriesId?: string | null;
   seriesOrder?: number | null;
+  isPrivate?: boolean;
 }) {
   const post = await PostClientRepository.updatePost(params);
   return toDomain(post);

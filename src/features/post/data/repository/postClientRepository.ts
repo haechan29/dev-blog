@@ -55,6 +55,7 @@ export async function createPost(requestDto: {
   content: string;
   tags: string[];
   password: string;
+  isPrivate: boolean;
 }): Promise<PostDto> {
   const response = await api.post(`/api/posts`, requestDto);
   return response.data;
@@ -71,6 +72,7 @@ export async function updatePost({
   password?: string;
   seriesId?: string | null;
   seriesOrder?: number | null;
+  isPrivate?: boolean;
 }): Promise<PostDto> {
   const response = await api.patch(`/api/posts/${postId}`, requestBody);
   return response.data;
