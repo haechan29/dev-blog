@@ -10,6 +10,7 @@ export interface PostEntity {
   user_id: string;
   series_id: string | null;
   series_order: number | null;
+  is_private: boolean;
   users: Pick<UserEntity, 'nickname' | 'deleted_at' | 'registered_at'>;
   series: { title: string } | null;
   post_stats: { like_count: number; view_count: number } | null;
