@@ -2,6 +2,7 @@
 
 import Comments from '@/components/comment/comments';
 import HomeToolbar from '@/components/home/homeToolbar';
+import ForbiddenPostPage from '@/components/post/forbiddenPostPage';
 import LikeButton from '@/components/post/likeButton';
 import PostContentWrapper from '@/components/post/postContentWrapper';
 import PostHeader from '@/components/post/postHeader';
@@ -12,6 +13,7 @@ import PostToolbar from '@/components/post/postToolbar';
 import UserProfile from '@/components/post/userProfile';
 import EnterFullscreenButton from '@/components/postViewer/enterFullscreenButton';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import { PostForbiddenError } from '@/features/post/data/errors/postErrors';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import useBgmController from '@/features/post/hooks/useBgmController';
 import useRecordView from '@/features/post/hooks/useRecordView';
@@ -73,7 +75,7 @@ export default function PostPageClient({
     },
   });
 
-  const { data: post } = useQuery({
+  const { data: post, error } = useQuery({
     queryKey: postKeys.detail(initialPost.id),
     queryFn: () => PostClientService.getPost(initialPost.id).then(createProps),
     initialData: initialPost,
@@ -101,6 +103,10 @@ export default function PostPageClient({
       fetchNextPage();
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  if (error instanceof PostForbiddenError) {
+    return <ForbiddenPostPage isLoggedIn={isLoggedIn} />;
+  }
 
   return (
     <>
