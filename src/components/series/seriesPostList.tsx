@@ -142,7 +142,7 @@ function SeriesPost({
           </div>
           <div className='flex-1 flex flex-col gap-2'>
             <div className='flex gap-2'>
-              {isOwner && post.visibility === 'private' && (
+              {post.visibility === 'private' && (
                 <LockIcon className='w-5 h-5 shrink-0 opacity-70 mt-1' />
               )}
               <div className='text-xl font-semibold text-gray-900 line-clamp-2'>

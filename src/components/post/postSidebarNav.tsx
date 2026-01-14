@@ -3,15 +3,14 @@
 import { LockIcon } from '@/components/lockIcon';
 import { PostProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
+import { Link2 } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export default function PostSidebarNav({
-  userId,
   currentPostId,
   posts,
 }: {
-  userId?: string;
   currentPostId: string;
   posts: PostProps[];
 }) {
@@ -77,11 +76,7 @@ export default function PostSidebarNav({
             onToggle={() => toggleSeries(seriesId)}
           />
           {openSeriesIds.has(seriesId) && (
-            <NavPostList
-              userId={userId}
-              posts={seriesPosts}
-              currentPostId={currentPostId}
-            />
+            <NavPostList posts={seriesPosts} currentPostId={currentPostId} />
           )}
         </div>
       ))}
@@ -97,8 +92,11 @@ export default function PostSidebarNav({
               : 'text-gray-900'
           )}
         >
-          {post.userId === userId && post.visibility === 'private' && (
+          {post.visibility === 'private' && (
             <LockIcon className='w-3.5 h-3.5 shrink-0 opacity-70' />
+          )}
+          {post.visibility === 'unlisted' && (
+            <Link2 className='w-3.5 h-3.5 shrink-0 opacity-70' />
           )}
           <div className='text-sm'>{post.title}</div>
         </Link>
@@ -133,11 +131,9 @@ function NavCategory({
 }
 
 function NavPostList({
-  userId,
   posts,
   currentPostId,
 }: {
-  userId?: string;
   posts: PostProps[];
   currentPostId: string;
 }) {
@@ -152,8 +148,11 @@ function NavPostList({
           : 'text-gray-900'
       )}
     >
-      {post.userId === userId && post.visibility === 'private' && (
+      {post.visibility === 'private' && (
         <LockIcon className='w-3.5 h-3.5 shrink-0' />
+      )}
+      {post.visibility === 'unlisted' && (
+        <Link2 className='w-3.5 h-3.5 shrink-0' />
       )}
       <div className='text-sm'>{post.title}</div>
     </Link>

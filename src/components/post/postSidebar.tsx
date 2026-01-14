@@ -12,11 +12,9 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostSidebar({
-  userId,
   authorId,
   currentPostId,
 }: {
-  userId?: string;
   authorId: string;
   currentPostId: string;
 }) {
@@ -43,13 +41,7 @@ export default function PostSidebar({
       isVisible={isVisible}
       onClose={() => dispatch(setIsVisible(false))}
     >
-      {posts && (
-        <PostSidebarNav
-          userId={userId}
-          currentPostId={currentPostId}
-          posts={posts}
-        />
-      )}
+      {posts && <PostSidebarNav currentPostId={currentPostId} posts={posts} />}
     </Sidebar>
   );
 }

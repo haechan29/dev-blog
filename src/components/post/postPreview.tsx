@@ -5,7 +5,7 @@ import PostInfo from '@/components/post/postInfo';
 import PostSettingsDropdown from '@/components/post/postSettingsDropdown';
 import { PostProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
-import { MoreVertical } from 'lucide-react';
+import { Link2, MoreVertical } from 'lucide-react';
 import Link from 'next/link';
 
 const SCALE_ANIMATION_DELAY = 0.5;
@@ -73,8 +73,11 @@ export default function PostPreview({
               'flex gap-2 items-start'
             )}
           >
-            {post.userId === userId && post.visibility === 'private' && (
+            {post.visibility === 'private' && (
               <LockIcon className='w-6 h-6 shrink-0 opacity-70 mt-1' />
+            )}
+            {post.visibility === 'unlisted' && (
+              <Link2 className='w-6 h-6 shrink-0 opacity-70 mt-1' />
             )}
             <div className='text-2xl font-semibold line-clamp-2'>{title}</div>
           </div>
