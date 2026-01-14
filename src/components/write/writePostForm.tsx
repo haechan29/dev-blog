@@ -2,6 +2,7 @@
 
 import WritePostContent from '@/components/write/writePostContent';
 import WritePostPassword from '@/components/write/writePostPassword';
+import WritePostPrivacy from '@/components/write/writePostPrivacy';
 import WritePostTag from '@/components/write/writePostTag';
 import WritePostTitle from '@/components/write/writePostTitle';
 import useWritePostForm from '@/features/write/hooks/useWritePostForm';
@@ -28,6 +29,7 @@ export default function WritePostForm({ isLoggedIn }: { isLoggedIn: boolean }) {
           <WritePostTitle />
           <WritePostTag />
           {!isLoggedIn && <WritePostPassword />}
+          <WritePostPrivacy />
         </div>
       </div>
     </div>

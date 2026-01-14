@@ -2,6 +2,7 @@
 
 import Comments from '@/components/comment/comments';
 import HomeToolbar from '@/components/home/homeToolbar';
+import ForbiddenPostPage from '@/components/post/forbiddenPostPage';
 import LikeButton from '@/components/post/likeButton';
 import PostContentWrapper from '@/components/post/postContentWrapper';
 import PostHeader from '@/components/post/postHeader';
@@ -9,9 +10,11 @@ import PostPreview from '@/components/post/postPreview';
 import PostSeriesNav from '@/components/post/postSeriesNav';
 import PostSidebar from '@/components/post/postSidebar';
 import PostToolbar from '@/components/post/postToolbar';
+import PostVisibilityBanner from '@/components/post/postVisibilityBanner';
 import UserProfile from '@/components/post/userProfile';
 import EnterFullscreenButton from '@/components/postViewer/enterFullscreenButton';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import { PostForbiddenError } from '@/features/post/data/errors/postErrors';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import useBgmController from '@/features/post/hooks/useBgmController';
 import useRecordView from '@/features/post/hooks/useRecordView';
@@ -73,7 +76,7 @@ export default function PostPageClient({
     },
   });
 
-  const { data: post } = useQuery({
+  const { data: post, error } = useQuery({
     queryKey: postKeys.detail(initialPost.id),
     queryFn: () => PostClientService.getPost(initialPost.id).then(createProps),
     initialData: initialPost,
@@ -102,12 +105,20 @@ export default function PostPageClient({
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  if (error instanceof PostForbiddenError) {
+    return <ForbiddenPostPage isLoggedIn={isLoggedIn} />;
+  }
+
   return (
     <>
       <HomeToolbar isLoggedIn={isLoggedIn} className='max-xl:hidden' />
       <PostToolbar className='xl:hidden' />
 
-      <PostSidebar userId={post.userId} currentPostId={post.id} />
+      <PostSidebar
+        userId={userId}
+        authorId={post.userId}
+        currentPostId={post.id}
+      />
 
       <div
         className={clsx(
@@ -120,6 +131,10 @@ export default function PostPageClient({
 
         <PostHeader isLoggedIn={isLoggedIn} userId={userId} post={post} />
         <div className='w-full h-px bg-gray-200 mb-10' />
+
+        {post.visibility === 'private' && post.userId === userId && (
+          <PostVisibilityBanner />
+        )}
 
         <PostContentWrapper post={post} parsedContent={parsedContent} />
 

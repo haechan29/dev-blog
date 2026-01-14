@@ -5,11 +5,15 @@ import {
 import { PostNotFoundError } from '@/features/post/data/errors/postErrors';
 import { toDto } from '@/features/post/data/mapper/postMapper';
 import Post from '@/features/post/domain/model/post';
+import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
-export async function fetchPostsByUserId(userId: string) {
-  const { data, error } = await supabase
+export async function fetchPostsByUserId(
+  userId: string,
+  currentUserId?: string
+) {
+  let query = supabase
     .from('posts')
     .select(
       `
@@ -22,19 +26,27 @@ export async function fetchPostsByUserId(userId: string) {
         user_id,
         series_id,
         series_order,
+        visibility,
         users:user_id(nickname, deleted_at, registered_at),
         series:series_id(title),
         post_stats(like_count, view_count)
       `
     )
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false });
+    .eq('user_id', userId);
+
+  if (currentUserId !== userId) {
+    query = query.eq('visibility', 'public');
+  }
+
+  query = query.order('created_at', { ascending: false });
+
+  const { data, error } = await query;
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return (data as unknown as PostEntity[]).map(toDto);
+  return data as unknown as PostEntity[];
 }
 
 export async function fetchPostsOwnership(postIds: string[]) {
@@ -64,6 +76,7 @@ export async function fetchPost(postId: string) {
         user_id,
         series_id,
         series_order,
+        visibility,
         users:user_id(nickname, deleted_at, registered_at),
         series:series_id(title),
         post_stats(like_count, view_count)
@@ -80,7 +93,7 @@ export async function fetchPost(postId: string) {
     throw new PostNotFoundError(`게시물을 찾을 수 없습니다 (${postId})`);
   }
 
-  return toDto(data as unknown as PostEntity);
+  return data as unknown as PostEntity;
 }
 
 export async function fetchPostForAuth(postId: string) {
@@ -126,12 +139,14 @@ export async function createPost({
   content,
   tags,
   passwordHash,
+  visibility,
   userId,
 }: {
   title: string;
   content: string;
   tags: string[];
   passwordHash: string | null;
+  visibility: PostVisibility;
   userId: string;
 }) {
   const { data, error } = await supabase
@@ -141,6 +156,7 @@ export async function createPost({
       content,
       tags,
       password_hash: passwordHash,
+      visibility,
       user_id: userId,
     })
     .select(
@@ -154,6 +170,7 @@ export async function createPost({
         user_id,
         series_id,
         series_order,
+        visibility,
         users:user_id(nickname, deleted_at, registered_at),
         series:series_id(title),
         post_stats(like_count, view_count)
@@ -175,6 +192,7 @@ export async function updatePost({
   tags,
   seriesId,
   seriesOrder,
+  visibility,
 }: {
   postId: string;
   title?: string;
@@ -182,6 +200,7 @@ export async function updatePost({
   tags?: string[];
   seriesId?: string | null;
   seriesOrder?: number | null;
+  visibility?: PostVisibility;
 }) {
   const updates: Partial<PostEntity> = {
     updated_at: new Date().toISOString(),
@@ -190,6 +209,7 @@ export async function updatePost({
     ...(tags !== undefined && { tags }),
     ...(seriesId !== undefined && { series_id: seriesId }),
     ...(seriesOrder !== undefined && { series_order: seriesOrder }),
+    ...(visibility !== undefined && { visibility }),
   };
 
   const { data, error } = await supabase
@@ -207,6 +227,7 @@ export async function updatePost({
         user_id,
         series_id,
         series_order,
+        visibility,
         users:user_id(nickname, deleted_at, registered_at),
         series:series_id(title),
         post_stats(like_count, view_count)

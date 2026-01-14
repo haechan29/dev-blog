@@ -26,13 +26,13 @@ export async function fetchFeedPosts({
         user_id,
         series_id,
         series_order,
+        visibility,
         users:user_id(nickname, deleted_at, registered_at),
         series:series_id(title),
         post_stats!inner(like_count, view_count, popularity)
       `
     )
-    .order('post_stats(popularity)', { ascending: false })
-    .limit(limit);
+    .eq('visibility', 'public');
 
   if (excludeIds.length > 0) {
     query = query.not('id', 'in', `(${excludeIds.join(',')})`);
@@ -45,6 +45,10 @@ export async function fetchFeedPosts({
   if (cursor) {
     query = query.lt('post_stats.popularity', cursor);
   }
+
+  query = query
+    .order('post_stats(popularity)', { ascending: false })
+    .limit(limit);
 
   const { data, error } = await query;
 

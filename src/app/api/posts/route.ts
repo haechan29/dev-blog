@@ -3,6 +3,7 @@ import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as ImageQueries from '@/features/image/data/queries/imageQueries';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as FeedUsecase from '@/features/post/data/usecases/feedUsecase';
+import * as PostUsecase from '@/features/post/data/usecases/postUsecase';
 import * as SearchUsecase from '@/features/post/data/usecases/searchUsecase';
 import { extractImageUrls } from '@/features/post/domain/lib/url';
 import { PostStatCreationError } from '@/features/postStat/data/errors/postStatErrors';
@@ -54,7 +55,7 @@ export async function GET(request: NextRequest) {
       throw new ValidationError('사용자를 찾을 수 없습니다');
     }
 
-    const data = await PostQueries.fetchPostsByUserId(userId);
+    const data = await PostUsecase.getPostsByUserId(userId);
     return NextResponse.json({ data });
   } catch (error) {
     console.error('게시글 목록 조회에 실패했습니다', error);
@@ -72,7 +73,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { title, content, password, tags } = await request.json();
+    const { title, content, password, tags, visibility } = await request.json();
 
     const session = await auth();
     const userId = await getUserId();
@@ -96,6 +97,7 @@ export async function POST(request: NextRequest) {
       content,
       tags,
       passwordHash,
+      visibility,
       userId,
     });
 

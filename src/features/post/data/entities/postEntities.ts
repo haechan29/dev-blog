@@ -1,3 +1,4 @@
+import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import { UserEntity } from '@/features/user/data/entities/userEntities';
 
 export interface PostEntity {
@@ -10,6 +11,7 @@ export interface PostEntity {
   user_id: string;
   series_id: string | null;
   series_order: number | null;
+  visibility: PostVisibility;
   users: Pick<UserEntity, 'nickname' | 'deleted_at' | 'registered_at'>;
   series: { title: string } | null;
   post_stats: { like_count: number; view_count: number } | null;
@@ -26,6 +28,7 @@ export interface PostEntityFlat {
   user_id: string;
   series_id: string | null;
   series_order: number | null;
+  visibility: PostVisibility;
   nickname: UserEntity['nickname'];
   deleted_at: UserEntity['deleted_at'];
   registered_at: UserEntity['registered_at'];

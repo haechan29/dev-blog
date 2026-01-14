@@ -19,6 +19,7 @@ export function toDto(entity: SeriesEntity): SeriesDto {
       seriesOrder: post.series_order,
       likeCount: post.post_stats?.like_count ?? 0,
       viewCount: post.post_stats?.view_count ?? 0,
+      visibility: post.visibility,
     })),
     postCount: entity.posts.length,
   };

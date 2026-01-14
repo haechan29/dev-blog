@@ -1,5 +1,6 @@
 'use client';
 
+import { LockIcon } from '@/components/lockIcon';
 import RemovePostDialog from '@/components/series/removePostDialog';
 import useSeries from '@/features/series/domain/hooks/useSeries';
 import { SeriesProps } from '@/features/series/ui/seriesProps';
@@ -140,8 +141,13 @@ function SeriesPost({
             {index + 1}
           </div>
           <div className='flex-1 flex flex-col gap-2'>
-            <div className='text-xl font-semibold text-gray-900 line-clamp-2'>
-              {post.title}
+            <div className='flex gap-2'>
+              {isOwner && post.visibility === 'private' && (
+                <LockIcon className='w-5 h-5 shrink-0 opacity-70 mt-1' />
+              )}
+              <div className='text-xl font-semibold text-gray-900 line-clamp-2'>
+                {post.title}
+              </div>
             </div>
             <div className='flex items-center gap-2 text-xs text-gray-500'>
               <div>{post.createdAt}</div>

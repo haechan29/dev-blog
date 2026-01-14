@@ -13,9 +13,11 @@ import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostSidebar({
   userId,
+  authorId,
   currentPostId,
 }: {
-  userId: string;
+  userId?: string;
+  authorId: string;
   currentPostId: string;
 }) {
   const dispatch = useDispatch<AppDispatch>();
@@ -24,7 +26,7 @@ export default function PostSidebar({
     return state.postSidebar.isVisible;
   });
 
-  const { posts } = usePosts(userId);
+  const { posts } = usePosts(authorId);
 
   useScrollLock({ isLocked: isVisible });
 
@@ -41,7 +43,13 @@ export default function PostSidebar({
       isVisible={isVisible}
       onClose={() => dispatch(setIsVisible(false))}
     >
-      {posts && <PostSidebarNav currentPostId={currentPostId} posts={posts} />}
+      {posts && (
+        <PostSidebarNav
+          userId={userId}
+          currentPostId={currentPostId}
+          posts={posts}
+        />
+      )}
     </Sidebar>
   );
 }

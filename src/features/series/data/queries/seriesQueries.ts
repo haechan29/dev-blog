@@ -16,7 +16,7 @@ export async function fetchSeries(seriesId: string) {
         created_at, 
         updated_at,
         users:user_id(nickname),
-        posts(id, title, created_at, series_id, series_order, post_stats(like_count, view_count))
+        posts(id, title, created_at, series_id, series_order, visibility, post_stats(like_count, view_count))
       `
     )
     .eq('id', seriesId)
@@ -31,7 +31,7 @@ export async function fetchSeries(seriesId: string) {
     throw new SeriesNotFoundError('시리즈를 찾을 수 없습니다');
   }
 
-  return toDto(data as unknown as SeriesEntity);
+  return data as unknown as SeriesEntity;
 }
 
 export async function fetchSeriesByUserId(userId: string) {
@@ -46,7 +46,7 @@ export async function fetchSeriesByUserId(userId: string) {
         created_at, 
         updated_at,
         users:user_id(nickname),
-        posts(id, title, created_at, series_id, series_order, post_stats(like_count, view_count))
+        posts(id, title, created_at, series_id, series_order, visibility, post_stats(like_count, view_count))
       `
     )
     .eq('user_id', userId)
@@ -56,7 +56,7 @@ export async function fetchSeriesByUserId(userId: string) {
     throw new Error(error.message);
   }
 
-  return (data as unknown as SeriesEntity[]).map(toDto);
+  return data as unknown as SeriesEntity[];
 }
 
 export async function createSeries({
@@ -114,7 +114,7 @@ export async function updateSeries({
         created_at, 
         updated_at,
         users:user_id(nickname),
-        posts(id, title, created_at, series_id, series_order, post_stats(like_count, view_count))
+        posts(id, title, created_at, series_id, series_order, visibility, post_stats(like_count, view_count))
       `
     )
     .single();

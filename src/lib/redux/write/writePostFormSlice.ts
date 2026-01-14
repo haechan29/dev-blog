@@ -1,9 +1,11 @@
+import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import { WritePostForm } from '@/features/write/domain/model/writePostForm';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: WritePostForm = {
   invalidField: null,
   isParseError: false,
+  visibility: 'public',
   title: {
     value: '',
     isUserInput: false,
@@ -40,6 +42,9 @@ const writePostFormSlice = createSlice({
     },
     setIsParseError: (state, action: PayloadAction<boolean>) => {
       state.isParseError = action.payload;
+    },
+    setVisibility: (state, action: PayloadAction<PostVisibility>) => {
+      state.visibility = action.payload;
     },
     setTitle: (
       state,
@@ -84,6 +89,7 @@ export default writePostFormSlice.reducer;
 export const {
   setInvalidField,
   setIsParseError,
+  setVisibility,
   setTitle,
   setTags,
   setPassword,

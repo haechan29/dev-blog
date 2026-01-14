@@ -1,3 +1,5 @@
+import { PostVisibility } from '@/features/post/domain/types/postVisibility';
+
 export interface PostDto {
   id: string;
   title: string;
@@ -14,4 +16,5 @@ export interface PostDto {
   seriesTitle: string | null;
   likeCount: number;
   viewCount: number;
+  visibility: PostVisibility;
 }

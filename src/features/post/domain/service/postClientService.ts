@@ -1,6 +1,7 @@
 import * as PostClientRepository from '@/features/post/data/repository/postClientRepository';
 import { toDomain } from '@/features/post/domain/mapper/postMapper';
 import Post from '@/features/post/domain/model/post';
+import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 
 export async function getPost(postId: string): Promise<Post> {
   const dto = await PostClientRepository.getPost(postId);
@@ -43,6 +44,7 @@ export async function createPost(params: {
   content: string;
   tags: string[];
   password: string;
+  visibility: PostVisibility;
 }) {
   const dto = await PostClientRepository.createPost(params);
   return toDomain(dto);
@@ -56,6 +58,7 @@ export async function updatePost(params: {
   password?: string;
   seriesId?: string | null;
   seriesOrder?: number | null;
+  visibility?: PostVisibility;
 }) {
   const post = await PostClientRepository.updatePost(params);
   return toDomain(post);

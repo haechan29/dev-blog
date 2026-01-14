@@ -1,5 +1,7 @@
 import { auth } from '@/auth';
 import EditPageClient from '@/components/edit/editPageClient';
+import ForbiddenPostPage from '@/components/post/forbiddenPostPage';
+import { PostForbiddenError } from '@/features/post/data/errors/postErrors';
 import { getPost } from '@/features/post/domain/service/postServerService';
 import { createProps } from '@/features/post/ui/postProps';
 import { cookies } from 'next/headers';
@@ -15,15 +17,23 @@ export default async function EditPage({
   const userId =
     session?.user?.user_id ?? (await cookies()).get('userId')?.value;
   const { postId } = await params;
-  const post = await getPost(postId).then(createProps);
 
-  if (post.userId !== userId) {
-    redirect('/');
+  try {
+    const post = await getPost(postId).then(createProps);
+
+    if (post.userId !== userId) {
+      redirect('/');
+    }
+
+    return (
+      <Suspense>
+        <EditPageClient isLoggedIn={!!session} post={post} />
+      </Suspense>
+    );
+  } catch (error) {
+    if (error instanceof PostForbiddenError) {
+      return <ForbiddenPostPage isLoggedIn={!!session} />;
+    }
+    throw error;
   }
-
-  return (
-    <Suspense>
-      <EditPageClient isLoggedIn={!!session} post={post} />
-    </Suspense>
-  );
 }

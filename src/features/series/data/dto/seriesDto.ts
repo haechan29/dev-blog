@@ -17,6 +17,7 @@ export interface SeriesDto {
     | 'seriesOrder'
     | 'likeCount'
     | 'viewCount'
+    | 'visibility'
   >[];
   postCount: number;
 }
