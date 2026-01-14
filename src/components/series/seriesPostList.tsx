@@ -2,6 +2,7 @@
 
 import { LockIcon } from '@/components/lockIcon';
 import RemovePostDialog from '@/components/series/removePostDialog';
+import Tooltip from '@/components/tooltip';
 import useSeries from '@/features/series/domain/hooks/useSeries';
 import { SeriesProps } from '@/features/series/ui/seriesProps';
 import {
@@ -20,7 +21,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import clsx from 'clsx';
-import { GripVertical, X } from 'lucide-react';
+import { GripVertical, Link2, X } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -143,7 +144,14 @@ function SeriesPost({
           <div className='flex-1 flex flex-col gap-2'>
             <div className='flex gap-2'>
               {post.visibility === 'private' && (
-                <LockIcon className='w-5 h-5 shrink-0 opacity-70 mt-1' />
+                <Tooltip text='다른 사람에게는 보이지 않습니다'>
+                  <LockIcon className='w-5 h-5 shrink-0 opacity-70 mt-1' />
+                </Tooltip>
+              )}
+              {post.visibility === 'unlisted' && (
+                <Tooltip text='링크가 없으면 다른 사람에게는 보이지 않습니다'>
+                  <Link2 className='w-5 h-5 shrink-0 opacity-70 mt-1' />
+                </Tooltip>
               )}
               <div className='text-xl font-semibold text-gray-900 line-clamp-2'>
                 {post.title}
