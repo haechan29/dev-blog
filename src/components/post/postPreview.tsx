@@ -1,5 +1,6 @@
 'use client';
 
+import { LockIcon } from '@/components/lockIcon';
 import PostInfo from '@/components/post/postInfo';
 import PostSettingsDropdown from '@/components/post/postSettingsDropdown';
 import { PostProps } from '@/features/post/ui/postProps';
@@ -66,13 +67,16 @@ export default function PostPreview({
         >
           <div
             className={clsx(
-              'text-2xl font-semibold line-clamp-2',
               showSettings && post.userId === userId
                 ? 'w-[calc(100%-3rem)]'
-                : 'w-full'
+                : 'w-full',
+              'flex gap-2 items-start'
             )}
           >
-            {title}
+            {post.userId === userId && post.visibility === 'private' && (
+              <LockIcon className='w-6 h-6 shrink-0 opacity-70 mt-1' />
+            )}
+            <div className='text-2xl font-semibold line-clamp-2'>{title}</div>
           </div>
 
           <div className='whitespace-pre-wrap break-keep wrap-anywhere'>
