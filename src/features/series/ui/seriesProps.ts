@@ -19,6 +19,7 @@ export interface SeriesProps {
     | 'seriesOrder'
     | 'likeCount'
     | 'viewCount'
+    | 'visibility'
   >[];
   postCount: number;
 }
