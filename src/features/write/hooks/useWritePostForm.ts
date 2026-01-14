@@ -31,7 +31,7 @@ function createProps(
   return {
     currentStepId,
     isParseError: form.isParseError,
-    isPrivate: form.isPrivate,
+    visibility: form.visibility,
     title: {
       value: form.title.value,
       isUserInput: form.title.isUserInput,

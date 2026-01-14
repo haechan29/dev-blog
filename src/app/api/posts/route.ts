@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { title, content, password, tags, isPrivate } = await request.json();
+    const { title, content, password, tags, visibility } = await request.json();
 
     const session = await auth();
     const userId = await getUserId();
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
       content,
       tags,
       passwordHash,
-      isPrivate,
+      visibility,
       userId,
     });
 

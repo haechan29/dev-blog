@@ -1,5 +1,6 @@
 import { PostDto } from '@/features/post/data/dto/postDto';
 import Post from '@/features/post/domain/model/post';
+import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import { api } from '@/lib/api';
 
 export async function getPost(postId: string): Promise<PostDto> {
@@ -55,7 +56,7 @@ export async function createPost(requestDto: {
   content: string;
   tags: string[];
   password: string;
-  isPrivate: boolean;
+  visibility: PostVisibility;
 }): Promise<PostDto> {
   const response = await api.post(`/api/posts`, requestDto);
   return response.data;
@@ -72,7 +73,7 @@ export async function updatePost({
   password?: string;
   seriesId?: string | null;
   seriesOrder?: number | null;
-  isPrivate?: boolean;
+  visibility?: PostVisibility;
 }): Promise<PostDto> {
   const response = await api.patch(`/api/posts/${postId}`, requestBody);
   return response.data;

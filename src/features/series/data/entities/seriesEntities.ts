@@ -17,6 +17,6 @@ export interface SeriesEntity {
     | 'series_id'
     | 'series_order'
     | 'post_stats'
-    | 'is_private'
+    | 'visibility'
   >[];
 }

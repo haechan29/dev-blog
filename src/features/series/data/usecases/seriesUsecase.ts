@@ -7,7 +7,7 @@ export async function getSeries(seriesId: string) {
   const series = await SeriesQueries.fetchSeries(seriesId);
 
   if (currentUserId !== series.user_id) {
-    series.posts = series.posts.filter(post => !post.is_private);
+    series.posts = series.posts.filter(post => post.visibility === 'public');
   }
 
   return toDto(series);
@@ -19,7 +19,7 @@ export async function getSeriesByUserId(userId: string) {
 
   if (currentUserId !== userId) {
     seriesList.forEach(series => {
-      series.posts = series.posts.filter(post => !post.is_private);
+      series.posts = series.posts.filter(post => post.visibility === 'public');
     });
   }
 

@@ -1,7 +1,9 @@
+import { PostVisibility } from '@/features/post/domain/types/postVisibility';
+
 export interface WritePostForm {
   invalidField: string | null;
   isParseError: boolean;
-  isPrivate: boolean;
+  visibility: PostVisibility;
   title: {
     value: string;
     isUserInput: boolean;

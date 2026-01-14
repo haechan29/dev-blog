@@ -7,7 +7,7 @@ export async function getPost(postId: string) {
   const userId = await getUserId();
   const post = await PostQueries.fetchPost(postId);
 
-  if (post.is_private && post.user_id !== userId) {
+  if (post.visibility === 'private' && post.user_id !== userId) {
     throw new PostForbiddenError('비공개 게시글입니다');
   }
 

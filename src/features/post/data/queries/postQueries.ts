@@ -5,6 +5,7 @@ import {
 import { PostNotFoundError } from '@/features/post/data/errors/postErrors';
 import { toDto } from '@/features/post/data/mapper/postMapper';
 import Post from '@/features/post/domain/model/post';
+import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
@@ -25,7 +26,7 @@ export async function fetchPostsByUserId(
         user_id,
         series_id,
         series_order,
-        is_private,
+        visibility,
         users:user_id(nickname, deleted_at, registered_at),
         series:series_id(title),
         post_stats(like_count, view_count)
@@ -34,7 +35,7 @@ export async function fetchPostsByUserId(
     .eq('user_id', userId);
 
   if (currentUserId !== userId) {
-    query = query.eq('is_private', false);
+    query = query.eq('visibility', 'public');
   }
 
   query = query.order('created_at', { ascending: false });
@@ -75,7 +76,7 @@ export async function fetchPost(postId: string) {
         user_id,
         series_id,
         series_order,
-        is_private,
+        visibility,
         users:user_id(nickname, deleted_at, registered_at),
         series:series_id(title),
         post_stats(like_count, view_count)
@@ -138,14 +139,14 @@ export async function createPost({
   content,
   tags,
   passwordHash,
-  isPrivate,
+  visibility,
   userId,
 }: {
   title: string;
   content: string;
   tags: string[];
   passwordHash: string | null;
-  isPrivate: boolean;
+  visibility: PostVisibility;
   userId: string;
 }) {
   const { data, error } = await supabase
@@ -155,7 +156,7 @@ export async function createPost({
       content,
       tags,
       password_hash: passwordHash,
-      is_private: isPrivate,
+      visibility,
       user_id: userId,
     })
     .select(
@@ -169,7 +170,7 @@ export async function createPost({
         user_id,
         series_id,
         series_order,
-        is_private,
+        visibility,
         users:user_id(nickname, deleted_at, registered_at),
         series:series_id(title),
         post_stats(like_count, view_count)
@@ -191,7 +192,7 @@ export async function updatePost({
   tags,
   seriesId,
   seriesOrder,
-  isPrivate,
+  visibility,
 }: {
   postId: string;
   title?: string;
@@ -199,7 +200,7 @@ export async function updatePost({
   tags?: string[];
   seriesId?: string | null;
   seriesOrder?: number | null;
-  isPrivate?: boolean;
+  visibility?: PostVisibility;
 }) {
   const updates: Partial<PostEntity> = {
     updated_at: new Date().toISOString(),
@@ -208,7 +209,7 @@ export async function updatePost({
     ...(tags !== undefined && { tags }),
     ...(seriesId !== undefined && { series_id: seriesId }),
     ...(seriesOrder !== undefined && { series_order: seriesOrder }),
-    ...(isPrivate !== undefined && { is_private: isPrivate }),
+    ...(visibility !== undefined && { visibility }),
   };
 
   const { data, error } = await supabase
@@ -226,7 +227,7 @@ export async function updatePost({
         user_id,
         series_id,
         series_order,
-        is_private,
+        visibility,
         users:user_id(nickname, deleted_at, registered_at),
         series:series_id(title),
         post_stats(like_count, view_count)
