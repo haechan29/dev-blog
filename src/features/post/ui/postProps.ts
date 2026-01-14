@@ -2,6 +2,7 @@ import { formatDate } from '@/features/post/domain/lib/date';
 import { extractPlainText } from '@/features/post/domain/lib/parse';
 import Heading from '@/features/post/domain/model/heading';
 import Post from '@/features/post/domain/model/post';
+import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import { UserStatus } from '@/features/user/domain/model/user';
 
 export type PostProps = {
@@ -21,6 +22,7 @@ export type PostProps = {
   seriesTitle: string | null;
   likeCount: number;
   viewCount: number;
+  visibility: PostVisibility;
 };
 
 export function createProps(post: Post): PostProps {
@@ -41,5 +43,6 @@ export function createProps(post: Post): PostProps {
     seriesTitle: post.seriesTitle,
     likeCount: post.likeCount,
     viewCount: post.viewCount,
+    visibility: post.visibility,
   };
 }

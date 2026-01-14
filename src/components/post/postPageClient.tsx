@@ -10,6 +10,7 @@ import PostPreview from '@/components/post/postPreview';
 import PostSeriesNav from '@/components/post/postSeriesNav';
 import PostSidebar from '@/components/post/postSidebar';
 import PostToolbar from '@/components/post/postToolbar';
+import PostVisibilityBanner from '@/components/post/postVisibilityBanner';
 import UserProfile from '@/components/post/userProfile';
 import EnterFullscreenButton from '@/components/postViewer/enterFullscreenButton';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
@@ -126,6 +127,10 @@ export default function PostPageClient({
 
         <PostHeader isLoggedIn={isLoggedIn} userId={userId} post={post} />
         <div className='w-full h-px bg-gray-200 mb-10' />
+
+        {post.visibility === 'private' && post.userId === userId && (
+          <PostVisibilityBanner />
+        )}
 
         <PostContentWrapper post={post} parsedContent={parsedContent} />
 

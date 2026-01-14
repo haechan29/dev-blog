@@ -17,6 +17,7 @@ export function toDomain(dto: PostDto): Post {
     dto.seriesOrder,
     dto.seriesTitle,
     dto.likeCount,
-    dto.viewCount
+    dto.viewCount,
+    dto.visibility
   );
 }

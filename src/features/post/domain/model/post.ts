@@ -1,5 +1,6 @@
 import { extractHeadings } from '@/features/post/domain/lib/parse';
 import Heading from '@/features/post/domain/model/heading';
+import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import { UserStatus } from '@/features/user/domain/model/user';
 
 export default class Post {
@@ -19,7 +20,8 @@ export default class Post {
     public readonly seriesOrder: number | null,
     public readonly seriesTitle: string | null,
     public readonly likeCount: number,
-    public readonly viewCount: number
+    public readonly viewCount: number,
+    public readonly visibility: PostVisibility
   ) {
     this.headings = extractHeadings(content);
   }
