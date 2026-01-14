@@ -114,7 +114,11 @@ export default function PostPageClient({
       <HomeToolbar isLoggedIn={isLoggedIn} className='max-xl:hidden' />
       <PostToolbar className='xl:hidden' />
 
-      <PostSidebar userId={post.userId} currentPostId={post.id} />
+      <PostSidebar
+        userId={userId}
+        authorId={post.userId}
+        currentPostId={post.id}
+      />
 
       <div
         className={clsx(
