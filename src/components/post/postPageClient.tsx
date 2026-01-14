@@ -128,9 +128,10 @@ export default function PostPageClient({
         <PostHeader isLoggedIn={isLoggedIn} userId={userId} post={post} />
         <div className='w-full h-px bg-gray-200 mb-10' />
 
-        {post.visibility === 'private' && post.userId === userId && (
-          <PostVisibilityBanner />
-        )}
+        <PostVisibilityBanner
+          visibility={post.visibility}
+          isAuthor={post.userId === userId}
+        />
 
         <PostContentWrapper post={post} parsedContent={parsedContent} />
 
