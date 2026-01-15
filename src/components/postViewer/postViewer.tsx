@@ -119,7 +119,7 @@ export default function PostViewer({ post }: { post: PostProps }) {
       if (Math.abs(delta) > SWIPE_THRESHOLD) {
         handlePageChange(delta > 0 ? 'prev' : 'next');
       } else {
-        setIsTouched(true);
+        setIsTouched(prev => !prev);
         debounceTouch(() => setIsTouched(false), 2000);
       }
 

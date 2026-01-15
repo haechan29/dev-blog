@@ -43,7 +43,8 @@ export default function PostViewerControlBar({
         className={clsx(
           'absolute bottom-0 left-0 w-full h-1 bg-gray-200',
           'transition-opacity duration-300 ease-in-out',
-          !isPageTransitioning && 'opacity-0 pointer-events-none'
+          (areBarsVisible || !isPageTransitioning) &&
+            'opacity-0 pointer-events-none'
         )}
       >
         <div
@@ -58,8 +59,7 @@ export default function PostViewerControlBar({
           'absolute bottom-0 inset-x-0 z-50',
           'max-md:from-black/50 max-md:to-transparent max-md:bg-linear-to-t',
           'transition-opacity duration-300 ease-in-out',
-          (isPageTransitioning || !areBarsVisible) &&
-            'opacity-0 pointer-events-none'
+          !areBarsVisible && 'opacity-0 pointer-events-none'
         )}
       >
         <div
