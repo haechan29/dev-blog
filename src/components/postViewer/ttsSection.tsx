@@ -33,21 +33,21 @@ export default function TTSSection() {
           debounce(() => dispatch(setIsControlBarTouched(false)), 2000);
         }}
         className={clsx(
-          'w-10 h-10 p-2 relative cursor-pointer',
+          'w-10 h-10 p-2 -m-2 relative cursor-pointer',
           'transition-opacity|discrete duration-300 ease-in-out'
         )}
         aria-label='음성 재생'
       >
         <Play
           className={clsx(
-            'w-6 h-6 absolute inset-0 m-auto stroke-1 text-white md:text-gray-900 transition-opacity duration-300 ease-in-out',
+            'absolute inset-0 m-auto stroke-1 text-white md:text-gray-900 transition-opacity duration-300 ease-in-out',
             isPlaying && 'opacity-0 pointer-events-none'
           )}
         />
 
         <Pause
           className={clsx(
-            'w-6 h-6 absolute inset-0 m-auto stroke-1 text-white md:text-gray-900 transition-opacity duration-300 ease-in-out',
+            'absolute inset-0 m-auto stroke-1 text-white md:text-gray-900 transition-opacity duration-300 ease-in-out',
             !isPlaying && 'opacity-0 pointer-events-none'
           )}
         />

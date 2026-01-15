@@ -7,8 +7,6 @@ import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import useDebounce from '@/hooks/useDebounce';
 import { processMd } from '@/lib/md/md';
 import {
-  nextPage,
-  previousPage,
   setCurrentPageIndex,
   setPages,
 } from '@/lib/redux/post/postViewerSlice';
@@ -37,7 +35,6 @@ export default function PostViewerContainer({
   const [result, setResult] = useState<JSX.Element | null>(null);
   const [container, setContainer] = useState<ContainerProps>();
   const [isMounted, setIsMounted] = useState(false);
-  const { isViewerMode } = usePostViewer();
 
   useEffect(() => {
     const viewerMeasure = document.querySelector('[data-viewer-measurement]');
@@ -62,32 +59,6 @@ export default function PostViewerContainer({
       return () => window.removeEventListener('resize', measure);
     }
   }, [debounce, dispatch, result, supportsFullscreen]);
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (
-        // don't handle keydown on input and text area
-        event.target instanceof HTMLInputElement ||
-        event.target instanceof HTMLTextAreaElement
-      ) {
-        return;
-      }
-
-      if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
-        dispatch(previousPage());
-      } else if (
-        event.key === 'ArrowRight' ||
-        event.key.toLowerCase() === 'd'
-      ) {
-        dispatch(nextPage());
-      }
-    };
-
-    if (isViewerMode) {
-      document.addEventListener('keydown', handleKeyDown);
-      return () => document.removeEventListener('keydown', handleKeyDown);
-    }
-  }, [dispatch, isViewerMode]);
 
   useEffect(() => {
     const render = async () => {

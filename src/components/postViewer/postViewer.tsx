@@ -12,7 +12,9 @@ import {
   nextPage,
   previousPage,
   setIsMouseMoved,
+  setIsPageTransitioning,
   setIsRotationFinished,
+  setIsTouched,
   setIsViewerMode,
 } from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
@@ -29,6 +31,7 @@ import { Toaster } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 
 const SWIPE_THRESHOLD = 50;
+const PAGE_TRANSITIONING_DURATION = 1000;
 
 export default function PostViewer({ post }: { post: PostProps }) {
   const dispatch = useDispatch<AppDispatch>();
@@ -37,6 +40,7 @@ export default function PostViewer({ post }: { post: PostProps }) {
   });
   const throttle = useThrottle();
   const debounceTouch = useDebounce();
+  const debounceSwipe = useDebounce();
   const debounceMouseMove = useDebounce();
   const debounceRotation = useDebounce();
   const [supportsFullscreen, setSupportsFullscreen] = useState(true);
@@ -64,8 +68,14 @@ export default function PostViewer({ post }: { post: PostProps }) {
       } else if (isRightSideClicked) {
         dispatch(nextPage());
       }
+
+      dispatch(setIsPageTransitioning(true));
+      debounceSwipe(
+        () => dispatch(setIsPageTransitioning(false)),
+        PAGE_TRANSITIONING_DURATION
+      );
     },
-    [dispatch, supportsFullscreen]
+    [debounceSwipe, dispatch, supportsFullscreen]
   );
 
   const handleTouchStart = useCallback(
@@ -91,11 +101,19 @@ export default function PostViewer({ post }: { post: PostProps }) {
         } else {
           dispatch(nextPage());
         }
+        dispatch(setIsPageTransitioning(true));
+        debounceSwipe(
+          () => dispatch(setIsPageTransitioning(false)),
+          PAGE_TRANSITIONING_DURATION
+        );
+      } else {
+        dispatch(setIsTouched(true));
+        debounceTouch(() => dispatch(setIsTouched(false)), 2000);
       }
 
       touchStartRef.current = null;
     },
-    [dispatch, supportsFullscreen]
+    [debounceSwipe, debounceTouch, dispatch, supportsFullscreen]
   );
 
   useScrollLock({
@@ -136,6 +154,42 @@ export default function PostViewer({ post }: { post: PostProps }) {
     return () =>
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, [dispatch, isViewerMode]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        // don't handle keydown on input and text area
+        event.target instanceof HTMLInputElement ||
+        event.target instanceof HTMLTextAreaElement
+      ) {
+        return;
+      }
+
+      if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
+        dispatch(previousPage());
+        dispatch(setIsPageTransitioning(true));
+        debounceSwipe(
+          () => dispatch(setIsPageTransitioning(false)),
+          PAGE_TRANSITIONING_DURATION
+        );
+      } else if (
+        event.key === 'ArrowRight' ||
+        event.key.toLowerCase() === 'd'
+      ) {
+        dispatch(nextPage());
+        dispatch(setIsPageTransitioning(true));
+        debounceSwipe(
+          () => dispatch(setIsPageTransitioning(false)),
+          PAGE_TRANSITIONING_DURATION
+        );
+      }
+    };
+
+    if (isViewerMode) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [debounceSwipe, dispatch, isViewerMode]);
 
   return (
     <div

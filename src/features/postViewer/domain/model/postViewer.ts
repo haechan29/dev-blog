@@ -10,6 +10,7 @@ export interface PostViewer {
   isToolbarTouched: boolean;
   isControlBarTouched: boolean;
   isRotationFinished: boolean;
+  isPageTransitioning: boolean;
   pages: Page[];
   currentPageIndex: number | null;
 }
