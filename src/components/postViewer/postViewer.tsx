@@ -8,13 +8,11 @@ import useDebounce from '@/hooks/useDebounce';
 import useScrollLock from '@/hooks/useScrollLock';
 import useThrottle from '@/hooks/useThrottle';
 import { canTouch } from '@/lib/browser';
-import { createRipple } from '@/lib/dom';
 import {
   nextPage,
   previousPage,
   setIsMouseMoved,
   setIsRotationFinished,
-  setIsTouched,
   setIsViewerMode,
 } from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
@@ -24,10 +22,13 @@ import {
   TransitionEvent,
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
+
+const SWIPE_THRESHOLD = 50;
 
 export default function PostViewer({ post }: { post: PostProps }) {
   const dispatch = useDispatch<AppDispatch>();
@@ -39,6 +40,8 @@ export default function PostViewer({ post }: { post: PostProps }) {
   const debounceMouseMove = useDebounce();
   const debounceRotation = useDebounce();
   const [supportsFullscreen, setSupportsFullscreen] = useState(true);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+
   const handleNavigation = useCallback(
     ({
       clientX,
@@ -61,6 +64,36 @@ export default function PostViewer({ post }: { post: PostProps }) {
       } else if (isRightSideClicked) {
         dispatch(nextPage());
       }
+    },
+    [dispatch, supportsFullscreen]
+  );
+
+  const handleTouchStart = useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      const touch = event.touches[0];
+      touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+    },
+    []
+  );
+
+  const handleTouchEnd = useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      if (!touchStartRef.current) return;
+
+      const touch = event.changedTouches[0];
+      const delta = supportsFullscreen
+        ? touch.clientX - touchStartRef.current.x
+        : touch.clientY - touchStartRef.current.y;
+
+      if (Math.abs(delta) > SWIPE_THRESHOLD) {
+        if (delta > 0) {
+          dispatch(previousPage());
+        } else {
+          dispatch(nextPage());
+        }
+      }
+
+      touchStartRef.current = null;
     },
     [dispatch, supportsFullscreen]
   );
@@ -108,16 +141,12 @@ export default function PostViewer({ post }: { post: PostProps }) {
     <div
       data-viewer
       onClick={(event: MouseEvent<HTMLDivElement>) => {
-        if (canTouch) {
-          createRipple({
-            ...event,
-            rippleColor: 'rgba(0,0,0,0.1)',
-          });
-          dispatch(setIsTouched(true));
-          debounceTouch(() => dispatch(setIsTouched(false)), 2000);
+        if (!canTouch) {
+          handleNavigation(event);
         }
-        handleNavigation(event);
       }}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
       onMouseMove={() => {
         if (canTouch) return;
         throttle(() => {
