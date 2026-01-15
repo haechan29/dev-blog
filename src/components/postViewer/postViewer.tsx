@@ -12,7 +12,6 @@ import {
   nextPage,
   previousPage,
   setIsMouseMoved,
-  setIsPageTransitioning,
   setIsRotationFinished,
   setIsTouched,
   setIsViewerMode,
@@ -20,7 +19,6 @@ import {
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
 import {
-  MouseEvent,
   TransitionEvent,
   useCallback,
   useEffect,
@@ -31,22 +29,36 @@ import { Toaster } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 
 const SWIPE_THRESHOLD = 50;
-const PAGE_TRANSITIONING_DURATION = 1000;
+const PAGE_TRANSITION_DURATION = 1000;
 
 export default function PostViewer({ post }: { post: PostProps }) {
   const dispatch = useDispatch<AppDispatch>();
+  const throttle = useThrottle();
+  const debounceTouch = useDebounce();
+  const debouncePageTransition = useDebounce();
+  const debounceMouseMove = useDebounce();
+  const debounceRotation = useDebounce();
+
   const isViewerMode = useSelector((state: RootState) => {
     return state.postViewer.isViewerMode;
   });
-  const throttle = useThrottle();
-  const debounceTouch = useDebounce();
-  const debounceSwipe = useDebounce();
-  const debounceMouseMove = useDebounce();
-  const debounceRotation = useDebounce();
+  const [isPageTransitioning, setIsPageTransitioning] = useState(false);
   const [supportsFullscreen, setSupportsFullscreen] = useState(true);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
 
-  const handleNavigation = useCallback(
+  const handlePageChange = useCallback(
+    (direction: 'next' | 'prev') => {
+      dispatch(direction === 'next' ? nextPage() : previousPage());
+      setIsPageTransitioning(true);
+      debouncePageTransition(
+        () => setIsPageTransitioning(false),
+        PAGE_TRANSITION_DURATION
+      );
+    },
+    [dispatch, debouncePageTransition]
+  );
+
+  const handleClick = useCallback(
     ({
       clientX,
       clientY,
@@ -56,26 +68,14 @@ export default function PostViewer({ post }: { post: PostProps }) {
       clientY: number;
       currentTarget: HTMLDivElement;
     }) => {
-      if (typeof document === 'undefined') return;
+      if (canTouch || typeof document === 'undefined') return;
 
       const { width, height } = currentTarget.getBoundingClientRect();
-      const [isLeftSideClicked, isRightSideClicked] = supportsFullscreen
-        ? [clientX < width / 2, clientX > width / 2]
-        : [clientY < height / 2, clientY > height / 2];
-
-      if (isLeftSideClicked) {
-        dispatch(previousPage());
-      } else if (isRightSideClicked) {
-        dispatch(nextPage());
-      }
-
-      dispatch(setIsPageTransitioning(true));
-      debounceSwipe(
-        () => dispatch(setIsPageTransitioning(false)),
-        PAGE_TRANSITIONING_DURATION
-      );
+      const clickPosition = supportsFullscreen ? clientX : clientY;
+      const threshold = supportsFullscreen ? width / 2 : height / 2;
+      handlePageChange(clickPosition < threshold ? 'prev' : 'next');
     },
-    [debounceSwipe, dispatch, supportsFullscreen]
+    [handlePageChange, supportsFullscreen]
   );
 
   const handleTouchStart = useCallback(
@@ -96,16 +96,7 @@ export default function PostViewer({ post }: { post: PostProps }) {
         : touch.clientY - touchStartRef.current.y;
 
       if (Math.abs(delta) > SWIPE_THRESHOLD) {
-        if (delta > 0) {
-          dispatch(previousPage());
-        } else {
-          dispatch(nextPage());
-        }
-        dispatch(setIsPageTransitioning(true));
-        debounceSwipe(
-          () => dispatch(setIsPageTransitioning(false)),
-          PAGE_TRANSITIONING_DURATION
-        );
+        handlePageChange(delta > 0 ? 'prev' : 'next');
       } else {
         dispatch(setIsTouched(true));
         debounceTouch(() => dispatch(setIsTouched(false)), 2000);
@@ -113,7 +104,7 @@ export default function PostViewer({ post }: { post: PostProps }) {
 
       touchStartRef.current = null;
     },
-    [debounceSwipe, debounceTouch, dispatch, supportsFullscreen]
+    [debounceTouch, dispatch, handlePageChange, supportsFullscreen]
   );
 
   useScrollLock({
@@ -156,49 +147,25 @@ export default function PostViewer({ post }: { post: PostProps }) {
   }, [dispatch, isViewerMode]);
 
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (
-        // don't handle keydown on input and text area
-        event.target instanceof HTMLInputElement ||
-        event.target instanceof HTMLTextAreaElement
-      ) {
-        return;
-      }
+    if (!isViewerMode) return;
 
-      if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
-        dispatch(previousPage());
-        dispatch(setIsPageTransitioning(true));
-        debounceSwipe(
-          () => dispatch(setIsPageTransitioning(false)),
-          PAGE_TRANSITIONING_DURATION
-        );
-      } else if (
-        event.key === 'ArrowRight' ||
-        event.key.toLowerCase() === 'd'
-      ) {
-        dispatch(nextPage());
-        dispatch(setIsPageTransitioning(true));
-        debounceSwipe(
-          () => dispatch(setIsPageTransitioning(false)),
-          PAGE_TRANSITIONING_DURATION
-        );
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const key = event.key;
+      if (key === 'ArrowLeft' || key.toLowerCase() === 'a') {
+        handlePageChange('prev');
+      } else if (key === 'ArrowRight' || key.toLowerCase() === 'd') {
+        handlePageChange('next');
       }
     };
 
-    if (isViewerMode) {
-      document.addEventListener('keydown', handleKeyDown);
-      return () => document.removeEventListener('keydown', handleKeyDown);
-    }
-  }, [debounceSwipe, dispatch, isViewerMode]);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [handlePageChange, isViewerMode]);
 
   return (
     <div
       data-viewer
-      onClick={(event: MouseEvent<HTMLDivElement>) => {
-        if (!canTouch) {
-          handleNavigation(event);
-        }
-      }}
+      onClick={handleClick}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onMouseMove={() => {
@@ -237,7 +204,7 @@ export default function PostViewer({ post }: { post: PostProps }) {
         content={post.content}
         supportsFullscreen={supportsFullscreen}
       />
-      <PostViewerControlBar />
+      <PostViewerControlBar isPageTransitioning={isPageTransitioning} />
     </div>
   );
 }

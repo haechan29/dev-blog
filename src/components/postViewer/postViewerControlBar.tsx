@@ -12,10 +12,13 @@ import clsx from 'clsx';
 import { useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function PostViewerControlBar() {
+export default function PostViewerControlBar({
+  isPageTransitioning,
+}: {
+  isPageTransitioning: boolean;
+}) {
   const dispatch = useDispatch<AppDispatch>();
-  const { areBarsVisible, isPageTransitioning, pageNumber, totalPages } =
-    usePostViewer();
+  const { areBarsVisible, pageNumber, totalPages } = usePostViewer();
 
   const progress = useMemo(() => {
     if (!pageNumber || !totalPages || totalPages <= 2) return null;

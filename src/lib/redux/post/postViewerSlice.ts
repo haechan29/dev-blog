@@ -12,7 +12,6 @@ const initialState: PostViewer = {
   isToolbarTouched: false,
   isControlBarTouched: false,
   isRotationFinished: false,
-  isPageTransitioning: false,
   pages: [],
   currentPageIndex: null,
 };
@@ -58,9 +57,6 @@ const postViewerSlice = createSlice({
     setIsRotationFinished: (state, action: PayloadAction<boolean>) => {
       state.isRotationFinished = action.payload;
     },
-    setIsPageTransitioning: (state, action: PayloadAction<boolean>) => {
-      state.isPageTransitioning = action.payload;
-    },
     setCurrentPageIndex: (state, action: PayloadAction<number>) => {
       state.currentPageIndex = action.payload;
     },
@@ -89,7 +85,6 @@ export const {
   setIsToolbarTouched,
   setIsControlBarTouched,
   setIsRotationFinished,
-  setIsPageTransitioning,
   setCurrentPageIndex,
   nextPage,
   previousPage,
