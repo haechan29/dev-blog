@@ -114,11 +114,7 @@ export default function PostPageClient({
       <HomeToolbar isLoggedIn={isLoggedIn} className='max-xl:hidden' />
       <PostToolbar className='xl:hidden' />
 
-      <PostSidebar
-        userId={userId}
-        authorId={post.userId}
-        currentPostId={post.id}
-      />
+      <PostSidebar authorId={post.userId} currentPostId={post.id} />
 
       <div
         className={clsx(
@@ -132,9 +128,10 @@ export default function PostPageClient({
         <PostHeader isLoggedIn={isLoggedIn} userId={userId} post={post} />
         <div className='w-full h-px bg-gray-200 mb-10' />
 
-        {post.visibility === 'private' && post.userId === userId && (
-          <PostVisibilityBanner />
-        )}
+        <PostVisibilityBanner
+          visibility={post.visibility}
+          isAuthor={post.userId === userId}
+        />
 
         <PostContentWrapper post={post} parsedContent={parsedContent} />
 

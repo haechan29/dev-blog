@@ -3,9 +3,10 @@
 import { LockIcon } from '@/components/lockIcon';
 import PostInfo from '@/components/post/postInfo';
 import PostSettingsDropdown from '@/components/post/postSettingsDropdown';
+import Tooltip from '@/components/tooltip';
 import { PostProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
-import { MoreVertical } from 'lucide-react';
+import { Link2, MoreVertical } from 'lucide-react';
 import Link from 'next/link';
 
 const SCALE_ANIMATION_DELAY = 0.5;
@@ -73,8 +74,15 @@ export default function PostPreview({
               'flex gap-2 items-start'
             )}
           >
-            {post.userId === userId && post.visibility === 'private' && (
-              <LockIcon className='w-6 h-6 shrink-0 opacity-70 mt-1' />
+            {post.visibility === 'private' && (
+              <Tooltip text='다른 사람에게는 보이지 않습니다'>
+                <LockIcon className='w-6 h-6 shrink-0 opacity-70 mt-1' />
+              </Tooltip>
+            )}
+            {post.visibility === 'unlisted' && (
+              <Tooltip text='링크가 없으면 다른 사람에게는 보이지 않습니다'>
+                <Link2 className='w-6 h-6 shrink-0 opacity-70 mt-1' />
+              </Tooltip>
             )}
             <div className='text-2xl font-semibold line-clamp-2'>{title}</div>
           </div>

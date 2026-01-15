@@ -1,17 +1,14 @@
 'use client';
 
-import { LockIcon } from '@/components/lockIcon';
 import { PostProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export default function PostSidebarNav({
-  userId,
   currentPostId,
   posts,
 }: {
-  userId?: string;
   currentPostId: string;
   posts: PostProps[];
 }) {
@@ -77,11 +74,7 @@ export default function PostSidebarNav({
             onToggle={() => toggleSeries(seriesId)}
           />
           {openSeriesIds.has(seriesId) && (
-            <NavPostList
-              userId={userId}
-              posts={seriesPosts}
-              currentPostId={currentPostId}
-            />
+            <NavPostList posts={seriesPosts} currentPostId={currentPostId} />
           )}
         </div>
       ))}
@@ -97,10 +90,7 @@ export default function PostSidebarNav({
               : 'text-gray-900'
           )}
         >
-          {post.userId === userId && post.visibility === 'private' && (
-            <LockIcon className='w-3.5 h-3.5 shrink-0 opacity-70' />
-          )}
-          <div className='text-sm'>{post.title}</div>
+          <div className='text-sm truncate'>{post.title}</div>
         </Link>
       ))}
     </div>
@@ -125,7 +115,7 @@ function NavCategory({
           isActive ? 'bg-blue-50 font-semibold text-blue-500' : 'text-gray-900'
         )}
       >
-        <div className='flex-1 text-sm'>{posts[0].seriesTitle}</div>
+        <div className='flex-1 text-sm truncate'>{posts[0].seriesTitle}</div>
         <div className='shrink-0 text-xs text-gray-400'>{posts.length}</div>
       </div>
     )
@@ -133,11 +123,9 @@ function NavCategory({
 }
 
 function NavPostList({
-  userId,
   posts,
   currentPostId,
 }: {
-  userId?: string;
   posts: PostProps[];
   currentPostId: string;
 }) {
@@ -146,16 +134,13 @@ function NavPostList({
       key={post.id}
       href={`/read/${post.id}`}
       className={clsx(
-        'flex w-full py-3 pl-6 pr-3 rounded-sm hover:text-blue-500 items-center gap-2',
+        'flex py-3 ml-3 px-3 rounded-sm hover:text-blue-500 items-center gap-2',
         post.id === currentPostId
           ? 'bg-blue-50 font-semibold text-blue-500'
           : 'text-gray-900'
       )}
     >
-      {post.userId === userId && post.visibility === 'private' && (
-        <LockIcon className='w-3.5 h-3.5 shrink-0' />
-      )}
-      <div className='text-sm'>{post.title}</div>
+      <div className='text-sm truncate'>{post.title}</div>
     </Link>
   ));
 }
