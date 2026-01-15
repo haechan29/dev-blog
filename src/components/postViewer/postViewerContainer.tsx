@@ -3,18 +3,17 @@
 import { BgmInner, VIEWER_BGM_CONTAINER_ID } from '@/components/md/bgm';
 import { Bgm } from '@/features/post/domain/types/bgm';
 import { PageBuilder } from '@/features/postViewer/domain/model/pageBuilder';
-import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
 import useDebounce from '@/hooks/useDebounce';
 import { processMd } from '@/lib/md/md';
 import {
   setCurrentPageIndex,
   setPages,
 } from '@/lib/redux/post/postViewerSlice';
-import { AppDispatch } from '@/lib/redux/store';
+import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
-import { JSX, useEffect, useState } from 'react';
+import { JSX, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 interface ContainerProps {
   result: JSX.Element;
@@ -31,7 +30,15 @@ export default function PostViewerContainer({
 }) {
   const dispatch = useDispatch<AppDispatch>();
   const debounce = useDebounce();
-  const { page } = usePostViewer();
+
+  const pages = useSelector((state: RootState) => state.postViewer.pages);
+  const currentPageIndex = useSelector(
+    (state: RootState) => state.postViewer.currentPageIndex
+  );
+  const page = useMemo(
+    () => (currentPageIndex !== null ? pages[currentPageIndex] : null),
+    [currentPageIndex, pages]
+  );
   const [result, setResult] = useState<JSX.Element | null>(null);
   const [container, setContainer] = useState<ContainerProps>();
   const [isMounted, setIsMounted] = useState(false);

@@ -11,9 +11,7 @@ import { canTouch } from '@/lib/browser';
 import {
   nextPage,
   previousPage,
-  setIsMouseMoved,
-  setIsRotationFinished,
-  setIsTouched,
+  setCurrentPageIndex,
   setIsViewerMode,
 } from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
@@ -38,13 +36,36 @@ export default function PostViewer({ post }: { post: PostProps }) {
   const debouncePageTransition = useDebounce();
   const debounceMouseMove = useDebounce();
   const debounceRotation = useDebounce();
+  const debounceToolbarTouch = useDebounce();
+  const debounceControlBarTouch = useDebounce();
 
-  const isViewerMode = useSelector((state: RootState) => {
-    return state.postViewer.isViewerMode;
-  });
+  const isViewerMode = useSelector(
+    (state: RootState) => state.postViewer.isViewerMode
+  );
+  const pages = useSelector((state: RootState) => state.postViewer.pages);
+
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const [isPageTransitioning, setIsPageTransitioning] = useState(false);
   const [supportsFullscreen, setSupportsFullscreen] = useState(true);
-  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  const [isMouseOnToolbar, setIsMouseOnToolbar] = useState(false);
+  const [isMouseOnControlBar, setIsMouseOnControlBar] = useState(false);
+  const [isMouseMoved, setIsMouseMoved] = useState(false);
+  const [isTouched, setIsTouched] = useState(false);
+  const [isRotationFinished, setIsRotationFinished] = useState(false);
+  const [isToolbarExpanded, setIsToolbarExpanded] = useState(false);
+  const [isToolbarTouched, setIsToolbarTouched] = useState(false);
+  const [isControlBarTouched, setIsControlBarTouched] = useState(false);
+
+  const areBarsVisible =
+    isMouseOnToolbar ||
+    isMouseOnControlBar ||
+    isMouseMoved ||
+    isTouched ||
+    isRotationFinished ||
+    isToolbarExpanded ||
+    isToolbarTouched ||
+    isControlBarTouched;
 
   const handlePageChange = useCallback(
     (direction: 'next' | 'prev') => {
@@ -98,14 +119,58 @@ export default function PostViewer({ post }: { post: PostProps }) {
       if (Math.abs(delta) > SWIPE_THRESHOLD) {
         handlePageChange(delta > 0 ? 'prev' : 'next');
       } else {
-        dispatch(setIsTouched(true));
-        debounceTouch(() => dispatch(setIsTouched(false)), 2000);
+        setIsTouched(true);
+        debounceTouch(() => setIsTouched(false), 2000);
       }
 
       touchStartRef.current = null;
     },
-    [debounceTouch, dispatch, handlePageChange, supportsFullscreen]
+    [debounceTouch, handlePageChange, supportsFullscreen]
   );
+
+  const handleMouseMove = useCallback(() => {
+    if (canTouch) return;
+
+    throttle(() => {
+      setIsMouseMoved(true);
+      debounceMouseMove(() => setIsMouseMoved(false), 2000);
+    }, 100);
+  }, [debounceMouseMove, throttle]);
+
+  const handleTransitionEnd = useCallback(
+    (event: TransitionEvent<HTMLElement>) => {
+      if (
+        !isViewerMode ||
+        event.target !== event.currentTarget ||
+        event.propertyName !== 'rotate'
+      ) {
+        return;
+      }
+
+      setIsRotationFinished(true);
+      debounceRotation(() => setIsRotationFinished(false), 2000);
+    },
+    [debounceRotation, isViewerMode]
+  );
+
+  const handleHeadingClick = useCallback(
+    (headingId: string) => {
+      const pageIndex = pages.findIndex(
+        page => page.heading && page.heading.id === headingId
+      );
+      if (pageIndex >= 0) {
+        dispatch(setCurrentPageIndex(pageIndex));
+      }
+      setIsToolbarTouched(true);
+      debounceToolbarTouch(() => setIsToolbarTouched(false), 2000);
+    },
+    [debounceToolbarTouch, dispatch, pages]
+  );
+
+  const handleControlBarInteraction = useCallback(() => {
+    setIsControlBarTouched(true);
+    debounceControlBarTouch(() => setIsControlBarTouched(false), 2000);
+  }, [debounceControlBarTouch]);
 
   useScrollLock({
     isLocked: isViewerMode,
@@ -162,31 +227,27 @@ export default function PostViewer({ post }: { post: PostProps }) {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handlePageChange, isViewerMode]);
 
+  useEffect(() => {
+    if (!isViewerMode) {
+      setIsMouseOnToolbar(false);
+      setIsMouseOnControlBar(false);
+      setIsMouseMoved(false);
+      setIsTouched(false);
+      setIsRotationFinished(false);
+      setIsToolbarExpanded(false);
+      setIsToolbarTouched(false);
+      setIsControlBarTouched(false);
+    }
+  }, [isViewerMode]);
+
   return (
     <div
       data-viewer
       onClick={handleClick}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      onMouseMove={() => {
-        if (canTouch) return;
-        throttle(() => {
-          dispatch(setIsMouseMoved(true));
-          debounceMouseMove(() => dispatch(setIsMouseMoved(false)), 2000);
-        }, 100);
-      }}
-      onTransitionEnd={(event: TransitionEvent<HTMLElement>) => {
-        if (
-          !isViewerMode ||
-          event.target !== event.currentTarget ||
-          event.propertyName !== 'rotate'
-        ) {
-          return;
-        }
-
-        dispatch(setIsRotationFinished(true));
-        debounceRotation(() => dispatch(setIsRotationFinished(false)), 2000);
-      }}
+      onMouseMove={handleMouseMove}
+      onTransitionEnd={handleTransitionEnd}
       className={clsx(
         'fixed inset-0 z-40 p-(--container-padding) bg-white',
         !supportsFullscreen &&
@@ -199,12 +260,29 @@ export default function PostViewer({ post }: { post: PostProps }) {
     >
       <Toaster toasterId='viewer' />
 
-      <PostViewerToolbar {...post} />
+      <PostViewerToolbar
+        title={post.title}
+        headings={post.headings}
+        areBarsVisible={areBarsVisible}
+        isExpanded={isToolbarExpanded}
+        onMouseEnter={() => setIsMouseOnToolbar(true)}
+        onMouseLeave={() => setIsMouseOnToolbar(false)}
+        onToggleExpand={() => setIsToolbarExpanded(!isToolbarExpanded)}
+        onHeadingClick={handleHeadingClick}
+      />
+
       <PostViewerContainer
         content={post.content}
         supportsFullscreen={supportsFullscreen}
       />
-      <PostViewerControlBar isPageTransitioning={isPageTransitioning} />
+
+      <PostViewerControlBar
+        isPageTransitioning={isPageTransitioning}
+        areBarsVisible={areBarsVisible}
+        onMouseEnter={() => setIsMouseOnControlBar(true)}
+        onMouseLeave={() => setIsMouseOnControlBar(false)}
+        onInteraction={handleControlBarInteraction}
+      />
     </div>
   );
 }

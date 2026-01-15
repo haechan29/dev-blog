@@ -3,37 +3,39 @@
 import ExitFullscreenButton from '@/components/postViewer/exitFullscreenButton';
 import PageIndicatorSection from '@/components/postViewer/pageIndicatorSection';
 import TTSSection from '@/components/postViewer/ttsSection';
-import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
-import { canTouch } from '@/lib/browser';
-import { setIsMouseOnControlBar } from '@/lib/redux/post/postViewerSlice';
-import { AppDispatch } from '@/lib/redux/store';
+import { RootState } from '@/lib/redux/store';
 import { cn } from '@/lib/utils';
 import clsx from 'clsx';
-import { useCallback, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
+import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 
 export default function PostViewerControlBar({
   isPageTransitioning,
+  areBarsVisible,
+  onMouseEnter,
+  onMouseLeave,
+  onInteraction,
 }: {
   isPageTransitioning: boolean;
+  areBarsVisible: boolean;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+  onInteraction: () => void;
 }) {
-  const dispatch = useDispatch<AppDispatch>();
-  const { areBarsVisible, pageNumber, totalPages } = usePostViewer();
+  const pages = useSelector((state: RootState) => state.postViewer.pages);
+  const currentPageIndex = useSelector(
+    (state: RootState) => state.postViewer.currentPageIndex
+  );
+  const pageNumber = useMemo(
+    () => (currentPageIndex === null ? null : currentPageIndex + 1),
+    [currentPageIndex]
+  );
+  const totalPages = useMemo(() => pages.length + 1, [pages.length]);
 
   const progress = useMemo(() => {
-    if (!pageNumber || !totalPages || totalPages <= 2) return null;
+    if (!pageNumber || totalPages <= 2) return null;
     return ((pageNumber - 1) / (totalPages - 2)) * 100;
   }, [pageNumber, totalPages]);
-
-  const handleMouseEnter = useCallback(() => {
-    if (canTouch) return;
-    dispatch(setIsMouseOnControlBar(true));
-  }, [dispatch]);
-
-  const handleMouseLeave = useCallback(() => {
-    if (canTouch) return;
-    dispatch(setIsMouseOnControlBar(false));
-  }, [dispatch]);
 
   return (
     <>
@@ -61,8 +63,8 @@ export default function PostViewerControlBar({
         )}
       >
         <div
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
           className='flex flex-col gap-6 mb-4 mx-4 lg:mx-6'
         >
           {progress !== null && (
@@ -71,8 +73,11 @@ export default function PostViewerControlBar({
 
           <div className='flex w-full justify-between items-center'>
             <div className='flex items-center gap-4'>
-              <TTSSection />
-              <PageIndicatorSection />
+              <TTSSection onInteraction={onInteraction} />
+              <PageIndicatorSection
+                pageNumber={pageNumber}
+                totalPages={totalPages}
+              />
             </div>
             <ExitFullscreenButton />
           </div>

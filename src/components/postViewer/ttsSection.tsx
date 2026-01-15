@@ -2,18 +2,18 @@
 
 import Tooltip from '@/components/tooltip';
 import useTTSPlayer from '@/features/postViewer/hooks/useTTSPlayer';
-import useDebounce from '@/hooks/useDebounce';
-import { setIsControlBarTouched } from '@/lib/redux/post/postViewerSlice';
-import { AppDispatch, RootState } from '@/lib/redux/store';
+import { RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { Pause, Play } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
-export default function TTSSection() {
+export default function TTSSection({
+  onInteraction,
+}: {
+  onInteraction: () => void;
+}) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const debounce = useDebounce();
-  const dispatch = useDispatch<AppDispatch>();
   const isViewerMode = useSelector((state: RootState) => {
     return state.postViewer.isViewerMode;
   });
@@ -29,8 +29,7 @@ export default function TTSSection() {
       <button
         onClick={() => {
           setIsPlaying(prev => !prev);
-          dispatch(setIsControlBarTouched(true));
-          debounce(() => dispatch(setIsControlBarTouched(false)), 2000);
+          onInteraction();
         }}
         className={clsx(
           'w-10 h-10 p-2 -m-2 relative cursor-pointer',

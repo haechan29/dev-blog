@@ -1,63 +1,52 @@
 'use client';
 
 import Heading from '@/features/post/domain/model/heading';
-import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
-import useDebounce from '@/hooks/useDebounce';
-import { canTouch } from '@/lib/browser';
-import {
-  setCurrentPageIndex,
-  setIsMouseOnToolbar,
-  setIsToolbarExpanded,
-  setIsToolbarTouched,
-} from '@/lib/redux/post/postViewerSlice';
-import { AppDispatch, RootState } from '@/lib/redux/store';
+import { RootState } from '@/lib/redux/store';
 import { scrollIntoElement } from '@/lib/scroll';
 import clsx from 'clsx';
 import { ChevronDown } from 'lucide-react';
-import { useCallback, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useCallback, useEffect, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 
 export default function PostViewerToolbar({
   title,
   headings,
+  areBarsVisible,
+  isExpanded,
+  onMouseEnter,
+  onMouseLeave,
+  onToggleExpand,
+  onHeadingClick,
 }: {
   title: string;
   headings: Heading[];
+  areBarsVisible: boolean;
+  isExpanded: boolean;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+  onToggleExpand: () => void;
+  onHeadingClick: (headingId: string) => void;
 }) {
-  const { page, isViewerMode, areBarsVisible } = usePostViewer();
   const pages = useSelector((state: RootState) => state.postViewer.pages);
+  const isViewerMode = useSelector(
+    (state: RootState) => state.postViewer.isViewerMode
+  );
+  const currentPageIndex = useSelector(
+    (state: RootState) => state.postViewer.currentPageIndex
+  );
+  const page = useMemo(
+    () => (currentPageIndex !== null ? pages[currentPageIndex] : null),
+    [currentPageIndex, pages]
+  );
 
-  const dispatch = useDispatch<AppDispatch>();
-  const debounce = useDebounce();
-  const { isToolbarExpanded: isExpanded } = usePostViewer();
-
-  const onMouseEnter = useCallback(() => {
-    if (canTouch) return;
-    dispatch(setIsMouseOnToolbar(true));
-  }, [dispatch]);
-
-  const onMouseLeave = useCallback(() => {
-    if (canTouch) return;
-    dispatch(setIsMouseOnToolbar(false));
-  }, [dispatch]);
-
-  const onContentClick = useCallback(
+  const handleContentClick = useCallback(
     (heading: Heading) => {
       if (isExpanded) {
-        const pageIndex = pages.findIndex(page => {
-          return page.heading && page.heading.id == heading.id;
-        });
-        if (pageIndex >= 0) {
-          dispatch(setCurrentPageIndex(pageIndex));
-        }
-
-        dispatch(setIsToolbarTouched(true));
-        debounce(() => dispatch(setIsToolbarTouched(false)), 2000);
+        onHeadingClick(heading.id);
       }
-
-      dispatch(setIsToolbarExpanded(!isExpanded));
+      onToggleExpand();
     },
-    [debounce, dispatch, isExpanded, pages]
+    [isExpanded, onHeadingClick, onToggleExpand]
   );
 
   useEffect(() => {
@@ -111,14 +100,12 @@ export default function PostViewerToolbar({
             isExpanded={isExpanded}
             heading={page?.heading ?? undefined}
             headings={headings}
-            onContentClick={onContentClick}
+            onContentClick={handleContentClick}
           />
 
           {headings.length > 0 && (
             <button
-              onClick={() => {
-                dispatch(setIsToolbarExpanded(!isExpanded));
-              }}
+              onClick={onToggleExpand}
               className='flex shrink-0 px-2 items-center justify-center cursor-pointer'
             >
               <ChevronDown

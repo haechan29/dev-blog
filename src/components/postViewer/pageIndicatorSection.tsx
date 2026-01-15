@@ -1,13 +1,14 @@
 'use client';
 
-import usePostViewer from '@/features/postViewer/hooks/usePostViewer';
-
-export default function PageIndicatorSection() {
-  const { pageNumber, totalPages } = usePostViewer();
-
+export default function PageIndicatorSection({
+  pageNumber,
+  totalPages,
+}: {
+  pageNumber: number | null;
+  totalPages: number;
+}) {
   return (
-    pageNumber !== null &&
-    totalPages !== null && (
+    pageNumber !== null && (
       <div className='flex items-center text-sm text-white md:text-gray-900 whitespace-nowrap gap-1'>
         <span>{pageNumber}</span>
         <span>/</span>
