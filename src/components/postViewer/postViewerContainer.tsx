@@ -102,15 +102,17 @@ export default function PostViewerContainer({
   return (
     <div className='w-full h-full relative'>
       <div
-        data-viewer-container
-        data-supports-fullscreen={supportsFullscreen}
         className={clsx(
           'prose w-full h-full relative flex justify-center',
           'absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 '
         )}
       >
         {container?.result && (
-          <div className='w-[calc(100%/var(--container-scale))] h-[calc(100%/var(--container-scale))] scale-(--container-scale) origin-top'>
+          <div
+            data-viewer-container
+            data-supports-fullscreen={supportsFullscreen}
+            className='w-[calc(100%/var(--container-scale))] h-[calc(100%/var(--container-scale))] scale-(--container-scale) origin-top'
+          >
             {container.result}
           </div>
         )}

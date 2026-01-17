@@ -428,7 +428,7 @@ body {
 }
 .tts-reading-inactive,
 .tts-reading-inactive * {
-  opacity: 0.4;
+  opacity: 0.5;
   transition: opacity 0.3s ease-in-out;
 }
 
