@@ -3,6 +3,7 @@
 import ExitFullscreenButton from '@/components/postViewer/exitFullscreenButton';
 import PageIndicatorSection from '@/components/postViewer/pageIndicatorSection';
 import TTSSection from '@/components/postViewer/ttsSection';
+import { canTouch } from '@/lib/browser';
 import { RootState } from '@/lib/redux/store';
 import { cn } from '@/lib/utils';
 import clsx from 'clsx';
@@ -55,6 +56,8 @@ export default function PostViewerControlBar({
 
       <div
         onClick={e => e.stopPropagation()}
+        onTouchStart={e => e.stopPropagation()}
+        onTouchEnd={e => e.stopPropagation()}
         className={clsx(
           'absolute bottom-0 inset-x-0 z-50',
           'max-md:from-black/50 max-md:to-transparent max-md:bg-linear-to-t',
@@ -63,8 +66,14 @@ export default function PostViewerControlBar({
         )}
       >
         <div
-          onMouseEnter={onMouseEnter}
-          onMouseLeave={onMouseLeave}
+          onMouseEnter={() => {
+            if (canTouch) return;
+            onMouseEnter();
+          }}
+          onMouseLeave={() => {
+            if (canTouch) return;
+            onMouseLeave();
+          }}
           className='flex flex-col gap-6 mb-4 mx-4 lg:mx-6'
         >
           {progress !== null && (

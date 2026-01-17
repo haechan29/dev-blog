@@ -1,6 +1,7 @@
 'use client';
 
 import Heading from '@/features/post/domain/model/heading';
+import { canTouch } from '@/lib/browser';
 import { RootState } from '@/lib/redux/store';
 import { scrollIntoElement } from '@/lib/scroll';
 import clsx from 'clsx';
@@ -80,10 +81,18 @@ export default function PostViewerToolbar({
         '--gradient-padding-bottom': isExpanded ? '5rem' : '2.5rem',
       }}
       onClick={e => e.stopPropagation()}
+      onTouchStart={e => e.stopPropagation()}
+      onTouchEnd={e => e.stopPropagation()}
     >
       <div
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
+        onMouseEnter={() => {
+          if (canTouch) return;
+          onMouseEnter();
+        }}
+        onMouseLeave={() => {
+          if (canTouch) return;
+          onMouseLeave();
+        }}
         className='flex flex-col p-2 md:p-4 lg:p-6'
       >
         {headings.length > 0 && page?.heading ? (
