@@ -1,7 +1,7 @@
 'use client';
 
 import clsx from 'clsx';
-import { AlertCircle, Maximize2, Minimize2 } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import Image from 'next/image';
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -29,20 +29,16 @@ export default function ImageWithCaption({
   'data-end-offset': string;
   children: ReactNode;
 }) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [expandedSize, setExpandedSize] = useState({ width: 0, height: 0 });
   const [isError, setIsError] = useState(false);
   const [isOversized, setIsOversized] = useState(false);
 
   const showErrorImage = useMemo(() => {
     return isError || !src || (mode !== 'preview' && src.startsWith('blob:'));
   }, [isError, mode, src]);
-  const naturalSizeRef = useRef<{ width: number; height: number } | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setIsError(false);
-    setIsExpanded(false);
   }, [src]);
 
   useEffect(() => {
@@ -85,70 +81,17 @@ export default function ImageWithCaption({
         {showErrorImage ? (
           <ErrorImage />
         ) : (
-          <>
-            <div
-              data-image-container
-              className={clsx('w-full h-full', isExpanded && 'overflow-auto')}
-            >
-              <Image
-                src={src}
-                alt={alt}
-                width={1000}
-                height={1000}
-                onError={() => setIsError(true)}
-                onLoad={e => {
-                  setIsError(false);
-                  naturalSizeRef.current = {
-                    width: e.currentTarget.naturalWidth,
-                    height: e.currentTarget.naturalHeight,
-                  };
-                }}
-                className={clsx(
-                  'max-w-none!',
-                  isExpanded ? 'min-w-full min-h-full' : 'object-contain'
-                )}
-                style={{
-                  width: isExpanded ? expandedSize.width : '100%',
-                  height: isExpanded ? expandedSize.height : '100%',
-                }}
-              />
-            </div>
-
-            <button
-              type='button'
-              aria-label={isExpanded ? '이미지 축소' : '이미지 확대'}
-              onClick={e => {
-                e.stopPropagation();
-
-                if (!isExpanded) {
-                  const container =
-                    e.currentTarget.parentElement?.querySelector('div');
-                  if (!container || !naturalSizeRef.current) return;
-
-                  const { width: naturalWidth, height: naturalHeight } =
-                    naturalSizeRef.current;
-
-                  const scale =
-                    Math.max(
-                      container.offsetWidth / naturalWidth,
-                      container.offsetHeight / naturalHeight
-                    ) * 0.9;
-                  setExpandedSize({
-                    width: naturalWidth * scale,
-                    height: naturalHeight * scale,
-                  });
-                }
-                setIsExpanded(isExpanded => !isExpanded);
-              }}
-              className='absolute top-2 right-3 p-2 bg-black/40 hover:bg-black/30 cursor-pointer rounded-lg text-white'
-            >
-              {isExpanded ? (
-                <Minimize2 className='w-4 h-4 hover:animate-pop hover:[--scale:0.8]' />
-              ) : (
-                <Maximize2 className='w-4 h-4 hover:animate-pop' />
-              )}
-            </button>
-          </>
+          <Image
+            src={src}
+            alt={alt}
+            width={1000}
+            height={1000}
+            onError={() => setIsError(true)}
+            onLoad={() => {
+              setIsError(false);
+            }}
+            className='w-full h-full max-w-none! object-contain'
+          />
         )}
       </div>
     );

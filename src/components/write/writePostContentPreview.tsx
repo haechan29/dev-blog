@@ -31,6 +31,8 @@ export default function WritePostContentPreview() {
       const target = findScrollTarget(contentPreview, cursorPosition);
       if (!target) return;
 
+      if (target.closest('pre')) return;
+
       const previewTop = contentPreview.getBoundingClientRect().top;
 
       let targetTop: number;
