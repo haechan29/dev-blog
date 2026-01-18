@@ -12,6 +12,7 @@ import {
   setContent,
   setTags,
   setTitle,
+  setVisibility,
 } from '@/lib/redux/write/writePostFormSlice';
 import { setCurrentStepId } from '@/lib/redux/write/writePostSlice';
 import { useSearchParams } from 'next/navigation';
@@ -63,6 +64,7 @@ export default function EditPageClient({
     dispatch(setContent({ value: post.content, isUserInput: false }));
     dispatch(setTitle({ value: post.title, isUserInput: false }));
     dispatch(setTags({ value: post.tags, isUserInput: false }));
+    dispatch(setVisibility(post.visibility));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
