@@ -111,22 +111,17 @@ export default function PostViewerContainer({
           <div
             data-viewer-container
             data-supports-fullscreen={supportsFullscreen}
-            className='w-[calc(100%/var(--container-scale))] h-[calc(100%/var(--container-scale))] scale-(--container-scale) origin-top'
+            className='w-[calc(100%/var(--container-scale))] h-[calc(100%/var(--container-scale))] scale-(--container-scale) origin-top relative'
           >
             {container.result}
-          </div>
-        )}
 
-        {container?.caption?.trim() && (
-          <div
-            className={clsx(
-              'absolute left-1/2 -translate-x-1/2 bottom-0 flex justify-center',
-              'w-[calc(100%/var(--container-scale))] scale-(--container-scale)'
+            {container?.caption?.trim() && (
+              <div className='w-full absolute left-1/2 -translate-x-1/2 bottom-0 flex justify-center'>
+                <div className='w-fit bg-black/70 text-white text-center break-keep wrap-anywhere text-balance px-2 py-1'>
+                  {container.caption}
+                </div>
+              </div>
             )}
-          >
-            <div className='w-fit bg-black/70 text-white text-center break-keep wrap-anywhere text-balance px-2 py-1'>
-              {container.caption}
-            </div>
           </div>
         )}
       </div>
