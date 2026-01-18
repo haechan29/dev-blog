@@ -38,13 +38,19 @@ export default function PostViewer({ post }: { post: PostProps }) {
   const debounceRotation = useDebounce();
   const debounceToolbarTouch = useDebounce();
   const debounceControlBarTouch = useDebounce();
+  const debounceHeadingChange = useDebounce();
 
   const isViewerMode = useSelector(
     (state: RootState) => state.postViewer.isViewerMode
   );
   const pages = useSelector((state: RootState) => state.postViewer.pages);
+  const currentPageIndex = useSelector(
+    (state: RootState) => state.postViewer.currentPageIndex
+  );
 
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const previousHeadingIdRef = useRef<string | null>(null);
+
   const [isPageTransitioning, setIsPageTransitioning] = useState(false);
   const [supportsFullscreen, setSupportsFullscreen] = useState(true);
 
@@ -56,6 +62,7 @@ export default function PostViewer({ post }: { post: PostProps }) {
   const [isToolbarExpanded, setIsToolbarExpanded] = useState(false);
   const [isToolbarTouched, setIsToolbarTouched] = useState(false);
   const [isControlBarTouched, setIsControlBarTouched] = useState(false);
+  const [isHeadingChanged, setIsHeadingChanged] = useState(false);
 
   const areBarsVisible =
     isMouseOnToolbar ||
@@ -65,7 +72,8 @@ export default function PostViewer({ post }: { post: PostProps }) {
     isRotationFinished ||
     isToolbarExpanded ||
     isToolbarTouched ||
-    isControlBarTouched;
+    isControlBarTouched ||
+    isHeadingChanged;
 
   const handlePageChange = useCallback(
     (direction: 'next' | 'prev') => {
@@ -225,16 +233,32 @@ export default function PostViewer({ post }: { post: PostProps }) {
   }, [handlePageChange, isViewerMode]);
 
   useEffect(() => {
-    if (!isViewerMode) {
-      setIsMouseOnToolbar(false);
-      setIsMouseOnControlBar(false);
-      setIsMouseMoved(false);
-      setIsTouched(false);
-      setIsRotationFinished(false);
-      setIsToolbarExpanded(false);
-      setIsToolbarTouched(false);
-      setIsControlBarTouched(false);
+    if (!isViewerMode || currentPageIndex === null) return;
+
+    const previousHeadingId = previousHeadingIdRef.current;
+
+    const currentHeading = pages[currentPageIndex]?.heading;
+    const currentHeadingId = currentHeading?.id ?? null;
+
+    if (previousHeadingId !== currentHeadingId) {
+      setIsHeadingChanged(true);
+      debounceHeadingChange(() => setIsHeadingChanged(false), 2000);
     }
+
+    previousHeadingIdRef.current = currentHeadingId;
+  }, [currentPageIndex, debounceHeadingChange, isViewerMode, pages]);
+
+  useEffect(() => {
+    if (isViewerMode) return;
+    setIsMouseOnToolbar(false);
+    setIsMouseOnControlBar(false);
+    setIsMouseMoved(false);
+    setIsTouched(false);
+    setIsRotationFinished(false);
+    setIsToolbarExpanded(false);
+    setIsToolbarTouched(false);
+    setIsControlBarTouched(false);
+    setIsHeadingChanged(false);
   }, [isViewerMode]);
 
   return (
