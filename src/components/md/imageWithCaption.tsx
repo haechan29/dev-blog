@@ -104,7 +104,7 @@ export default function ImageWithCaption({
         data-start-offset={startOffset}
         data-end-offset={endOffset}
         data-size={size}
-        className='flex flex-col gap-4'
+        className='flex flex-col gap-4 items-center'
       >
         {showErrorImage ? (
           <ErrorImage />
@@ -118,7 +118,9 @@ export default function ImageWithCaption({
             onLoad={() => setIsError(false)}
             className={clsx(
               'h-auto',
-              size === 'large' ? 'w-full' : 'min-w-56 w-1/2'
+              size === 'large'
+                ? 'w-full max-w-4xl'
+                : 'w-full lg:w-1/2 lg:min-w-120 max-w-2xl'
             )}
           />
         )}
@@ -134,7 +136,7 @@ export default function ImageWithCaption({
       data-start-offset={startOffset}
       data-end-offset={endOffset}
       data-size={size}
-      className='flex flex-col gap-4'
+      className='flex flex-col gap-4 items-center'
     >
       {showErrorImage ? (
         <ErrorImage />
