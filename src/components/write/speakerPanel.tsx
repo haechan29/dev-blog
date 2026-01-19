@@ -135,11 +135,15 @@ export default function SpeakerPanel({
       const { selectionStart, selectionEnd } = contentEditor;
       const textBefore = content.substring(0, selectionStart);
       const textAfter = content.substring(selectionEnd);
+      const selectedText = content.substring(selectionStart, selectionEnd);
+
+      const hasSelection = selectionStart !== selectionEnd;
+      const dialogueContent = hasSelection ? selectedText : DEFAULT_CONTENT;
 
       const attrs = avatar
         ? `speaker="${speaker}" avatar="${avatar}"`
         : `speaker="${speaker}"`;
-      const directive = `:::dialogue{${attrs}}\n${DEFAULT_CONTENT}\n:::`;
+      const directive = `:::dialogue{${attrs}}\n${dialogueContent}\n:::`;
 
       const shouldBreakBefore = textBefore.trim() && !textBefore.endsWith('\n');
       const shouldBreakAfter = textAfter.trim() && !textAfter.startsWith('\n');
@@ -155,12 +159,15 @@ export default function SpeakerPanel({
         textBefore.length +
         (shouldBreakBefore ? 1 : 0) +
         `:::dialogue{${attrs}}\n`.length;
-      const contentEnd = contentStart + DEFAULT_CONTENT.length;
+      const contentEnd = contentStart + dialogueContent.length;
 
       dispatch(setContent({ value: newText, isUserInput: false }));
       setTimeout(() => {
         contentEditor.focus();
-        contentEditor.setSelectionRange(contentStart, contentEnd);
+        contentEditor.setSelectionRange(
+          hasSelection ? contentEnd : contentStart,
+          contentEnd
+        );
       }, 100);
     },
     [content, dispatch]
