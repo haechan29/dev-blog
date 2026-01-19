@@ -1,5 +1,11 @@
-import { DialogueNode } from '@/types/mdast';
-import { BgmNode, ImageWithCaptionNode, Root, SpacerNode, Text } from 'mdast';
+import {
+  BgmNode,
+  DialogueNode,
+  ImageWithCaptionNode,
+  Root,
+  SpacerNode,
+  Text,
+} from 'mdast';
 import type {
   ContainerDirective,
   LeafDirective,

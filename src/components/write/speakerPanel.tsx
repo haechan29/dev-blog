@@ -11,7 +11,7 @@ import imageCompression from 'browser-image-compression';
 import clsx from 'clsx';
 import { ChevronLeft, Loader2, Plus } from 'lucide-react';
 import Image from 'next/image';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -50,6 +50,7 @@ export default function SpeakerPanel({
   const [editingSpeakerIndex, setEditingSpeakerIndex] = useState<number | null>(
     null
   );
+  const hasParsedInitialContent = useRef(false);
   const uploadTargetIndexRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -192,6 +193,16 @@ export default function SpeakerPanel({
     [content, dispatch, speakers]
   );
 
+  useEffect(() => {
+    if (hasParsedInitialContent.current || !content) return;
+
+    const parsed = parseDialogueSpeakers(content);
+    if (parsed.length > 0) {
+      setSpeakers(parsed);
+    }
+    hasParsedInitialContent.current = true;
+  }, [content]);
+
   return (
     <>
       <input
@@ -325,4 +336,31 @@ export default function SpeakerPanel({
       />
     </>
   );
+}
+
+function parseDialogueSpeakers(content: string): Speaker[] {
+  const regex = /:::dialogue\{([^}]*)\}/g;
+  const speakerMap = new Map<string, Set<string>>();
+
+  let match;
+  while ((match = regex.exec(content)) !== null) {
+    const attrs = match[1];
+    const speakerMatch = attrs.match(/speaker="([^"]*)"/);
+    const avatarMatch = attrs.match(/avatar="([^"]*)"/);
+
+    if (speakerMatch) {
+      const speaker = speakerMatch[1];
+      if (!speakerMap.has(speaker)) {
+        speakerMap.set(speaker, new Set());
+      }
+      if (avatarMatch) {
+        speakerMap.get(speaker)!.add(avatarMatch[1]);
+      }
+    }
+  }
+
+  return Array.from(speakerMap.entries()).map(([name, avatars]) => ({
+    name,
+    avatars: Array.from(avatars).map(url => ({ url, status: 'done' as const })),
+  }));
 }
