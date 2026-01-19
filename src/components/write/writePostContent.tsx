@@ -4,17 +4,27 @@ import WritePostContentEditor from '@/components/write/writePostContentEditor';
 import WritePostContentPreview from '@/components/write/writePostContentPreview';
 import WritePostContentToolbar from '@/components/write/writePostContentToolbar';
 import useBgmController from '@/features/post/hooks/useBgmController';
+import useContentToolbar from '@/features/write/hooks/useContentToolbar';
+import clsx from 'clsx';
 import { Plus, X } from 'lucide-react';
 import { useState } from 'react';
 
 export default function WritePostContent() {
+  const [isSpeakerPanelOpen, setIsSpeakerPanelOpen] = useState(true);
+
   useBgmController();
 
   return (
     <div className='h-full grid max-lg:grid-rows-[calc(50%-0.5rem)_calc(50%-0.5rem)] lg:grid-cols-2 gap-4'>
       <div className='h-full flex flex-col max-lg:min-w-0 lg:min-h-0'>
-        <WritePostContentToolbar />
-        <SpeakerPanel />
+        <WritePostContentToolbar
+          isSpeakerPanelOpen={isSpeakerPanelOpen}
+          setIsSpeakerPanelOpen={setIsSpeakerPanelOpen}
+        />
+        <SpeakerPanel
+          isSpeakerPanelOpen={isSpeakerPanelOpen}
+          setIsSpeakerPanelOpen={setIsSpeakerPanelOpen}
+        />
         <div className='flex-1 min-h-0'>
           <WritePostContentEditor />
         </div>
@@ -27,7 +37,17 @@ export default function WritePostContent() {
   );
 }
 
-function SpeakerPanel() {
+function SpeakerPanel({
+  isSpeakerPanelOpen,
+  setIsSpeakerPanelOpen,
+}: {
+  isSpeakerPanelOpen: boolean;
+  setIsSpeakerPanelOpen: (open: boolean) => void;
+}) {
+  const {
+    contentToolbar: { shouldAttachToolbarToBottom, toolbarTranslateY },
+  } = useContentToolbar();
+
   const [speakers, setSpeakers] = useState([
     {
       name: '호스트',
@@ -64,7 +84,18 @@ function SpeakerPanel() {
 
   return (
     <>
-      <div className='flex flex-wrap items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg mb-2'>
+      <div
+        className={clsx(
+          'flex flex-wrap items-center gap-2 px-3 py-2 border-gray-200',
+          shouldAttachToolbarToBottom
+            ? 'fixed inset-x-0 z-50 w-screen top-full bg-white/80 backdrop-blur-md translate-y-(--toolbar-translate-y)'
+            : 'border-t border-x',
+          !isSpeakerPanelOpen && 'hidden'
+        )}
+        style={{
+          '--toolbar-translate-y': toolbarTranslateY,
+        }}
+      >
         {speakers.map((speaker, speakerIndex) => (
           <div
             key={speakerIndex}

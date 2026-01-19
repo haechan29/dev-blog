@@ -57,7 +57,13 @@ const toolbarLayout = {
   bgm: ['bgmStartTime'],
 };
 
-export default function WritePostContentToolbar() {
+export default function WritePostContentToolbar({
+  isSpeakerPanelOpen,
+  setIsSpeakerPanelOpen,
+}: {
+  isSpeakerPanelOpen: boolean;
+  setIsSpeakerPanelOpen: (open: boolean) => void;
+}) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { uploadAndInsert } = useImageUpload();
   const [isQuotaDialogOpen, setIsQuotaDialogOpen] = useState(false);
@@ -101,7 +107,8 @@ export default function WritePostContentToolbar() {
           'translate-y-(--toolbar-translate-y)',
           shouldAttachToolbarToBottom
             ? 'fixed inset-x-0 z-50 w-screen top-full bg-white/80 backdrop-blur-md touch-pan-x'
-            : 'rounded-t-lg border-t border-x'
+            : 'rounded-t-lg border-t border-x',
+          shouldAttachToolbarToBottom && isSpeakerPanelOpen && 'hidden'
         )}
         style={{
           '--toolbar-translate-y': toolbarTranslateY,
