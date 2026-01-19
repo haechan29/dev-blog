@@ -9,40 +9,56 @@ import {
 } from '@/components/ui/dialog';
 import clsx from 'clsx';
 import { X } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-export default function AddSpeakerDialog({
+export default function SpeakerSettingsDialog({
   isOpen,
   setIsOpen,
-  onAdd,
+  onSubmit,
+  editingSpeakerIndex,
+  initialName = '',
 }: {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  onAdd: (speaker: { name: string; avatars: string[] }) => void;
+  onSubmit: (name: string, index: number | null) => void;
+  editingSpeakerIndex: number | null;
+  initialName?: string;
 }) {
+  const isEditMode = editingSpeakerIndex !== null;
   const [newName, setNewName] = useState('');
   const [isNameValid, setIsNameValid] = useState(true);
 
-  const handleAddSpeaker = () => {
+  const handleSubmit = useCallback(() => {
     if (!newName.trim()) {
       setIsNameValid(false);
       return;
     }
-    onAdd({ name: newName.trim(), avatars: [] });
+    onSubmit(newName.trim(), editingSpeakerIndex);
     setNewName('');
     setIsOpen(false);
-  };
+  }, [editingSpeakerIndex, newName, onSubmit, setIsOpen]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setNewName(initialName);
+      setIsNameValid(true);
+    }
+  }, [isOpen, initialName]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent showCloseButton={false} className='gap-0 rounded-sm'>
-        <DialogTitle className='sr-only'>화자 추가</DialogTitle>
+        <DialogTitle className='sr-only'>
+          {isEditMode ? '화자 수정' : '화자 추가'}
+        </DialogTitle>
         <DialogDescription className='sr-only'>
-          새로운 화자를 추가합니다
+          {isEditMode ? '화자 이름을 수정합니다' : '새로운 화자를 추가합니다'}
         </DialogDescription>
-        <div className='text-xl font-bold mt-2 mb-1'>화자 추가</div>
+        <div className='text-xl font-bold mt-2 mb-1'>
+          {isEditMode ? '화자 수정' : '화자 추가'}
+        </div>
         <div className='text-sm text-gray-500 mb-6'>
-          새로운 화자를 추가합니다
+          {isEditMode ? '화자 이름을 수정합니다' : '새로운 화자를 추가합니다'}
         </div>
 
         <input
@@ -52,7 +68,6 @@ export default function AddSpeakerDialog({
             setNewName(e.target.value);
             setIsNameValid(true);
           }}
-          onKeyDown={e => e.key === 'Enter' && handleAddSpeaker()}
           placeholder='화자 이름'
           autoFocus
           className={clsx(
@@ -66,10 +81,10 @@ export default function AddSpeakerDialog({
 
         <div className='flex justify-between items-center'>
           <button
-            onClick={handleAddSpeaker}
+            onClick={handleSubmit}
             className='flex justify-center items-center px-6 h-10 rounded-sm font-bold text-white bg-blue-600 hover:bg-blue-500'
           >
-            추가
+            {isEditMode ? '수정' : '추가'}
           </button>
 
           <DialogClose asChild>
