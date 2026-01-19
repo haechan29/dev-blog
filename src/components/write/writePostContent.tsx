@@ -1,16 +1,17 @@
 'use client';
 
+import AddSpeakerDialog from '@/components/write/addSpeakerDialog';
 import WritePostContentEditor from '@/components/write/writePostContentEditor';
 import WritePostContentPreview from '@/components/write/writePostContentPreview';
 import WritePostContentToolbar from '@/components/write/writePostContentToolbar';
 import useBgmController from '@/features/post/hooks/useBgmController';
 import useContentToolbar from '@/features/write/hooks/useContentToolbar';
 import clsx from 'clsx';
-import { Plus, X } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useState } from 'react';
 
 export default function WritePostContent() {
-  const [isSpeakerPanelOpen, setIsSpeakerPanelOpen] = useState(true);
+  const [isSpeakerPanelOpen, setIsSpeakerPanelOpen] = useState(false);
 
   useBgmController();
 
@@ -61,26 +62,7 @@ function SpeakerPanel({
       avatars: ['https://api.dicebear.com/9.x/personas/svg?seed=guest1'],
     },
   ]);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [newName, setNewName] = useState('');
-  const [newAvatars, setNewAvatars] = useState<string[]>([]);
-
-  const addSpeaker = () => {
-    if (!newName.trim()) return;
-    setSpeakers([...speakers, { name: newName.trim(), avatars: newAvatars }]);
-    setNewName('');
-    setNewAvatars([]);
-    setIsAddDialogOpen(false);
-  };
-
-  const addNewAvatar = (file: File) => {
-    const url = URL.createObjectURL(file);
-    setNewAvatars([...newAvatars, url]);
-  };
-
-  const removeNewAvatar = (index: number) => {
-    setNewAvatars(newAvatars.filter((_, i) => i !== index));
-  };
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(true);
 
   return (
     <>
@@ -151,80 +133,11 @@ function SpeakerPanel({
         </button>
       </div>
 
-      {isAddDialogOpen && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
-          <div className='bg-white rounded-lg p-4 w-80 space-y-4'>
-            <h3 className='font-medium'>화자 추가</h3>
-
-            <div className='space-y-2'>
-              <div className='flex flex-wrap gap-2'>
-                {newAvatars.map((avatar, index) => (
-                  <div key={index} className='relative'>
-                    <div className='w-14 h-14 rounded-lg overflow-hidden border border-gray-200'>
-                      <img
-                        src={avatar}
-                        alt=''
-                        className='w-full h-full object-cover'
-                      />
-                    </div>
-                    <button
-                      onClick={() => removeNewAvatar(index)}
-                      className='absolute -top-1 -right-1 w-5 h-5 bg-gray-800 text-white rounded-full flex items-center justify-center'
-                    >
-                      <X className='w-3 h-3' />
-                    </button>
-                  </div>
-                ))}
-
-                <label className='cursor-pointer'>
-                  <div className='w-14 h-14 rounded-lg bg-gray-100 flex items-center justify-center border-2 border-dashed border-gray-300 hover:border-gray-400'>
-                    <Plus className='w-5 h-5 text-gray-400' />
-                  </div>
-                  <input
-                    type='file'
-                    accept='image/*'
-                    className='hidden'
-                    onChange={e => {
-                      const file = e.target.files?.[0];
-                      if (file) addNewAvatar(file);
-                      e.target.value = '';
-                    }}
-                  />
-                </label>
-              </div>
-              <span className='text-xs text-gray-500'>표정별 이미지 추가</span>
-            </div>
-
-            <input
-              type='text'
-              value={newName}
-              onChange={e => setNewName(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && addSpeaker()}
-              placeholder='화자 이름'
-              autoFocus
-              className='w-full px-3 py-2 border border-gray-200 rounded'
-            />
-            <div className='flex justify-end gap-2'>
-              <button
-                onClick={() => {
-                  setIsAddDialogOpen(false);
-                  setNewName('');
-                  setNewAvatars([]);
-                }}
-                className='px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded'
-              >
-                취소
-              </button>
-              <button
-                onClick={addSpeaker}
-                className='px-3 py-1.5 text-sm bg-blue-500 text-white rounded hover:bg-blue-600'
-              >
-                추가
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AddSpeakerDialog
+        isOpen={isAddDialogOpen}
+        setIsOpen={setIsAddDialogOpen}
+        onAdd={speaker => setSpeakers([...speakers, speaker])}
+      />
     </>
   );
 }
