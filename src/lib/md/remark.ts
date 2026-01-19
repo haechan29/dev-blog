@@ -1,4 +1,5 @@
-import { ImageWithCaptionNode, Root, RootContent, Text } from 'mdast';
+import { DialogueNode } from '@/types/mdast';
+import { BgmNode, ImageWithCaptionNode, Root, SpacerNode, Text } from 'mdast';
 import type {
   ContainerDirective,
   LeafDirective,
@@ -108,7 +109,7 @@ export function remarkSpacer() {
 
         if (breakStart === nodeEnd && breakCount >= 2) {
           const spacerCount = breakCount - 1;
-          const spacers: RootContent[] = [];
+          const spacers: SpacerNode[] = [];
 
           for (let j = 0; j < spacerCount; j++) {
             const offsetStart = nodeEnd + 1 + j;
@@ -195,7 +196,7 @@ export function remarkBgm() {
       const { youtubeUrl, startTime } = node.attributes || {};
       if (!youtubeUrl) return;
 
-      const newNode = {
+      const newNode: BgmNode = {
         ...node,
         type: 'bgm',
         data: {
@@ -203,6 +204,32 @@ export function remarkBgm() {
           hProperties: {
             'data-youtube-url': youtubeUrl,
             'data-start-time': startTime ?? '0',
+          },
+        },
+      };
+
+      parent.children[index] = newNode;
+    });
+  };
+}
+
+export function remarkDialogue() {
+  return (tree: Root) => {
+    visit(tree, (node: Node, index?: number, parent?: Parent) => {
+      if (index === undefined || !parent) return;
+      if (!isDirectiveNode(node) || node.name !== 'dialogue') return;
+
+      const { speaker, avatar } = node.attributes || {};
+      if (!speaker) return;
+
+      const newNode: DialogueNode = {
+        ...node,
+        type: 'dialogue',
+        data: {
+          hName: 'dialogue',
+          hProperties: {
+            'data-speaker': speaker,
+            ...(avatar && { 'data-avatar': avatar }),
           },
         },
       };

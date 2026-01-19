@@ -10,6 +10,7 @@ export const schema: Options = {
     'spacer',
     'bgm',
     'imageWithCaption',
+    'dialogue',
   ],
   attributes: {
     ...defaultSchema.attributes,
@@ -21,6 +22,7 @@ export const schema: Options = {
       'data-caption',
     ],
     bgm: ['data-youtube-url', 'data-start-time'],
+    dialogue: ['data-speaker', 'data-avatar'],
   },
   protocols: {
     ...defaultSchema.protocols,

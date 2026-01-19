@@ -1,4 +1,5 @@
 import { Bgm } from '@/components/md/bgm';
+import Dialogue from '@/components/md/dialogue';
 import ExternalLink from '@/components/md/externalLink';
 import Figure from '@/components/md/figure';
 import ImageWithCaption from '@/components/md/imageWithCaption';
@@ -6,6 +7,7 @@ import Spacer from '@/components/md/spacer';
 import { rehypeMode, rehypeOffset, rehypeStyle, schema } from '@/lib/md/rehype';
 import {
   remarkBgm,
+  remarkDialogue,
   remarkImg,
   remarkInsPosition,
   remarkSpacer,
@@ -42,6 +44,7 @@ const processor = unified()
   .use(remarkDirective) // support custom directives like :::bgm
   .use(remarkImg) // process img nodes
   .use(remarkBgm) // process bgm nodes
+  .use(remarkDialogue) // process dialogue nodes
   .use(remarkRehype) // convert markdown AST to HTML AST
   .use(rehypeSanitize, schema) // remove unsafe HTML tags and attributes
   .use(rehypePrettyCode) // add syntax highlighting to code blocks
@@ -61,6 +64,7 @@ const processor = unified()
         imageWithCaption: ImageWithCaption,
         figure: Figure,
         spacer: Spacer,
+        dialogue: Dialogue,
       },
     }
   );
