@@ -3,6 +3,7 @@
 import SpeakerSettingsDialog from '@/components/write/speakerSettingsDialog';
 import { ApiError } from '@/errors/errors';
 import * as ImageClientRepository from '@/features/image/data/repository/imageClientRepository';
+import { parseDirectiveRanges } from '@/features/write/domain/lib/contentButton';
 import useContentToolbar from '@/features/write/hooks/useContentToolbar';
 import { colors, getColorIndex } from '@/lib/color';
 import { AppDispatch, RootState } from '@/lib/redux/store';
@@ -125,7 +126,7 @@ export default function SpeakerPanel({
     }
   }, []);
 
-  const insertDialogue = useCallback(
+  const handleDialogue = useCallback(
     (speaker: string, avatar?: string) => {
       const contentEditor = document.querySelector(
         '[data-content-editor]'
@@ -133,42 +134,72 @@ export default function SpeakerPanel({
       if (!contentEditor) return;
 
       const { selectionStart, selectionEnd } = contentEditor;
-      const textBefore = content.substring(0, selectionStart);
-      const textAfter = content.substring(selectionEnd);
-      const selectedText = content.substring(selectionStart, selectionEnd);
+      const ranges = parseDirectiveRanges(content, 'dialogue');
+      const targetRange = ranges.find(([start, end]) => {
+        return selectionStart >= start && selectionStart <= end;
+      });
 
-      const hasSelection = selectionStart !== selectionEnd;
-      const dialogueContent = hasSelection ? selectedText : DEFAULT_CONTENT;
-
-      const attrs = avatar
-        ? `speaker="${speaker}" avatar="${avatar}"`
-        : `speaker="${speaker}"`;
-      const directive = `:::dialogue{${attrs}}\n${dialogueContent}\n:::`;
-
-      const shouldBreakBefore = textBefore.trim() && !textBefore.endsWith('\n');
-      const shouldBreakAfter = textAfter.trim() && !textAfter.startsWith('\n');
-
-      const newText =
-        textBefore +
-        (shouldBreakBefore ? '\n' : '') +
-        directive +
-        (shouldBreakAfter ? '\n' : '') +
-        textAfter;
-
-      const contentStart =
-        textBefore.length +
-        (shouldBreakBefore ? 1 : 0) +
-        `:::dialogue{${attrs}}\n`.length;
-      const contentEnd = contentStart + dialogueContent.length;
-
-      dispatch(setContent({ value: newText, isUserInput: false }));
-      setTimeout(() => {
-        contentEditor.focus();
-        contentEditor.setSelectionRange(
-          hasSelection ? contentEnd : contentStart,
-          contentEnd
+      if (targetRange) {
+        const [rangeStart, rangeEnd] = targetRange;
+        const directiveText = content.substring(rangeStart, rangeEnd);
+        const newAttrs = avatar
+          ? `speaker="${speaker}" avatar="${avatar}"`
+          : `speaker="${speaker}"`;
+        const updatedDirective = directiveText.replace(
+          /:::dialogue\{[^}]*\}/,
+          `:::dialogue{${newAttrs}}`
         );
-      }, 100);
+
+        const newContent =
+          content.substring(0, rangeStart) +
+          updatedDirective +
+          content.substring(rangeEnd);
+
+        dispatch(setContent({ value: newContent, isUserInput: false }));
+        setTimeout(() => {
+          contentEditor.focus();
+          contentEditor.setSelectionRange(selectionStart, selectionStart);
+        }, 100);
+      } else {
+        const textBefore = content.substring(0, selectionStart);
+        const textAfter = content.substring(selectionEnd);
+        const selectedText = content.substring(selectionStart, selectionEnd);
+
+        const hasSelection = selectionStart !== selectionEnd;
+        const dialogueContent = hasSelection ? selectedText : DEFAULT_CONTENT;
+
+        const attrs = avatar
+          ? `speaker="${speaker}" avatar="${avatar}"`
+          : `speaker="${speaker}"`;
+        const directive = `:::dialogue{${attrs}}\n${dialogueContent}\n:::`;
+
+        const shouldBreakBefore =
+          textBefore.trim() && !textBefore.endsWith('\n');
+        const shouldBreakAfter =
+          textAfter.trim() && !textAfter.startsWith('\n');
+
+        const newText =
+          textBefore +
+          (shouldBreakBefore ? '\n' : '') +
+          directive +
+          (shouldBreakAfter ? '\n' : '') +
+          textAfter;
+
+        const contentStart =
+          textBefore.length +
+          (shouldBreakBefore ? 1 : 0) +
+          `:::dialogue{${attrs}}\n`.length;
+        const contentEnd = contentStart + dialogueContent.length;
+
+        dispatch(setContent({ value: newText, isUserInput: false }));
+        setTimeout(() => {
+          contentEditor.focus();
+          contentEditor.setSelectionRange(
+            hasSelection ? contentEnd : contentStart,
+            contentEnd
+          );
+        }, 100);
+      }
     },
     [content, dispatch]
   );
@@ -269,7 +300,7 @@ export default function SpeakerPanel({
                     key={avatarIndex}
                     onClick={() =>
                       avatar.status === 'done' &&
-                      insertDialogue(speaker.name, avatar.url)
+                      handleDialogue(speaker.name, avatar.url)
                     }
                     disabled={avatar.status === 'loading'}
                     className='w-7 h-7 relative rounded-full overflow-hidden bg-gray-100 border-2 border-transparent hover:border-blue-500 disabled:hover:border-transparent'
@@ -295,7 +326,7 @@ export default function SpeakerPanel({
                 ))
               ) : (
                 <button
-                  onClick={() => insertDialogue(speaker.name)}
+                  onClick={() => handleDialogue(speaker.name)}
                   className={clsx(
                     'w-7 h-7 rounded-full flex items-center justify-center text-xs text-white font-medium border-2 border-transparent hover:border-blue-500',
                     colors[getColorIndex(speaker.name)]
