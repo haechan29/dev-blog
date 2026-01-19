@@ -13,26 +13,7 @@ import {
   WritePostContentButtonProps,
 } from '@/features/write/ui/writePostContentButtonProps';
 import clsx from 'clsx';
-import {
-  AlignCenter,
-  Captions,
-  ChevronDown,
-  Code2,
-  Columns,
-  Expand,
-  Grid2x2,
-  ImageIcon,
-  Link,
-  List,
-  Minus,
-  MoreHorizontal,
-  Music,
-  Quote,
-  Rows,
-  Shrink,
-  Timer,
-  Underline,
-} from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -48,7 +29,14 @@ const toolbarLayout = {
     { group: 'list', items: ['unorderedList', 'orderedList'] },
     {
       group: 'more',
-      items: ['bgm', 'code', 'table', 'horizontalRule', 'blockquote'],
+      items: [
+        'bgm',
+        'speakerPanel',
+        'code',
+        'table',
+        'horizontalRule',
+        'blockquote',
+      ],
     },
   ],
   table: ['addRow', 'addColumn'],
@@ -70,6 +58,7 @@ export default function WritePostContentToolbar({
 
   const { activeCategory, onAction } = useWritePostContentButton({
     onUpload: () => fileInputRef.current?.click(),
+    onToggleSpeakerPanel: () => setIsSpeakerPanelOpen(!isSpeakerPanelOpen),
   });
   const {
     contentToolbar: { shouldAttachToolbarToBottom, toolbarTranslateY },
@@ -124,7 +113,7 @@ export default function WritePostContentToolbar({
                   onClick={() => onAction(button)}
                   className='min-w-10 h-10 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer'
                 >
-                  <ContentButton buttonContent={button.content} />
+                  <ContentButton content={button.content} />
                 </button>
               </Tooltip>
             );
@@ -262,7 +251,7 @@ function ToolbarDropdown({
           onClick={() => setIsOpen(prev => !prev)}
           className='min-w-10 h-10 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer gap-0.5'
         >
-          <ContentButton buttonContent={groupProps.content} />
+          <ContentButton content={groupProps.content} />
           {group !== 'more' && (
             <ChevronDown className='w-3 h-3 text-gray-400' />
           )}
@@ -298,7 +287,7 @@ function ToolbarDropdown({
                   }}
                   className='flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-gray-100 cursor-pointer'
                 >
-                  <ContentButton buttonContent={button.content} />
+                  <ContentButton content={button.content} />
                   <span>{button.label}</span>
                 </button>
               );
@@ -310,49 +299,10 @@ function ToolbarDropdown({
   );
 }
 
-function ContentButton({
-  buttonContent: { icon, style, value },
-}: {
-  buttonContent: ButtonContent;
-}) {
-  switch (icon) {
-    case 'text':
-      return <div className={style}>{value}</div>;
-    case 'link':
-      return <Link className={style} />;
-    case 'heading':
-      return <div className={style}>H</div>;
-    case 'list':
-      return <List className={style} />;
-    case 'more':
-      return <MoreHorizontal className={style} />;
-    case 'code':
-      return <Code2 className={style} />;
-    case 'table':
-      return <Grid2x2 className={style} />;
-    case 'blockquote':
-      return <Quote className={style} />;
-    case 'horizontalRule':
-      return <Minus className={style} />;
-    case 'image':
-      return <ImageIcon className={style} />;
-    case 'imageLarge':
-      return <Expand className={style} />;
-    case 'imageSmall':
-      return <Shrink className={style} />;
-    case 'imageCaption':
-      return <AlignCenter className={style} />;
-    case 'imageSubtitle':
-      return <Captions className={style} />;
-    case 'addRow':
-      return <Rows className={style} />;
-    case 'addColumn':
-      return <Columns className={style} />;
-    case 'bgm':
-      return <Music className={style} />;
-    case 'bgmStartTime':
-      return <Timer className={style} />;
-    case 'underline':
-      return <Underline className={style} />;
+function ContentButton({ content }: { content: ButtonContent }) {
+  if (content.type === 'text') {
+    return <span className={content.style}>{content.value}</span>;
   }
+  const Icon = content.icon;
+  return <Icon className={content.style} />;
 }

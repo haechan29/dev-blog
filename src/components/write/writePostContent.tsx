@@ -8,7 +8,7 @@ import useBgmController from '@/features/post/hooks/useBgmController';
 import { useState } from 'react';
 
 export default function WritePostContent() {
-  const [isSpeakerPanelOpen, setIsSpeakerPanelOpen] = useState(true);
+  const [isSpeakerPanelOpen, setIsSpeakerPanelOpen] = useState(false);
 
   useBgmController();
 

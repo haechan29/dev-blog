@@ -7,7 +7,7 @@ import useContentToolbar from '@/features/write/hooks/useContentToolbar';
 import { colors, getColorIndex } from '@/lib/color';
 import imageCompression from 'browser-image-compression';
 import clsx from 'clsx';
-import { Loader2, Plus } from 'lucide-react';
+import { ChevronLeft, Loader2, Plus } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
@@ -169,6 +169,17 @@ export default function SpeakerPanel({
           '--toolbar-translate-y': toolbarTranslateY,
         }}
       >
+        {shouldAttachToolbarToBottom && (
+          <button
+            onMouseDown={e => e.preventDefault()}
+            onTouchStart={e => e.preventDefault()}
+            onClick={() => setIsSpeakerPanelOpen(false)}
+            className='p-2 -m-2 flex items-center justify-center rounded-full shrink-0'
+          >
+            <ChevronLeft className='w-5 h-5 text-gray-400' />
+          </button>
+        )}
+
         {speakers.map((speaker, speakerIndex) => (
           <div
             key={speakerIndex}

@@ -27,8 +27,10 @@ const CURSOR_MARKER = '__NEW_CURSOR_POSITION__';
 
 export default function useWritePostContentButton({
   onUpload,
+  onToggleSpeakerPanel,
 }: {
   onUpload: () => void;
+  onToggleSpeakerPanel: () => void;
 }) {
   const {
     writePostForm: {
@@ -248,6 +250,8 @@ export default function useWritePostContentButton({
         handleTableAction(contentButtonProps);
       } else if (action === 'code') {
         handleCodeAction(contentButtonProps);
+      } else if (action === 'toggle') {
+        onToggleSpeakerPanel();
       }
     },
     [
@@ -255,6 +259,7 @@ export default function useWritePostContentButton({
       handleDirectiveAction,
       handleMarkdownAction,
       handleTableAction,
+      onToggleSpeakerPanel,
       onUpload,
     ]
   );
