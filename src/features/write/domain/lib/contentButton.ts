@@ -1,5 +1,6 @@
 const IMAGE_DIRECTIVE_PATTERN = ':::img[\\s\\S]*?:::';
 const BGM_DIRECTIVE_PATTERN = '::bgm\\{[^}]*\\}';
+const DIALOGUE_DIRECTIVE_PATTERN = ':::dialogue[\\s\\S]*?:::';
 const CODE_PATTERN = '```[\\s\\S]*?```';
 
 export function parseRanges(text: string, type: string) {
@@ -18,6 +19,8 @@ export function parseDirectiveRanges(text: string, type: string) {
     regex = new RegExp(IMAGE_DIRECTIVE_PATTERN, 'g');
   } else if (type === 'bgm') {
     regex = new RegExp(BGM_DIRECTIVE_PATTERN, 'g');
+  } else if (type === 'dialogue') {
+    regex = new RegExp(DIALOGUE_DIRECTIVE_PATTERN, 'g');
   } else {
     return [];
   }

@@ -5,6 +5,7 @@ declare module 'mdast' {
     spacer: SpacerNode;
     bgm: BgmNode;
     imageWithCaption: ImageWithCaptionNode;
+    dialogue: DialogueNode;
   }
 
   interface SpacerNode extends Node {
@@ -35,6 +36,17 @@ declare module 'mdast' {
         'data-size': 'medium' | 'large';
         'data-status': 'failed' | 'success' | 'loading';
         'data-caption': string;
+      };
+    };
+  }
+
+  interface DialogueNode extends Node {
+    type: 'dialogue';
+    data: {
+      hName: 'dialogue';
+      hProperties: {
+        'data-speaker': string;
+        'data-avatar'?: string;
       };
     };
   }
