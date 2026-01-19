@@ -5,11 +5,17 @@ import { ApiError } from '@/errors/errors';
 import * as ImageClientRepository from '@/features/image/data/repository/imageClientRepository';
 import useContentToolbar from '@/features/write/hooks/useContentToolbar';
 import { colors, getColorIndex } from '@/lib/color';
+import { AppDispatch, RootState } from '@/lib/redux/store';
+import { setContent } from '@/lib/redux/write/writePostFormSlice';
 import imageCompression from 'browser-image-compression';
 import clsx from 'clsx';
 import { ChevronLeft, Loader2, Plus } from 'lucide-react';
+import Image from 'next/image';
 import { useCallback, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useDispatch, useSelector } from 'react-redux';
+
+const DEFAULT_CONTENT = '내용을 입력해주세요.';
 
 interface Avatar {
   url: string;
@@ -31,42 +37,14 @@ export default function SpeakerPanel({
   const {
     contentToolbar: { shouldAttachToolbarToBottom, toolbarTranslateY },
   } = useContentToolbar();
+  const content = useSelector(
+    (state: RootState) => state.writePostForm.content.value
+  );
+  const dispatch = useDispatch<AppDispatch>();
 
   const [speakers, setSpeakers] = useState<Speaker[]>([
-    {
-      name: '호스트',
-      avatars: [
-        {
-          url: 'https://api.dicebear.com/9.x/personas/svg?seed=host1',
-          status: 'done',
-        },
-        {
-          url: 'https://api.dicebear.com/9.x/personas/svg?seed=host2',
-          status: 'done',
-        },
-      ],
-    },
-    {
-      name: '게스트',
-      avatars: [],
-    },
-    {
-      name: '임해찬',
-      avatars: [
-        {
-          url: 'https://api.dicebear.com/9.x/personas/svg?seed=host3',
-          status: 'done',
-        },
-        {
-          url: 'https://api.dicebear.com/9.x/personas/svg?seed=host4',
-          status: 'done',
-        },
-        {
-          url: 'https://api.dicebear.com/9.x/personas/svg?seed=host5',
-          status: 'done',
-        },
-      ],
-    },
+    { name: '호스트', avatars: [] },
+    { name: '게스트', avatars: [] },
   ]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const uploadTargetIndexRef = useRef<number | null>(null);
@@ -143,6 +121,47 @@ export default function SpeakerPanel({
     }
   }, []);
 
+  const insertDialogue = useCallback(
+    (speaker: string, avatar?: string) => {
+      const contentEditor = document.querySelector(
+        '[data-content-editor]'
+      ) as HTMLTextAreaElement;
+      if (!contentEditor) return;
+
+      const { selectionStart, selectionEnd } = contentEditor;
+      const textBefore = content.substring(0, selectionStart);
+      const textAfter = content.substring(selectionEnd);
+
+      const attrs = avatar
+        ? `speaker="${speaker}" avatar="${avatar}"`
+        : `speaker="${speaker}"`;
+      const directive = `:::dialogue{${attrs}}\n${DEFAULT_CONTENT}\n:::`;
+
+      const shouldBreakBefore = textBefore.trim() && !textBefore.endsWith('\n');
+      const shouldBreakAfter = textAfter.trim() && !textAfter.startsWith('\n');
+
+      const newText =
+        textBefore +
+        (shouldBreakBefore ? '\n' : '') +
+        directive +
+        (shouldBreakAfter ? '\n' : '') +
+        textAfter;
+
+      const contentStart =
+        textBefore.length +
+        (shouldBreakBefore ? 1 : 0) +
+        `:::dialogue{${attrs}}\n`.length;
+      const contentEnd = contentStart + DEFAULT_CONTENT.length;
+
+      dispatch(setContent({ value: newText, isUserInput: false }));
+      setTimeout(() => {
+        contentEditor.focus();
+        contentEditor.setSelectionRange(contentStart, contentEnd);
+      }, 100);
+    },
+    [content, dispatch]
+  );
+
   return (
     <>
       <input
@@ -159,7 +178,7 @@ export default function SpeakerPanel({
 
       <div
         className={clsx(
-          'flex items-center gap-2 px-3 py-2 border-gray-200 overflow-x-auto',
+          'flex items-center gap-2 px-3 py-1.5 border-gray-200 overflow-x-auto',
           shouldAttachToolbarToBottom
             ? 'fixed inset-x-0 z-50 w-screen top-full bg-white/80 backdrop-blur-md translate-y-(--toolbar-translate-y)'
             : 'border-t border-x',
@@ -192,25 +211,18 @@ export default function SpeakerPanel({
                 speaker.avatars.map((avatar, avatarIndex) => (
                   <button
                     key={avatarIndex}
-                    onClick={() => {
-                      console.log(
-                        `삽입: ${speaker.name}, avatar ${avatarIndex}`
-                      );
-                    }}
-                    className='w-7 h-7 relative rounded-full overflow-hidden bg-gray-100 border-2 border-transparent hover:border-blue-500'
+                    onClick={() =>
+                      avatar.status === 'done' &&
+                      insertDialogue(speaker.name, avatar.url)
+                    }
+                    disabled={avatar.status === 'loading'}
+                    className='w-7 h-7 relative rounded-full overflow-hidden bg-gray-100 border-2 border-transparent hover:border-blue-500 disabled:hover:border-transparent'
                   >
-                    {/* import Image from 'next/image';
                     <Image
-                      src={avatar}
+                      src={avatar.url}
                       alt=''
                       width={28}
                       height={28}
-                      className='w-full h-full object-cover'
-                    /> */}
-
-                    <img
-                      src={avatar.url}
-                      alt=''
                       className='w-full h-full object-cover'
                     />
 
@@ -227,9 +239,7 @@ export default function SpeakerPanel({
                 ))
               ) : (
                 <button
-                  onClick={() => {
-                    console.log(`삽입: ${speaker.name}, no avatar`);
-                  }}
+                  onClick={() => insertDialogue(speaker.name)}
                   className={clsx(
                     'w-7 h-7 rounded-full flex items-center justify-center text-xs text-white font-medium border-2 border-transparent hover:border-blue-500',
                     colors[getColorIndex(speaker.name)]
