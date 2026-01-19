@@ -6,17 +6,25 @@ import { ReactNode } from 'react';
 export default function Dialogue({
   'data-speaker': speaker,
   'data-avatar': avatar,
+  'data-start-offset': startOffset,
+  'data-end-offset': endOffset,
   children,
 }: {
   'data-speaker': string;
   'data-avatar'?: string;
+  'data-start-offset': number;
+  'data-end-offset': number;
   children?: ReactNode;
 }) {
   const initial = speaker.charAt(0).toUpperCase();
   const color = colors[getColorIndex(speaker)];
 
   return (
-    <div className='my-4 flex gap-3'>
+    <div
+      data-start-offset={startOffset}
+      data-end-offset={endOffset}
+      className='my-4 flex gap-3'
+    >
       {avatar ? (
         <Image
           src={avatar}
