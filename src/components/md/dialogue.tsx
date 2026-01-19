@@ -1,4 +1,4 @@
-import { colors, getColorIndex } from '@/lib/color';
+import { colors, getColorIndex, ringColors, textColors } from '@/lib/color';
 import clsx from 'clsx';
 import Image from 'next/image';
 import { ReactNode } from 'react';
@@ -31,7 +31,10 @@ export default function Dialogue({
           alt={speaker}
           width={32}
           height={32}
-          className='w-8 h-8 rounded-full object-cover shrink-0'
+          className={clsx(
+            'w-8 h-8 rounded-full object-cover shrink-0 ring-2',
+            ringColors[getColorIndex(speaker)]
+          )}
         />
       ) : (
         <div
@@ -45,7 +48,14 @@ export default function Dialogue({
       )}
 
       <div className='flex-1'>
-        <div className='text-xs text-gray-500'>{speaker}</div>
+        <div
+          className={clsx(
+            'text-xs font-medium',
+            textColors[getColorIndex(speaker)]
+          )}
+        >
+          {speaker}
+        </div>
         <div className='text-gray-900'>{children}</div>
       </div>
     </div>
