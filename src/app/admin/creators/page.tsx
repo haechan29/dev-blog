@@ -1,17 +1,8 @@
-import { auth } from '@/auth';
 import CreatorForm from '@/components/creator/creatorForm';
-import * as CreatorRepository from '@/features/creator/data/repository/creatorRepository';
-import { notFound } from 'next/navigation';
+import * as CreatorServerRepository from '@/features/creator/data/repository/creatorServerRepository';
 
 export default async function CreatorsPage() {
-  const session = await auth();
-  const isAdmin = session?.user?.user_id === process.env.ADMIN_USER_ID;
-
-  if (!isAdmin) {
-    notFound();
-  }
-
-  const creators = await CreatorRepository.getCreators();
+  const creators = await CreatorServerRepository.getCreators();
 
   return (
     <div className='min-h-screen p-8'>

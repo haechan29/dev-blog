@@ -1,16 +1,7 @@
-import { auth } from '@/auth';
 import Tooltip from '@/components/tooltip';
 import * as InquiryServerRepository from '@/features/inquiry/data/repository/inquiryServerRepository';
-import { notFound } from 'next/navigation';
 
 export default async function AdminPage() {
-  const session = await auth();
-  const isAdmin = session?.user?.user_id === process.env.ADMIN_USER_ID;
-
-  if (!isAdmin) {
-    notFound();
-  }
-
   const inquiries = await InquiryServerRepository.getInquiries();
 
   return (
