@@ -3,5 +3,6 @@ export interface Inquiry {
   userId: string;
   content: string;
   createdAt: string;
+  createdAtBrief: string;
   nickname: string | null;
 }
