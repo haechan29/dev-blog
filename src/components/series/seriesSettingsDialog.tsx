@@ -57,14 +57,18 @@ export default function SeriesSettingsDialog({
   );
 
   const handleSave = useCallback(async () => {
+    if (selectedSeriesId === undefined) return;
+
     setIsLoading(true);
 
     try {
-      await PostClientService.updatePost({
-        postId: post.id,
-        seriesId: selectedSeriesId,
-        seriesOrder: selectedSeries?.postCount,
-      });
+      await PostClientService.updatePostsInSeries([
+        {
+          id: post.id,
+          seriesId: selectedSeriesId,
+          seriesOrder: selectedSeries?.postCount ?? null,
+        },
+      ]);
 
       setIsOpen(false);
 
@@ -118,8 +122,8 @@ export default function SeriesSettingsDialog({
                 {selectedSeriesId === undefined
                   ? '시리즈를 선택하세요'
                   : selectedSeriesId === null
-                  ? '시리즈 없음'
-                  : selectedSeries?.title}
+                    ? '시리즈 없음'
+                    : selectedSeries?.title}
               </span>
 
               <div className='flex items-center gap-2'>

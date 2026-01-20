@@ -24,11 +24,13 @@ export default function useSeries(initialSeries: SeriesProps) {
 
   const addPostMutation = useMutation({
     mutationFn: (postId: string) => {
-      return PostClientService.updatePost({
-        postId,
-        seriesId,
-        seriesOrder: series.postCount,
-      });
+      return PostClientService.updatePostsInSeries([
+        {
+          id: postId,
+          seriesId,
+          seriesOrder: series.postCount,
+        },
+      ]);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
