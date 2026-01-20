@@ -10,7 +10,7 @@ const initialState: WritePostForm = {
     value: '',
     isUserInput: false,
     isEmptyAllowed: false,
-    maxLength: 50,
+    maxLength: 100,
   },
   tags: {
     value: [],
