@@ -1,15 +1,10 @@
-import { toDto } from '@/features/outreach-email/data/mapper/outreachEmailMapper';
+import { toDomain } from '@/features/outreach-email/data/mapper/outreachEmailMapper';
 import * as OutreachEmailQueries from '@/features/outreach-email/data/queries/outreachEmailQueries';
 import 'server-only';
 
-export async function getOutreachEmails(creatorId?: string) {
-  const emails = await OutreachEmailQueries.fetchOutreachEmails(creatorId);
-  return emails.map(toDto);
-}
-
 export async function getOutreachEmail(id: string) {
   const email = await OutreachEmailQueries.fetchOutreachEmail(id);
-  return email ? toDto(email) : null;
+  return email ? toDomain(email) : null;
 }
 
 export async function createOutreachEmail(params: {
@@ -18,7 +13,7 @@ export async function createOutreachEmail(params: {
   body: string;
 }) {
   const email = await OutreachEmailQueries.createOutreachEmail(params);
-  return toDto(email);
+  return toDomain(email);
 }
 
 export async function updateOutreachEmail(params: {
@@ -29,7 +24,7 @@ export async function updateOutreachEmail(params: {
   respondedAt?: string | null;
 }) {
   const email = await OutreachEmailQueries.updateOutreachEmail(params);
-  return toDto(email);
+  return toDomain(email);
 }
 
 export async function deleteOutreachEmail(id: string) {
