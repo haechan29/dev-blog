@@ -3,13 +3,14 @@
 import { CreatorDetail } from '@/components/creator/creatorDetail';
 import { CreatorFormDialog } from '@/components/creator/creatorFormDialog';
 import { CreatorList } from '@/components/creator/creatorList';
+import { DeleteCreatorDialog } from '@/components/creator/deleteCreatorDialog';
 import { EmailFormDialog } from '@/components/creator/emailFormDialog';
 import { Creator } from '@/features/creator/domain/model/creator';
 import * as OutreachEmailClientRepository from '@/features/outreach-email/data/repository/outreachEmailClientRepository';
 import { OutreachEmail } from '@/features/outreach-email/domain/model/outreachEmail';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-export function CreatorManagement({
+export function CreatorPageClient({
   initialCreators,
 }: {
   initialCreators: Creator[];
@@ -20,6 +21,9 @@ export function CreatorManagement({
   const [creators, setCreators] = useState(initialCreators);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+
   const [isEmailFormOpen, setIsEmailFormOpen] = useState(false);
   const [emails, setEmails] = useState<OutreachEmail[]>([]);
   const [isEmailsLoading, setIsEmailsLoading] = useState(false);
@@ -33,7 +37,8 @@ export function CreatorManagement({
     setIsFormOpen(true);
   }, []);
 
-  const handleEdit = useCallback(() => {
+  const handleEdit = useCallback((id: string) => {
+    setSelectedCreatorId(id);
     setFormMode('edit');
     setIsFormOpen(true);
   }, []);
@@ -50,9 +55,18 @@ export function CreatorManagement({
     [formMode]
   );
 
-  const handleSendEmail = useCallback(() => {
-    setIsEmailFormOpen(true);
+  const handleDelete = useCallback((id: string) => {
+    setDeleteTargetId(id);
+    setIsDeleteDialogOpen(true);
   }, []);
+
+  const handleDeleteSuccess = useCallback(() => {
+    if (deleteTargetId === selectedCreatorId) {
+      setSelectedCreatorId(null);
+    }
+    setCreators(prev => prev.filter(c => c.id !== deleteTargetId));
+    setDeleteTargetId(null);
+  }, [deleteTargetId, selectedCreatorId]);
 
   const fetchEmails = useCallback(async (creatorId: string) => {
     setIsEmailsLoading(true);
@@ -65,6 +79,10 @@ export function CreatorManagement({
     } finally {
       setIsEmailsLoading(false);
     }
+  }, []);
+
+  const handleSendEmail = useCallback(() => {
+    setIsEmailFormOpen(true);
   }, []);
 
   const handleSendEmailSuccess = useCallback(() => {
@@ -88,13 +106,14 @@ export function CreatorManagement({
         selectedId={selectedCreatorId}
         onSelect={setSelectedCreatorId}
         onCreate={handleCreate}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
       />
 
       <CreatorDetail
         creator={selectedCreator}
         emails={emails}
         isEmailsLoading={isEmailsLoading}
-        onEdit={handleEdit}
         onSendEmail={handleSendEmail}
       />
 
@@ -113,6 +132,18 @@ export function CreatorManagement({
           isOpen={isEmailFormOpen}
           setIsOpen={setIsEmailFormOpen}
           onSuccess={handleSendEmailSuccess}
+        />
+      )}
+
+      {deleteTargetId && (
+        <DeleteCreatorDialog
+          creatorId={deleteTargetId}
+          creatorName={
+            creators.find(c => c.id === deleteTargetId)?.channelName ?? ''
+          }
+          isOpen={isDeleteDialogOpen}
+          setIsOpen={setIsDeleteDialogOpen}
+          onSuccess={handleDeleteSuccess}
         />
       )}
     </>

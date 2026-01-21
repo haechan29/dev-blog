@@ -7,13 +7,11 @@ export function CreatorDetail({
   creator,
   emails,
   isEmailsLoading,
-  onEdit,
   onSendEmail,
 }: {
   creator: Creator | null;
   emails: OutreachEmail[];
   isEmailsLoading: boolean;
-  onEdit: () => void;
   onSendEmail: () => void;
 }) {
   if (!creator) {
@@ -27,15 +25,7 @@ export function CreatorDetail({
   return (
     <main className='flex-1 flex flex-col overflow-hidden'>
       <section className='p-4 border-b'>
-        <div className='flex justify-between items-start mb-2'>
-          <h2 className='text-xl font-bold'>{creator.channelName}</h2>
-          <button
-            onClick={onEdit}
-            className='px-3 py-1 text-sm border rounded hover:bg-gray-50'
-          >
-            수정
-          </button>
-        </div>
+        <h2 className='text-xl font-bold mb-2'>{creator.channelName}</h2>
         <div className='text-sm text-gray-600 space-y-1'>
           <div>이메일: {creator.email}</div>
           <div>상태: {creator.status}</div>
@@ -56,7 +46,7 @@ export function CreatorDetail({
                 <div className='font-medium'>{email.subject}</div>
                 <div className='text-sm text-gray-500 mt-1'>
                   {email.sentAt.slice(0, 10)} ·{' '}
-                  {email.status === 'responded' ? '답신 받음' : '대기 중'}
+                  {email.status === 'responded' ? '답장 받음' : '대기 중'}
                 </div>
               </li>
             ))}

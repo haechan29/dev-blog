@@ -1,6 +1,9 @@
 'use client';
 
+import { CreatorSettingsDropdown } from '@/components/creator/creatorSettingsDropdown';
 import { Creator } from '@/features/creator/domain/model/creator';
+import clsx from 'clsx';
+import { MoreVertical } from 'lucide-react';
 import { useState } from 'react';
 
 type CreatorStatus = 'pending' | 'sent' | 'accepted' | 'rejected';
@@ -17,11 +20,15 @@ export function CreatorList({
   selectedId,
   onSelect,
   onCreate,
+  onEdit,
+  onDelete,
 }: {
   creators: Creator[];
   selectedId: string | null;
   onSelect: (id: string) => void;
   onCreate: () => void;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
 }) {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<CreatorStatus | 'all'>(
@@ -72,14 +79,29 @@ export function CreatorList({
           <li
             key={creator.id}
             onClick={() => onSelect(creator.id)}
-            className={`p-3 cursor-pointer border-b hover:bg-gray-50 ${
-              selectedId === creator.id ? 'bg-blue-50' : ''
-            }`}
+            className={clsx(
+              'flex justify-between items-center p-3 cursor-pointer border-b',
+              selectedId === creator.id ? 'bg-blue-50' : 'hover:bg-gray-50'
+            )}
           >
-            <div className='font-medium'>{creator.channelName}</div>
-            <div className='text-sm text-gray-500'>
-              {STATUS_LABELS[creator.status]}
+            <div>
+              <div className='font-medium'>{creator.channelName}</div>
+              <div className='text-sm text-gray-500'>
+                {STATUS_LABELS[creator.status]}
+              </div>
             </div>
+
+            <CreatorSettingsDropdown
+              onEdit={() => onEdit(creator.id)}
+              onDelete={() => onDelete(creator.id)}
+            >
+              <button
+                onClick={e => e.stopPropagation()}
+                className='p-2 -m-2 hover:bg-gray-200 rounded-full cursor-pointer'
+              >
+                <MoreVertical className='w-5 h-5 text-gray-400' />
+              </button>
+            </CreatorSettingsDropdown>
           </li>
         ))}
       </ul>

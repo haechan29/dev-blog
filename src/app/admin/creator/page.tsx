@@ -1,4 +1,4 @@
-import { CreatorManagement } from '@/components/creator/creatorManagement';
+import { CreatorPageClient } from '@/components/creator/creatorPageClient';
 import * as CreatorServerRepository from '@/features/creator/data/repository/creatorServerRepository';
 
 export default async function CreatorPage() {
@@ -6,7 +6,7 @@ export default async function CreatorPage() {
 
   return (
     <div className='h-screen flex'>
-      <CreatorManagement initialCreators={creators} />
+      <CreatorPageClient initialCreators={creators} />
     </div>
   );
 }
