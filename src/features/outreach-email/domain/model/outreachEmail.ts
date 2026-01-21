@@ -4,7 +4,7 @@ export interface OutreachEmail {
   channelName?: string;
   subject: string;
   body: string;
-  status: 'sent' | 'awaiting_response' | 'accepted' | 'rejected';
+  status: 'sent' | 'responded';
   sentAt: string;
   respondedAt: string | null;
   createdAt: string;

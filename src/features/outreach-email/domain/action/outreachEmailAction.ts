@@ -41,7 +41,7 @@ export async function updateOutreachEmail(id: string, formData: FormData) {
     ...(subject && { subject }),
     ...(body && { body }),
     ...(status && {
-      status: status as 'sent' | 'awaiting_response' | 'accepted' | 'rejected',
+      status: status as 'sent' | 'responded',
     }),
     ...(respondedAt !== undefined && { respondedAt }),
   });

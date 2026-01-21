@@ -1,8 +1,4 @@
-export type OutreachEmailStatus =
-  | 'sent'
-  | 'awaiting_response'
-  | 'accepted'
-  | 'rejected';
+export type OutreachEmailStatus = 'sent' | 'responded';
 
 export interface OutreachEmailEntity {
   id: string;

@@ -25,7 +25,7 @@ export async function updateOutreachEmail(params: {
   id: string;
   subject?: string;
   body?: string;
-  status?: 'sent' | 'awaiting_response' | 'accepted' | 'rejected';
+  status?: 'sent' | 'responded';
   respondedAt?: string | null;
 }) {
   const email = await OutreachEmailQueries.updateOutreachEmail(params);
