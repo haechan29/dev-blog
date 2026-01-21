@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 import 'server-only';
 
 const SELECT_FIELDS =
-  'id, creator_id, subject, body, status, sent_at, responded_at, created_at, updated_at, creators(channel_name)';
+  'id, creator_id, gmail_thread_id, gmail_message_id, direction, subject, body, sent_at, creators(channel_name)';
 
 export async function fetchOutreachEmails(creatorId?: string) {
   let query = supabase
@@ -24,71 +24,34 @@ export async function fetchOutreachEmails(creatorId?: string) {
   return data as unknown as OutreachEmailEntity[];
 }
 
-export async function fetchOutreachEmail(id: string) {
-  const { data, error } = await supabase
-    .from('outreach_emails')
-    .select(SELECT_FIELDS)
-    .eq('id', id)
-    .maybeSingle();
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data as unknown as OutreachEmailEntity | null;
-}
-
 export async function createOutreachEmail({
   creatorId,
+  gmailThreadId,
+  gmailMessageId,
+  direction,
   subject,
   body,
+  sentAt,
 }: {
   creatorId: string;
+  gmailThreadId: string | null;
+  gmailMessageId: string | null;
+  direction: 'sent' | 'received';
   subject: string;
   body: string;
+  sentAt: string;
 }) {
   const { data, error } = await supabase
     .from('outreach_emails')
     .insert({
       creator_id: creatorId,
+      gmail_thread_id: gmailThreadId,
+      gmail_message_id: gmailMessageId,
+      direction,
       subject,
       body,
+      sent_at: sentAt,
     })
-    .select(SELECT_FIELDS)
-    .single();
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data as unknown as OutreachEmailEntity;
-}
-
-export async function updateOutreachEmail({
-  id,
-  subject,
-  body,
-  status,
-  respondedAt,
-}: {
-  id: string;
-  subject?: string;
-  body?: string;
-  status?: OutreachEmailEntity['status'];
-  respondedAt?: string | null;
-}) {
-  const updates: Record<string, unknown> = {
-    updated_at: new Date().toISOString(),
-    ...(subject !== undefined && { subject }),
-    ...(body !== undefined && { body }),
-    ...(status !== undefined && { status }),
-    ...(respondedAt !== undefined && { responded_at: respondedAt }),
-  };
-
-  const { data, error } = await supabase
-    .from('outreach_emails')
-    .update(updates)
-    .eq('id', id)
     .select(SELECT_FIELDS)
     .single();
 

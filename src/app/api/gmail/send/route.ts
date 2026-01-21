@@ -50,19 +50,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { error: insertError } = await supabase
-      .from('outreach_emails')
-      .insert({
-        creator_id: creatorId,
-        subject,
-        body,
-        status: 'sent',
-      });
-
-    if (insertError) {
-      console.error('발송 이력 저장 실패:', insertError);
-    }
-
     return NextResponse.json({ success: true, messageId: result.id });
   } catch (error) {
     console.error('메일 발송 실패:', error);

@@ -2,11 +2,10 @@ export interface OutreachEmail {
   id: string;
   creatorId: string;
   channelName?: string;
+  gmailThreadId: string | null;
+  gmailMessageId: string | null;
+  direction: 'sent' | 'received';
   subject: string;
   body: string;
-  status: 'sent' | 'responded';
   sentAt: string;
-  respondedAt: string | null;
-  createdAt: string;
-  updatedAt: string;
 }

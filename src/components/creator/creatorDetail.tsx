@@ -83,30 +83,16 @@ function EmailStatusSummary({ emails }: { emails: OutreachEmail[] }) {
   const lastEmail = emails[0];
   if (!lastEmail) return null;
 
-  const daysSinceSent = Math.floor(
+  const daysSince = Math.floor(
     (Date.now() - new Date(lastEmail.sentAt).getTime()) / (1000 * 60 * 60 * 24)
   );
 
-  const sentText = daysSinceSent === 0 ? '오늘' : `${daysSinceSent}일 전`;
-
-  if (lastEmail.status === 'responded' && lastEmail.respondedAt) {
-    const daysSinceResponse = Math.floor(
-      (Date.now() - new Date(lastEmail.respondedAt).getTime()) /
-        (1000 * 60 * 60 * 24)
-    );
-    const respondedText =
-      daysSinceResponse === 0 ? '오늘' : `${daysSinceResponse}일 전`;
-
-    return (
-      <div className='text-sm text-gray-600 mb-4 p-2 bg-gray-50 rounded'>
-        마지막 발송: {sentText} · 답장 받음 ({respondedText})
-      </div>
-    );
-  }
+  const daysText = daysSince === 0 ? '오늘' : `${daysSince}일 전`;
+  const directionText = lastEmail.direction === 'sent' ? '발송' : '수신';
 
   return (
     <div className='text-sm text-gray-600 mb-4 p-2 bg-gray-50 rounded'>
-      마지막 발송: {sentText} · 답장 대기 중
+      마지막 {directionText}: {daysText}
     </div>
   );
 }
@@ -124,16 +110,13 @@ function EmailTimelineItem({
   isOpen: boolean;
   onToggle: () => void;
 }) {
+  const isSent = email.direction === 'sent';
+
   return (
     <li className='flex gap-3 group'>
       <div className='flex flex-col items-center'>
         <div className={clsx('w-px h-2 bg-gray-200', isFirst && 'invisible')} />
-        <div
-          className={clsx(
-            'w-2 h-2 rounded-full shrink-0',
-            email.status === 'responded' ? 'bg-green-500' : 'bg-gray-300'
-          )}
-        />
+        <div className='w-2 h-2 rounded-full shrink-0 bg-grey-300' />
         <div
           className={clsx('w-px flex-1 bg-gray-200', isLast && 'invisible')}
         />
@@ -154,8 +137,7 @@ function EmailTimelineItem({
             />
           </div>
           <div className='text-sm text-gray-500 mt-1'>
-            {email.sentAt.slice(0, 10)} ·{' '}
-            {email.status === 'responded' ? '답장 받음' : '대기 중'}
+            {email.sentAt.slice(0, 10)} · {isSent ? '보냄' : '받음'}
           </div>
         </button>
 
