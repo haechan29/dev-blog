@@ -1,12 +1,19 @@
 'use client';
 
 import { Creator } from '@/features/creator/domain/model/creator';
+import { OUTREACH_EMAIL_TEMPLATES } from '@/features/outreach-email/constants/templates';
 import * as OutreachEmailClientRepository from '@/features/outreach-email/data/repository/outreachEmailClientRepository';
 import { OutreachEmail } from '@/features/outreach-email/domain/model/outreachEmail';
 import { api } from '@/lib/api';
 import { useCallback, useEffect, useState } from 'react';
 
-export function CreatorDetail({ creator }: { creator: Creator | null }) {
+export function CreatorDetail({
+  creator,
+  onEdit,
+}: {
+  creator: Creator | null;
+  onEdit: () => void;
+}) {
   const [emails, setEmails] = useState<OutreachEmail[]>([]);
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
@@ -74,7 +81,15 @@ export function CreatorDetail({ creator }: { creator: Creator | null }) {
   return (
     <main className='flex-1 flex flex-col overflow-hidden'>
       <section className='p-4 border-b'>
-        <h2 className='text-xl font-bold mb-2'>{creator.channelName}</h2>
+        <div className='flex justify-between items-start mb-2'>
+          <h2 className='text-xl font-bold'>{creator.channelName}</h2>
+          <button
+            onClick={onEdit}
+            className='px-3 py-1 text-sm border rounded hover:bg-gray-50'
+          >
+            수정
+          </button>
+        </div>
         <div className='text-sm text-gray-600 space-y-1'>
           <div>이메일: {creator.email}</div>
           <div>상태: {creator.status}</div>
@@ -106,6 +121,29 @@ export function CreatorDetail({ creator }: { creator: Creator | null }) {
       <section className='p-4 border-t'>
         <h3 className='font-semibold mb-2'>새 이메일</h3>
         <div className='space-y-2'>
+          <select
+            onChange={e => {
+              const template = OUTREACH_EMAIL_TEMPLATES.find(
+                t => t.id === e.target.value
+              );
+              if (template) {
+                setSubject(template.subject);
+                setBody(template.body(creator.channelName));
+              }
+            }}
+            className='w-full px-3 py-2 border rounded'
+            defaultValue=''
+          >
+            <option value='' disabled>
+              템플릿 선택
+            </option>
+            {OUTREACH_EMAIL_TEMPLATES.map(t => (
+              <option key={t.id} value={t.id}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+
           <input
             type='text'
             placeholder='제목'
@@ -113,6 +151,7 @@ export function CreatorDetail({ creator }: { creator: Creator | null }) {
             onChange={e => setSubject(e.target.value)}
             className='w-full px-3 py-2 border rounded'
           />
+
           <textarea
             placeholder='본문'
             value={body}
@@ -120,6 +159,7 @@ export function CreatorDetail({ creator }: { creator: Creator | null }) {
             rows={5}
             className='w-full px-3 py-2 border rounded resize-none'
           />
+
           <button
             onClick={handleSend}
             disabled={isSending}

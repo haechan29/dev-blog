@@ -16,10 +16,12 @@ export function CreatorList({
   creators,
   selectedId,
   onSelect,
+  onCreate,
 }: {
   creators: Creator[];
   selectedId: string | null;
   onSelect: (id: string) => void;
+  onCreate: () => void;
 }) {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<CreatorStatus | 'all'>(
@@ -57,7 +59,10 @@ export function CreatorList({
           <option value='accepted'>수락</option>
           <option value='rejected'>거절</option>
         </select>
-        <button className='w-full py-2 bg-blue-500 text-white rounded'>
+        <button
+          onClick={onCreate}
+          className='w-full py-2 bg-blue-500 text-white rounded'
+        >
           + 크리에이터 등록
         </button>
       </div>
