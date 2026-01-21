@@ -2,12 +2,15 @@
 
 import { ValidationError } from '@/errors/errors';
 import * as OutreachEmailRepository from '@/features/outreach-email/data/repository/outreachEmailServerRepository';
+import { assertAdmin } from '@/lib/admin';
 import { revalidatePath } from 'next/cache';
 
 export async function createOutreachEmail(
   creatorId: string,
   formData: FormData
 ) {
+  await assertAdmin();
+
   const subject = formData.get('subject') as string;
   const body = formData.get('body') as string;
 
@@ -31,6 +34,8 @@ export async function createOutreachEmail(
 }
 
 export async function updateOutreachEmail(id: string, formData: FormData) {
+  await assertAdmin();
+
   const subject = formData.get('subject') as string;
   const body = formData.get('body') as string;
   const status = formData.get('status') as string | null;
@@ -52,6 +57,8 @@ export async function updateOutreachEmail(id: string, formData: FormData) {
 }
 
 export async function deleteOutreachEmail(id: string) {
+  await assertAdmin();
+
   await OutreachEmailRepository.deleteOutreachEmail(id);
 
   revalidatePath('/admin/outreach-emails');

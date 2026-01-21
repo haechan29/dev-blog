@@ -2,9 +2,12 @@
 
 import { ValidationError } from '@/errors/errors';
 import * as CreatorServerRepository from '@/features/creator/data/repository/creatorServerRepository';
+import { assertAdmin } from '@/lib/admin';
 import { revalidatePath } from 'next/cache';
 
 export async function createCreator(formData: FormData) {
+  await assertAdmin();
+
   const channelName = formData.get('channelName') as string;
   const email = formData.get('email') as string;
   const memo = formData.get('memo') as string | null;
@@ -29,6 +32,8 @@ export async function createCreator(formData: FormData) {
 }
 
 export async function updateCreator(id: string, formData: FormData) {
+  await assertAdmin();
+
   const channelName = formData.get('channelName') as string;
   const email = formData.get('email') as string;
   const memo = formData.get('memo') as string | null;
@@ -46,6 +51,8 @@ export async function updateCreator(id: string, formData: FormData) {
 }
 
 export async function deleteCreator(id: string) {
+  await assertAdmin();
+
   await CreatorServerRepository.deleteCreator(id);
 
   revalidatePath('/admin/creators');
