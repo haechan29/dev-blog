@@ -1,75 +1,21 @@
 'use client';
 
 import { Creator } from '@/features/creator/domain/model/creator';
-import { OUTREACH_EMAIL_TEMPLATES } from '@/features/outreach-email/constants/templates';
-import * as OutreachEmailClientRepository from '@/features/outreach-email/data/repository/outreachEmailClientRepository';
 import { OutreachEmail } from '@/features/outreach-email/domain/model/outreachEmail';
-import { api } from '@/lib/api';
-import { useCallback, useEffect, useState } from 'react';
 
 export function CreatorDetail({
   creator,
+  emails,
+  isEmailsLoading,
   onEdit,
+  onSendEmail,
 }: {
   creator: Creator | null;
+  emails: OutreachEmail[];
+  isEmailsLoading: boolean;
   onEdit: () => void;
+  onSendEmail: () => void;
 }) {
-  const [emails, setEmails] = useState<OutreachEmail[]>([]);
-  const [subject, setSubject] = useState('');
-  const [body, setBody] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSending, setIsSending] = useState(false);
-
-  const handleSend = useCallback(async () => {
-    if (!creator?.id) return;
-
-    if (!subject || !body) {
-      alert('제목과 본문을 입력해주세요');
-      return;
-    }
-
-    setIsSending(true);
-    try {
-      await api.post('/api/gmail/send', {
-        creatorId: creator.id,
-        subject,
-        body,
-      });
-
-      const data = await OutreachEmailClientRepository.getOutreachEmails(
-        creator.id
-      );
-      setEmails(data);
-
-      setSubject('');
-      setBody('');
-    } catch (error) {
-      console.error(error);
-      alert('발송에 실패했습니다');
-    } finally {
-      setIsSending(false);
-    }
-  }, [body, creator?.id, subject]);
-
-  useEffect(() => {
-    if (!creator?.id) return;
-
-    const fetchEmails = async () => {
-      setIsLoading(true);
-      try {
-        const data = await OutreachEmailClientRepository.getOutreachEmails(
-          creator.id
-        );
-        setEmails(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchEmails();
-  }, [creator?.id]);
-
   if (!creator) {
     return (
       <main className='flex-1 flex items-center justify-center text-gray-400'>
@@ -99,7 +45,7 @@ export function CreatorDetail({
 
       <section className='flex-1 p-4 overflow-y-auto'>
         <h3 className='font-semibold mb-2'>이메일 히스토리</h3>
-        {isLoading ? (
+        {isEmailsLoading ? (
           <div className='text-gray-400'>로딩 중...</div>
         ) : emails.length === 0 ? (
           <div className='text-gray-400'>발송된 이메일이 없습니다</div>
@@ -119,55 +65,12 @@ export function CreatorDetail({
       </section>
 
       <section className='p-4 border-t'>
-        <h3 className='font-semibold mb-2'>새 이메일</h3>
-        <div className='space-y-2'>
-          <select
-            onChange={e => {
-              const template = OUTREACH_EMAIL_TEMPLATES.find(
-                t => t.id === e.target.value
-              );
-              if (template) {
-                setSubject(template.subject);
-                setBody(template.body(creator.channelName));
-              }
-            }}
-            className='w-full px-3 py-2 border rounded'
-            defaultValue=''
-          >
-            <option value='' disabled>
-              템플릿 선택
-            </option>
-            {OUTREACH_EMAIL_TEMPLATES.map(t => (
-              <option key={t.id} value={t.id}>
-                {t.name}
-              </option>
-            ))}
-          </select>
-
-          <input
-            type='text'
-            placeholder='제목'
-            value={subject}
-            onChange={e => setSubject(e.target.value)}
-            className='w-full px-3 py-2 border rounded'
-          />
-
-          <textarea
-            placeholder='본문'
-            value={body}
-            onChange={e => setBody(e.target.value)}
-            rows={5}
-            className='w-full px-3 py-2 border rounded resize-none'
-          />
-
-          <button
-            onClick={handleSend}
-            disabled={isSending}
-            className='px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50'
-          >
-            {isSending ? '발송 중...' : '발송'}
-          </button>
-        </div>
+        <button
+          onClick={onSendEmail}
+          className='w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-400'
+        >
+          새 이메일 작성
+        </button>
       </section>
     </main>
   );
