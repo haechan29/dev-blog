@@ -3,17 +3,30 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const { to, subject, body } = await request.json();
+    const { creatorId, subject, body } = await request.json();
 
-    if (!to || !subject || !body) {
+    if (!creatorId || !subject || !body) {
       return NextResponse.json(
-        { error: '받는 사람, 제목, 내용이 필요합니다' },
+        { error: '크리에이터 ID, 제목, 내용이 필요합니다' },
         { status: 400 }
       );
     }
 
+    const { data: creator, error: creatorError } = await supabase
+      .from('creators')
+      .select('email')
+      .eq('id', creatorId)
+      .single();
+
+    if (creatorError || !creator) {
+      return NextResponse.json(
+        { error: '크리에이터를 찾을 수 없습니다' },
+        { status: 404 }
+      );
+    }
+
     const accessToken = await getValidAccessToken();
-    const rawEmail = createEmail(to, subject, body);
+    const rawEmail = createEmail(creator.email, subject, body);
 
     const response = await fetch(
       'https://gmail.googleapis.com/gmail/v1/users/me/messages/send',
@@ -34,6 +47,19 @@ export async function POST(request: NextRequest) {
         { error: result.error.message },
         { status: 400 }
       );
+    }
+
+    const { error: insertError } = await supabase
+      .from('outreach_emails')
+      .insert({
+        creator_id: creatorId,
+        subject,
+        body,
+        status: 'sent',
+      });
+
+    if (insertError) {
+      console.error('발송 이력 저장 실패:', insertError);
     }
 
     return NextResponse.json({ success: true, messageId: result.id });
