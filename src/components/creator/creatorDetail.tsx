@@ -2,6 +2,9 @@
 
 import { Creator } from '@/features/creator/domain/model/creator';
 import { OutreachEmail } from '@/features/outreach-email/domain/model/outreachEmail';
+import clsx from 'clsx';
+import { ChevronRight } from 'lucide-react';
+import { useState } from 'react';
 
 export function CreatorDetail({
   creator,
@@ -14,6 +17,8 @@ export function CreatorDetail({
   isEmailsLoading: boolean;
   onSendEmail: () => void;
 }) {
+  const [openEmailId, setOpenEmailId] = useState<string | null>(null);
+
   if (!creator) {
     return (
       <main className='flex-1 flex items-center justify-center text-gray-400'>
@@ -35,20 +40,28 @@ export function CreatorDetail({
 
       <section className='flex-1 p-4 overflow-y-auto'>
         <h3 className='font-semibold mb-2'>이메일 히스토리</h3>
+
+        {!isEmailsLoading && emails.length > 0 && (
+          <EmailStatusSummary emails={emails} />
+        )}
+
         {isEmailsLoading ? (
           <div className='text-gray-400'>로딩 중...</div>
         ) : emails.length === 0 ? (
           <div className='text-gray-400'>발송된 이메일이 없습니다</div>
         ) : (
-          <ul className='space-y-3'>
-            {emails.map(email => (
-              <li key={email.id} className='p-3 border rounded'>
-                <div className='font-medium'>{email.subject}</div>
-                <div className='text-sm text-gray-500 mt-1'>
-                  {email.sentAt.slice(0, 10)} ·{' '}
-                  {email.status === 'responded' ? '답장 받음' : '대기 중'}
-                </div>
-              </li>
+          <ul>
+            {emails.map((email, index) => (
+              <EmailTimelineItem
+                key={email.id}
+                email={email}
+                isFirst={index === 0}
+                isLast={index === emails.length - 1}
+                isOpen={openEmailId === email.id}
+                onToggle={() =>
+                  setOpenEmailId(openEmailId === email.id ? null : email.id)
+                }
+              />
             ))}
           </ul>
         )}
@@ -63,5 +76,95 @@ export function CreatorDetail({
         </button>
       </section>
     </main>
+  );
+}
+
+function EmailStatusSummary({ emails }: { emails: OutreachEmail[] }) {
+  const lastEmail = emails[0];
+  if (!lastEmail) return null;
+
+  const daysSinceSent = Math.floor(
+    (Date.now() - new Date(lastEmail.sentAt).getTime()) / (1000 * 60 * 60 * 24)
+  );
+
+  const sentText = daysSinceSent === 0 ? '오늘' : `${daysSinceSent}일 전`;
+
+  if (lastEmail.status === 'responded' && lastEmail.respondedAt) {
+    const daysSinceResponse = Math.floor(
+      (Date.now() - new Date(lastEmail.respondedAt).getTime()) /
+        (1000 * 60 * 60 * 24)
+    );
+    const respondedText =
+      daysSinceResponse === 0 ? '오늘' : `${daysSinceResponse}일 전`;
+
+    return (
+      <div className='text-sm text-gray-600 mb-4 p-2 bg-gray-50 rounded'>
+        마지막 발송: {sentText} · 답장 받음 ({respondedText})
+      </div>
+    );
+  }
+
+  return (
+    <div className='text-sm text-gray-600 mb-4 p-2 bg-gray-50 rounded'>
+      마지막 발송: {sentText} · 답장 대기 중
+    </div>
+  );
+}
+
+function EmailTimelineItem({
+  email,
+  isFirst,
+  isLast,
+  isOpen,
+  onToggle,
+}: {
+  email: OutreachEmail;
+  isFirst: boolean;
+  isLast: boolean;
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <li className='flex gap-3 group'>
+      <div className='flex flex-col items-center'>
+        <div className={clsx('w-px h-2 bg-gray-200', isFirst && 'invisible')} />
+        <div
+          className={clsx(
+            'w-2 h-2 rounded-full shrink-0',
+            email.status === 'responded' ? 'bg-green-500' : 'bg-gray-300'
+          )}
+        />
+        <div
+          className={clsx('w-px flex-1 bg-gray-200', isLast && 'invisible')}
+        />
+      </div>
+
+      <div className='flex-1 mb-4'>
+        <button
+          onClick={onToggle}
+          className='w-full text-left p-2 -m-2 cursor-pointer'
+        >
+          <div className='flex items-center gap-1'>
+            <span className='font-medium'>{email.subject}</span>
+            <ChevronRight
+              className={clsx(
+                'w-4 h-4 text-gray-400 group-hover:text-gray-600 shrink-0 transition-transform',
+                isOpen && 'rotate-90'
+              )}
+            />
+          </div>
+          <div className='text-sm text-gray-500 mt-1'>
+            {email.sentAt.slice(0, 10)} ·{' '}
+            {email.status === 'responded' ? '답장 받음' : '대기 중'}
+          </div>
+        </button>
+
+        {isOpen && (
+          <div className='mt-2 text-sm text-gray-700 whitespace-pre-wrap'>
+            {email.body}
+          </div>
+        )}
+      </div>
+    </li>
   );
 }
