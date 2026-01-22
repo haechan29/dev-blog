@@ -1,5 +1,119 @@
 import { supabase } from '@/lib/supabase';
 
+interface GmailMessage {
+  id: string;
+  threadId: string;
+  labelIds?: string[];
+  internalDate: string;
+  payload?: {
+    headers?: { name: string; value: string }[];
+    body?: { data?: string };
+    parts?: GmailMessagePart[];
+  };
+}
+
+interface GmailMessagePart {
+  mimeType: string;
+  body?: { data?: string };
+  parts?: GmailMessagePart[];
+}
+
+export async function fetchGmailMessages(afterTimestamp: number | null) {
+  const accessToken = await getValidAccessToken();
+  const query = afterTimestamp ? `after:${afterTimestamp}` : '';
+
+  const response = await fetch(
+    `https://gmail.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(query)}&maxResults=100`,
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+  const result = await response.json();
+
+  return result.messages ?? [];
+}
+
+export async function fetchGmailMessage(
+  messageId: string
+): Promise<GmailMessage> {
+  const accessToken = await getValidAccessToken();
+
+  const response = await fetch(
+    `https://gmail.googleapis.com/gmail/v1/users/me/messages/${messageId}?format=full`,
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+  return response.json();
+}
+
+export function parseGmailMessage(
+  msgData: GmailMessage,
+  creatorEmailMap: Map<string, string>
+): {
+  creatorId: string;
+  gmailThreadId: string;
+  gmailMessageId: string;
+  direction: 'sent' | 'received';
+  subject: string;
+  body: string;
+  sentAt: string;
+} | null {
+  const headers = msgData.payload?.headers ?? [];
+  const from = headers.find(h => h.name === 'From')?.value ?? '';
+  const to = headers.find(h => h.name === 'To')?.value ?? '';
+  const subject = headers.find(h => h.name === 'Subject')?.value ?? '';
+
+  const fromEmail = extractEmail(from).toLowerCase();
+  const toEmail = extractEmail(to).toLowerCase();
+
+  let creatorId: string | null = null;
+  let direction: 'sent' | 'received' | null = null;
+
+  if (creatorEmailMap.has(toEmail)) {
+    creatorId = creatorEmailMap.get(toEmail)!;
+    direction = 'sent';
+  } else if (creatorEmailMap.has(fromEmail)) {
+    creatorId = creatorEmailMap.get(fromEmail)!;
+    direction = 'received';
+  }
+
+  if (!creatorId || !direction) return null;
+
+  return {
+    creatorId,
+    gmailThreadId: msgData.threadId,
+    gmailMessageId: msgData.id,
+    direction,
+    subject,
+    body: extractBody(msgData.payload),
+    sentAt: new Date(parseInt(msgData.internalDate)).toISOString(),
+  };
+}
+
+function extractEmail(str: string): string {
+  const match = str.match(/<(.+?)>/) || str.match(/([^\s]+@[^\s]+)/);
+  return match ? match[1] : str;
+}
+
+function extractBody(payload: GmailMessage['payload']): string {
+  if (!payload) return '';
+
+  if (payload.body?.data) {
+    return Buffer.from(payload.body.data, 'base64').toString('utf-8');
+  }
+
+  if (payload.parts) {
+    for (const part of payload.parts) {
+      if (part.mimeType === 'text/plain' && part.body?.data) {
+        return Buffer.from(part.body.data, 'base64').toString('utf-8');
+      }
+    }
+    for (const part of payload.parts) {
+      const result = extractBody(part);
+      if (result) return result;
+    }
+  }
+
+  return '';
+}
+
 export async function getValidAccessToken() {
   const { data: tokens, error } = await supabase
     .from('gmail_tokens')

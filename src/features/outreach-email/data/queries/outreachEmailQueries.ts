@@ -72,3 +72,14 @@ export async function deleteOutreachEmail(id: string) {
     throw new Error(error.message);
   }
 }
+
+export async function fetchLastSyncTimestamp(): Promise<number | null> {
+  const { data } = await supabase
+    .from('outreach_emails')
+    .select('sent_at')
+    .order('sent_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  return data ? Math.floor(new Date(data.sent_at).getTime() / 1000) : null;
+}
