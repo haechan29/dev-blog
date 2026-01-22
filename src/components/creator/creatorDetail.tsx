@@ -1,5 +1,6 @@
 'use client';
 
+import { CreatorSettingsDropdown } from '@/components/creator/creatorSettingsDropdown';
 import {
   Creator,
   CREATOR_STATUS_LABELS,
@@ -7,7 +8,7 @@ import {
 import { OutreachEmail } from '@/features/outreach-email/domain/model/outreachEmail';
 import { formatDateBrief, formatRelativeTime } from '@/lib/date';
 import clsx from 'clsx';
-import { ChevronRight, RefreshCw } from 'lucide-react';
+import { ChevronRight, MoreVertical, RefreshCw } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export function CreatorDetail({
@@ -18,6 +19,8 @@ export function CreatorDetail({
   onSync,
   isSyncing,
   lastSyncedAt,
+  onEdit,
+  onDelete,
 }: {
   creator: Creator | null;
   emails: OutreachEmail[];
@@ -26,6 +29,8 @@ export function CreatorDetail({
   onSync: () => void;
   isSyncing: boolean;
   lastSyncedAt: Date | null;
+  onEdit: () => void;
+  onDelete: () => void;
 }) {
   const [openEmailId, setOpenEmailId] = useState<string | null>(null);
 
@@ -56,6 +61,11 @@ export function CreatorDetail({
           >
             메일 작성
           </button>
+          <CreatorSettingsDropdown onEdit={onEdit} onDelete={onDelete}>
+            <button className='p-2 hover:bg-gray-100 rounded-full cursor-pointer'>
+              <MoreVertical className='w-5 h-5 text-gray-500' />
+            </button>
+          </CreatorSettingsDropdown>
         </div>
         {creator.memo && (
           <div className='text-sm text-gray-600'>{creator.memo}</div>

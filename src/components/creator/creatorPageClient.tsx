@@ -156,6 +156,8 @@ export function CreatorPageClient({
         onSync={handleSync}
         isSyncing={isSyncing}
         lastSyncedAt={lastSyncedAt}
+        onEdit={() => selectedCreatorId && handleEdit(selectedCreatorId)}
+        onDelete={() => selectedCreatorId && handleDelete(selectedCreatorId)}
       />
 
       <CreatorFormDialog
