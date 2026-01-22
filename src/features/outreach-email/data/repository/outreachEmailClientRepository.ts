@@ -20,3 +20,8 @@ export async function sendOutreachEmail({
 }): Promise<void> {
   await api.post('/api/outreach-emails', { creatorId, subject, body });
 }
+
+export async function syncOutreachEmails(): Promise<{ synced: number }> {
+  const response = await api.post('/api/outreach-emails/sync');
+  return response.data;
+}

@@ -3,7 +3,7 @@
 import { Creator } from '@/features/creator/domain/model/creator';
 import { OutreachEmail } from '@/features/outreach-email/domain/model/outreachEmail';
 import clsx from 'clsx';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
 
 export function CreatorDetail({
@@ -11,11 +11,15 @@ export function CreatorDetail({
   emails,
   isEmailsLoading,
   onSendEmail,
+  onSync,
+  isSyncing,
 }: {
   creator: Creator | null;
   emails: OutreachEmail[];
   isEmailsLoading: boolean;
   onSendEmail: () => void;
+  onSync: () => void;
+  isSyncing: boolean;
 }) {
   const [openEmailId, setOpenEmailId] = useState<string | null>(null);
 
@@ -39,7 +43,21 @@ export function CreatorDetail({
       </section>
 
       <section className='flex-1 p-4 overflow-y-auto'>
-        <h3 className='font-semibold mb-2'>이메일 히스토리</h3>
+        <div className='flex items-center gap-2 mb-2'>
+          <h3 className='font-semibold'>이메일 히스토리</h3>
+          <button
+            onClick={onSync}
+            disabled={isSyncing}
+            className='p-1 hover:bg-gray-100 rounded disabled:opacity-50'
+          >
+            <RefreshCw
+              className={clsx(
+                'w-4 h-4 text-gray-500',
+                isSyncing && 'animate-spin'
+              )}
+            />
+          </button>
+        </div>
 
         {!isEmailsLoading && emails.length > 0 && (
           <EmailStatusSummary emails={emails} />

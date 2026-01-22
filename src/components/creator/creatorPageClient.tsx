@@ -29,6 +29,7 @@ export function CreatorPageClient({
   const [isEmailFormOpen, setIsEmailFormOpen] = useState(false);
   const [emails, setEmails] = useState<OutreachEmail[]>([]);
   const [isEmailsLoading, setIsEmailsLoading] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const selectedCreator = useMemo(() => {
     return creators.find(c => c.id === selectedCreatorId) ?? null;
@@ -95,6 +96,25 @@ export function CreatorPageClient({
     }
   }, [fetchEmails, selectedCreatorId]);
 
+  const handleSync = useCallback(async () => {
+    setIsSyncing(true);
+    try {
+      const result = await OutreachEmailClientRepository.syncOutreachEmails();
+      toast.success(`${result.synced}개 이메일 동기화 완료`);
+      if (selectedCreatorId) {
+        fetchEmails(selectedCreatorId);
+      }
+    } catch (error) {
+      const message =
+        error instanceof ApiError
+          ? error.message
+          : '이메일 동기화에 실패했습니다';
+      toast.error(message);
+    } finally {
+      setIsSyncing(false);
+    }
+  }, [selectedCreatorId, fetchEmails]);
+
   useEffect(() => {
     if (selectedCreatorId) {
       fetchEmails(selectedCreatorId);
@@ -119,6 +139,8 @@ export function CreatorPageClient({
         emails={emails}
         isEmailsLoading={isEmailsLoading}
         onSendEmail={handleSendEmail}
+        onSync={handleSync}
+        isSyncing={isSyncing}
       />
 
       <CreatorFormDialog
