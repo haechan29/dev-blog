@@ -9,25 +9,6 @@ export async function getOutreachEmails(
   return response.data;
 }
 
-export async function sendOutreachEmail({
-  creatorId,
-  subject,
-  body,
-  replyToEmailId,
-}: {
-  creatorId: string;
-  subject: string;
-  body: string;
-  replyToEmailId?: string;
-}): Promise<void> {
-  await api.post('/api/outreach-emails', {
-    creatorId,
-    subject,
-    body,
-    replyToEmailId,
-  });
-}
-
 export async function syncOutreachEmails(): Promise<{ synced: number }> {
   const response = await api.post('/api/outreach-emails/sync');
   return response.data;

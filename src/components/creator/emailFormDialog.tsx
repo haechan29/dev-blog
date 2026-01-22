@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/popover';
 import { ApiError } from '@/errors/errors';
 import { OUTREACH_EMAIL_TEMPLATES } from '@/features/outreach-email/constants/templates';
-import * as OutreachEmailClientRepository from '@/features/outreach-email/data/repository/outreachEmailClientRepository';
+import * as OutreachEmailAction from '@/features/outreach-email/domain/action/outreachEmailAction';
 import { OutreachEmail } from '@/features/outreach-email/domain/model/outreachEmail';
 import clsx from 'clsx';
 import { Check, ChevronsUpDown, Loader2, X } from 'lucide-react';
@@ -88,7 +88,7 @@ export function EmailFormDialog({
 
     setIsSending(true);
     try {
-      await OutreachEmailClientRepository.sendOutreachEmail({
+      await OutreachEmailAction.sendOutreachEmail({
         creatorId,
         subject,
         body,
