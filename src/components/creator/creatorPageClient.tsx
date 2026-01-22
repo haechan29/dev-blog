@@ -34,6 +34,9 @@ export function CreatorPageClient({
   const selectedCreator = useMemo(() => {
     return creators.find(c => c.id === selectedCreatorId) ?? null;
   }, [creators, selectedCreatorId]);
+  const latestReceivedEmail = useMemo(() => {
+    return emails.find(e => e.direction === 'received') ?? null;
+  }, [emails]);
 
   const handleCreate = useCallback(() => {
     setFormMode('create');
@@ -155,6 +158,7 @@ export function CreatorPageClient({
         <EmailFormDialog
           creatorId={selectedCreator.id}
           creatorName={selectedCreator.channelName}
+          latestReceivedEmail={latestReceivedEmail}
           isOpen={isEmailFormOpen}
           setIsOpen={setIsEmailFormOpen}
           onSuccess={handleSendEmailSuccess}

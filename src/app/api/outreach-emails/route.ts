@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
   try {
     await assertAdmin();
 
-    const { creatorId, subject, body } = await request.json();
+    const { creatorId, subject, body, replyToEmailId } = await request.json();
 
     if (!creatorId || !subject || !body) {
       throw new ValidationError('크리에이터 ID, 제목, 내용이 필요합니다');
@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
       creatorId,
       subject,
       body,
+      replyToEmailId,
     });
 
     return NextResponse.json({ data: null });

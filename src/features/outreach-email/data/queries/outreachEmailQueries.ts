@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 import 'server-only';
 
 const SELECT_FIELDS =
-  'id, creator_id, gmail_thread_id, gmail_message_id, direction, subject, body, sent_at, creators(channel_name)';
+  'id, creator_id, gmail_thread_id, gmail_message_id, message_id, direction, subject, body, sent_at';
 
 export async function fetchOutreachEmails(creatorId?: string) {
   let query = supabase
@@ -22,6 +22,20 @@ export async function fetchOutreachEmails(creatorId?: string) {
   }
 
   return data as unknown as OutreachEmailEntity[];
+}
+
+export async function fetchOutreachEmail(id: string) {
+  const { data, error } = await supabase
+    .from('outreach_emails')
+    .select(SELECT_FIELDS)
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data as unknown as OutreachEmailEntity;
 }
 
 export async function createOutreachEmail({

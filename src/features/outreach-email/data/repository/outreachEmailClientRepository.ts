@@ -13,12 +13,19 @@ export async function sendOutreachEmail({
   creatorId,
   subject,
   body,
+  replyToEmailId,
 }: {
   creatorId: string;
   subject: string;
   body: string;
+  replyToEmailId?: string;
 }): Promise<void> {
-  await api.post('/api/outreach-emails', { creatorId, subject, body });
+  await api.post('/api/outreach-emails', {
+    creatorId,
+    subject,
+    body,
+    replyToEmailId,
+  });
 }
 
 export async function syncOutreachEmails(): Promise<{ synced: number }> {

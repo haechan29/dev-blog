@@ -13,10 +13,12 @@ export async function sendEmail({
   creatorId,
   subject,
   body,
+  replyToEmailId,
 }: {
   creatorId: string;
   subject: string;
   body: string;
+  replyToEmailId?: string;
 }): Promise<void> {
   const creator = await CreatorQueries.fetchCreator(creatorId);
 
@@ -24,8 +26,26 @@ export async function sendEmail({
     throw new NotFoundError('크리에이터를 찾을 수 없습니다');
   }
 
-  const rawEmail = createRawEmail(creator.email, subject, body);
-  await sendGmailMessage(rawEmail);
+  let replyTo: { threadId: string; messageId: string } | undefined;
+
+  if (replyToEmailId) {
+    const originalEmail =
+      await OutreachEmailQueries.fetchOutreachEmail(replyToEmailId);
+    if (originalEmail?.gmail_thread_id && originalEmail?.message_id) {
+      replyTo = {
+        threadId: originalEmail.gmail_thread_id,
+        messageId: originalEmail.message_id,
+      };
+    }
+  }
+
+  const rawEmail = createRawEmail(
+    creator.email,
+    subject,
+    body,
+    replyTo ? { messageId: replyTo.messageId } : undefined
+  );
+  await sendGmailMessage(rawEmail, replyTo?.threadId);
 }
 
 export async function syncEmails(): Promise<{ synced: number }> {

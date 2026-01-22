@@ -21,6 +21,7 @@ import {
 import { ApiError } from '@/errors/errors';
 import { OUTREACH_EMAIL_TEMPLATES } from '@/features/outreach-email/constants/templates';
 import * as OutreachEmailClientRepository from '@/features/outreach-email/data/repository/outreachEmailClientRepository';
+import { OutreachEmail } from '@/features/outreach-email/domain/model/outreachEmail';
 import clsx from 'clsx';
 import { Check, ChevronsUpDown, Loader2, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
@@ -29,12 +30,14 @@ import toast from 'react-hot-toast';
 export function EmailFormDialog({
   creatorId,
   creatorName,
+  latestReceivedEmail,
   isOpen,
   setIsOpen,
   onSuccess,
 }: {
   creatorId: string;
   creatorName: string;
+  latestReceivedEmail: OutreachEmail | null;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   onSuccess: () => void;
@@ -45,6 +48,7 @@ export function EmailFormDialog({
   const [invalidField, setInvalidField] = useState<'subject' | 'body' | null>(
     null
   );
+  const [mode, setMode] = useState<'send' | 'reply'>('send');
 
   useEffect(() => {
     if (!isOpen) {
@@ -52,6 +56,24 @@ export function EmailFormDialog({
       setBody('');
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen && latestReceivedEmail) {
+      setMode('reply');
+    }
+  }, [isOpen, latestReceivedEmail]);
+
+  useEffect(() => {
+    if (mode === 'reply' && latestReceivedEmail) {
+      const originalSubject = latestReceivedEmail.subject;
+      const replySubject = originalSubject.toLowerCase().startsWith('re:')
+        ? originalSubject
+        : `Re: ${originalSubject}`;
+      setSubject(replySubject);
+    } else if (mode === 'send') {
+      setSubject('');
+    }
+  }, [latestReceivedEmail, mode]);
 
   const handleSend = useCallback(async () => {
     if (!subject.trim()) {
@@ -70,6 +92,7 @@ export function EmailFormDialog({
         creatorId,
         subject,
         body,
+        replyToEmailId: mode === 'reply' ? latestReceivedEmail?.id : undefined,
       });
 
       toast.success('발송되었습니다');
@@ -82,7 +105,15 @@ export function EmailFormDialog({
     } finally {
       setIsSending(false);
     }
-  }, [subject, body, creatorId, onSuccess, setIsOpen]);
+  }, [
+    body,
+    creatorId,
+    latestReceivedEmail?.id,
+    mode,
+    onSuccess,
+    setIsOpen,
+    subject,
+  ]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -97,6 +128,7 @@ export function EmailFormDialog({
         <div className='space-y-4 mb-8'>
           <TemplateDropdown
             onSelect={template => {
+              setMode('send');
               setSubject(template.subject);
               setBody(template.body(creatorName));
             }}
@@ -110,11 +142,14 @@ export function EmailFormDialog({
               setInvalidField(null);
             }}
             placeholder='제목'
+            disabled={mode === 'reply'}
             className={clsx(
               'w-full border p-3 rounded-sm outline-none',
               invalidField === 'subject'
                 ? 'border-red-400 animate-shake'
-                : 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
+                : mode === 'reply'
+                  ? 'border-gray-200 bg-gray-50 text-gray-500'
+                  : 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
             )}
           />
 
@@ -125,7 +160,7 @@ export function EmailFormDialog({
               setInvalidField(null);
             }}
             placeholder='본문'
-            rows={8}
+            rows={6}
             className={clsx(
               'w-full border p-3 rounded-sm outline-none resize-none',
               invalidField === 'body'
@@ -133,6 +168,18 @@ export function EmailFormDialog({
                 : 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
             )}
           />
+
+          {latestReceivedEmail && (
+            <label className='flex items-center gap-1.5 text-sm text-gray-900 cursor-pointer -mt-2'>
+              <input
+                type='checkbox'
+                checked={mode === 'reply'}
+                onChange={e => setMode(e.target.checked ? 'reply' : 'send')}
+                className='w-4 h-4'
+              />
+              기존 스레드에 답장하기
+            </label>
+          )}
         </div>
 
         <div className='flex justify-between items-center'>

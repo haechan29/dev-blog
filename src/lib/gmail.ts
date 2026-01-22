@@ -81,20 +81,33 @@ export function parseGmailMessage(
   };
 }
 
-export function createRawEmail(to: string, subject: string, body: string) {
-  const email = [
+export function createRawEmail(
+  to: string,
+  subject: string,
+  body: string,
+  replyTo?: { messageId: string }
+) {
+  const headers = [
     `To: ${to}`,
     `Subject: =?UTF-8?B?${Buffer.from(subject).toString('base64')}?=`,
     'MIME-Version: 1.0',
     'Content-Type: text/plain; charset=UTF-8',
-    '',
-    body,
-  ].join('\r\n');
+  ];
+
+  if (replyTo?.messageId) {
+    headers.push(`In-Reply-To: ${replyTo.messageId}`);
+    headers.push(`References: ${replyTo.messageId}`);
+  }
+
+  const email = [...headers, '', body].join('\r\n');
 
   return Buffer.from(email).toString('base64url');
 }
 
-export async function sendGmailMessage(rawEmail: string): Promise<string> {
+export async function sendGmailMessage(
+  rawEmail: string,
+  threadId?: string
+): Promise<string> {
   const accessToken = await getValidAccessToken();
 
   const response = await fetch(
@@ -105,7 +118,10 @@ export async function sendGmailMessage(rawEmail: string): Promise<string> {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ raw: rawEmail }),
+      body: JSON.stringify({
+        raw: rawEmail,
+        ...(threadId && { threadId }),
+      }),
     }
   );
 

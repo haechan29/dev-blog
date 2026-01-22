@@ -5,9 +5,9 @@ export interface OutreachEmailEntity {
   creator_id: string;
   gmail_thread_id: string | null;
   gmail_message_id: string | null;
+  message_id: string | null;
   direction: EmailDirection;
   subject: string;
   body: string;
   sent_at: string;
-  creators?: { channel_name: string };
 }
