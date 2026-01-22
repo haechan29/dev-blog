@@ -28,6 +28,7 @@ export async function createOutreachEmail({
   creatorId,
   gmailThreadId,
   gmailMessageId,
+  messageId,
   direction,
   subject,
   body,
@@ -36,6 +37,7 @@ export async function createOutreachEmail({
   creatorId: string;
   gmailThreadId: string | null;
   gmailMessageId: string | null;
+  messageId: string | null;
   direction: 'sent' | 'received';
   subject: string;
   body: string;
@@ -47,6 +49,7 @@ export async function createOutreachEmail({
       creator_id: creatorId,
       gmail_thread_id: gmailThreadId,
       gmail_message_id: gmailMessageId,
+      message_id: messageId,
       direction,
       subject,
       body,

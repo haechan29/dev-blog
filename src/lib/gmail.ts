@@ -46,19 +46,12 @@ export async function fetchGmailMessage(
 export function parseGmailMessage(
   msgData: GmailMessage,
   creatorEmailMap: Map<string, string>
-): {
-  creatorId: string;
-  gmailThreadId: string;
-  gmailMessageId: string;
-  direction: 'sent' | 'received';
-  subject: string;
-  body: string;
-  sentAt: string;
-} | null {
+) {
   const headers = msgData.payload?.headers ?? [];
   const from = headers.find(h => h.name === 'From')?.value ?? '';
   const to = headers.find(h => h.name === 'To')?.value ?? '';
   const subject = headers.find(h => h.name === 'Subject')?.value ?? '';
+  const messageId = headers.find(h => h.name === 'Message-ID')?.value ?? null;
 
   const fromEmail = extractEmail(from).toLowerCase();
   const toEmail = extractEmail(to).toLowerCase();
@@ -82,6 +75,7 @@ export function parseGmailMessage(
     gmailMessageId: msgData.id,
     direction,
     subject,
+    messageId,
     body: extractBody(msgData.payload),
     sentAt: new Date(parseInt(msgData.internalDate)).toISOString(),
   };
