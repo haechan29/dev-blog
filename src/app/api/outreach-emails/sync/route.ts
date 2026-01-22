@@ -1,13 +1,11 @@
-import { ApiError, UnauthorizedError } from '@/errors/errors';
+import { ApiError } from '@/errors/errors';
 import { syncEmails } from '@/features/outreach-email/data/usecases/outreachEmailUsecase';
-import { NextRequest, NextResponse } from 'next/server';
+import { assertAdmin } from '@/lib/admin';
+import { NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
+export async function POST() {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      throw new UnauthorizedError('CRON_SECRET이 일치하지 않습니다');
-    }
+    await assertAdmin();
 
     const result = await syncEmails();
     return NextResponse.json({ data: result });
