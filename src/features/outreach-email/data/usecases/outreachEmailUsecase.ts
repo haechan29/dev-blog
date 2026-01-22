@@ -1,10 +1,32 @@
+import { NotFoundError } from '@/errors/errors';
 import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries';
 import * as OutreachEmailQueries from '@/features/outreach-email/data/queries/outreachEmailQueries';
 import {
+  createRawEmail,
   fetchGmailMessage,
   fetchGmailMessages,
   parseGmailMessage,
+  sendGmailMessage,
 } from '@/lib/gmail';
+
+export async function sendEmail({
+  creatorId,
+  subject,
+  body,
+}: {
+  creatorId: string;
+  subject: string;
+  body: string;
+}): Promise<void> {
+  const creator = await CreatorQueries.fetchCreator(creatorId);
+
+  if (!creator) {
+    throw new NotFoundError('크리에이터를 찾을 수 없습니다');
+  }
+
+  const rawEmail = createRawEmail(creator.email, subject, body);
+  await sendGmailMessage(rawEmail);
+}
 
 export async function syncEmails(): Promise<{ synced: number }> {
   const afterTimestamp = await OutreachEmailQueries.fetchLastSyncTimestamp();

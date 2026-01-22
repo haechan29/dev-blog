@@ -1,8 +1,8 @@
+import { NotFoundError } from '@/errors/errors';
 import {
   PostEntity,
   PostEntityFlat,
 } from '@/features/post/data/entities/postEntities';
-import { PostNotFoundError } from '@/features/post/data/errors/postErrors';
 import { toDto } from '@/features/post/data/mapper/postMapper';
 import Post from '@/features/post/domain/model/post';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
@@ -90,7 +90,7 @@ export async function fetchPost(postId: string) {
   }
 
   if (!data) {
-    throw new PostNotFoundError(`게시물을 찾을 수 없습니다 (${postId})`);
+    throw new NotFoundError('게시물을 찾을 수 없습니다');
   }
 
   return data as unknown as PostEntity;
@@ -108,7 +108,7 @@ export async function fetchPostForAuth(postId: string) {
   }
 
   if (!data) {
-    throw new PostNotFoundError(`게시물을 찾을 수 없습니다 (${postId})`);
+    throw new NotFoundError('게시물을 찾을 수 없습니다');
   }
 
   return data as Pick<PostEntity, 'user_id' | 'password_hash'>;

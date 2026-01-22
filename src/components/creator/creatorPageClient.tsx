@@ -5,10 +5,12 @@ import { CreatorFormDialog } from '@/components/creator/creatorFormDialog';
 import { CreatorList } from '@/components/creator/creatorList';
 import { DeleteCreatorDialog } from '@/components/creator/deleteCreatorDialog';
 import { EmailFormDialog } from '@/components/creator/emailFormDialog';
+import { ApiError } from '@/errors/errors';
 import { Creator } from '@/features/creator/domain/model/creator';
 import * as OutreachEmailClientRepository from '@/features/outreach-email/data/repository/outreachEmailClientRepository';
 import { OutreachEmail } from '@/features/outreach-email/domain/model/outreachEmail';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import toast from 'react-hot-toast';
 
 export function CreatorPageClient({
   initialCreators,
@@ -75,7 +77,9 @@ export function CreatorPageClient({
         await OutreachEmailClientRepository.getOutreachEmails(creatorId);
       setEmails(data);
     } catch (error) {
-      console.error(error);
+      const message =
+        error instanceof ApiError ? error.message : '댓글 삭제에 실패했습니다';
+      toast.error(message);
     } finally {
       setIsEmailsLoading(false);
     }

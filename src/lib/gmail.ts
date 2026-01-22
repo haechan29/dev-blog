@@ -87,6 +87,43 @@ export function parseGmailMessage(
   };
 }
 
+export function createRawEmail(to: string, subject: string, body: string) {
+  const email = [
+    `To: ${to}`,
+    `Subject: =?UTF-8?B?${Buffer.from(subject).toString('base64')}?=`,
+    'MIME-Version: 1.0',
+    'Content-Type: text/plain; charset=UTF-8',
+    '',
+    body,
+  ].join('\r\n');
+
+  return Buffer.from(email).toString('base64url');
+}
+
+export async function sendGmailMessage(rawEmail: string): Promise<string> {
+  const accessToken = await getValidAccessToken();
+
+  const response = await fetch(
+    'https://gmail.googleapis.com/gmail/v1/users/me/messages/send',
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ raw: rawEmail }),
+    }
+  );
+
+  const result = await response.json();
+
+  if (result.error) {
+    throw new Error(result.error.message);
+  }
+
+  return result.id;
+}
+
 function extractEmail(str: string): string {
   const match = str.match(/<(.+?)>/) || str.match(/([^\s]+@[^\s]+)/);
   return match ? match[1] : str;
@@ -114,7 +151,7 @@ function extractBody(payload: GmailMessage['payload']): string {
   return '';
 }
 
-export async function getValidAccessToken() {
+async function getValidAccessToken() {
   const { data: tokens, error } = await supabase
     .from('gmail_tokens')
     .select('*')

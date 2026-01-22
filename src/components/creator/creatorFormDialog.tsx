@@ -66,8 +66,7 @@ export function CreatorFormDialog({
       onSuccess(result);
       setIsOpen(false);
       toast.success(mode === 'create' ? '등록되었습니다' : '수정되었습니다');
-    } catch (error) {
-      console.error(error);
+    } catch {
       toast.error(
         mode === 'create' ? '등록에 실패했습니다' : '수정에 실패했습니다'
       );

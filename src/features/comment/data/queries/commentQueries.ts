@@ -1,8 +1,8 @@
+import { NotFoundError } from '@/errors/errors';
 import {
   CommentEntity,
   CommentEntityFlat,
 } from '@/features/comment/data/entities/commentEntities';
-import { CommentNotFoundError } from '@/features/comment/data/errors/commentErrors';
 import { flatToDto, toDto } from '@/features/comment/data/mapper/commentMapper';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
@@ -21,7 +21,7 @@ export async function fetchComment(commentId: number) {
   }
 
   if (!data) {
-    throw new CommentNotFoundError('댓글을 찾을 수 없습니다');
+    throw new NotFoundError('댓글을 찾을 수 없습니다');
   }
 
   return data as Pick<CommentEntity, 'user_id' | 'password_hash'>;

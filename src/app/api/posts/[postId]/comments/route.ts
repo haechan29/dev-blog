@@ -1,7 +1,6 @@
 import { auth } from '@/auth';
 import { ApiError, ValidationError } from '@/errors/errors';
 import * as CommentQueries from '@/features/comment/data/queries/commentQueries';
-import { PostNotFoundError } from '@/features/post/data/errors/postErrors';
 import { getUserId } from '@/lib/user';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
@@ -21,8 +20,8 @@ export async function GET(
   } catch (error) {
     console.error('댓글 조회 요청이 실패했습니다', error);
 
-    if (error instanceof PostNotFoundError) {
-      return NextResponse.json({ error: error.message }, { status: 404 });
+    if (error instanceof ApiError) {
+      return error.toResponse();
     }
 
     return NextResponse.json(

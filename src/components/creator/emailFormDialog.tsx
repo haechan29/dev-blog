@@ -7,8 +7,9 @@ import {
   DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { ApiError } from '@/errors/errors';
 import { OUTREACH_EMAIL_TEMPLATES } from '@/features/outreach-email/constants/templates';
-import { api } from '@/lib/api';
+import * as OutreachEmailClientRepository from '@/features/outreach-email/data/repository/outreachEmailClientRepository';
 import { Loader2, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -45,7 +46,7 @@ export function EmailFormDialog({
 
     setIsSending(true);
     try {
-      await api.post('/api/gmail/send', {
+      await OutreachEmailClientRepository.sendOutreachEmail({
         creatorId,
         subject,
         body,
@@ -55,8 +56,9 @@ export function EmailFormDialog({
       onSuccess();
       setIsOpen(false);
     } catch (error) {
-      console.error(error);
-      toast.error('발송에 실패했습니다');
+      const message =
+        error instanceof ApiError ? error.message : '메일 발송에 실패했습니다';
+      toast.error(message);
     } finally {
       setIsSending(false);
     }
