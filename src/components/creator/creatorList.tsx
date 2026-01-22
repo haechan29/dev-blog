@@ -3,7 +3,7 @@
 import { CreatorSettingsDropdown } from '@/components/creator/creatorSettingsDropdown';
 import {
   Creator,
-  CREATOR_STATUS_LABELS,
+  CREATOR_STATUS_CONFIG,
   CreatorStatus,
 } from '@/features/creator/domain/model/creator';
 import clsx from 'clsx';
@@ -81,9 +81,14 @@ export function CreatorList({
           >
             <div>
               <div className='font-medium'>{creator.channelName}</div>
-              <div className='text-sm text-gray-500'>
-                {CREATOR_STATUS_LABELS[creator.status]}
-              </div>
+              <span
+                className={clsx(
+                  'text-xs px-2 py-0.5 rounded',
+                  CREATOR_STATUS_CONFIG[creator.status].color
+                )}
+              >
+                {CREATOR_STATUS_CONFIG[creator.status].label}
+              </span>
             </div>
 
             <CreatorSettingsDropdown

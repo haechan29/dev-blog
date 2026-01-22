@@ -1,16 +1,21 @@
 'use server';
 
 import { ValidationError } from '@/errors/errors';
+import { CreatorStatus } from '@/features/creator/data/entities/creatorEntities';
 import * as CreatorServerRepository from '@/features/creator/data/repository/creatorServerRepository';
 import { assertAdmin } from '@/lib/admin';
 import { revalidatePath } from 'next/cache';
 
-export async function createCreator(formData: FormData) {
+export async function createCreator({
+  channelName,
+  email,
+  memo,
+}: {
+  channelName: string;
+  email: string;
+  memo?: string;
+}) {
   await assertAdmin();
-
-  const channelName = formData.get('channelName') as string;
-  const email = formData.get('email') as string;
-  const memo = formData.get('memo') as string | null;
 
   if (!channelName) {
     throw new ValidationError('채널명을 찾을 수 없습니다');
@@ -31,18 +36,27 @@ export async function createCreator(formData: FormData) {
   return creator;
 }
 
-export async function updateCreator(id: string, formData: FormData) {
+export async function updateCreator({
+  id,
+  channelName,
+  email,
+  memo,
+  status,
+}: {
+  id: string;
+  channelName?: string;
+  email?: string;
+  memo?: string;
+  status?: CreatorStatus;
+}) {
   await assertAdmin();
-
-  const channelName = formData.get('channelName') as string;
-  const email = formData.get('email') as string;
-  const memo = formData.get('memo') as string | null;
 
   const creator = await CreatorServerRepository.updateCreator({
     id,
     ...(channelName && { channelName }),
     ...(email && { email }),
     ...(memo && { memo }),
+    ...(status && { status }),
   });
 
   revalidatePath('/admin/creators');

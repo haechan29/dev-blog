@@ -6,7 +6,11 @@ import { CreatorList } from '@/components/creator/creatorList';
 import { DeleteCreatorDialog } from '@/components/creator/deleteCreatorDialog';
 import { EmailFormDialog } from '@/components/creator/emailFormDialog';
 import { ApiError } from '@/errors/errors';
-import { Creator } from '@/features/creator/domain/model/creator';
+import * as CreatorAction from '@/features/creator/domain/action/creatorAction';
+import {
+  Creator,
+  CreatorStatus,
+} from '@/features/creator/domain/model/creator';
 import * as OutreachEmailClientRepository from '@/features/outreach-email/data/repository/outreachEmailClientRepository';
 import { OutreachEmail } from '@/features/outreach-email/domain/model/outreachEmail';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -60,6 +64,27 @@ export function CreatorPageClient({
       }
     },
     [formMode]
+  );
+
+  const handleStatusChange = useCallback(
+    async (status: CreatorStatus) => {
+      if (!selectedCreatorId) return;
+
+      try {
+        const updated = await CreatorAction.updateCreator({
+          id: selectedCreatorId,
+          status,
+        });
+        setCreators(prev => prev.map(c => (c.id === updated.id ? updated : c)));
+      } catch (error) {
+        const message =
+          error instanceof ApiError
+            ? error.message
+            : '상태 변경에 실패했습니다';
+        toast.error(message);
+      }
+    },
+    [selectedCreatorId]
   );
 
   const handleDelete = useCallback((id: string) => {
@@ -158,6 +183,7 @@ export function CreatorPageClient({
         lastSyncedAt={lastSyncedAt}
         onEdit={() => selectedCreatorId && handleEdit(selectedCreatorId)}
         onDelete={() => selectedCreatorId && handleDelete(selectedCreatorId)}
+        onStatusChange={handleStatusChange}
       />
 
       <CreatorFormDialog

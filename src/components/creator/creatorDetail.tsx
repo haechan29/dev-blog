@@ -2,14 +2,21 @@
 
 import { CreatorSettingsDropdown } from '@/components/creator/creatorSettingsDropdown';
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
   Creator,
-  CREATOR_STATUS_LABELS,
+  CREATOR_STATUS_CONFIG,
+  CreatorStatus,
 } from '@/features/creator/domain/model/creator';
 import { OutreachEmail } from '@/features/outreach-email/domain/model/outreachEmail';
 import { formatDateBrief, formatRelativeTime } from '@/lib/date';
 import clsx from 'clsx';
 import { ChevronRight, MoreVertical, RefreshCw } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 
 export function CreatorDetail({
   creator,
@@ -21,6 +28,7 @@ export function CreatorDetail({
   lastSyncedAt,
   onEdit,
   onDelete,
+  onStatusChange,
 }: {
   creator: Creator | null;
   emails: OutreachEmail[];
@@ -31,6 +39,7 @@ export function CreatorDetail({
   lastSyncedAt: Date | null;
   onEdit: () => void;
   onDelete: () => void;
+  onStatusChange: (status: CreatorStatus) => void;
 }) {
   const [openEmailId, setOpenEmailId] = useState<string | null>(null);
 
@@ -51,9 +60,16 @@ export function CreatorDetail({
       <section className='p-4 border-b'>
         <div className='flex items-center gap-3 mb-2'>
           <h2 className='text-xl font-bold'>{creator.channelName}</h2>
-          <span className='text-xs px-2 py-0.5 rounded bg-gray-200 text-gray-700'>
-            {CREATOR_STATUS_LABELS[creator.status]}
-          </span>
+          <StatusDropdown onStatusChange={onStatusChange}>
+            <button
+              className={clsx(
+                'text-xs px-2 py-0.5 rounded cursor-pointer',
+                CREATOR_STATUS_CONFIG[creator.status].color
+              )}
+            >
+              {CREATOR_STATUS_CONFIG[creator.status].label}
+            </button>
+          </StatusDropdown>
           <div className='flex-1' />
           <button
             onClick={onSendEmail}
@@ -187,5 +203,30 @@ function EmailTimelineItem({
         )}
       </div>
     </li>
+  );
+}
+
+function StatusDropdown({
+  onStatusChange,
+  children,
+}: {
+  onStatusChange: (status: CreatorStatus) => void;
+  children: ReactNode;
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+      <DropdownMenuContent>
+        {Object.entries(CREATOR_STATUS_CONFIG).map(([status, { label }]) => (
+          <DropdownMenuItem
+            key={status}
+            onClick={() => onStatusChange(status as CreatorStatus)}
+            className='cursor-pointer'
+          >
+            {label}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

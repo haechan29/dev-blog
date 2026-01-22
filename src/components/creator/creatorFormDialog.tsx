@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import * as CreatorAction from '@/features/creator/domain/action/creatorAction';
 import { Creator } from '@/features/creator/domain/model/creator';
+import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -32,6 +33,9 @@ export function CreatorFormDialog({
   const [email, setEmail] = useState('');
   const [memo, setMemo] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [invalidField, setInvalidField] = useState<
+    'channelName' | 'email' | null
+  >(null);
 
   useEffect(() => {
     if (isOpen && mode === 'edit' && creator) {
@@ -46,22 +50,33 @@ export function CreatorFormDialog({
   }, [isOpen, mode, creator]);
 
   const handleSubmit = useCallback(async () => {
-    if (!channelName.trim() || !email.trim()) {
-      toast.error('채널명과 이메일은 필수입니다');
+    if (mode === 'edit' && !creator) return;
+
+    if (!channelName.trim()) {
+      setInvalidField('channelName');
+      return;
+    }
+
+    if (!email.trim()) {
+      setInvalidField('email');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const formData = new FormData();
-      formData.set('channelName', channelName.trim());
-      formData.set('email', email.trim());
-      formData.set('memo', memo.trim());
-
       const result =
         mode === 'create'
-          ? await CreatorAction.createCreator(formData)
-          : await CreatorAction.updateCreator(creator!.id, formData);
+          ? await CreatorAction.createCreator({
+              channelName: channelName.trim(),
+              email: email.trim(),
+              memo: memo.trim() || undefined,
+            })
+          : await CreatorAction.updateCreator({
+              id: creator!.id,
+              channelName: channelName.trim(),
+              email: email.trim(),
+              memo: memo.trim() || undefined,
+            });
 
       onSuccess(result);
       setIsOpen(false);
@@ -93,16 +108,32 @@ export function CreatorFormDialog({
           <input
             type='text'
             value={channelName}
-            onChange={e => setChannelName(e.target.value)}
+            onChange={e => {
+              setChannelName(e.target.value);
+              setInvalidField(null);
+            }}
             placeholder='채널명'
-            className='w-full border border-gray-200 p-3 rounded-sm outline-none hover:border-blue-500 focus:border-blue-500'
+            className={clsx(
+              'w-full border p-3 rounded-sm outline-none',
+              invalidField === 'channelName'
+                ? 'border-red-400 animate-shake'
+                : 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
+            )}
           />
           <input
             type='email'
             value={email}
-            onChange={e => setEmail(e.target.value)}
+            onChange={e => {
+              setEmail(e.target.value);
+              setInvalidField(null);
+            }}
             placeholder='이메일'
-            className='w-full border border-gray-200 p-3 rounded-sm outline-none hover:border-blue-500 focus:border-blue-500'
+            className={clsx(
+              'w-full border p-3 rounded-sm outline-none',
+              invalidField === 'email'
+                ? 'border-red-400 animate-shake'
+                : 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
+            )}
           />
           <textarea
             value={memo}
