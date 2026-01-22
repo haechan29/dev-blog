@@ -5,7 +5,7 @@ import {
   CREATOR_STATUS_LABELS,
 } from '@/features/creator/domain/model/creator';
 import { OutreachEmail } from '@/features/outreach-email/domain/model/outreachEmail';
-import { formatDateBrief } from '@/lib/date';
+import { formatDateBrief, formatRelativeTime } from '@/lib/date';
 import clsx from 'clsx';
 import { ChevronRight, RefreshCw } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -17,6 +17,7 @@ export function CreatorDetail({
   onSendEmail,
   onSync,
   isSyncing,
+  lastSyncedAt,
 }: {
   creator: Creator | null;
   emails: OutreachEmail[];
@@ -24,6 +25,7 @@ export function CreatorDetail({
   onSendEmail: () => void;
   onSync: () => void;
   isSyncing: boolean;
+  lastSyncedAt: Date | null;
 }) {
   const [openEmailId, setOpenEmailId] = useState<string | null>(null);
 
@@ -63,18 +65,27 @@ export function CreatorDetail({
       <section className='flex-1 p-4 overflow-y-auto'>
         <div className='flex items-center gap-2 mb-2'>
           <h3 className='font-semibold'>이메일 히스토리</h3>
-          <button
-            onClick={onSync}
-            disabled={isSyncing}
-            className='p-1 hover:bg-gray-100 rounded disabled:opacity-50'
-          >
-            <RefreshCw
-              className={clsx(
-                'w-4 h-4 text-gray-500',
-                isSyncing && 'animate-spin'
-              )}
-            />
-          </button>
+
+          <div className='flex items-center gap-1'>
+            <button
+              onClick={onSync}
+              disabled={isSyncing}
+              className='p-1 hover:bg-gray-100 rounded disabled:opacity-50'
+            >
+              <RefreshCw
+                className={clsx(
+                  'w-4 h-4 text-gray-500',
+                  isSyncing && 'animate-spin'
+                )}
+              />
+            </button>
+
+            {lastSyncedAt && (
+              <span className='text-xs text-gray-400'>
+                마지막 갱신: {formatRelativeTime(lastSyncedAt)}
+              </span>
+            )}
+          </div>
         </div>
 
         {isEmailsLoading ? (
