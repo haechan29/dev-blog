@@ -3,7 +3,6 @@
 import { CreatorSettingsDropdown } from '@/components/creator/creatorSettingsDropdown';
 import {
   Creator,
-  CREATOR_STATUS_CONFIG,
   CreatorStatus,
 } from '@/features/creator/domain/model/creator';
 import clsx from 'clsx';
@@ -13,6 +12,7 @@ import { useState } from 'react';
 export function CreatorList({
   creators,
   selectedId,
+  unreadCounts,
   onSelect,
   onCreate,
   onEdit,
@@ -20,6 +20,7 @@ export function CreatorList({
 }: {
   creators: Creator[];
   selectedId: string | null;
+  unreadCounts: Record<string, number>;
   onSelect: (id: string) => void;
   onCreate: () => void;
   onEdit: (id: string) => void;
@@ -79,16 +80,18 @@ export function CreatorList({
               selectedId === creator.id ? 'bg-blue-50' : 'hover:bg-gray-50'
             )}
           >
-            <div>
-              <div className='font-medium'>{creator.channelName}</div>
-              <span
+            <div className='flex items-center gap-2'>
+              <div
                 className={clsx(
-                  'text-xs px-2 py-0.5 rounded',
-                  CREATOR_STATUS_CONFIG[creator.status].color
+                  'font-medium',
+                  unreadCounts[creator.id] > 0 ? 'text-black' : 'text-gray-500'
                 )}
               >
-                {CREATOR_STATUS_CONFIG[creator.status].label}
-              </span>
+                {creator.channelName}
+              </div>
+              {unreadCounts[creator.id] > 0 && (
+                <span className='w-2 h-2 rounded-full bg-blue-500' />
+              )}
             </div>
 
             <CreatorSettingsDropdown

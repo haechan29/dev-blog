@@ -29,6 +29,7 @@ export function CreatorDetail({
   onEdit,
   onDelete,
   onStatusChange,
+  onMarkAsRead,
 }: {
   creator: Creator | null;
   emails: OutreachEmail[];
@@ -40,12 +41,22 @@ export function CreatorDetail({
   onEdit: () => void;
   onDelete: () => void;
   onStatusChange: (status: CreatorStatus) => void;
+  onMarkAsRead: (emailId: string, creatorId: string) => void;
 }) {
   const [openEmailId, setOpenEmailId] = useState<string | null>(null);
 
   useEffect(() => {
-    setOpenEmailId(emails[0]?.id ?? null);
-  }, [emails]);
+    const firstEmail = emails[0];
+    setOpenEmailId(firstEmail?.id ?? null);
+
+    if (
+      firstEmail &&
+      !firstEmail.isRead &&
+      firstEmail.direction === 'received'
+    ) {
+      onMarkAsRead(firstEmail.id, firstEmail.creatorId);
+    }
+  }, [emails, onMarkAsRead]);
 
   if (!creator) {
     return (
@@ -130,6 +141,7 @@ export function CreatorDetail({
                 onToggle={() =>
                   setOpenEmailId(openEmailId === email.id ? null : email.id)
                 }
+                onMarkAsRead={() => onMarkAsRead(email.id, email.creatorId)}
               />
             ))}
           </ul>
@@ -145,12 +157,14 @@ function EmailTimelineItem({
   isLast,
   isOpen,
   onToggle,
+  onMarkAsRead,
 }: {
   email: OutreachEmail;
   isFirst: boolean;
   isLast: boolean;
   isOpen: boolean;
   onToggle: () => void;
+  onMarkAsRead: () => void;
 }) {
   const isSent = email.direction === 'sent';
 
@@ -178,7 +192,12 @@ function EmailTimelineItem({
 
       <div className='flex-1 mb-8'>
         <button
-          onClick={onToggle}
+          onClick={() => {
+            onToggle();
+            if (!isOpen && !email.isRead && email.direction === 'received') {
+              onMarkAsRead();
+            }
+          }}
           className='w-full text-left p-2 -m-2 cursor-pointer'
         >
           <div className='flex items-center gap-1'>

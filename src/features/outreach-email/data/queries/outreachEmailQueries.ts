@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 import 'server-only';
 
 const SELECT_FIELDS =
-  'id, creator_id, gmail_thread_id, gmail_message_id, message_id, direction, subject, body, sent_at';
+  'id, creator_id, gmail_thread_id, gmail_message_id, message_id, direction, subject, body, sent_at, is_read';
 
 export async function fetchOutreachEmails(creatorId?: string) {
   let query = supabase
@@ -83,6 +83,35 @@ export async function deleteOutreachEmail(id: string) {
   const { error } = await supabase
     .from('outreach_emails')
     .delete()
+    .eq('id', id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function fetchUnreadCounts(): Promise<Record<string, number>> {
+  const { data, error } = await supabase
+    .from('outreach_emails')
+    .select('creator_id')
+    .eq('is_read', false)
+    .eq('direction', 'received');
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const counts: Record<string, number> = {};
+  for (const row of data) {
+    counts[row.creator_id] = (counts[row.creator_id] || 0) + 1;
+  }
+  return counts;
+}
+
+export async function markAsRead(id: string) {
+  const { error } = await supabase
+    .from('outreach_emails')
+    .update({ is_read: true })
     .eq('id', id);
 
   if (error) {

@@ -4,9 +4,11 @@ import { OutreachEmail } from '@/features/outreach-email/domain/model/outreachEm
 export function toDomain(entity: OutreachEmailEntity): OutreachEmail {
   return {
     id: entity.id,
+    creatorId: entity.creator_id,
     direction: entity.direction,
     subject: entity.subject,
     body: entity.body,
     sentAt: entity.sent_at,
+    isRead: entity.is_read,
   };
 }

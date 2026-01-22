@@ -9,6 +9,11 @@ export async function getOutreachEmails(
   return response.data;
 }
 
+export async function getUnreadCounts(): Promise<Record<string, number>> {
+  const response = await api.get('/api/outreach-emails/unread-counts');
+  return response.data;
+}
+
 export async function syncOutreachEmails(): Promise<{ synced: number }> {
   const response = await api.post('/api/outreach-emails/sync');
   return response.data;

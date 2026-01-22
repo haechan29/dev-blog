@@ -10,4 +10,5 @@ export interface OutreachEmailEntity {
   subject: string;
   body: string;
   sent_at: string;
+  is_read: boolean;
 }

@@ -39,3 +39,14 @@ export async function sendOutreachEmail({
 
   revalidatePath('/admin/creators');
 }
+
+export async function markOutreachEmailAsRead(id: string) {
+  await assertAdmin();
+
+  if (!id) {
+    throw new ValidationError('이메일 ID가 필요합니다');
+  }
+
+  await OutreachEmailServerRepository.markAsRead(id);
+  revalidatePath('/admin/creators');
+}

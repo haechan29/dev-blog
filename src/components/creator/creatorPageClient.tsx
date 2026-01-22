@@ -12,6 +12,7 @@ import {
   CreatorStatus,
 } from '@/features/creator/domain/model/creator';
 import * as OutreachEmailClientRepository from '@/features/outreach-email/data/repository/outreachEmailClientRepository';
+import * as OutreachEmailAction from '@/features/outreach-email/domain/action/outreachEmailAction';
 import { OutreachEmail } from '@/features/outreach-email/domain/model/outreachEmail';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -29,6 +30,7 @@ export function CreatorPageClient({
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
 
   const [isEmailFormOpen, setIsEmailFormOpen] = useState(false);
   const [emails, setEmails] = useState<OutreachEmail[]>([]);
@@ -128,20 +130,42 @@ export function CreatorPageClient({
   const syncEmails = useCallback(async () => {
     setIsSyncing(true);
     try {
-      const result = await OutreachEmailClientRepository.syncOutreachEmails();
+      await OutreachEmailClientRepository.syncOutreachEmails();
       setLastSyncedAt(new Date());
-      return result;
     } catch (error) {
       const message =
         error instanceof ApiError
           ? error.message
           : '이메일 동기화에 실패했습니다';
       toast.error(message);
-      return null;
     } finally {
       setIsSyncing(false);
     }
   }, []);
+
+  const fetchUnreadCounts = useCallback(async () => {
+    try {
+      const counts = await OutreachEmailClientRepository.getUnreadCounts();
+      setUnreadCounts(counts);
+    } catch {
+      toast.error('미열람 이메일 갯수 조회에 실패했습니다');
+    }
+  }, []);
+
+  const handleMarkAsRead = useCallback(
+    async (emailId: string, creatorId: string) => {
+      try {
+        await OutreachEmailAction.markOutreachEmailAsRead(emailId);
+        setUnreadCounts(prev => ({
+          ...prev,
+          [creatorId]: Math.max((prev[creatorId] || 0) - 1, 0),
+        }));
+      } catch {
+        toast.error('이메일 읽음 처리에 실패했습니다');
+      }
+    },
+    []
+  );
 
   const handleSync = useCallback(async () => {
     await syncEmails();
@@ -162,11 +186,16 @@ export function CreatorPageClient({
     syncEmails();
   }, [syncEmails]);
 
+  useEffect(() => {
+    fetchUnreadCounts();
+  }, [fetchUnreadCounts]);
+
   return (
     <>
       <CreatorList
         creators={creators}
         selectedId={selectedCreatorId}
+        unreadCounts={unreadCounts}
         onSelect={setSelectedCreatorId}
         onCreate={handleCreate}
         onEdit={handleEdit}
@@ -184,6 +213,7 @@ export function CreatorPageClient({
         onEdit={() => selectedCreatorId && handleEdit(selectedCreatorId)}
         onDelete={() => selectedCreatorId && handleDelete(selectedCreatorId)}
         onStatusChange={handleStatusChange}
+        onMarkAsRead={handleMarkAsRead}
       />
 
       <CreatorFormDialog
