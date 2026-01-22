@@ -1,19 +1,14 @@
 'use client';
 
 import { CreatorSettingsDropdown } from '@/components/creator/creatorSettingsDropdown';
-import { Creator } from '@/features/creator/domain/model/creator';
+import {
+  Creator,
+  CREATOR_STATUS_LABELS,
+  CreatorStatus,
+} from '@/features/creator/domain/model/creator';
 import clsx from 'clsx';
 import { MoreVertical } from 'lucide-react';
 import { useState } from 'react';
-
-type CreatorStatus = 'pending' | 'sent' | 'accepted' | 'rejected';
-
-const STATUS_LABELS: Record<CreatorStatus, string> = {
-  pending: '대기',
-  sent: '발송됨',
-  accepted: '수락',
-  rejected: '거절',
-};
 
 export function CreatorList({
   creators,
@@ -87,7 +82,7 @@ export function CreatorList({
             <div>
               <div className='font-medium'>{creator.channelName}</div>
               <div className='text-sm text-gray-500'>
-                {STATUS_LABELS[creator.status]}
+                {CREATOR_STATUS_LABELS[creator.status]}
               </div>
             </div>
 

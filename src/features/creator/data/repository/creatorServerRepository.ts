@@ -1,15 +1,15 @@
-import { toDto } from '@/features/creator/data/mapper/creatorMapper';
+import { toDomain } from '@/features/creator/data/mapper/creatorMapper';
 import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries';
 import 'server-only';
 
 export async function getCreators() {
   const creators = await CreatorQueries.fetchCreators();
-  return creators.map(toDto);
+  return creators.map(toDomain);
 }
 
 export async function getCreator(id: string) {
   const creator = await CreatorQueries.fetchCreator(id);
-  return creator ? toDto(creator) : null;
+  return creator ? toDomain(creator) : null;
 }
 
 export async function createCreator(params: {
@@ -18,7 +18,7 @@ export async function createCreator(params: {
   memo?: string;
 }) {
   const creator = await CreatorQueries.createCreator(params);
-  return toDto(creator);
+  return toDomain(creator);
 }
 
 export async function updateCreator(params: {
@@ -29,7 +29,7 @@ export async function updateCreator(params: {
   status?: 'pending' | 'sent' | 'accepted' | 'rejected';
 }) {
   const creator = await CreatorQueries.updateCreator(params);
-  return toDto(creator);
+  return toDomain(creator);
 }
 
 export async function deleteCreator(id: string) {
