@@ -1,16 +1,28 @@
 'use client';
 
 import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+} from '@/components/ui/command';
+import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { ApiError } from '@/errors/errors';
 import { OUTREACH_EMAIL_TEMPLATES } from '@/features/outreach-email/constants/templates';
 import * as OutreachEmailClientRepository from '@/features/outreach-email/data/repository/outreachEmailClientRepository';
-import { Loader2, X } from 'lucide-react';
+import clsx from 'clsx';
+import { Check, ChevronsUpDown, Loader2, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
@@ -30,6 +42,9 @@ export function EmailFormDialog({
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [invalidField, setInvalidField] = useState<'subject' | 'body' | null>(
+    null
+  );
 
   useEffect(() => {
     if (!isOpen) {
@@ -39,8 +54,13 @@ export function EmailFormDialog({
   }, [isOpen]);
 
   const handleSend = useCallback(async () => {
-    if (!subject.trim() || !body.trim()) {
-      toast.error('제목과 본문을 입력해주세요');
+    if (!subject.trim()) {
+      setInvalidField('subject');
+      return;
+    }
+
+    if (!body.trim()) {
+      setInvalidField('body');
       return;
     }
 
@@ -75,43 +95,43 @@ export function EmailFormDialog({
         <div className='text-xl font-bold mt-2 mb-6'>이메일 발송</div>
 
         <div className='space-y-4 mb-8'>
-          <select
-            onChange={e => {
-              const template = OUTREACH_EMAIL_TEMPLATES.find(
-                t => t.id === e.target.value
-              );
-              if (template) {
-                setSubject(template.subject);
-                setBody(template.body(creatorName));
-              }
+          <TemplateDropdown
+            onSelect={template => {
+              setSubject(template.subject);
+              setBody(template.body(creatorName));
             }}
-            className='w-full border border-gray-200 p-3 rounded-sm outline-none hover:border-blue-500 focus:border-blue-500'
-            defaultValue=''
-          >
-            <option value='' disabled>
-              템플릿 선택
-            </option>
-            {OUTREACH_EMAIL_TEMPLATES.map(t => (
-              <option key={t.id} value={t.id}>
-                {t.name}
-              </option>
-            ))}
-          </select>
+          />
 
           <input
             type='text'
             value={subject}
-            onChange={e => setSubject(e.target.value)}
+            onChange={e => {
+              setSubject(e.target.value);
+              setInvalidField(null);
+            }}
             placeholder='제목'
-            className='w-full border border-gray-200 p-3 rounded-sm outline-none hover:border-blue-500 focus:border-blue-500'
+            className={clsx(
+              'w-full border p-3 rounded-sm outline-none',
+              invalidField === 'subject'
+                ? 'border-red-400 animate-shake'
+                : 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
+            )}
           />
 
           <textarea
             value={body}
-            onChange={e => setBody(e.target.value)}
+            onChange={e => {
+              setBody(e.target.value);
+              setInvalidField(null);
+            }}
             placeholder='본문'
             rows={8}
-            className='w-full border border-gray-200 p-3 rounded-sm outline-none hover:border-blue-500 focus:border-blue-500 resize-none'
+            className={clsx(
+              'w-full border p-3 rounded-sm outline-none resize-none',
+              invalidField === 'body'
+                ? 'border-red-400 animate-shake'
+                : 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
+            )}
           />
         </div>
 
@@ -133,5 +153,64 @@ export function EmailFormDialog({
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function TemplateDropdown({
+  onSelect,
+}: {
+  onSelect: (template: (typeof OUTREACH_EMAIL_TEMPLATES)[number]) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  const selectedTemplate = OUTREACH_EMAIL_TEMPLATES.find(
+    t => t.id === selectedId
+  );
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          className={clsx(
+            'w-full flex justify-between items-center border p-3 rounded-sm outline-none',
+            'border-gray-200 hover:border-blue-500',
+            selectedTemplate ? 'bg-white' : 'bg-gray-50'
+          )}
+        >
+          <span
+            className={selectedTemplate ? 'text-gray-900' : 'text-gray-400'}
+          >
+            {selectedTemplate?.name ?? '템플릿 선택'}
+          </span>
+          <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+        </button>
+      </PopoverTrigger>
+
+      <PopoverContent className='w-(--radix-popover-trigger-width) p-0 rounded-sm'>
+        <Command>
+          <CommandEmpty>템플릿이 없습니다.</CommandEmpty>
+          <CommandGroup>
+            {OUTREACH_EMAIL_TEMPLATES.map(template => (
+              <CommandItem
+                key={template.id}
+                value={template.name}
+                onSelect={() => {
+                  setSelectedId(template.id);
+                  onSelect(template);
+                  setOpen(false);
+                }}
+                className='flex justify-between px-3 py-2 gap-1 cursor-pointer'
+              >
+                <span>{template.name}</span>
+                {selectedId === template.id && (
+                  <Check className='h-4 w-4 text-blue-600 -mr-1' />
+                )}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }
