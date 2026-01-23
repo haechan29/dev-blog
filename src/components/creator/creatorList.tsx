@@ -1,13 +1,15 @@
 'use client';
 
 import { CreatorSettingsDropdown } from '@/components/creator/creatorSettingsDropdown';
+import { CreatorStatusFilter } from '@/components/creator/creatorStatusFilter';
 import {
   Creator,
   CreatorStatus,
+  STATUS_FILTER_OPTIONS,
 } from '@/features/creator/domain/model/creator';
 import clsx from 'clsx';
-import { MoreVertical } from 'lucide-react';
-import { useState } from 'react';
+import { MoreVertical, Plus, SlidersHorizontal } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 export function CreatorList({
   creators,
@@ -26,48 +28,50 @@ export function CreatorList({
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
 }) {
-  const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<CreatorStatus | 'all'>(
     'all'
   );
-
-  const filtered = creators.filter(c => {
-    const matchesSearch = c.channelName
-      .toLowerCase()
-      .includes(search.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || c.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  const filtered = useMemo(() => {
+    return creators.filter(c => {
+      return statusFilter === 'all' || c.status === statusFilter;
+    });
+  }, [creators, statusFilter]);
 
   return (
-    <aside className='w-[300px] border-r flex flex-col'>
-      <div className='p-3 border-b space-y-2'>
-        <input
-          type='text'
-          placeholder='검색...'
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className='w-full px-3 py-2 border rounded'
-        />
-        <select
-          value={statusFilter}
-          onChange={e =>
-            setStatusFilter(e.target.value as CreatorStatus | 'all')
-          }
-          className='w-full px-3 py-2 border rounded'
-        >
-          <option value='all'>전체</option>
-          <option value='pending'>대기</option>
-          <option value='sent'>발송됨</option>
-          <option value='accepted'>수락</option>
-          <option value='rejected'>거절</option>
-        </select>
-        <button
-          onClick={onCreate}
-          className='w-full py-2 bg-blue-500 text-white rounded'
-        >
-          + 크리에이터 등록
-        </button>
+    <aside className='w-(--sidebar-width) border-r border-gray-200 flex flex-col px-4'>
+      <div className='py-3 flex items-center justify-between'>
+        <span className='font-semibold text-gray-900'>크리에이터</span>
+
+        <div className='flex items-center gap-1'>
+          <CreatorStatusFilter
+            value={statusFilter}
+            onChange={setStatusFilter}
+            creators={creators}
+          >
+            <button
+              className={clsx(
+                'flex items-center gap-1 p-2 rounded-sm cursor-pointer',
+                statusFilter === 'all'
+                  ? 'text-gray-500 hover:bg-gray-100'
+                  : 'text-blue-500 hover:bg-blue-50'
+              )}
+            >
+              <SlidersHorizontal className='w-4 h-4' />
+              {statusFilter !== 'all' && (
+                <span className='text-sm'>
+                  {STATUS_FILTER_OPTIONS[statusFilter].label}
+                </span>
+              )}
+            </button>
+          </CreatorStatusFilter>
+
+          <button
+            onClick={onCreate}
+            className='p-2 rounded-sm text-gray-500 hover:bg-gray-100 cursor-pointer'
+          >
+            <Plus className='w-4 h-4' />
+          </button>
+        </div>
       </div>
 
       <ul className='flex-1 overflow-y-auto'>
@@ -76,35 +80,42 @@ export function CreatorList({
             key={creator.id}
             onClick={() => onSelect(creator.id)}
             className={clsx(
-              'flex justify-between items-center p-3 cursor-pointer border-b',
-              selectedId === creator.id ? 'bg-blue-50' : 'hover:bg-gray-50'
+              'flex justify-between items-center p-3 rounded-sm cursor-pointer',
+              selectedId === creator.id
+                ? 'bg-blue-50 text-blue-500'
+                : 'text-gray-900 hover:text-blue-500'
             )}
           >
             <div className='flex items-center gap-2'>
               <div
                 className={clsx(
-                  'font-medium',
-                  unreadCounts[creator.id] > 0 ? 'text-black' : 'text-gray-500'
+                  'text-sm',
+                  selectedId === creator.id && 'font-semibold',
+                  unreadCounts[creator.id] > 0 &&
+                    selectedId !== creator.id &&
+                    'font-medium'
                 )}
               >
                 {creator.channelName}
               </div>
               {unreadCounts[creator.id] > 0 && (
-                <span className='w-2 h-2 rounded-full bg-blue-500' />
+                <span className='w-1.5 h-1.5 rounded-full bg-blue-500' />
               )}
             </div>
 
-            <CreatorSettingsDropdown
-              onEdit={() => onEdit(creator.id)}
-              onDelete={() => onDelete(creator.id)}
-            >
-              <button
-                onClick={e => e.stopPropagation()}
-                className='p-2 -m-2 hover:bg-gray-200 rounded-full cursor-pointer'
+            {selectedId === creator.id && (
+              <CreatorSettingsDropdown
+                onEdit={() => onEdit(creator.id)}
+                onDelete={() => onDelete(creator.id)}
               >
-                <MoreVertical className='w-5 h-5 text-gray-400' />
-              </button>
-            </CreatorSettingsDropdown>
+                <button
+                  onClick={e => e.stopPropagation()}
+                  className='p-2 -m-2 rounded-full hover:bg-gray-200 cursor-pointer'
+                >
+                  <MoreVertical className='w-5 h-5 text-gray-400' />
+                </button>
+              </CreatorSettingsDropdown>
+            )}
           </li>
         ))}
       </ul>

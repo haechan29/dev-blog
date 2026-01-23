@@ -51,7 +51,7 @@ export function DeleteCreatorDialog({
 
         <div className='text-xl font-bold mt-2 mb-1'>크리에이터 삭제</div>
         <div className='text-sm text-gray-500 mb-8'>
-          <strong>{creatorName}</strong>을(를) 삭제할까요?
+          선택한 크리에이터를 삭제합니다.
         </div>
 
         <div className='flex justify-between items-center'>

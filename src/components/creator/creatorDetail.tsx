@@ -126,7 +126,7 @@ export function CreatorDetail({
         </div>
 
         {isEmailsLoading ? (
-          <div className='text-gray-400'>로딩 중...</div>
+          <></>
         ) : emails.length === 0 ? (
           <div className='text-gray-400'>발송된 이메일이 없습니다</div>
         ) : (

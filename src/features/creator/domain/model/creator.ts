@@ -10,6 +10,11 @@ export const CREATOR_STATUS_CONFIG: Record<
   rejected: { label: '거절', color: 'bg-red-100 text-red-700' },
 };
 
+export const STATUS_FILTER_OPTIONS = {
+  all: { label: '전체' },
+  ...CREATOR_STATUS_CONFIG,
+};
+
 export interface Creator {
   id: string;
   channelName: string;
