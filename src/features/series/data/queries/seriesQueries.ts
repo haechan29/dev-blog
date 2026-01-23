@@ -1,5 +1,5 @@
+import { NotFoundError } from '@/errors/errors';
 import { SeriesEntity } from '@/features/series/data/entities/seriesEntities';
-import { SeriesNotFoundError } from '@/features/series/data/errors/seriesErrors';
 import { toDto } from '@/features/series/data/mapper/seriesMapper';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
@@ -28,7 +28,7 @@ export async function fetchSeries(seriesId: string) {
   }
 
   if (!data) {
-    throw new SeriesNotFoundError('시리즈를 찾을 수 없습니다');
+    throw new NotFoundError('시리즈를 찾을 수 없습니다');
   }
 
   return data as unknown as SeriesEntity;

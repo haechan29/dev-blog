@@ -33,3 +33,9 @@ export class ValidationError extends ApiError {
     super(message, ErrorCode.VALIDATION_ERROR, 400);
   }
 }
+
+export class NotFoundError extends ApiError {
+  constructor(message: string) {
+    super(message, ErrorCode.NOT_FOUND, 404);
+  }
+}
