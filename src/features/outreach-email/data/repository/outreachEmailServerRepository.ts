@@ -14,3 +14,7 @@ export async function sendEmail(params: {
 export async function markAsRead(id: string) {
   await OutreachEmailQueries.markAsRead(id);
 }
+
+export async function syncEmails() {
+  return await OutreachEmailUsecase.syncEmails();
+}

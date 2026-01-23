@@ -130,7 +130,7 @@ export function CreatorPageClient({
   const syncEmails = useCallback(async () => {
     setIsSyncing(true);
     try {
-      await OutreachEmailClientRepository.syncOutreachEmails();
+      await OutreachEmailAction.syncOutreachEmails();
       setLastSyncedAt(new Date());
     } catch (error) {
       const message =

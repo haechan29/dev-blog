@@ -50,3 +50,13 @@ export async function markOutreachEmailAsRead(id: string) {
   await OutreachEmailServerRepository.markAsRead(id);
   revalidatePath('/admin/creators');
 }
+
+export async function syncOutreachEmails() {
+  await assertAdmin();
+
+  const result = await OutreachEmailServerRepository.syncEmails();
+
+  revalidatePath('/admin/creators');
+
+  return result;
+}
