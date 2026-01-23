@@ -5,7 +5,7 @@ export default async function CreatorPage() {
   const creators = await CreatorServerRepository.getCreators();
 
   return (
-    <div className='h-screen flex'>
+    <div className='min-h-screen flex'>
       <CreatorPageClient initialCreators={creators} />
     </div>
   );

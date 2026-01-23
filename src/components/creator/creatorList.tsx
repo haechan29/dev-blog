@@ -10,6 +10,7 @@ import {
 import clsx from 'clsx';
 import { MoreVertical, Plus, SlidersHorizontal } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import SimpleBar from 'simplebar-react';
 
 export function CreatorList({
   creators,
@@ -38,8 +39,8 @@ export function CreatorList({
   }, [creators, statusFilter]);
 
   return (
-    <aside className='w-(--sidebar-width) border-r border-gray-200 flex flex-col px-4'>
-      <div className='py-3 flex items-center justify-between'>
+    <aside className='fixed top-0 left-0 w-(--sidebar-width) h-screen overflow-hidden border-r border-gray-200 flex flex-col'>
+      <div className='px-4 py-3 flex items-center justify-between'>
         <span className='font-semibold text-gray-900'>크리에이터</span>
 
         <div className='flex items-center gap-1'>
@@ -74,51 +75,53 @@ export function CreatorList({
         </div>
       </div>
 
-      <ul className='flex-1 overflow-y-auto'>
-        {filtered.map(creator => (
-          <li
-            key={creator.id}
-            onClick={() => onSelect(creator.id)}
-            className={clsx(
-              'flex justify-between items-center p-3 rounded-sm cursor-pointer',
-              selectedId === creator.id
-                ? 'bg-blue-50 text-blue-500'
-                : 'text-gray-900 hover:text-blue-500'
-            )}
-          >
-            <div className='flex items-center gap-2'>
-              <div
-                className={clsx(
-                  'text-sm',
-                  selectedId === creator.id && 'font-semibold',
-                  unreadCounts[creator.id] > 0 &&
-                    selectedId !== creator.id &&
-                    'font-medium'
-                )}
-              >
-                {creator.channelName}
-              </div>
-              {unreadCounts[creator.id] > 0 && (
-                <span className='w-1.5 h-1.5 rounded-full bg-blue-500' />
+      <SimpleBar className='flex-1 min-h-0 simplebar-hover'>
+        <ul className='px-4 pb-4'>
+          {filtered.map(creator => (
+            <li
+              key={creator.id}
+              onClick={() => onSelect(creator.id)}
+              className={clsx(
+                'flex justify-between items-center p-3 rounded-sm cursor-pointer',
+                selectedId === creator.id
+                  ? 'bg-blue-50 text-blue-500'
+                  : 'text-gray-900 hover:text-blue-500'
               )}
-            </div>
-
-            {selectedId === creator.id && (
-              <CreatorSettingsDropdown
-                onEdit={() => onEdit(creator.id)}
-                onDelete={() => onDelete(creator.id)}
-              >
-                <button
-                  onClick={e => e.stopPropagation()}
-                  className='p-2 -m-2 rounded-full hover:bg-gray-200 cursor-pointer'
+            >
+              <div className='flex items-center gap-2'>
+                <div
+                  className={clsx(
+                    'text-sm',
+                    selectedId === creator.id && 'font-semibold',
+                    unreadCounts[creator.id] > 0 &&
+                      selectedId !== creator.id &&
+                      'font-medium'
+                  )}
                 >
-                  <MoreVertical className='w-5 h-5 text-gray-400' />
-                </button>
-              </CreatorSettingsDropdown>
-            )}
-          </li>
-        ))}
-      </ul>
+                  {creator.channelName}
+                </div>
+                {unreadCounts[creator.id] > 0 && (
+                  <span className='w-1.5 h-1.5 rounded-full bg-blue-500' />
+                )}
+              </div>
+
+              {selectedId === creator.id && (
+                <CreatorSettingsDropdown
+                  onEdit={() => onEdit(creator.id)}
+                  onDelete={() => onDelete(creator.id)}
+                >
+                  <button
+                    onClick={e => e.stopPropagation()}
+                    className='p-2 -m-2 rounded-full hover:bg-gray-200 cursor-pointer'
+                  >
+                    <MoreVertical className='w-5 h-5 text-gray-400' />
+                  </button>
+                </CreatorSettingsDropdown>
+              )}
+            </li>
+          ))}
+        </ul>
+      </SimpleBar>
     </aside>
   );
 }

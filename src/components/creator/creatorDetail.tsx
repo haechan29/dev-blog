@@ -60,14 +60,14 @@ export function CreatorDetail({
 
   if (!creator) {
     return (
-      <main className='flex-1 flex items-center justify-center text-gray-400'>
+      <main className='flex-1 min-w-0 ml-(--sidebar-width) flex items-center justify-center text-gray-400'>
         크리에이터를 선택해주세요
       </main>
     );
   }
 
   return (
-    <main className='flex-1 flex flex-col overflow-hidden'>
+    <main className='flex-1 min-w-0 ml-(--sidebar-width) flex flex-col overflow-hidden'>
       <section className='p-4 border-b'>
         <div className='flex items-center gap-3 mb-2'>
           <h2 className='text-xl font-bold'>{creator.channelName}</h2>
@@ -128,7 +128,9 @@ export function CreatorDetail({
         {isEmailsLoading ? (
           <></>
         ) : emails.length === 0 ? (
-          <div className='text-gray-400'>발송된 이메일이 없습니다</div>
+          <div className='py-20 text-center text-gray-400'>
+            발송된 이메일이 없습니다
+          </div>
         ) : (
           <ul>
             {emails.map((email, index) => (
