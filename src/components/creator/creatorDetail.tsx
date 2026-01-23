@@ -67,8 +67,8 @@ export function CreatorDetail({
   }
 
   return (
-    <main className='flex-1 min-w-0 ml-(--sidebar-width) flex flex-col overflow-hidden'>
-      <section className='p-4 border-b'>
+    <main className='flex-1 min-w-0 ml-(--sidebar-width) flex flex-col'>
+      <section className='sticky top-0 bg-white/80 backdrop-blur-md p-4'>
         <div className='flex items-center gap-3 mb-2'>
           <h2 className='text-xl font-bold'>{creator.channelName}</h2>
           <StatusDropdown onStatusChange={onStatusChange}>
@@ -99,7 +99,7 @@ export function CreatorDetail({
         )}
       </section>
 
-      <section className='flex-1 p-4 overflow-y-auto'>
+      <section className='flex-1 p-4'>
         <div className='flex items-center gap-2 mb-2'>
           <h3 className='font-semibold'>이메일 히스토리</h3>
 

@@ -2,23 +2,32 @@ import { CreatorEntity } from '@/features/creator/data/entities/creatorEntities'
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
+const SELECT_FIELDS =
+  'id, channel_name, email, memo, status, created_at, last_received_at';
+
 export async function fetchCreators() {
   const { data, error } = await supabase
     .from('creators')
-    .select('id, channel_name, email, memo, status, created_at')
-    .order('created_at', { ascending: false });
+    .select(SELECT_FIELDS)
+    .order('last_received_at', { ascending: false, nullsFirst: false });
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return data as CreatorEntity[];
+  const sorted = data.sort((a, b) => {
+    if (a.status === 'rejected' && b.status !== 'rejected') return 1;
+    if (a.status !== 'rejected' && b.status === 'rejected') return -1;
+    return 0;
+  });
+
+  return sorted as CreatorEntity[];
 }
 
 export async function fetchCreator(id: string) {
   const { data, error } = await supabase
     .from('creators')
-    .select('id, channel_name, email, memo, status, created_at')
+    .select(SELECT_FIELDS)
     .eq('id', id)
     .maybeSingle();
 
@@ -45,7 +54,7 @@ export async function createCreator({
       email,
       memo: memo ?? null,
     })
-    .select('id, channel_name, email, memo, status, created_at')
+    .select(SELECT_FIELDS)
     .single();
 
   if (error) {
@@ -79,7 +88,7 @@ export async function updateCreator({
     .from('creators')
     .update(updates)
     .eq('id', id)
-    .select('id, channel_name, email, memo, status, created_at')
+    .select(SELECT_FIELDS)
     .single();
 
   if (error) {
@@ -87,6 +96,17 @@ export async function updateCreator({
   }
 
   return data as CreatorEntity;
+}
+
+export async function updateLastReceivedAt(id: string, timestamp: string) {
+  const { error } = await supabase
+    .from('creators')
+    .update({ last_received_at: timestamp })
+    .eq('id', id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
 }
 
 export async function deleteCreator(id: string) {

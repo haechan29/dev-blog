@@ -39,7 +39,7 @@ export function CreatorList({
   }, [creators, statusFilter]);
 
   return (
-    <aside className='fixed top-0 left-0 w-(--sidebar-width) h-screen overflow-hidden border-r border-gray-200 flex flex-col'>
+    <aside className='fixed top-0 left-0 w-(--sidebar-width) h-screen overflow-hidden border-gray-200 flex flex-col'>
       <div className='px-4 py-3 flex items-center justify-between'>
         <span className='font-semibold text-gray-900'>크리에이터</span>
 
@@ -85,7 +85,9 @@ export function CreatorList({
                 'flex justify-between items-center p-3 rounded-sm cursor-pointer',
                 selectedId === creator.id
                   ? 'bg-blue-50 text-blue-500'
-                  : 'text-gray-900 hover:text-blue-500'
+                  : creator.status === 'rejected'
+                    ? 'text-gray-400 hover:text-blue-500'
+                    : 'text-gray-900 hover:text-blue-500'
               )}
             >
               <div className='flex items-center gap-2'>

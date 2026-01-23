@@ -75,6 +75,14 @@ export async function syncEmails(): Promise<{ synced: number }> {
 
     try {
       await OutreachEmailQueries.createOutreachEmail(parsed);
+
+      if (parsed.direction === 'received') {
+        await CreatorQueries.updateLastReceivedAt(
+          parsed.creatorId,
+          parsed.sentAt
+        );
+      }
+
       syncedCount++;
     } catch (error) {
       const isUniqueViolation =
