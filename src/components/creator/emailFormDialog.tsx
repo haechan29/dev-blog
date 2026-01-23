@@ -54,6 +54,8 @@ export function EmailFormDialog({
     if (!isOpen) {
       setSubject('');
       setBody('');
+      setMode('send');
+      setInvalidField(null);
     }
   }, [isOpen]);
 
@@ -128,8 +130,9 @@ export function EmailFormDialog({
         <div className='space-y-4 mb-8'>
           <TemplateDropdown
             onSelect={template => {
-              setMode('send');
-              setSubject(template.subject);
+              if (mode === 'send') {
+                setSubject(template.subject);
+              }
               setBody(template.body(creatorName));
             }}
           />
