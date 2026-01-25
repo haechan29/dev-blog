@@ -200,6 +200,8 @@ export function CreatorPageClient({
         onCreate={handleCreate}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onSync={syncEmails}
+        isSyncing={isSyncing}
       />
 
       <CreatorDetail

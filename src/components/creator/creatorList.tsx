@@ -8,7 +8,7 @@ import {
   STATUS_FILTER_OPTIONS,
 } from '@/features/creator/domain/model/creator';
 import clsx from 'clsx';
-import { MoreVertical, Plus, SlidersHorizontal } from 'lucide-react';
+import { MoreVertical, Plus, RefreshCw, SlidersHorizontal } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import SimpleBar from 'simplebar-react';
 
@@ -20,6 +20,8 @@ export function CreatorList({
   onCreate,
   onEdit,
   onDelete,
+  onSync,
+  isSyncing,
 }: {
   creators: Creator[];
   selectedId: string | null;
@@ -28,6 +30,8 @@ export function CreatorList({
   onCreate: () => void;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  onSync: () => void;
+  isSyncing: boolean;
 }) {
   const [statusFilter, setStatusFilter] = useState<CreatorStatus | 'all'>(
     'all'
@@ -44,6 +48,16 @@ export function CreatorList({
         <span className='font-semibold text-gray-900'>크리에이터</span>
 
         <div className='flex items-center gap-1'>
+          <button
+            onClick={onSync}
+            disabled={isSyncing}
+            className='p-2 rounded-sm text-gray-500 hover:bg-gray-100 disabled:opacity-50 cursor-pointer'
+          >
+            <RefreshCw
+              className={clsx('w-4 h-4', isSyncing && 'animate-spin')}
+            />
+          </button>
+
           <CreatorStatusFilter
             value={statusFilter}
             onChange={setStatusFilter}
