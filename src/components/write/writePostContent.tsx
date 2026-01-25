@@ -7,11 +7,12 @@ import WritePostContentPreview from '@/components/write/writePostContentPreview'
 import WritePostContentToolbar from '@/components/write/writePostContentToolbar';
 import useBgmController from '@/features/post/hooks/useBgmController';
 import { parseDirectiveRanges } from '@/features/write/domain/lib/contentButton';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function WritePostContent() {
   const [isSpeakerPanelOpen, setIsSpeakerPanelOpen] = useState(false);
   const [hasPanelAutoOpened, setHasPanelAutoOpened] = useState(false);
+  const isScrollSyncPausedRef = useRef(false);
 
   useBgmController();
 
@@ -44,12 +45,13 @@ export default function WritePostContent() {
   }, [hasPanelAutoOpened]);
 
   return (
-    <ImageDropzone>
+    <ImageDropzone isScrollSyncPausedRef={isScrollSyncPausedRef}>
       <div className='h-full grid max-lg:grid-rows-[calc(50%-0.5rem)_calc(50%-0.5rem)] lg:grid-cols-2 gap-4'>
         <div className='h-full flex flex-col max-lg:min-w-0 lg:min-h-0'>
           <WritePostContentToolbar
             isSpeakerPanelOpen={isSpeakerPanelOpen}
             setIsSpeakerPanelOpen={setIsSpeakerPanelOpen}
+            isScrollSyncPausedRef={isScrollSyncPausedRef}
           />
           <SpeakerPanel
             isSpeakerPanelOpen={isSpeakerPanelOpen}
@@ -61,7 +63,9 @@ export default function WritePostContent() {
         </div>
 
         <div className='max-lg:min-w-0 lg:min-h-0'>
-          <WritePostContentPreview />
+          <WritePostContentPreview
+            isScrollSyncPausedRef={isScrollSyncPausedRef}
+          />
         </div>
       </div>
     </ImageDropzone>

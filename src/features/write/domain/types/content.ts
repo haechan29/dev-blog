@@ -6,15 +6,8 @@ type IdleContent = {
 type ErrorContent = {
   status: 'error';
 };
-type LoadingContent = {
-  status: 'loading';
-};
 type SuccessContent = {
   status: 'success';
   value: JSX.Element;
 };
-export type Content =
-  | IdleContent
-  | ErrorContent
-  | LoadingContent
-  | SuccessContent;
+export type Content = IdleContent | ErrorContent | SuccessContent;

@@ -3,12 +3,18 @@
 import DailyQuotaExhaustedDialog from '@/components/image/DailyQuotaExhaustedDialog';
 import { DailyQuotaExhaustedError } from '@/features/image/data/errors/imageErrors';
 import useImageUpload from '@/features/write/hooks/useImageUpload';
-import { ReactNode, useState } from 'react';
+import { MutableRefObject, ReactNode, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import toast from 'react-hot-toast';
 
-export default function ImageDropzone({ children }: { children: ReactNode }) {
-  const { uploadAndInsert } = useImageUpload();
+export default function ImageDropzone({
+  children,
+  isScrollSyncPausedRef,
+}: {
+  children: ReactNode;
+  isScrollSyncPausedRef: MutableRefObject<boolean>;
+}) {
+  const { uploadAndInsert } = useImageUpload({ isScrollSyncPausedRef });
   const [isQuotaDialogOpen, setIsQuotaDialogOpen] = useState(false);
 
   const { getRootProps, isDragActive } = useDropzone({

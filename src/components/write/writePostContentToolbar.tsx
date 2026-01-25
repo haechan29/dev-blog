@@ -14,7 +14,7 @@ import {
 } from '@/features/write/ui/writePostContentButtonProps';
 import clsx from 'clsx';
 import { ChevronDown } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { MutableRefObject, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 const toolbarLayout = {
@@ -48,12 +48,14 @@ const toolbarLayout = {
 export default function WritePostContentToolbar({
   isSpeakerPanelOpen,
   setIsSpeakerPanelOpen,
+  isScrollSyncPausedRef,
 }: {
   isSpeakerPanelOpen: boolean;
   setIsSpeakerPanelOpen: (open: boolean) => void;
+  isScrollSyncPausedRef: MutableRefObject<boolean>;
 }) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const { uploadAndInsert } = useImageUpload();
+  const { uploadAndInsert } = useImageUpload({ isScrollSyncPausedRef });
   const [isQuotaDialogOpen, setIsQuotaDialogOpen] = useState(false);
 
   const { activeCategory, onAction } = useWritePostContentButton({

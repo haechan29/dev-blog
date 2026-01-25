@@ -5,13 +5,17 @@ import { insertMarkdown } from '@/features/write/domain/lib/insertMarkdown';
 import { AppDispatch } from '@/lib/redux/store';
 import { setContent } from '@/lib/redux/write/writePostFormSlice';
 import imageCompression from 'browser-image-compression';
-import { useCallback } from 'react';
+import { MutableRefObject, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 
 const LOADING_IMAGE_PATTERN = /:::img\{[^}]*status="loading"[^}]*\}/;
 
-export default function useImageUpload() {
+export default function useImageUpload({
+  isScrollSyncPausedRef,
+}: {
+  isScrollSyncPausedRef?: MutableRefObject<boolean>;
+}) {
   const dispatch = useDispatch<AppDispatch>();
 
   const uploadAndInsert = useCallback(
@@ -24,6 +28,8 @@ export default function useImageUpload() {
       if (!contentEditor) return;
 
       let cursorPosition = contentEditor.selectionStart;
+
+      if (isScrollSyncPausedRef) isScrollSyncPausedRef.current = true;
 
       for (const file of files) {
         const blobUrl = URL.createObjectURL(file);
@@ -49,9 +55,8 @@ export default function useImageUpload() {
                   useWebWorker: true,
                 });
 
-          const uploadedUrl = await ImageClientRepository.uploadImage(
-            compressedFile
-          );
+          const uploadedUrl =
+            await ImageClientRepository.uploadImage(compressedFile);
           URL.revokeObjectURL(blobUrl);
 
           const currentContent = contentEditor.value;
@@ -83,11 +88,12 @@ export default function useImageUpload() {
       }
 
       setTimeout(() => {
+        if (isScrollSyncPausedRef) isScrollSyncPausedRef.current = false;
         contentEditor.focus();
         contentEditor.setSelectionRange(cursorPosition, cursorPosition);
       }, 100);
     },
-    [dispatch]
+    [dispatch, isScrollSyncPausedRef]
   );
 
   return { uploadAndInsert };

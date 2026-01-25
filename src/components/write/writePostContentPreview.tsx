@@ -5,11 +5,15 @@ import { processMd } from '@/lib/md/md';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { setIsParseError } from '@/lib/redux/write/writePostFormSlice';
 import clsx from 'clsx';
-import { useCallback, useEffect, useState } from 'react';
+import { MutableRefObject, useCallback, useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useDispatch, useSelector } from 'react-redux';
 
-export default function WritePostContentPreview() {
+export default function WritePostContentPreview({
+  isScrollSyncPausedRef,
+}: {
+  isScrollSyncPausedRef: MutableRefObject<boolean>;
+}) {
   const dispatch = useDispatch<AppDispatch>();
   const debounce = useDebounce();
   const {
@@ -69,12 +73,10 @@ export default function WritePostContentPreview() {
 
   useEffect(() => {
     const parseMd = async (content: string) => {
-      if (parsedContent.status === 'loading') return;
       if (content.length === 0) {
         setParsedContent({ status: 'idle' });
         return;
       }
-      setParsedContent({ status: 'loading' });
 
       try {
         const result = await processMd({ source: content, mode: 'preview' });
@@ -85,11 +87,12 @@ export default function WritePostContentPreview() {
     };
 
     parseMd(content);
-  }, [content, parsedContent.status]);
+  }, [content]);
 
   useEffect(() => {
     debounce(() => {
       if (parsedContent.status !== 'success') return;
+      if (isScrollSyncPausedRef.current) return;
       const contentPreview = document.querySelector('[data-content-preview]');
       if (!contentPreview) return;
       scrollToCursorPosition(contentPreview, cursorPosition, cursorOffset);
@@ -100,6 +103,7 @@ export default function WritePostContentPreview() {
     debounce,
     parsedContent.status,
     scrollToCursorPosition,
+    isScrollSyncPausedRef,
   ]);
 
   useEffect(() => {
