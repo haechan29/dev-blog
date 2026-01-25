@@ -263,6 +263,8 @@ export default function SpeakerPanel({
             : 'border-t border-x',
           !isSpeakerPanelOpen && 'hidden'
         )}
+        onMouseDown={e => e.preventDefault()}
+        onTouchStart={e => e.preventDefault()}
         style={{
           '--toolbar-translate-y': toolbarTranslateY,
         }}
