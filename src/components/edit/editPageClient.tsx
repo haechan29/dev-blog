@@ -4,10 +4,11 @@ import QueryParamsValidator from '@/components/queryParamsValidator';
 import RestoreDraftDialog from '@/components/write/restoreDraftDialog';
 import WritePostForm from '@/components/write/writePostForm';
 import WritePostToolbar from '@/components/write/writePostToolbar';
+import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
 import { writePostSteps } from '@/features/write/constants/writePostStep';
 import useAutoSave from '@/features/write/hooks/useAutoSave';
-import { AppDispatch } from '@/lib/redux/store';
+import { AppDispatch, RootState } from '@/lib/redux/store';
 import {
   setContent,
   setTags,
@@ -16,14 +17,8 @@ import {
 } from '@/lib/redux/write/writePostFormSlice';
 import { setCurrentStepId } from '@/lib/redux/write/writePostSlice';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-
-import ImageDropzone from '@/components/image/ImageDropzone';
-import * as PostClientService from '@/features/post/domain/service/postClientService';
-import { RootState } from '@/lib/redux/store';
-import { useCallback } from 'react';
-import { useSelector } from 'react-redux';
+import { useCallback, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function EditPageClient({
   isLoggedIn,
@@ -76,13 +71,17 @@ export default function EditPageClient({
   }, []);
 
   return (
-    <QueryParamsValidator
-      queryKey='step'
-      isValidValue={value => value !== null && value in writePostSteps}
-      fallbackOption={{ type: 'defaultValue', value: 'write' }}
-    >
-      <RestoreDraftDialog draft={draft} isOpen={isOpen} setIsOpen={setIsOpen} />
-      <ImageDropzone>
+    <div className='w-screen h-dvh flex flex-col'>
+      <QueryParamsValidator
+        queryKey='step'
+        isValidValue={value => value !== null && value in writePostSteps}
+        fallbackOption={{ type: 'defaultValue', value: 'write' }}
+      >
+        <RestoreDraftDialog
+          draft={draft}
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+        />
         <WritePostToolbar
           isLoggedIn={isLoggedIn}
           publishPost={async () => updatePost(post.id)}
@@ -91,7 +90,7 @@ export default function EditPageClient({
         <div className='flex-1 min-h-0'>
           <WritePostForm isLoggedIn={isLoggedIn} />
         </div>
-      </ImageDropzone>
-    </QueryParamsValidator>
+      </QueryParamsValidator>
+    </div>
   );
 }

@@ -29,7 +29,7 @@ const initialState: WritePostForm = {
     value: '',
     isUserInput: false,
     isEmptyAllowed: false,
-    maxLength: 50_000,
+    maxLength: 30_000,
   },
 };
 
