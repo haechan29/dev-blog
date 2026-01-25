@@ -18,8 +18,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://sharetext.app'),
   title: 'ShareText',
   description: '누구나 글을 쓰고 읽을 수 있는 텍스트 콘텐츠 플랫폼',
+  openGraph: {
+    title: 'ShareText',
+    description: '누구나 글을 쓰고 읽을 수 있는 텍스트 콘텐츠 플랫폼',
+    url: 'https://sharetext.app',
+    siteName: 'ShareText',
+    type: 'website',
+  },
 };
 
 export default async function RootLayout({

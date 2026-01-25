@@ -6,6 +6,7 @@ import * as CommentServerService from '@/features/comment/domain/service/comment
 import { PostForbiddenError } from '@/features/post/data/errors/postErrors';
 import * as PostServerService from '@/features/post/domain/service/postServerService';
 import { createProps } from '@/features/post/ui/postProps';
+import { Metadata } from 'next';
 import { cookies } from 'next/headers';
 
 export default async function PostPage({
@@ -44,5 +45,46 @@ export default async function PostPage({
       return <ForbiddenPostPage isLoggedIn={!!session} />;
     }
     throw error;
+  }
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ postId: string }>;
+}): Promise<Metadata> {
+  const { postId } = await params;
+
+  try {
+    const post = await PostServerService.getPost(postId);
+    const postProps = createProps(post);
+
+    const description = postProps.plainText.replace(/\n/g, ' ').slice(0, 160);
+    const url = `https://sharetext.app/read/${postId}`;
+
+    return {
+      title: postProps.title,
+      description,
+      keywords: postProps.tags,
+      authors: [{ name: postProps.authorName }],
+      openGraph: {
+        title: postProps.title,
+        description,
+        url,
+        type: 'article',
+        publishedTime: post.createdAt,
+        authors: [postProps.authorName],
+        tags: postProps.tags,
+      },
+      twitter: {
+        card: 'summary',
+        title: postProps.title,
+        description,
+      },
+    };
+  } catch {
+    return {
+      title: '셰어텍스트',
+    };
   }
 }
