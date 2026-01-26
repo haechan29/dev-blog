@@ -51,10 +51,12 @@ export async function createMedia({
   url,
   sizeBytes,
   userId,
+  type,
 }: {
   url: string;
   sizeBytes: number;
   userId: string;
+  type: 'image' | 'audio';
 }) {
   const { data, error } = await supabase
     .from('media')
@@ -62,6 +64,7 @@ export async function createMedia({
       url,
       size_bytes: sizeBytes,
       user_id: userId,
+      type,
     })
     .select('id')
     .single();

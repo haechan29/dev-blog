@@ -10,7 +10,8 @@ import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { nanoid } from 'nanoid';
 import { NextRequest, NextResponse } from 'next/server';
 
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+const ALLOWED_AUDIO_TYPES = ['audio/mpeg'];
 const LIMIT_PER_MINUTE = 100 * 1024 * 1024; // 100MB
 const DAILY_QUOTA = 1024 * 1024 * 1024; // 1GB
 
@@ -28,9 +29,14 @@ export async function POST(request: NextRequest) {
       throw new ValidationError('파일을 찾을 수 없습니다');
     }
 
-    if (!ALLOWED_TYPES.includes(file.type)) {
+    const isImage = ALLOWED_IMAGE_TYPES.includes(file.type);
+    const isAudio = ALLOWED_AUDIO_TYPES.includes(file.type);
+
+    if (!isImage && !isAudio) {
       throw new ValidationError('허용되지 않는 파일 형식입니다');
     }
+
+    const type = isImage ? 'image' : 'audio';
 
     const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -57,6 +63,7 @@ export async function POST(request: NextRequest) {
       url,
       sizeBytes: file.size,
       userId,
+      type,
     });
 
     const buffer = Buffer.from(await file.arrayBuffer());
