@@ -124,8 +124,17 @@ export function CreatorPageClient({
   const handleSendEmailSuccess = useCallback(() => {
     if (selectedCreatorId) {
       fetchEmails(selectedCreatorId);
+
+      if (selectedCreator?.status === 'pending') {
+        handleStatusChange('sent');
+      }
     }
-  }, [fetchEmails, selectedCreatorId]);
+  }, [
+    fetchEmails,
+    handleStatusChange,
+    selectedCreator?.status,
+    selectedCreatorId,
+  ]);
 
   const syncEmails = useCallback(async () => {
     setIsSyncing(true);
