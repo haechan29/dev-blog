@@ -95,7 +95,9 @@ export function CreatorDetail({
           </CreatorSettingsDropdown>
         </div>
         {creator.memo && (
-          <div className='text-sm text-gray-600'>{creator.memo}</div>
+          <div className='text-sm text-gray-600 whitespace-pre-wrap'>
+            {creator.memo}
+          </div>
         )}
       </section>
 
