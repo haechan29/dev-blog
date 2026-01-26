@@ -1,6 +1,6 @@
 import { auth } from '@/auth';
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
-import * as ImageQueries from '@/features/image/data/queries/imageQueries';
+import * as MediaQueries from '@/features/media/data/queries/mediaQueries';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as PostUsecase from '@/features/post/data/usecases/postUsecase';
 import { extractImageUrls } from '@/features/post/domain/lib/url';
@@ -75,10 +75,10 @@ export async function PATCH(
       }
     }
 
-    await ImageQueries.unlinkImagesFromPost(postId);
+    await MediaQueries.unlinkMediaListFromPost(postId);
 
     const imageUrls = extractImageUrls(content);
-    await ImageQueries.linkImagesToPost(postId, imageUrls);
+    await MediaQueries.linkMediaListToPost(postId, imageUrls);
 
     const updated = await PostQueries.updatePost({
       postId,
@@ -141,11 +141,11 @@ export async function DELETE(
       }
     }
 
-    const images = await ImageQueries.getImagesByPostId(postId);
+    const mediaList = await MediaQueries.getMediaListByPostId(postId);
 
     await Promise.all(
-      images.map(async image => {
-        const key = image.url.split('/').pop();
+      mediaList.map(async media => {
+        const key = media.url.split('/').pop();
         if (key) {
           await r2Client.send(
             new DeleteObjectCommand({

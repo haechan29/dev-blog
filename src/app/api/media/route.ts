@@ -2,8 +2,8 @@ import { ApiError, ValidationError } from '@/errors/errors';
 import {
   DailyQuotaExhaustedError,
   RateLimitError,
-} from '@/features/image/data/errors/imageErrors';
-import * as ImageQueries from '@/features/image/data/queries/imageQueries';
+} from '@/features/media/data/errors/mediaErrors';
+import * as MediaQueries from '@/features/media/data/queries/mediaQueries';
 import { r2Client } from '@/lib/r2';
 import { getUserId } from '@/lib/user';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
@@ -36,8 +36,8 @@ export async function POST(request: NextRequest) {
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
     const [usageLastMinute, usageLastDay] = await Promise.all([
-      ImageQueries.getUsageSince(userId, oneMinuteAgo),
-      ImageQueries.getUsageSince(userId, oneDayAgo),
+      MediaQueries.getUsageSince(userId, oneMinuteAgo),
+      MediaQueries.getUsageSince(userId, oneDayAgo),
     ]);
 
     if (usageLastMinute + file.size > LIMIT_PER_MINUTE) {
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     const key = `${nanoid()}.${ext}`;
     const url = `${process.env.R2_PUBLIC_URL}/${key}`;
 
-    await ImageQueries.createImage({
+    await MediaQueries.createMedia({
       url,
       sizeBytes: file.size,
       userId,
@@ -72,14 +72,14 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ data: { url } });
   } catch (error) {
-    console.error('이미지 업로드에 실패했습니다', error);
+    console.error('파일 업로드에 실패했습니다', error);
 
     if (error instanceof ApiError) {
       return error.toResponse();
     }
 
     return NextResponse.json(
-      { error: '이미지 업로드에 실패했습니다' },
+      { error: '파일 업로드에 실패했습니다' },
       { status: 500 }
     );
   }

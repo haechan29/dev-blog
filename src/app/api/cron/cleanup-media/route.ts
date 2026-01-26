@@ -1,4 +1,4 @@
-import * as ImageQueries from '@/features/image/data/queries/imageQueries';
+import * as MediaQueries from '@/features/media/data/queries/mediaQueries';
 import { r2Client } from '@/lib/r2';
 import { DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { NextRequest, NextResponse } from 'next/server';
@@ -13,11 +13,11 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const images = await ImageQueries.getOrphanImages();
+    const mediaList = await MediaQueries.getOrphanMediaList();
 
     await Promise.all(
-      images.map(async image => {
-        const key = image.url.split('/').pop();
+      mediaList.map(async media => {
+        const key = media.url.split('/').pop();
         if (key) {
           await r2Client.send(
             new DeleteObjectCommand({
@@ -29,15 +29,15 @@ export async function GET(request: NextRequest) {
       })
     );
 
-    const imageIds = images.map(image => image.id);
-    await ImageQueries.deleteImagesByIds(imageIds);
+    const mediaIds = mediaList.map(media => media.id);
+    await MediaQueries.deleteMediaListByIds(mediaIds);
 
-    return NextResponse.json({ deleted: images.length });
+    return NextResponse.json({ deleted: mediaList.length });
   } catch (error) {
-    console.error('이미지 정리에 실패했습니다', error);
+    console.error('파일 정리에 실패했습니다', error);
 
     return NextResponse.json(
-      { error: '이미지 정리에 실패했습니다' },
+      { error: '파일 정리에 실패했습니다' },
       { status: 500 }
     );
   }

@@ -2,7 +2,7 @@
 
 import SpeakerSettingsDialog from '@/components/write/speakerSettingsDialog';
 import { ApiError } from '@/errors/errors';
-import * as ImageClientRepository from '@/features/image/data/repository/imageClientRepository';
+import * as MediaClientRepository from '@/features/media/data/repository/mediaClientRepository';
 import { parseDirectiveRanges } from '@/features/write/domain/lib/contentButton';
 import useContentToolbar from '@/features/write/hooks/useContentToolbar';
 import { colors, getColorIndex } from '@/lib/color';
@@ -89,7 +89,7 @@ export default function SpeakerPanel({
             });
 
       const uploadedUrl =
-        await ImageClientRepository.uploadImage(compressedFile);
+        await MediaClientRepository.uploadMedia(compressedFile);
       URL.revokeObjectURL(blobUrl);
 
       setSpeakers(prev =>

@@ -1,9 +1,9 @@
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
-export async function getImagesByPostId(postId: string) {
+export async function getMediaListByPostId(postId: string) {
   const { data, error } = await supabase
-    .from('images')
+    .from('media')
     .select('id, url')
     .eq('post_id', postId);
 
@@ -19,7 +19,7 @@ export async function getUsageSince(
   since: Date
 ): Promise<number> {
   const { data, error } = await supabase
-    .from('images')
+    .from('media')
     .select('size_bytes')
     .eq('user_id', userId)
     .gte('created_at', since.toISOString());
@@ -31,11 +31,11 @@ export async function getUsageSince(
   return data.reduce((sum, row) => sum + (row.size_bytes || 0), 0);
 }
 
-export async function getOrphanImages() {
+export async function getOrphanMediaList() {
   const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
   const { data, error } = await supabase
-    .from('images')
+    .from('media')
     .select('id, url')
     .is('post_id', null)
     .lt('created_at', oneDayAgo);
@@ -47,7 +47,7 @@ export async function getOrphanImages() {
   return data;
 }
 
-export async function createImage({
+export async function createMedia({
   url,
   sizeBytes,
   userId,
@@ -57,7 +57,7 @@ export async function createImage({
   userId: string;
 }) {
   const { data, error } = await supabase
-    .from('images')
+    .from('media')
     .insert({
       url,
       size_bytes: sizeBytes,
@@ -73,11 +73,11 @@ export async function createImage({
   return data.id;
 }
 
-export async function linkImagesToPost(postId: string, urls: string[]) {
+export async function linkMediaListToPost(postId: string, urls: string[]) {
   if (urls.length === 0) return;
 
   const { error } = await supabase
-    .from('images')
+    .from('media')
     .update({ post_id: postId })
     .in('url', urls);
 
@@ -86,9 +86,9 @@ export async function linkImagesToPost(postId: string, urls: string[]) {
   }
 }
 
-export async function unlinkImagesFromPost(postId: string) {
+export async function unlinkMediaListFromPost(postId: string) {
   const { error } = await supabase
-    .from('images')
+    .from('media')
     .update({ post_id: null })
     .eq('post_id', postId);
 
@@ -97,10 +97,10 @@ export async function unlinkImagesFromPost(postId: string) {
   }
 }
 
-export async function deleteImagesByIds(ids: string[]) {
+export async function deleteMediaListByIds(ids: string[]) {
   if (ids.length === 0) return;
 
-  const { error } = await supabase.from('images').delete().in('id', ids);
+  const { error } = await supabase.from('media').delete().in('id', ids);
 
   if (error) {
     throw new Error(error.message);

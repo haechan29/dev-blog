@@ -1,6 +1,6 @@
 import { ApiError } from '@/errors/errors';
-import { DailyQuotaExhaustedError } from '@/features/image/data/errors/imageErrors';
-import * as ImageClientRepository from '@/features/image/data/repository/imageClientRepository';
+import { DailyQuotaExhaustedError } from '@/features/media/data/errors/mediaErrors';
+import * as MediaClientRepository from '@/features/media/data/repository/mediaClientRepository';
 import { insertMarkdown } from '@/features/write/domain/lib/insertMarkdown';
 import { AppDispatch } from '@/lib/redux/store';
 import { setContent } from '@/lib/redux/write/writePostFormSlice';
@@ -56,7 +56,7 @@ export default function useImageUpload({
                 });
 
           const uploadedUrl =
-            await ImageClientRepository.uploadImage(compressedFile);
+            await MediaClientRepository.uploadMedia(compressedFile);
           URL.revokeObjectURL(blobUrl);
 
           const currentContent = contentEditor.value;

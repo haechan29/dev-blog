@@ -1,7 +1,7 @@
 'use client';
 
 import DailyQuotaExhaustedDialog from '@/components/image/DailyQuotaExhaustedDialog';
-import { DailyQuotaExhaustedError } from '@/features/image/data/errors/imageErrors';
+import { DailyQuotaExhaustedError } from '@/features/media/data/errors/mediaErrors';
 import useImageUpload from '@/features/write/hooks/useImageUpload';
 import { MutableRefObject, ReactNode, useState } from 'react';
 import { useDropzone } from 'react-dropzone';

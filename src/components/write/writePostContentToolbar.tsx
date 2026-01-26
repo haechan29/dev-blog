@@ -2,7 +2,7 @@
 
 import DailyQuotaExhaustedDialog from '@/components/image/DailyQuotaExhaustedDialog';
 import Tooltip from '@/components/tooltip';
-import { DailyQuotaExhaustedError } from '@/features/image/data/errors/imageErrors';
+import { DailyQuotaExhaustedError } from '@/features/media/data/errors/mediaErrors';
 import useContentToolbar from '@/features/write/hooks/useContentToolbar';
 import useImageUpload from '@/features/write/hooks/useImageUpload';
 import useWritePostContentButton from '@/features/write/hooks/useWritePostContentButton';

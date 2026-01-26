@@ -1,6 +1,6 @@
 import { auth } from '@/auth';
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
-import * as ImageQueries from '@/features/image/data/queries/imageQueries';
+import * as MediaQueries from '@/features/media/data/queries/mediaQueries';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as FeedUsecase from '@/features/post/data/usecases/feedUsecase';
 import * as PostUsecase from '@/features/post/data/usecases/postUsecase';
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
 
     await Promise.all([
       PostStatQueries.createPostStat(post.id),
-      ImageQueries.linkImagesToPost(post.id, imageUrls),
+      MediaQueries.linkMediaListToPost(post.id, imageUrls),
     ]);
 
     return NextResponse.json({ data: post });

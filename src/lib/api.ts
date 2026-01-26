@@ -1,5 +1,5 @@
 import { ApiError } from '@/errors/errors';
-import { DailyQuotaExhaustedError } from '@/features/image/data/errors/imageErrors';
+import { DailyQuotaExhaustedError } from '@/features/media/data/errors/mediaErrors';
 import { PostForbiddenError } from '@/features/post/data/errors/postErrors';
 import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
 import { ErrorCode } from '@/types/errorCode';
