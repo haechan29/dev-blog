@@ -45,7 +45,19 @@ export async function sendEmail({
     body,
     replyTo ? { messageId: replyTo.messageId } : undefined
   );
-  await sendGmailMessage(rawEmail, replyTo?.threadId);
+
+  const result = await sendGmailMessage(rawEmail, replyTo?.threadId);
+
+  await OutreachEmailQueries.createOutreachEmail({
+    creatorId,
+    gmailThreadId: result.threadId,
+    gmailMessageId: result.id,
+    messageId: null,
+    direction: 'sent',
+    subject,
+    body,
+    sentAt: new Date().toISOString(),
+  });
 }
 
 export async function syncEmails(): Promise<{ synced: number }> {

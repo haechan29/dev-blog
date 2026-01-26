@@ -104,10 +104,7 @@ export function createRawEmail(
   return Buffer.from(email).toString('base64url');
 }
 
-export async function sendGmailMessage(
-  rawEmail: string,
-  threadId?: string
-): Promise<string> {
+export async function sendGmailMessage(rawEmail: string, threadId?: string) {
   const accessToken = await getValidAccessToken();
 
   const response = await fetch(
@@ -131,7 +128,7 @@ export async function sendGmailMessage(
     throw new Error(result.error.message);
   }
 
-  return result.id;
+  return { id: result.id, threadId: result.threadId };
 }
 
 function extractEmail(str: string): string {
