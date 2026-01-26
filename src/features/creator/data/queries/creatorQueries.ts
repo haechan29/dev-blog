@@ -3,13 +3,13 @@ import { supabase } from '@/lib/supabase';
 import 'server-only';
 
 const SELECT_FIELDS =
-  'id, channel_name, email, memo, status, created_at, last_received_at';
+  'id, channel_name, email, memo, status, created_at, last_mailed_at';
 
 export async function fetchCreators() {
   const { data, error } = await supabase
     .from('creators')
     .select(SELECT_FIELDS)
-    .order('last_received_at', { ascending: false, nullsFirst: false });
+    .order('last_mailed_at', { ascending: false, nullsFirst: false });
 
   if (error) {
     throw new Error(error.message);
@@ -98,10 +98,10 @@ export async function updateCreator({
   return data as CreatorEntity;
 }
 
-export async function updateLastReceivedAt(id: string, timestamp: string) {
+export async function updateLastMailedAt(id: string, timestamp: string) {
   const { error } = await supabase
     .from('creators')
-    .update({ last_received_at: timestamp })
+    .update({ last_mailed_at: timestamp })
     .eq('id', id);
 
   if (error) {

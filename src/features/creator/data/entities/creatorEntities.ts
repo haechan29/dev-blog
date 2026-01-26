@@ -7,5 +7,5 @@ export interface CreatorEntity {
   memo: string | null;
   status: CreatorStatus;
   created_at: string;
-  last_received_at: string | null;
+  last_mailed_at: string | null;
 }

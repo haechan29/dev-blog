@@ -9,6 +9,5 @@ export function toDomain(entity: CreatorEntity): Creator {
     memo: entity.memo,
     status: entity.status,
     createdAt: entity.created_at,
-    lastReceivedAt: entity.last_received_at,
   };
 }

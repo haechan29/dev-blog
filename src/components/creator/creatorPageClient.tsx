@@ -249,9 +249,6 @@ export function CreatorPageClient({
       {deleteTargetId && (
         <DeleteCreatorDialog
           creatorId={deleteTargetId}
-          creatorName={
-            creators.find(c => c.id === deleteTargetId)?.channelName ?? ''
-          }
           isOpen={isDeleteDialogOpen}
           setIsOpen={setIsDeleteDialogOpen}
           onSuccess={handleDeleteSuccess}

@@ -14,13 +14,11 @@ import toast from 'react-hot-toast';
 
 export function DeleteCreatorDialog({
   creatorId,
-  creatorName,
   isOpen,
   setIsOpen,
   onSuccess,
 }: {
   creatorId: string;
-  creatorName: string;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   onSuccess: () => void;

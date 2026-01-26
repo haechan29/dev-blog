@@ -22,5 +22,4 @@ export interface Creator {
   memo: string | null;
   status: 'pending' | 'sent' | 'accepted' | 'rejected';
   createdAt: string;
-  lastReceivedAt: string | null;
 }
