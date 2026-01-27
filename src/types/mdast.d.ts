@@ -20,8 +20,8 @@ declare module 'mdast' {
     data: {
       hName: 'bgm';
       hProperties: {
-        'data-youtube-url': string;
-        'data-start-time': string;
+        src: string;
+        'data-status'?: 'loading' | 'failed';
       };
     };
   }

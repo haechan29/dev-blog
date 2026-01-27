@@ -199,8 +199,10 @@ export function remarkBgm() {
       if (index === undefined || !parent) return;
       if (!isDirectiveNode(node) || node.name !== 'bgm') return;
 
-      const { youtubeUrl, startTime } = node.attributes || {};
-      if (!youtubeUrl) return;
+      const { src, status } = node.attributes || {};
+
+      const validStatus =
+        status === 'loading' || status === 'failed' ? status : undefined;
 
       const newNode: BgmNode = {
         ...node,
@@ -208,8 +210,8 @@ export function remarkBgm() {
         data: {
           hName: 'bgm',
           hProperties: {
-            'data-youtube-url': youtubeUrl,
-            'data-start-time': startTime ?? '0',
+            src: src ?? '',
+            ...(validStatus && { 'data-status': validStatus }),
           },
         },
       };

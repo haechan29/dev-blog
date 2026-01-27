@@ -21,7 +21,7 @@ export const schema: Options = {
       ['data-status', 'loading', 'failed', 'success'],
       'data-caption',
     ],
-    bgm: ['data-youtube-url', 'data-start-time'],
+    bgm: ['src', ['data-status', 'loading', 'failed']],
     dialogue: ['data-speaker', 'data-avatar'],
   },
   protocols: {

@@ -1,7 +1,6 @@
 'use client';
 
-import { BgmInner, VIEWER_BGM_CONTAINER_ID } from '@/components/md/bgm';
-import { Bgm } from '@/features/post/domain/types/bgm';
+import { BgmButton, VIEWER_BGM_CONTAINER_ID } from '@/components/md/bgm';
 import { PageBuilder } from '@/features/postViewer/domain/model/pageBuilder';
 import useDebounce from '@/hooks/useDebounce';
 import { processMd } from '@/lib/md/md';
@@ -17,7 +16,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 interface ContainerProps {
   result: JSX.Element;
-  bgm: Bgm | null;
+  bgm: string | null;
   caption?: string;
 }
 
@@ -131,10 +130,9 @@ export default function PostViewerContainer({
           className='absolute top-0 right-0'
           onClick={e => e.stopPropagation()}
         >
-          <BgmInner
-            {...container.bgm}
+          <BgmButton
+            src={container.bgm}
             containerId={VIEWER_BGM_CONTAINER_ID}
-            mode='viewer'
           />
         </div>
       )}

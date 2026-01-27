@@ -1,6 +1,4 @@
-import { parseYouTubeUrl } from '@/features/post/domain/lib/bgm';
 import Heading from '@/features/post/domain/model/heading';
-import { Bgm } from '@/features/post/domain/types/bgm';
 import { Page } from '@/features/postViewer/domain/types/page';
 
 interface OffsetRange {
@@ -14,7 +12,7 @@ export class PageBuilder {
   private isPageEmpty = true;
   private baseTop: number | null = null;
   private pendingHeading: Heading | null = null;
-  private pendingBgm: Bgm | null = null;
+  private pendingBgm: string | null = null;
 
   constructor(private containerHeight: number) {}
 
@@ -57,11 +55,10 @@ export class PageBuilder {
   private handleBgm(element: HTMLElement) {
     this.flushCurrentPage();
 
-    const youtubeUrl = element.dataset.youtubeUrl;
-    if (!youtubeUrl) return;
+    const src = element.dataset.src;
+    if (!src) return;
 
-    const startTime = element.dataset.startTime ?? null;
-    this.pendingBgm = parseYouTubeUrl(youtubeUrl, startTime);
+    this.pendingBgm = src;
   }
 
   private handleImageWithCaption(element: HTMLElement) {

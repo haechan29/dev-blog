@@ -43,7 +43,6 @@ const toolbarLayout = {
   table: ['addRow', 'addColumn'],
   code: ['codeLanguage'],
   image: ['imageLarge', 'imageSmall', 'imageCaption', 'imageSubtitle'],
-  bgm: ['bgmStartTime'],
 };
 
 export default function WritePostContentToolbar({
@@ -57,8 +56,12 @@ export default function WritePostContentToolbar({
 }) {
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const audioInputRef = useRef<HTMLInputElement | null>(null);
-  const { uploadAndInsert: uploadImage } = useImageUpload({ isScrollSyncPausedRef });
-  const { uploadAndInsert: uploadAudio } = useBgmUpload({ isScrollSyncPausedRef });
+  const { uploadAndInsert: uploadImage } = useImageUpload({
+    isScrollSyncPausedRef,
+  });
+  const { uploadAndInsert: uploadAudio } = useBgmUpload({
+    isScrollSyncPausedRef,
+  });
   const [isQuotaDialogOpen, setIsQuotaDialogOpen] = useState(false);
 
   const { activeCategory, onAction } = useWritePostContentButton({

@@ -15,7 +15,6 @@ import {
   Quote,
   Rows,
   Shrink,
-  Timer,
   Underline,
   Users,
 } from 'lucide-react';
@@ -74,7 +73,7 @@ export interface CodeButtonProps {
 export interface DirectiveButtonProps {
   id: string;
   action: 'directive';
-  category: 'image' | 'bgm';
+  category: 'image';
   label: string;
   content: ButtonContent;
   position: 'attribute' | 'content';
@@ -348,16 +347,6 @@ export const buttonProps: Record<string, WritePostContentButtonProps> = {
     label: 'BGM',
     content: { type: 'icon', icon: Music, style: 'w-4 h-4' },
     type: 'audio',
-  },
-  bgmStartTime: {
-    id: 'bgmStartTime',
-    action: 'directive',
-    category: 'bgm',
-    label: '시작시간 설정',
-    content: { type: 'icon', icon: Timer, style: 'w-5 h-5' },
-    position: 'attribute',
-    key: 'startTime',
-    value: '5',
   },
   codeLanguage: {
     id: 'codeLanguage',
