@@ -4,13 +4,14 @@ import { BgmButton, VIEWER_BGM_CONTAINER_ID } from '@/components/md/bgm';
 import { PageBuilder } from '@/features/postViewer/domain/model/pageBuilder';
 import useDebounce from '@/hooks/useDebounce';
 import { processMd } from '@/lib/md/md';
+import { setRequestedBgm } from '@/lib/redux/bgmControllerSlice';
 import {
   setCurrentPageIndex,
   setPages,
 } from '@/lib/redux/post/postViewerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import clsx from 'clsx';
-import { JSX, useEffect, useMemo, useState } from 'react';
+import { JSX, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -30,6 +31,12 @@ export default function PostViewerContainer({
   const dispatch = useDispatch<AppDispatch>();
   const debounce = useDebounce();
 
+  const isPlaying = useSelector(
+    (state: RootState) => state.bgmController.isPlaying
+  );
+  const isViewerMode = useSelector(
+    (state: RootState) => state.postViewer.isViewerMode
+  );
   const pages = useSelector((state: RootState) => state.postViewer.pages);
   const currentPageIndex = useSelector(
     (state: RootState) => state.postViewer.currentPageIndex
@@ -41,6 +48,9 @@ export default function PostViewerContainer({
   const [result, setResult] = useState<JSX.Element | null>(null);
   const [container, setContainer] = useState<ContainerProps>();
   const [isMounted, setIsMounted] = useState(false);
+
+  const prevBgmRef = useRef<string | null>(null);
+  const prevIsViewerModeRef = useRef(false);
 
   useEffect(() => {
     const viewerMeasure = document.querySelector('[data-viewer-measurement]');
@@ -98,6 +108,23 @@ export default function PostViewerContainer({
     setIsMounted(true);
   }, []);
 
+  useEffect(() => {
+    const isFirstEntry = !prevIsViewerModeRef.current && isViewerMode;
+    prevIsViewerModeRef.current = isViewerMode;
+
+    if (!isViewerMode || isFirstEntry) return;
+
+    if (isPlaying && page?.bgm && page.bgm !== prevBgmRef.current) {
+      dispatch(
+        setRequestedBgm({
+          src: page.bgm,
+          containerId: `${VIEWER_BGM_CONTAINER_ID}-${page.bgm}`,
+        })
+      );
+    }
+    prevBgmRef.current = page?.bgm ?? null;
+  }, [dispatch, isPlaying, isViewerMode, page?.bgm]);
+
   return (
     <div className='w-full h-full relative'>
       <div
@@ -132,7 +159,7 @@ export default function PostViewerContainer({
         >
           <BgmButton
             src={container.bgm}
-            containerId={VIEWER_BGM_CONTAINER_ID}
+            containerId={`${VIEWER_BGM_CONTAINER_ID}-${container.bgm}`}
           />
         </div>
       )}

@@ -26,7 +26,7 @@ export function Bgm({
 }) {
   const containerId = useMemo(() => {
     return mode === 'viewer'
-      ? VIEWER_BGM_CONTAINER_ID
+      ? `${VIEWER_BGM_CONTAINER_ID}-${src}`
       : `${startOffset}-${src}`;
   }, [mode, startOffset, src]);
 
