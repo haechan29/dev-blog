@@ -31,12 +31,8 @@ export async function PATCH(request: NextRequest) {
       throw new ValidationError('닉네임을 찾을 수 없습니다');
     }
 
-    if (nickname.length < 2 || nickname.length > 20) {
-      throw new ValidationError('닉네임은 2-20자여야 합니다');
-    }
-
-    if (!/^[가-힣a-zA-Z0-9]+$/.test(nickname)) {
-      throw new ValidationError('한글, 영문, 숫자만 사용 가능합니다');
+    if (nickname.length < 1 || nickname.length > 50) {
+      throw new ValidationError('닉네임은 1-50자여야 합니다');
     }
 
     await UserQueries.updateUser(nickname);

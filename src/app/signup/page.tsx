@@ -10,10 +10,9 @@ import Link from 'next/link';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 
-type NicknameError = 'length' | 'format' | 'duplicate' | null;
+type NicknameError = 'length' | 'duplicate' | null;
 const nicknameErrorMessages = {
-  length: '닉네임은 2-20자여야 합니다',
-  format: '한글, 영문, 숫자만 사용 가능합니다',
+  length: '닉네임은 1-50자여야 합니다',
   duplicate: '이미 사용 중인 닉네임입니다',
 } as const;
 
@@ -28,15 +27,8 @@ export default function SignupPage() {
   const [privacyAgreed, setPrivacyAgreed] = useState(false);
 
   const handleSubmit = () => {
-    if (nickname.trim().length < 2 || nickname.trim().length > 20) {
+    if (nickname.trim().length < 1 || nickname.trim().length > 50) {
       setNicknameError('length');
-      setIsTermsValid(true);
-      setIsPrivacyValid(true);
-      return;
-    }
-
-    if (!/^[가-힣a-zA-Z0-9]+$/.test(nickname.trim())) {
-      setNicknameError('format');
       setIsTermsValid(true);
       setIsPrivacyValid(true);
       return;
@@ -102,7 +94,7 @@ export default function SignupPage() {
                 : 'border-gray-200 hover:border-blue-500 focus:border-blue-500',
               nickname ? 'bg-white' : 'bg-gray-50'
             )}
-            maxLength={20}
+            maxLength={50}
           />
           {nicknameError ? (
             <div className='text-sm text-red-500 mt-1'>
@@ -110,7 +102,7 @@ export default function SignupPage() {
             </div>
           ) : (
             <div className='text-sm text-gray-500 mt-1'>
-              2-20자, 한글/영문/숫자 사용 가능
+              1-50자
             </div>
           )}
         </div>
