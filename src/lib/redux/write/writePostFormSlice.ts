@@ -82,6 +82,7 @@ const writePostFormSlice = createSlice({
       state.content.value = value;
       state.content.isUserInput = isUserInput;
     },
+    resetWritePostForm: () => ({ ...initialState }),
   },
 });
 
@@ -94,4 +95,5 @@ export const {
   setTags,
   setPassword,
   setContent,
+  resetWritePostForm,
 } = writePostFormSlice.actions;

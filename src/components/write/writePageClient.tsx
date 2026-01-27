@@ -9,6 +9,7 @@ import { createProps } from '@/features/post/ui/postProps';
 import { writePostSteps } from '@/features/write/constants/writePostStep';
 import useAutoSave from '@/features/write/hooks/useAutoSave';
 import { AppDispatch, RootState } from '@/lib/redux/store';
+import { resetWritePostForm } from '@/lib/redux/write/writePostFormSlice';
 import { setCurrentStepId } from '@/lib/redux/write/writePostSlice';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -47,6 +48,12 @@ export default function WritePageClient({
       setIsOpen(true);
     }
   }, [draft, step]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetWritePostForm());
+    };
+  }, [dispatch]);
 
   return (
     <div className='w-screen h-dvh flex flex-col'>
