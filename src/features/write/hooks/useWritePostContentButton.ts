@@ -26,10 +26,12 @@ import { useDispatch } from 'react-redux';
 const CURSOR_MARKER = '__NEW_CURSOR_POSITION__';
 
 export default function useWritePostContentButton({
-  onUpload,
+  onImageUpload,
+  onAudioUpload,
   onToggleSpeakerPanel,
 }: {
-  onUpload: () => void;
+  onImageUpload: () => void;
+  onAudioUpload: () => void;
   onToggleSpeakerPanel: () => void;
 }) {
   const {
@@ -241,7 +243,11 @@ export default function useWritePostContentButton({
     (contentButtonProps: WritePostContentButtonProps) => {
       const { action } = contentButtonProps;
       if (action === 'upload') {
-        onUpload();
+        if (contentButtonProps.type === 'image') {
+          onImageUpload();
+        } else if (contentButtonProps.type === 'audio') {
+          onAudioUpload();
+        }
       } else if (action === 'markdown') {
         handleMarkdownAction(contentButtonProps);
       } else if (action === 'directive') {
@@ -260,7 +266,8 @@ export default function useWritePostContentButton({
       handleMarkdownAction,
       handleTableAction,
       onToggleSpeakerPanel,
-      onUpload,
+      onImageUpload,
+      onAudioUpload,
     ]
   );
 

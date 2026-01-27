@@ -2,7 +2,7 @@
 
 import DailyQuotaExhaustedDialog from '@/components/image/DailyQuotaExhaustedDialog';
 import { DailyQuotaExhaustedError } from '@/features/media/data/errors/mediaErrors';
-import useImageUpload from '@/features/write/hooks/useImageUpload';
+import useImageUpload from '@/features/media/hooks/useImageUpload';
 import { MutableRefObject, ReactNode, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import toast from 'react-hot-toast';

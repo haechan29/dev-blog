@@ -3,8 +3,9 @@
 import DailyQuotaExhaustedDialog from '@/components/image/DailyQuotaExhaustedDialog';
 import Tooltip from '@/components/tooltip';
 import { DailyQuotaExhaustedError } from '@/features/media/data/errors/mediaErrors';
+import useBgmUpload from '@/features/media/hooks/useBgmUpload';
+import useImageUpload from '@/features/media/hooks/useImageUpload';
 import useContentToolbar from '@/features/write/hooks/useContentToolbar';
-import useImageUpload from '@/features/write/hooks/useImageUpload';
 import useWritePostContentButton from '@/features/write/hooks/useWritePostContentButton';
 import {
   ButtonContent,
@@ -54,12 +55,15 @@ export default function WritePostContentToolbar({
   setIsSpeakerPanelOpen: (open: boolean) => void;
   isScrollSyncPausedRef: MutableRefObject<boolean>;
 }) {
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const { uploadAndInsert } = useImageUpload({ isScrollSyncPausedRef });
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
+  const audioInputRef = useRef<HTMLInputElement | null>(null);
+  const { uploadAndInsert: uploadImage } = useImageUpload({ isScrollSyncPausedRef });
+  const { uploadAndInsert: uploadAudio } = useBgmUpload({ isScrollSyncPausedRef });
   const [isQuotaDialogOpen, setIsQuotaDialogOpen] = useState(false);
 
   const { activeCategory, onAction } = useWritePostContentButton({
-    onUpload: () => fileInputRef.current?.click(),
+    onImageUpload: () => imageInputRef.current?.click(),
+    onAudioUpload: () => audioInputRef.current?.click(),
     onToggleSpeakerPanel: () => setIsSpeakerPanelOpen(!isSpeakerPanelOpen),
   });
   const {
@@ -69,7 +73,7 @@ export default function WritePostContentToolbar({
   return (
     <>
       <input
-        ref={fileInputRef}
+        ref={imageInputRef}
         type='file'
         accept='image/*'
         multiple
@@ -79,7 +83,27 @@ export default function WritePostContentToolbar({
           if (files.length === 0) return;
 
           try {
-            await uploadAndInsert(files);
+            await uploadImage(files);
+          } catch (error) {
+            if (error instanceof DailyQuotaExhaustedError) {
+              setIsQuotaDialogOpen(true);
+            }
+          }
+          e.target.value = '';
+        }}
+      />
+
+      <input
+        ref={audioInputRef}
+        type='file'
+        accept='audio/mpeg'
+        hidden
+        onChange={async e => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+
+          try {
+            await uploadAudio(file);
           } catch (error) {
             if (error instanceof DailyQuotaExhaustedError) {
               setIsQuotaDialogOpen(true);

@@ -88,6 +88,7 @@ export interface UploadButtonProps {
   category: 'default';
   label: string;
   content: ButtonContent;
+  type: 'image' | 'audio';
 }
 
 export interface ToggleButtonProps {
@@ -300,6 +301,7 @@ export const buttonProps: Record<string, WritePostContentButtonProps> = {
     category: 'default',
     label: '이미지',
     content: { type: 'icon', icon: ImageIcon, style: 'w-4 h-4' },
+    type: 'image',
   },
   imageLarge: {
     id: 'imageLarge',
@@ -341,13 +343,11 @@ export const buttonProps: Record<string, WritePostContentButtonProps> = {
   },
   bgm: {
     id: 'bgm',
-    action: 'markdown',
+    action: 'upload',
     category: 'default',
     label: 'BGM',
     content: { type: 'icon', icon: Music, style: 'w-4 h-4' },
-    isBlock: true,
-    markdownBefore: '::bgm{youtubeUrl="',
-    markdownAfter: '"}\n',
+    type: 'audio',
   },
   bgmStartTime: {
     id: 'bgmStartTime',

@@ -27,9 +27,9 @@ export default function useImageUpload({
       ) as HTMLTextAreaElement;
       if (!contentEditor) return;
 
-      let cursorPosition = contentEditor.selectionStart;
-
       if (isScrollSyncPausedRef) isScrollSyncPausedRef.current = true;
+
+      let cursorPosition = contentEditor.selectionStart;
 
       for (const file of files) {
         const blobUrl = URL.createObjectURL(file);
