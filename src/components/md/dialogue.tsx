@@ -1,7 +1,13 @@
+'use client';
+
 import { colors, getColorIndex, ringColors, textColors } from '@/lib/color';
 import clsx from 'clsx';
 import Image from 'next/image';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
+
+function isValidImageSrc(src: string) {
+  return src.startsWith('/') || src.startsWith('http');
+}
 
 export default function Dialogue({
   'data-speaker': speaker,
@@ -16,8 +22,14 @@ export default function Dialogue({
   'data-end-offset': number;
   children?: ReactNode;
 }) {
+  const [isError, setIsError] = useState(false);
   const initial = speaker.charAt(0).toUpperCase();
   const color = colors[getColorIndex(speaker)];
+  const showImage = avatar && isValidImageSrc(avatar) && !isError;
+
+  useEffect(() => {
+    setIsError(false);
+  }, [avatar]);
 
   return (
     <div
@@ -25,12 +37,13 @@ export default function Dialogue({
       data-end-offset={endOffset}
       className='my-4 flex gap-3'
     >
-      {avatar ? (
+      {showImage ? (
         <Image
           src={avatar}
           alt={speaker}
           width={32}
           height={32}
+          onError={() => setIsError(true)}
           className={clsx(
             'w-8 h-8 rounded-full object-cover shrink-0 ring-2',
             ringColors[getColorIndex(speaker)]
