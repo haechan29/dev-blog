@@ -5,7 +5,10 @@ import { setCurrentHeading } from '@/lib/redux/post/postReaderSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { scrollIntoElement } from '@/lib/scroll';
 import clsx from 'clsx';
+import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+
+const MAX_ITEMS = 12;
 
 export default function TableOfContentsItem({
   headings,
@@ -16,7 +19,20 @@ export default function TableOfContentsItem({
   const { currentHeading } = useSelector(
     (state: RootState) => state.postReader
   );
-  const minLevel = Math.min(...headings.map(h => h.level));
+  const minLevel = useMemo(
+    () => Math.min(...headings.map(h => h.level)),
+    [headings]
+  );
+
+  const filteredHeadings = useMemo(() => {
+    let maxLevel = Math.max(...headings.map(h => h.level));
+    let filtered = headings;
+    while (filtered.length > MAX_ITEMS && maxLevel > minLevel) {
+      filtered = headings.filter(h => h.level < maxLevel);
+      maxLevel--;
+    }
+    return filtered;
+  }, [headings, minLevel]);
 
   const handleClick = (heading: Heading) => {
     const postContent = document.querySelector('[data-post-content]');
@@ -41,7 +57,7 @@ export default function TableOfContentsItem({
       )}
     >
       <ul className='space-y-2'>
-        {headings.map(heading => (
+        {filteredHeadings.map(heading => (
           <li key={heading.id}>
             <button
               onClick={() => handleClick(heading)}
