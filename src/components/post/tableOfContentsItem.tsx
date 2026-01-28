@@ -16,6 +16,7 @@ export default function TableOfContentsItem({
   const { currentHeading } = useSelector(
     (state: RootState) => state.postReader
   );
+  const minLevel = Math.min(...headings.map(h => h.level));
 
   const handleClick = (heading: Heading) => {
     const postContent = document.querySelector('[data-post-content]');
@@ -44,12 +45,12 @@ export default function TableOfContentsItem({
           <li key={heading.id}>
             <button
               onClick={() => handleClick(heading)}
+              style={{ '--indent': `${(heading.level - minLevel) * 0.5}rem` }}
               className={clsx(
-                'w-full text-left text-sm hover:text-blue-500 truncate text-gray-900',
+                'w-full text-left text-sm hover:text-blue-500 truncate text-gray-900 pl-(--indent)',
                 currentHeading?.id === heading.id
                   ? 'xl:text-blue-500'
-                  : 'xl:text-gray-500',
-                heading.level == 1 ? '' : heading.level == 2 ? 'pl-2' : 'pl-4'
+                  : 'xl:text-gray-500'
               )}
             >
               {heading.text}
