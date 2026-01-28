@@ -256,9 +256,9 @@ export default function SpeakerPanel({
         }}
       />
 
-      <SimpleBar
+      <div
         className={clsx(
-          'simplebar-hover border-gray-200',
+          'border-gray-200',
           shouldAttachToolbarToBottom
             ? 'fixed inset-x-0 z-50 w-screen top-full bg-white/80 backdrop-blur-md translate-y-(--toolbar-translate-y)'
             : 'border-t border-x',
@@ -270,105 +270,107 @@ export default function SpeakerPanel({
           '--toolbar-translate-y': toolbarTranslateY,
         }}
       >
-        <div className='flex items-center px-3 py-1.5 gap-2'>
-          {shouldAttachToolbarToBottom && (
-            <button
-              onMouseDown={e => e.preventDefault()}
-              onTouchStart={e => e.preventDefault()}
-              onClick={() => setIsSpeakerPanelOpen(false)}
-              className='p-2 -m-2 flex items-center justify-center rounded-full shrink-0'
-            >
-              <ChevronLeft className='w-5 h-5 text-gray-400' />
-            </button>
-          )}
-
-          {speakers.map((speaker, speakerIndex) => (
-            <div
-              key={speakerIndex}
-              className='flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-full shrink-0'
-            >
+        <SimpleBar className='simplebar-hover'>
+          <div className='flex items-center px-3 py-1.5 gap-2'>
+            {shouldAttachToolbarToBottom && (
               <button
-                onClick={() => {
-                  setEditingSpeakerIndex(speakerIndex);
-                  setIsDialogOpen(true);
-                }}
-                className='text-sm hover:text-blue-600 hover:cursor-pointer'
+                onMouseDown={e => e.preventDefault()}
+                onTouchStart={e => e.preventDefault()}
+                onClick={() => setIsSpeakerPanelOpen(false)}
+                className='p-2 -m-2 flex items-center justify-center rounded-full shrink-0'
               >
-                {speaker.name}
+                <ChevronLeft className='w-5 h-5 text-gray-400' />
               </button>
-
-              <div className='flex gap-1'>
-                {speaker.avatars.length > 0 ? (
-                  speaker.avatars.map((avatar, avatarIndex) => (
-                    <button
-                      key={avatarIndex}
-                      onClick={() =>
-                        avatar.status === 'done' &&
-                        handleDialogue(speaker.name, avatar.url)
-                      }
-                      disabled={avatar.status === 'loading'}
-                      className='w-7 h-7 relative rounded-full overflow-hidden bg-gray-100 border-2 border-transparent hover:border-blue-500 disabled:hover:border-transparent'
-                    >
-                      <Image
-                        src={avatar.url}
-                        alt=''
-                        width={28}
-                        height={28}
-                        className='w-full h-full object-cover'
-                      />
-
-                      {avatar.status === 'loading' && (
-                        <div className='absolute inset-0 flex items-center justify-center bg-black/30'>
-                          <Loader2
-                            size={18}
-                            strokeWidth={2}
-                            className='animate-spin text-white'
-                          />
-                        </div>
-                      )}
-                    </button>
-                  ))
-                ) : (
-                  <button
-                    onClick={() => handleDialogue(speaker.name)}
-                    className={clsx(
-                      'w-7 h-7 rounded-full flex items-center justify-center text-xs text-white font-medium border-2 border-transparent hover:border-blue-500',
-                      colors[getColorIndex(speaker.name)]
-                    )}
-                  >
-                    {speaker.name.charAt(0).toUpperCase()}
-                  </button>
-                )}
-              </div>
-
-              <button
-                onClick={() => {
-                  uploadTargetIndexRef.current = speakerIndex;
-                  fileInputRef.current?.click();
-                }}
-                className='w-7 h-7 rounded-full border border-dashed border-gray-400 flex items-center justify-center text-gray-400 hover:border-gray-600 hover:text-gray-600'
-              >
-                <Plus className='w-3 h-3' />
-              </button>
-            </div>
-          ))}
-
-          <button
-            onClick={() => {
-              setEditingSpeakerIndex(null);
-              setIsDialogOpen(true);
-            }}
-            className={clsx(
-              'w-7 h-7 flex items-center justify-center rounded-full shrink-0',
-              'border border-dashed border-gray-400 text-gray-400 hover:border-gray-600 hover:text-gray-600'
             )}
-          >
-            <Plus className='w-3 h-3' />
-          </button>
 
-          <div className='shrink-0 w-px h-px' />
-        </div>
-      </SimpleBar>
+            {speakers.map((speaker, speakerIndex) => (
+              <div
+                key={speakerIndex}
+                className='flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-full shrink-0'
+              >
+                <button
+                  onClick={() => {
+                    setEditingSpeakerIndex(speakerIndex);
+                    setIsDialogOpen(true);
+                  }}
+                  className='text-sm hover:text-blue-600 hover:cursor-pointer'
+                >
+                  {speaker.name}
+                </button>
+
+                <div className='flex gap-1'>
+                  {speaker.avatars.length > 0 ? (
+                    speaker.avatars.map((avatar, avatarIndex) => (
+                      <button
+                        key={avatarIndex}
+                        onClick={() =>
+                          avatar.status === 'done' &&
+                          handleDialogue(speaker.name, avatar.url)
+                        }
+                        disabled={avatar.status === 'loading'}
+                        className='w-7 h-7 relative rounded-full overflow-hidden bg-gray-100 border-2 border-transparent hover:border-blue-500 disabled:hover:border-transparent'
+                      >
+                        <Image
+                          src={avatar.url}
+                          alt=''
+                          width={28}
+                          height={28}
+                          className='w-full h-full object-cover'
+                        />
+
+                        {avatar.status === 'loading' && (
+                          <div className='absolute inset-0 flex items-center justify-center bg-black/30'>
+                            <Loader2
+                              size={18}
+                              strokeWidth={2}
+                              className='animate-spin text-white'
+                            />
+                          </div>
+                        )}
+                      </button>
+                    ))
+                  ) : (
+                    <button
+                      onClick={() => handleDialogue(speaker.name)}
+                      className={clsx(
+                        'w-7 h-7 rounded-full flex items-center justify-center text-xs text-white font-medium border-2 border-transparent hover:border-blue-500',
+                        colors[getColorIndex(speaker.name)]
+                      )}
+                    >
+                      {speaker.name.charAt(0).toUpperCase()}
+                    </button>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => {
+                    uploadTargetIndexRef.current = speakerIndex;
+                    fileInputRef.current?.click();
+                  }}
+                  className='w-7 h-7 rounded-full border border-dashed border-gray-400 flex items-center justify-center text-gray-400 hover:border-gray-600 hover:text-gray-600'
+                >
+                  <Plus className='w-3 h-3' />
+                </button>
+              </div>
+            ))}
+
+            <button
+              onClick={() => {
+                setEditingSpeakerIndex(null);
+                setIsDialogOpen(true);
+              }}
+              className={clsx(
+                'w-7 h-7 flex items-center justify-center rounded-full shrink-0',
+                'border border-dashed border-gray-400 text-gray-400 hover:border-gray-600 hover:text-gray-600'
+              )}
+            >
+              <Plus className='w-3 h-3' />
+            </button>
+
+            <div className='shrink-0 w-px h-px' />
+          </div>
+        </SimpleBar>
+      </div>
 
       <SpeakerSettingsDialog
         isOpen={isDialogOpen}
