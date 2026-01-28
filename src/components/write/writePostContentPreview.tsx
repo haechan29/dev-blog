@@ -125,7 +125,10 @@ export default function WritePostContentPreview({
         className='prose flex-1 min-h-0 border-gray-200 border max-lg:rounded-lg lg:rounded-b-lg overflow-y-auto p-4'
       >
         {parsedContent.status === 'success' ? (
-          <ErrorBoundary fallback={<div>에러가 발생했습니다</div>}>
+          <ErrorBoundary
+            fallback={<div>에러가 발생했습니다</div>}
+            resetKeys={[parsedContent.value]}
+          >
             {parsedContent.value}
           </ErrorBoundary>
         ) : (
