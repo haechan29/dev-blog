@@ -4,6 +4,7 @@ import useContentToolbar from '@/features/write/hooks/useContentToolbar';
 import useUndoHistory from '@/features/write/hooks/useUndoHistory';
 import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import useScrollLock from '@/hooks/useScrollLock';
+import { getCaretOffsetTop, scrollToCaretIfNeeded } from '@/lib/offset';
 import { AppDispatch } from '@/lib/redux/store';
 import {
   setContent,
@@ -69,6 +70,7 @@ export default function WritePostContentEditor() {
         setTimeout(() => {
           textarea.focus();
           textarea.setSelectionRange(prev.selectionStart, prev.selectionEnd);
+          scrollToCaretIfNeeded(textarea);
         }, 0);
         return;
       }
@@ -83,6 +85,7 @@ export default function WritePostContentEditor() {
         setTimeout(() => {
           textarea.focus();
           textarea.setSelectionRange(next.selectionStart, next.selectionEnd);
+          scrollToCaretIfNeeded(textarea);
         }, 0);
         return;
       }
@@ -109,6 +112,7 @@ export default function WritePostContentEditor() {
           selectionStart + shortcut.before.length,
           selectionEnd + shortcut.before.length
         );
+        scrollToCaretIfNeeded(textarea);
       }, 0);
     },
     [pushHistory, redo, undo]
@@ -220,51 +224,4 @@ export default function WritePostContentEditor() {
       </div>
     </div>
   );
-}
-
-function getCaretOffsetTop(textarea: HTMLTextAreaElement): number {
-  const mirror = document.createElement('div');
-  const style = getComputedStyle(textarea);
-
-  const properties = [
-    'fontFamily',
-    'fontSize',
-    'fontWeight',
-    'lineHeight',
-    'paddingTop',
-    'paddingRight',
-    'paddingBottom',
-    'paddingLeft',
-    'borderTopWidth',
-    'borderRightWidth',
-    'borderBottomWidth',
-    'borderLeftWidth',
-    'width',
-    'overflowWrap',
-    'wordWrap',
-    'wordBreak',
-    'boxSizing',
-  ] as const;
-
-  properties.forEach(prop => {
-    mirror.style[prop] = style[prop];
-  });
-
-  mirror.style.position = 'absolute';
-  mirror.style.visibility = 'hidden';
-  mirror.style.whiteSpace = 'pre-wrap';
-
-  mirror.textContent = textarea.value.substring(0, textarea.selectionStart);
-
-  const marker = document.createElement('span');
-  marker.textContent = '\u200b'; // zero-width space
-  mirror.appendChild(marker);
-
-  document.body.appendChild(mirror);
-
-  const caretTop = marker.offsetTop;
-
-  document.body.removeChild(mirror);
-
-  return caretTop;
 }

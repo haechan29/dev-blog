@@ -6,6 +6,7 @@ import * as MediaClientRepository from '@/features/media/data/repository/mediaCl
 import { parseDirectiveRanges } from '@/features/write/domain/lib/contentButton';
 import useContentToolbar from '@/features/write/hooks/useContentToolbar';
 import { colors, getColorIndex } from '@/lib/color';
+import { scrollToCaretIfNeeded } from '@/lib/offset';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { setContent } from '@/lib/redux/write/writePostFormSlice';
 import imageCompression from 'browser-image-compression';
@@ -160,6 +161,7 @@ export default function SpeakerPanel({
         setTimeout(() => {
           contentEditor.focus();
           contentEditor.setSelectionRange(selectionStart, selectionStart);
+          scrollToCaretIfNeeded(contentEditor);
         }, 100);
       } else {
         const textBefore = content.substring(0, selectionStart);
@@ -199,6 +201,7 @@ export default function SpeakerPanel({
             hasSelection ? contentEnd : contentStart,
             contentEnd
           );
+          scrollToCaretIfNeeded(contentEditor);
         }, 100);
       }
     },

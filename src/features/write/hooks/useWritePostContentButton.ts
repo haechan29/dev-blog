@@ -18,6 +18,7 @@ import {
   TableButtonProps,
   WritePostContentButtonProps,
 } from '@/features/write/ui/writePostContentButtonProps';
+import { scrollToCaretIfNeeded } from '@/lib/offset';
 import { AppDispatch } from '@/lib/redux/store';
 import { setContent } from '@/lib/redux/write/writePostFormSlice';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -83,6 +84,7 @@ export default function useWritePostContentButton({
           finalCursorPosition - selectedText.length,
           finalCursorPosition
         );
+        scrollToCaretIfNeeded(contentEditor);
       }, 100);
     },
     [content, dispatch]
@@ -158,6 +160,7 @@ export default function useWritePostContentButton({
           finalCursorPosition,
           finalCursorPosition
         );
+        scrollToCaretIfNeeded(contentEditor);
       }, 100);
     },
     [dispatch]
@@ -192,6 +195,7 @@ export default function useWritePostContentButton({
       setTimeout(() => {
         contentEditor.focus();
         contentEditor.setSelectionRange(newCursorPosition, newCursorPosition);
+        scrollToCaretIfNeeded(contentEditor);
       }, 100);
     },
     [dispatch]
@@ -233,6 +237,7 @@ export default function useWritePostContentButton({
         setTimeout(() => {
           contentEditor.focus();
           contentEditor.setSelectionRange(newCursorPosition, newCursorPosition);
+          scrollToCaretIfNeeded(contentEditor);
         }, 100);
       }
     },

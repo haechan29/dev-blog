@@ -2,6 +2,7 @@ import { ApiError } from '@/errors/errors';
 import { DailyQuotaExhaustedError } from '@/features/media/data/errors/mediaErrors';
 import * as MediaClientRepository from '@/features/media/data/repository/mediaClientRepository';
 import { insertMarkdown } from '@/features/write/domain/lib/insertMarkdown';
+import { scrollToCaretIfNeeded } from '@/lib/offset';
 import { AppDispatch } from '@/lib/redux/store';
 import { setContent } from '@/lib/redux/write/writePostFormSlice';
 import { MutableRefObject, useCallback } from 'react';
@@ -69,6 +70,7 @@ export default function useBgmUpload({
         if (isScrollSyncPausedRef) isScrollSyncPausedRef.current = false;
         contentEditor.focus();
         contentEditor.setSelectionRange(newCursorPosition, newCursorPosition);
+        scrollToCaretIfNeeded(contentEditor);
       }, 100);
     },
     [dispatch, isScrollSyncPausedRef]
