@@ -95,39 +95,68 @@ export default function PostViewerToolbar({
         }}
         className='flex flex-col p-2 md:p-4 lg:p-6'
       >
-        {headings.length > 0 && page?.heading ? (
-          <div className='w-full truncate hidden md:block md:text-sm lg:text-base text-gray-400 px-2'>
-            {title}
-          </div>
-        ) : (
-          <div className='w-full text-base md:text-lg lg:text-xl text-left text-white md:text-gray-900 font-bold px-2'>
-            {title}
-          </div>
-        )}
-        <div className='flex w-full items-start'>
-          <Content
-            isExpanded={isExpanded}
-            heading={page?.heading ?? undefined}
-            headings={headings}
-            onContentClick={handleContentClick}
-          />
-
-          {headings.length > 0 && (
-            <button
-              onClick={onToggleExpand}
-              className='flex shrink-0 px-2 items-center justify-center cursor-pointer'
-            >
-              <ChevronDown
-                className={clsx(
-                  'w-6 h-6 text-white md:text-gray-500 stroke-1 transition-transform duration-300 ease-in-out',
-                  isExpanded && '-rotate-180'
-                )}
+        {page?.heading ? (
+          <>
+            <div className='w-full truncate hidden md:block md:text-sm lg:text-base text-gray-400 px-2'>
+              {title}
+            </div>
+            <div className='flex w-full items-start'>
+              <Content
+                isExpanded={isExpanded}
+                heading={page.heading}
+                headings={headings}
+                onContentClick={handleContentClick}
               />
-            </button>
-          )}
-        </div>
+              <ExpandButton isExpanded={isExpanded} onClick={onToggleExpand} />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className='flex w-full items-center'>
+              <div className='flex-1 text-base md:text-lg lg:text-xl text-left text-white md:text-gray-900 font-bold px-2'>
+                {title}
+              </div>
+              {headings.length > 0 && (
+                <ExpandButton
+                  isExpanded={isExpanded}
+                  onClick={onToggleExpand}
+                />
+              )}
+            </div>
+            {headings.length > 0 && (
+              <Content
+                isExpanded={isExpanded}
+                heading={undefined}
+                headings={headings}
+                onContentClick={handleContentClick}
+              />
+            )}
+          </>
+        )}
       </div>
     </div>
+  );
+}
+
+function ExpandButton({
+  isExpanded,
+  onClick,
+}: {
+  isExpanded: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className='flex shrink-0 px-2 items-center justify-center cursor-pointer'
+    >
+      <ChevronDown
+        className={clsx(
+          'w-6 h-6 text-white md:text-gray-500 stroke-1 transition-transform duration-300 ease-in-out',
+          isExpanded && '-rotate-180'
+        )}
+      />
+    </button>
   );
 }
 
@@ -154,15 +183,15 @@ function Content({
             key={item.id}
             onClick={() => onContentClick(item)}
             className={clsx(
-              'w-full text-base md:text-lg lg:text-xl text-left text-white md:text-gray-900',
-              'transition-discrete|opacity duration-300 ease-in',
+              'w-full text-base md:text-lg lg:text-xl text-left text-white',
+              'transition-[opacity,height,margin] duration-300 ease-in',
               isExpanded || heading?.id === item.id
                 ? 'h-6 opacity-100'
                 : 'h-0 opacity-0',
               heading?.id === item.id
-                ? 'text-gray-900 font-bold'
-                : 'text-gray-400',
-              isExpanded && 'my-1 md:my-2',
+                ? 'md:text-gray-900 font-bold'
+                : 'md:text-gray-400 hover:text-gray-600',
+              isExpanded && 'my-1 md:my-2 cursor-pointer',
               'pl-(--padding-left)'
             )}
             style={{
