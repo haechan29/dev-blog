@@ -76,6 +76,10 @@ export default function PostSettingsDropdown({
     }, 300);
   }, [mode, debounce]);
 
+  if (!showRawContent && post.userId !== userId) {
+    return null;
+  }
+
   return (
     <>
       <DeletePostDialog
