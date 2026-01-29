@@ -9,6 +9,7 @@ const slugger = new GithubSlugger();
 export function extractHeadings(content: string): Heading[] {
   const headings: Heading[] = [];
 
+  slugger.reset();
   const tree = unified().use(remarkParse).parse(content);
 
   visit(tree, 'heading', node => {
