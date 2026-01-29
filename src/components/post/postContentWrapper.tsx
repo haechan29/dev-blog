@@ -9,7 +9,7 @@ import useThrottle from '@/hooks/useThrottle';
 import { setCurrentHeading } from '@/lib/redux/post/postReaderSlice';
 import { setIsContentVisible } from '@/lib/redux/post/postToolbarSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
-import { ReactNode, useEffect, useRef } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostContentWrapper({
@@ -20,7 +20,6 @@ export default function PostContentWrapper({
   parsedContent: ReactNode;
 }) {
   const dispatch = useDispatch<AppDispatch>();
-  const isInitialMount = useRef(true);
   const throttle = useThrottle();
   const { mode } = useSelector((state: RootState) => state.postReader);
 
@@ -30,10 +29,6 @@ export default function PostContentWrapper({
 
     const postContentObserver = new IntersectionObserver(
       entries => {
-        if (isInitialMount.current) {
-          isInitialMount.current = false;
-          return;
-        }
         dispatch(setIsContentVisible(entries[0].isIntersecting));
       },
       {
@@ -54,6 +49,7 @@ export default function PostContentWrapper({
       }, 100);
     };
 
+    updateHeading();
     document.addEventListener('scroll', updateHeading);
     return () => document.removeEventListener('scroll', updateHeading);
   }, [dispatch, throttle]);
