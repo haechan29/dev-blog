@@ -42,10 +42,12 @@ export async function createCreator({
   channelName,
   email,
   memo,
+  userId,
 }: {
   channelName: string;
   email: string;
   memo?: string;
+  userId: string;
 }) {
   const { data, error } = await supabase
     .from('creators')
@@ -53,6 +55,7 @@ export async function createCreator({
       channel_name: channelName,
       email,
       memo: memo ?? null,
+      user_id: userId,
     })
     .select(SELECT_FIELDS)
     .single();

@@ -1,5 +1,6 @@
 import { toDomain } from '@/features/creator/data/mapper/creatorMapper';
 import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries';
+import * as CreatorUsecases from '@/features/creator/data/usecases/creatorUsecase';
 import 'server-only';
 
 export async function getCreators() {
@@ -17,7 +18,7 @@ export async function createCreator(params: {
   email: string;
   memo?: string;
 }) {
-  const creator = await CreatorQueries.createCreator(params);
+  const creator = await CreatorUsecases.createCreatorWithUser(params);
   return toDomain(creator);
 }
 
