@@ -79,9 +79,9 @@ export async function PATCH(
       }
     }
 
-    await MediaQueries.unlinkMediaListFromPost(postId);
-
     if (content) {
+      await MediaQueries.unlinkMediaListFromPost(postId);
+
       const imageUrls = extractImageUrls(content);
       await MediaQueries.linkMediaListToPost(postId, imageUrls);
     }

@@ -1,4 +1,5 @@
 import { auth } from '@/auth';
+import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries';
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as MediaQueries from '@/features/media/data/queries/mediaQueries';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
@@ -87,11 +88,14 @@ export async function POST(request: NextRequest) {
     if (!userId) {
       throw new ValidationError('사용자 아이디를 찾을 수 없습니다');
     }
-    if (!session && !password) {
+    const skipPasswordCheck =
+      session || !!(await CreatorQueries.fetchCreatorByUserId(userId));
+
+    if (!skipPasswordCheck && !password) {
       throw new ValidationError('비밀번호를 찾을 수 없습니다');
     }
 
-    const passwordHash = session ? null : await bcrypt.hash(password, 10);
+    const passwordHash = skipPasswordCheck ? null : await bcrypt.hash(password, 10);
     const post = await PostQueries.createPost({
       title,
       content,
