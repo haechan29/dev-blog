@@ -3,6 +3,7 @@
 import { LockIcon } from '@/components/lockIcon';
 import PostInfo from '@/components/post/postInfo';
 import PostSettingsDropdown from '@/components/post/postSettingsDropdown';
+import PostVisibilityToggle from '@/components/post/postVisibilityToggle';
 import Tooltip from '@/components/tooltip';
 import { PostProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
@@ -18,13 +19,17 @@ export default function PostPreview({
   post,
   userId,
   showSettings = false,
+  isCreatorOwner = false,
   onDeleteSuccess,
+  onVisibilitySuccess,
 }: {
   isLoggedIn: boolean;
   post: PostProps;
   userId?: string;
   showSettings?: boolean;
+  isCreatorOwner?: boolean;
   onDeleteSuccess?: () => void;
+  onVisibilitySuccess?: () => void;
 }) {
   const { id, title, plainText, tags } = post;
   const isScrollAnimationEnabled =
@@ -48,7 +53,14 @@ export default function PostPreview({
       />
 
       {showSettings && (
-        <div className='absolute top-0 right-0 z-10'>
+        <div className='absolute top-0 right-0 z-10 flex items-center gap-2'>
+          {isCreatorOwner && (
+            <PostVisibilityToggle
+              postId={id}
+              visibility={post.visibility}
+              onSuccess={onVisibilitySuccess}
+            />
+          )}
           <PostSettingsDropdown
             isLoggedIn={isLoggedIn}
             userId={userId}
@@ -68,9 +80,11 @@ export default function PostPreview({
         >
           <div
             className={clsx(
-              showSettings && post.userId === userId
-                ? 'w-[calc(100%-3rem)]'
-                : 'w-full',
+              showSettings && isCreatorOwner
+                ? 'w-[calc(100%-6rem)]'
+                : showSettings && post.userId === userId
+                  ? 'w-[calc(100%-3rem)]'
+                  : 'w-full',
               'flex gap-2 items-start'
             )}
           >

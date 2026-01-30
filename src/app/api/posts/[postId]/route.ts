@@ -77,8 +77,10 @@ export async function PATCH(
 
     await MediaQueries.unlinkMediaListFromPost(postId);
 
-    const imageUrls = extractImageUrls(content);
-    await MediaQueries.linkMediaListToPost(postId, imageUrls);
+    if (content) {
+      const imageUrls = extractImageUrls(content);
+      await MediaQueries.linkMediaListToPost(postId, imageUrls);
+    }
 
     const updated = await PostQueries.updatePost({
       postId,
