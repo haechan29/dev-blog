@@ -22,10 +22,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function EditPageClient({
-  isLoggedIn,
+  skipPasswordInput,
   post,
 }: {
-  isLoggedIn: boolean;
+  skipPasswordInput: boolean;
   post: PostProps;
 }) {
   const searchParams = useSearchParams();
@@ -90,12 +90,12 @@ export default function EditPageClient({
           setIsOpen={setIsOpen}
         />
         <WritePostToolbar
-          isLoggedIn={isLoggedIn}
+          skipPasswordInput={skipPasswordInput}
           publishPost={async () => updatePost(post.id)}
           removeDraft={removeDraft}
         />
         <div className='flex-1 min-h-0'>
-          <WritePostForm isLoggedIn={isLoggedIn} />
+          <WritePostForm skipPasswordInput={skipPasswordInput} />
         </div>
       </QueryParamsValidator>
     </div>

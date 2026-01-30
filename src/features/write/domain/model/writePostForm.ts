@@ -32,7 +32,7 @@ export interface WritePostForm {
 }
 
 export function validate(
-  isLoggedIn: boolean,
+  skipPasswordInput: boolean,
   form: WritePostForm,
   ...fields: string[]
 ) {
@@ -51,7 +51,7 @@ export function validate(
         );
       }
       case 'password': {
-        if (isLoggedIn) return true;
+        if (skipPasswordInput) return true;
         const { value, isEmptyAllowed, maxLength } = form[field];
         return (
           (isEmptyAllowed || value.length > 0) && value.length <= maxLength

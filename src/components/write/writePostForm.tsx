@@ -8,7 +8,7 @@ import WritePostTitle from '@/components/write/writePostTitle';
 import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import clsx from 'clsx';
 
-export default function WritePostForm({ isLoggedIn }: { isLoggedIn: boolean }) {
+export default function WritePostForm({ skipPasswordInput }: { skipPasswordInput: boolean }) {
   const {
     writePostForm: { currentStepId },
   } = useWritePostForm();
@@ -28,7 +28,7 @@ export default function WritePostForm({ isLoggedIn }: { isLoggedIn: boolean }) {
         <div className='w-screen h-full flex flex-col gap-4 px-4 md:px-40 lg:56 xl:px-72'>
           <WritePostTitle />
           <WritePostTag />
-          {!isLoggedIn && <WritePostPassword />}
+          {!skipPasswordInput && <WritePostPassword />}
           <WritePostPrivacy />
         </div>
       </div>

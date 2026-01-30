@@ -1,6 +1,7 @@
 import { auth } from '@/auth';
 import EditPageClient from '@/components/edit/editPageClient';
 import ForbiddenPostPage from '@/components/post/forbiddenPostPage';
+import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries';
 import { PostForbiddenError } from '@/features/post/data/errors/postErrors';
 import { getPost } from '@/features/post/domain/service/postServerService';
 import { createProps } from '@/features/post/ui/postProps';
@@ -25,9 +26,14 @@ export default async function EditPage({
       redirect('/');
     }
 
+    const isCreator = userId
+      ? !!(await CreatorQueries.fetchCreatorByUserId(userId))
+      : false;
+    const skipPasswordInput = !!session || isCreator;
+
     return (
       <Suspense>
-        <EditPageClient isLoggedIn={!!session} post={post} />
+        <EditPageClient skipPasswordInput={skipPasswordInput} post={post} />
       </Suspense>
     );
   } catch (error) {
