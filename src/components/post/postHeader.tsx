@@ -13,13 +13,13 @@ import { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function PostHeader({
-  isLoggedIn,
   userId,
   post,
+  skipPasswordInput,
 }: {
-  isLoggedIn: boolean;
   userId?: string;
   post: PostProps;
+  skipPasswordInput: boolean;
 }) {
   const router = useRouterWithProgress();
   const dispatch = useDispatch<AppDispatch>();
@@ -80,7 +80,7 @@ export default function PostHeader({
         <PostInfo post={post} />
 
         <PostSettingsDropdown
-          isLoggedIn={isLoggedIn}
+          skipPasswordInput={skipPasswordInput}
           userId={userId}
           post={post}
           showRawContent={true}

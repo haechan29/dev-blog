@@ -32,6 +32,7 @@ import { useDispatch } from 'react-redux';
 
 export default function PostPageClient({
   isLoggedIn,
+  isCreator,
   userId,
   initialPost,
   initialComments,
@@ -40,6 +41,7 @@ export default function PostPageClient({
   parsedContent,
 }: {
   isLoggedIn: boolean;
+  isCreator: boolean;
   userId?: string;
   initialPost: PostProps;
   initialComments: CommentItemProps[];
@@ -125,7 +127,11 @@ export default function PostPageClient({
       >
         <EnterFullscreenButton />
 
-        <PostHeader isLoggedIn={isLoggedIn} userId={userId} post={post} />
+        <PostHeader
+          skipPasswordInput={isLoggedIn || isCreator}
+          userId={userId}
+          post={post}
+        />
         <div className='w-full h-px bg-gray-200 mb-10' />
 
         <PostVisibilityBanner
@@ -158,11 +164,7 @@ export default function PostPageClient({
           {recommendedPosts.map(post => (
             <div key={post.id}>
               <div className='h-px bg-gray-200 mb-8' />
-              <PostPreview
-                isLoggedIn={isLoggedIn}
-                post={post}
-                userId={userId}
-              />
+              <PostPreview post={post} userId={userId} />
             </div>
           ))}
 

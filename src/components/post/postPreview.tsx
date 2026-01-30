@@ -15,17 +15,17 @@ const SCROLL_ANIMATION_DELAY = 1;
 const MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION = 200;
 
 export default function PostPreview({
-  isLoggedIn,
   post,
   userId,
+  skipPasswordInput = false,
   showSettings = false,
   isCreatorOwner = false,
   onDeleteSuccess,
   onVisibilitySuccess,
 }: {
-  isLoggedIn: boolean;
   post: PostProps;
   userId?: string;
+  skipPasswordInput?: boolean;
   showSettings?: boolean;
   isCreatorOwner?: boolean;
   onDeleteSuccess?: () => void;
@@ -62,7 +62,7 @@ export default function PostPreview({
             />
           )}
           <PostSettingsDropdown
-            isLoggedIn={isLoggedIn}
+            skipPasswordInput={skipPasswordInput}
             userId={userId}
             post={post}
             showRawContent={false}

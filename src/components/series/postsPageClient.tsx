@@ -39,10 +39,10 @@ export default function PostsPageClient({
       {posts.map((post, index) => (
         <div key={post.id} className='mb-8'>
           <PostPreview
-            isLoggedIn={isLoggedIn}
             post={post}
             userId={currentUserId}
             showSettings={true}
+            skipPasswordInput={isLoggedIn || isCreator}
             isCreatorOwner={isCreator && post.userId === currentUserId}
             onDeleteSuccess={handleDeleteSuccess}
             onVisibilitySuccess={handleVisibilitySuccess}

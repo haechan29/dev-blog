@@ -3,6 +3,7 @@ import ForbiddenPostPage from '@/components/post/forbiddenPostPage';
 import PostPageClient from '@/components/post/postPageClient';
 import PostParsedContent from '@/components/post/postParsedContent';
 import * as CommentServerService from '@/features/comment/domain/service/commentServerService';
+import * as CreatorServerRepository from '@/features/creator/data/repository/creatorServerRepository';
 import { PostForbiddenError } from '@/features/post/data/errors/postErrors';
 import * as PostServerService from '@/features/post/domain/service/postServerService';
 import { createProps } from '@/features/post/ui/postProps';
@@ -21,10 +22,11 @@ export default async function PostPage({
   const { postId } = await params;
 
   try {
-    const [post, comments, { posts, nextCursor }] = await Promise.all([
+    const [post, comments, { posts, nextCursor }, creator] = await Promise.all([
       PostServerService.getPost(postId).then(createProps),
       CommentServerService.getComments(postId, userId),
       PostServerService.getFeedPosts(null, userId, postId),
+      userId ? CreatorServerRepository.getCreatorByUserId(userId) : null,
     ]);
     const commentProps = comments.map(comment => comment.toProps());
     const postProps = posts.map(createProps);
@@ -32,6 +34,7 @@ export default async function PostPage({
     return (
       <PostPageClient
         isLoggedIn={!!session}
+        isCreator={!!creator}
         userId={userId}
         initialPost={post}
         initialComments={commentProps}

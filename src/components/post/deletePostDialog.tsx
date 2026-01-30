@@ -14,13 +14,13 @@ import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
 export default function DeletePostDialog({
-  isLoggedIn,
+  skipPasswordInput,
   postId,
   isOpen,
   setIsOpen,
   onDeleteSuccess,
 }: {
-  isLoggedIn: boolean;
+  skipPasswordInput: boolean;
   postId: string;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
@@ -32,7 +32,7 @@ export default function DeletePostDialog({
 
   const deletePost = useCallback(
     async (postId: string, password: string) => {
-      if (!isLoggedIn && !password) {
+      if (!skipPasswordInput && !password) {
         setIsPasswordValid(false);
         return;
       }
@@ -50,7 +50,7 @@ export default function DeletePostDialog({
       }
       setIsLoading(false);
     },
-    [isLoggedIn, onDeleteSuccess, setIsOpen]
+    [skipPasswordInput, onDeleteSuccess, setIsOpen]
   );
 
   useEffect(() => {
@@ -72,7 +72,7 @@ export default function DeletePostDialog({
           정말로 게시글을 삭제할까요?
         </div>
 
-        {!isLoggedIn && (
+        {!skipPasswordInput && (
           <input
             className={clsx(
               'w-full border p-3 mb-8 rounded-sm outline-none',

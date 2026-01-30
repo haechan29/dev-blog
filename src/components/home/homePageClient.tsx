@@ -75,11 +75,7 @@ export default function HomePageClient({
         <div className='flex flex-col mt-8'>
           {posts.map((post, index) => (
             <div key={post.id} className='mb-8'>
-              <PostPreview
-                isLoggedIn={isLoggedIn}
-                post={post}
-                userId={userId}
-              />
+              <PostPreview post={post} userId={userId} />
               {index !== posts.length - 1 && (
                 <div className='h-px bg-gray-200' />
               )}

@@ -20,14 +20,14 @@ import { MouseEvent, ReactNode, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostSettingsDropdown({
-  isLoggedIn,
+  skipPasswordInput = false,
   userId,
   post,
   showRawContent,
   onDeleteSuccess,
   children,
 }: {
-  isLoggedIn: boolean;
+  skipPasswordInput?: boolean;
   userId?: string;
   post: PostProps;
   showRawContent: boolean;
@@ -83,7 +83,7 @@ export default function PostSettingsDropdown({
   return (
     <>
       <DeletePostDialog
-        isLoggedIn={isLoggedIn}
+        skipPasswordInput={skipPasswordInput}
         postId={post.id}
         isOpen={isDeleteDialogOpen}
         setIsOpen={setIsDeleteDialogOpen}
