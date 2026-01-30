@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 import 'server-only';
 
 const SELECT_FIELDS =
-  'id, channel_name, email, memo, status, created_at, last_mailed_at';
+  'id, channel_name, email, memo, status, created_at, last_mailed_at, user_id';
 
 export async function fetchCreators() {
   const { data, error } = await supabase
@@ -118,4 +118,18 @@ export async function deleteCreator(id: string) {
   if (error) {
     throw new Error(error.message);
   }
+}
+
+export async function fetchCreatorByUserId(userId: string) {
+  const { data, error } = await supabase
+    .from('creators')
+    .select(SELECT_FIELDS)
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data as CreatorEntity | null;
 }

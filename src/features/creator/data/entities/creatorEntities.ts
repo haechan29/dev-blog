@@ -8,4 +8,5 @@ export interface CreatorEntity {
   status: CreatorStatus;
   created_at: string;
   last_mailed_at: string | null;
+  user_id: string | null;
 }

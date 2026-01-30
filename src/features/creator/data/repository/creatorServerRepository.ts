@@ -36,3 +36,8 @@ export async function updateCreator(params: {
 export async function deleteCreator(id: string) {
   await CreatorQueries.deleteCreator(id);
 }
+
+export async function getCreatorByUserId(userId: string) {
+  const creator = await CreatorQueries.fetchCreatorByUserId(userId);
+  return creator ? toDomain(creator) : null;
+}
