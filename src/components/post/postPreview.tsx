@@ -5,10 +5,12 @@ import PostInfo from '@/components/post/postInfo';
 import PostSettingsDropdown from '@/components/post/postSettingsDropdown';
 import PostVisibilityToggle from '@/components/post/postVisibilityToggle';
 import Tooltip from '@/components/tooltip';
+import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import { PostProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
 import { Link2, MoreVertical } from 'lucide-react';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 const SCALE_ANIMATION_DELAY = 0.5;
 const SCROLL_ANIMATION_DELAY = 1;
@@ -32,8 +34,15 @@ export default function PostPreview({
   onVisibilitySuccess?: () => void;
 }) {
   const { id, title, plainText, tags } = post;
+  const [optimisticVisibility, setOptimisticVisibility] =
+    useState<PostVisibility>(post.visibility);
+
   const isScrollAnimationEnabled =
     plainText.length >= MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION;
+
+  useEffect(() => {
+    setOptimisticVisibility(post.visibility);
+  }, [post.visibility]);
 
   return (
     <div
@@ -57,7 +66,8 @@ export default function PostPreview({
           {isCreatorOwner && (
             <PostVisibilityToggle
               postId={id}
-              visibility={post.visibility}
+              optimisticVisibility={optimisticVisibility}
+              setOptimisticVisibility={setOptimisticVisibility}
               onSuccess={onVisibilitySuccess}
             />
           )}
@@ -91,7 +101,7 @@ export default function PostPreview({
             <div
               className={clsx(
                 'shrink-0 transition-[width,margin,opacity] duration-300 ease-in-out overflow-hidden',
-                post.visibility === 'private'
+                optimisticVisibility === 'private'
                   ? 'w-6 opacity-100 mr-2'
                   : 'w-0 opacity-0 mr-0'
               )}
@@ -104,7 +114,7 @@ export default function PostPreview({
             <div
               className={clsx(
                 'shrink-0 transition-[width,margin,opacity] duration-300 ease-in-out overflow-hidden',
-                post.visibility === 'unlisted'
+                optimisticVisibility === 'unlisted'
                   ? 'w-6 opacity-100 mr-2'
                   : 'w-0 opacity-0 mr-0'
               )}

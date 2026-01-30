@@ -9,26 +9,32 @@ import toast from 'react-hot-toast';
 
 export default function PostVisibilityToggle({
   postId,
-  visibility,
+  optimisticVisibility,
+  setOptimisticVisibility,
   onSuccess,
 }: {
   postId: string;
-  visibility: PostVisibility;
+  optimisticVisibility: PostVisibility;
+  setOptimisticVisibility: (visibility: PostVisibility) => void;
   onSuccess?: () => void;
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  const isPublic = visibility === 'public';
+  const isPublic = optimisticVisibility === 'public';
 
   const onToggle = useCallback(async () => {
     if (isLoading) return;
 
     const newVisibility = isPublic ? 'unlisted' : 'public';
+    const previousVisibility = optimisticVisibility;
+
+    setOptimisticVisibility(newVisibility);
     setIsLoading(true);
 
     try {
       await PostClientService.updatePost({ postId, visibility: newVisibility });
       onSuccess?.();
     } catch (error) {
+      setOptimisticVisibility(previousVisibility);
       const message =
         error instanceof ApiError
           ? error.message
@@ -37,7 +43,14 @@ export default function PostVisibilityToggle({
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, isPublic, postId, onSuccess]);
+  }, [
+    isLoading,
+    isPublic,
+    onSuccess,
+    optimisticVisibility,
+    postId,
+    setOptimisticVisibility,
+  ]);
 
   return (
     <button
