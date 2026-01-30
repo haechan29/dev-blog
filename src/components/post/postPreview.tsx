@@ -85,19 +85,35 @@ export default function PostPreview({
                 : showSettings && post.userId === userId
                   ? 'w-[calc(100%-3rem)]'
                   : 'w-full',
-              'flex gap-2 items-start'
+              'flex items-start'
             )}
           >
-            {post.visibility === 'private' && (
+            <div
+              className={clsx(
+                'shrink-0 transition-[width,margin,opacity] duration-300 ease-in-out overflow-hidden',
+                post.visibility === 'private'
+                  ? 'w-6 opacity-100 mr-2'
+                  : 'w-0 opacity-0 mr-0'
+              )}
+            >
               <Tooltip text='다른 사람에게는 보이지 않습니다'>
-                <LockIcon className='w-6 h-6 shrink-0 opacity-70 mt-1' />
+                <LockIcon className='w-6 h-6 opacity-70 mt-1' />
               </Tooltip>
-            )}
-            {post.visibility === 'unlisted' && (
+            </div>
+
+            <div
+              className={clsx(
+                'shrink-0 transition-[width,margin,opacity] duration-300 ease-in-out overflow-hidden',
+                post.visibility === 'unlisted'
+                  ? 'w-6 opacity-100 mr-2'
+                  : 'w-0 opacity-0 mr-0'
+              )}
+            >
               <Tooltip text='링크가 없으면 다른 사람에게는 보이지 않습니다'>
-                <Link2 className='w-6 h-6 shrink-0 opacity-70 mt-1' />
+                <Link2 className='w-6 h-6 opacity-70 mt-1' />
               </Tooltip>
-            )}
+            </div>
+
             <div className='text-2xl font-semibold line-clamp-2'>{title}</div>
           </div>
 
