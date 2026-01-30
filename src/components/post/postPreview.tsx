@@ -5,12 +5,10 @@ import PostInfo from '@/components/post/postInfo';
 import PostSettingsDropdown from '@/components/post/postSettingsDropdown';
 import PostVisibilityToggle from '@/components/post/postVisibilityToggle';
 import Tooltip from '@/components/tooltip';
-import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import { PostProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
 import { Link2, MoreVertical } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
 const SCALE_ANIMATION_DELAY = 0.5;
 const SCROLL_ANIMATION_DELAY = 1;
@@ -34,15 +32,8 @@ export default function PostPreview({
   onVisibilitySuccess?: () => void;
 }) {
   const { id, title, plainText, tags } = post;
-  const [optimisticVisibility, setOptimisticVisibility] =
-    useState<PostVisibility>(post.visibility);
-
   const isScrollAnimationEnabled =
     plainText.length >= MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION;
-
-  useEffect(() => {
-    setOptimisticVisibility(post.visibility);
-  }, [post.visibility]);
 
   return (
     <div
@@ -62,12 +53,11 @@ export default function PostPreview({
       />
 
       {showSettings && (
-        <div className='absolute top-0 right-0 z-10 flex items-center gap-2'>
+        <div className='absolute top-0 right-0 z-10 flex items-center gap-3'>
           {isCreatorOwner && (
             <PostVisibilityToggle
               postId={id}
-              optimisticVisibility={optimisticVisibility}
-              setOptimisticVisibility={setOptimisticVisibility}
+              initialVisibility={post.visibility}
               onSuccess={onVisibilitySuccess}
             />
           )}
@@ -91,40 +81,32 @@ export default function PostPreview({
           <div
             className={clsx(
               showSettings && isCreatorOwner
-                ? 'w-[calc(100%-6rem)]'
+                ? 'w-[calc(100%-9rem)] sm:w-[calc(100%-10rem)]'
                 : showSettings && post.userId === userId
                   ? 'w-[calc(100%-3rem)]'
                   : 'w-full',
-              'flex items-start'
+              'flex items-start gap-2'
             )}
           >
-            <div
-              className={clsx(
-                'shrink-0 transition-[width,margin,opacity] duration-300 ease-in-out overflow-hidden',
-                optimisticVisibility === 'private'
-                  ? 'w-6 opacity-100 mr-2'
-                  : 'w-0 opacity-0 mr-0'
-              )}
-            >
-              <Tooltip text='다른 사람에게는 보이지 않습니다'>
-                <LockIcon className='w-6 h-6 opacity-70 mt-1' />
-              </Tooltip>
-            </div>
+            {!isCreatorOwner && post.visibility === 'private' && (
+              <div className='shrink-0'>
+                <Tooltip text='나만 볼 수 있습니다'>
+                  <LockIcon className='w-6 h-6 opacity-70 mt-1' />
+                </Tooltip>
+              </div>
+            )}
 
-            <div
-              className={clsx(
-                'shrink-0 transition-[width,margin,opacity] duration-300 ease-in-out overflow-hidden',
-                optimisticVisibility === 'unlisted'
-                  ? 'w-6 opacity-100 mr-2'
-                  : 'w-0 opacity-0 mr-0'
-              )}
-            >
-              <Tooltip text='링크가 없으면 다른 사람에게는 보이지 않습니다'>
-                <Link2 className='w-6 h-6 opacity-70 mt-1' />
-              </Tooltip>
-            </div>
+            {!isCreatorOwner && post.visibility === 'unlisted' && (
+              <div className='shrink-0'>
+                <Tooltip text='링크를 아는 사람만 볼 수 있습니다'>
+                  <Link2 className='w-6 h-6 opacity-70 mt-1' />
+                </Tooltip>
+              </div>
+            )}
 
-            <div className='text-2xl font-semibold line-clamp-2'>{title}</div>
+            <div className='text-xl sm:text-2xl font-semibold line-clamp-2'>
+              {title}
+            </div>
           </div>
 
           <div className='whitespace-pre-wrap break-keep wrap-anywhere'>

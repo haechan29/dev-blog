@@ -144,12 +144,12 @@ function SeriesPost({
           <div className='flex-1 flex flex-col gap-2'>
             <div className='flex gap-2'>
               {post.visibility === 'private' && (
-                <Tooltip text='다른 사람에게는 보이지 않습니다'>
+                <Tooltip text='나만 볼 수 있습니다'>
                   <LockIcon className='w-5 h-5 shrink-0 opacity-70 mt-1' />
                 </Tooltip>
               )}
               {post.visibility === 'unlisted' && (
-                <Tooltip text='링크가 없으면 다른 사람에게는 보이지 않습니다'>
+                <Tooltip text='링크를 아는 사람만 볼 수 있습니다'>
                   <Link2 className='w-5 h-5 shrink-0 opacity-70 mt-1' />
                 </Tooltip>
               )}
