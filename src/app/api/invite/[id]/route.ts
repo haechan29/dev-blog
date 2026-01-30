@@ -14,7 +14,7 @@ export async function GET(
       .from('creators')
       .select('user_id, users(nickname)')
       .eq('id', id)
-      .single();
+      .maybeSingle();
 
     if (error) {
       throw new Error(error.message);
