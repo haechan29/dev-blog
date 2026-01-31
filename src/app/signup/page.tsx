@@ -7,7 +7,7 @@ import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
 type NicknameError = 'length' | 'duplicate' | null;
@@ -18,7 +18,7 @@ const nicknameErrorMessages = {
 
 export default function SignupPage() {
   const router = useRouterWithProgress();
-  const { updateUserMutation } = useUser();
+  const { user, updateUserMutation } = useUser();
   const [nickname, setNickname] = useState('');
   const [nicknameError, setNicknameError] = useState<NicknameError>(null);
   const [isTermsValid, setIsTermsValid] = useState(true);
@@ -71,6 +71,12 @@ export default function SignupPage() {
     );
   };
 
+  useEffect(() => {
+    if (user?.nickname) {
+      setNickname(user.nickname);
+    }
+  }, [user?.nickname]);
+
   return (
     <div className='min-h-screen flex items-center justify-center bg-gray-50 px-4'>
       <div className='w-full max-w-md bg-white p-8 rounded-lg border border-gray-200'>
@@ -101,9 +107,7 @@ export default function SignupPage() {
               {nicknameErrorMessages[nicknameError]}
             </div>
           ) : (
-            <div className='text-sm text-gray-500 mt-1'>
-              1-50자
-            </div>
+            <div className='text-sm text-gray-500 mt-1'>1-50자</div>
           )}
         </div>
 
