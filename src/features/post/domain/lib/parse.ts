@@ -57,8 +57,9 @@ function remarkFilter() {
     visit(tree, (node: Node, index?: number, parent?: Parent) => {
       if (
         node.type === 'heading' ||
+        node.type === 'table' ||
         node.type === 'imageWithCaption' ||
-        node.type === 'table'
+        node.type === 'bgm'
       ) {
         if (parent && index !== undefined) {
           parent.children.splice(index, 1);
