@@ -9,7 +9,7 @@ export async function fetchCreators() {
   const { data, error } = await supabase
     .from('creators')
     .select(SELECT_FIELDS)
-    .order('last_mailed_at', { ascending: false, nullsFirst: false });
+    .order('last_mailed_at', { ascending: false, nullsFirst: true });
 
   if (error) {
     throw new Error(error.message);
