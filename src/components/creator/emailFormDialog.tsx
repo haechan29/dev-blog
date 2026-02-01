@@ -50,33 +50,6 @@ export function EmailFormDialog({
   );
   const [mode, setMode] = useState<'send' | 'reply'>('send');
 
-  useEffect(() => {
-    if (!isOpen) {
-      setSubject('');
-      setBody('');
-      setMode('send');
-      setInvalidField(null);
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (isOpen && latestReceivedEmail) {
-      setMode('reply');
-    }
-  }, [isOpen, latestReceivedEmail]);
-
-  useEffect(() => {
-    if (mode === 'reply' && latestReceivedEmail) {
-      const originalSubject = latestReceivedEmail.subject;
-      const replySubject = originalSubject.toLowerCase().startsWith('re:')
-        ? originalSubject
-        : `Re: ${originalSubject}`;
-      setSubject(replySubject);
-    } else if (mode === 'send') {
-      setSubject('');
-    }
-  }, [latestReceivedEmail, mode]);
-
   const handleSend = useCallback(async () => {
     if (!subject.trim()) {
       setInvalidField('subject');
@@ -116,6 +89,33 @@ export function EmailFormDialog({
     setIsOpen,
     subject,
   ]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setSubject('');
+      setBody('');
+      setMode('send');
+      setInvalidField(null);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen && latestReceivedEmail) {
+      setMode('reply');
+    }
+  }, [isOpen, latestReceivedEmail]);
+
+  useEffect(() => {
+    if (mode === 'reply' && latestReceivedEmail) {
+      const originalSubject = latestReceivedEmail.subject;
+      const replySubject = originalSubject.toLowerCase().startsWith('re:')
+        ? originalSubject
+        : `Re: ${originalSubject}`;
+      setSubject(replySubject);
+    } else if (mode === 'send') {
+      setSubject('');
+    }
+  }, [latestReceivedEmail, mode]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

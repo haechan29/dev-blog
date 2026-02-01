@@ -44,6 +44,20 @@ export async function createUser() {
   return data.id as string;
 }
 
+export async function createUserWithNickname(nickname: string) {
+  const { data, error } = await supabase
+    .from('users')
+    .insert({ nickname, auth_user_id: null })
+    .select('id')
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data.id as string;
+}
+
 export async function updateUser(nickname: string) {
   const userId = (await cookies()).get('userId')?.value;
   const authUserId = (await auth())?.user?.id;
