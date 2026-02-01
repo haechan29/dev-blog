@@ -17,6 +17,7 @@ import { formatDateBrief, formatRelativeTime } from '@/lib/date';
 import clsx from 'clsx';
 import { ChevronRight, MoreVertical, RefreshCw } from 'lucide-react';
 import { ReactNode, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 
 export function CreatorDetail({
   creator,
@@ -44,6 +45,20 @@ export function CreatorDetail({
   onMarkAsRead: (emailId: string, creatorId: string) => void;
 }) {
   const [openEmailId, setOpenEmailId] = useState<string | null>(null);
+  const onChannelNameClick = async () => {
+    if (!creator) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(
+        `https://www.sharetext.app/api/invite/${creator.id}`
+      );
+      toast.success('복사되었습니다');
+    } catch {
+      toast.error('복사에 실패했습니다');
+    }
+  };
 
   useEffect(() => {
     const firstEmail = emails[0];
@@ -70,7 +85,12 @@ export function CreatorDetail({
     <main className='flex-1 min-w-0 ml-(--sidebar-width) flex flex-col'>
       <section className='sticky top-0 bg-white/80 backdrop-blur-md p-4'>
         <div className='flex items-center gap-3 mb-2'>
-          <h2 className='text-xl font-bold'>{creator.channelName}</h2>
+          <button
+            onClick={onChannelNameClick}
+            className='hover:opacity-60 cursor-pointer'
+          >
+            <h2 className='text-xl font-bold'>{creator.channelName}</h2>
+          </button>
           <StatusDropdown onStatusChange={onStatusChange}>
             <button
               className={clsx(
