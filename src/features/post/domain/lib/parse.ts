@@ -1,10 +1,27 @@
 import Heading from '@/features/post/domain/model/heading';
+import { remarkBgm, remarkDialogue, remarkImg } from '@/lib/md/remark';
 import GithubSlugger from 'github-slugger';
+import { Node, Parent, Root } from 'mdast';
+import remarkDirective from 'remark-directive';
+import remarkGfm from 'remark-gfm';
+import remarkIns from 'remark-ins';
 import remarkParse from 'remark-parse';
+import remarkSupersub from 'remark-supersub';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
 
 const slugger = new GithubSlugger();
+
+const textProcessor = unified()
+  .use(remarkParse)
+  .use(remarkGfm, { singleTilde: false })
+  .use(remarkIns)
+  .use(remarkSupersub)
+  .use(remarkDirective)
+  .use(remarkImg)
+  .use(remarkBgm)
+  .use(remarkDialogue)
+  .use(remarkFilter);
 
 export function extractHeadings(content: string): Heading[] {
   const headings: Heading[] = [];
@@ -29,27 +46,47 @@ export function extractHeadings(content: string): Heading[] {
 
   return headings;
 }
-
 export function extractPlainText(content: string): string {
-  return content
-    .replace(/```[\s\S]*?```/g, '') // remove code blocks
-    .replace(/`[^`]*`/g, '') // remove inline code
-    .replace(/^#{1,6}\s+.*$/gm, '') // remove heading markers
-    .replace(/^\s*[-*+]\s+/gm, '') // remove unordered list markers
-    .replace(/^\s*\d+\.\s+/gm, '') // remove ordered list markers
-    .replace(/^\s*>\s*(.*)/gm, '$1') // remove blockquote markers and keep content
-    .replace(/\*\*(.*?)\*\*/g, '$1') // remove bold formatting
-    .replace(/__(.*?)__/g, '$1') // remove bold formatting (underscore)
-    .replace(/\*(.*?)\*/g, '$1') // remove italic formatting
-    .replace(/_(.*?)_/g, '$1') // remove italic formatting (underscore)
-    .replace(/~~(.*?)~~/g, '$1') // remove strikethrough formatting
-    .replace(/\+\+(.*?)\+\+/g, '$1') // remove underline formatting
-    .replace(/\[(.*?)\]\(.*?\)/g, '$1') // remove links and keep text
-    .replace(/!\[.*?\]\(.*?\)/g, '') // remove images completely
-    .replace(/^\s*\|.*\|$/gm, '') // remove table rows
-    .replace(/^\s*[-:|\s]*$/gm, '') // remove table separators
-    .replace(/^\s*---+\s*$/gm, '') // remove horizontal rules
-    .replace(/[ \t]+/g, ' ') // remove multiple spaces and tabs only
-    .replace(/\n+/g, '\n') // reduce multiple newlines to single newline
-    .trim();
+  const tree = textProcessor.parse(content);
+  const transformed = textProcessor.runSync(tree);
+  return extractText(transformed);
+}
+
+function remarkFilter() {
+  return (tree: Root) => {
+    visit(tree, (node: Node, index?: number, parent?: Parent) => {
+      if (
+        node.type === 'heading' ||
+        node.type === 'imageWithCaption' ||
+        node.type === 'table'
+      ) {
+        if (parent && index !== undefined) {
+          parent.children.splice(index, 1);
+          return index;
+        }
+      }
+    });
+  };
+}
+
+function extractText(node: Node): string {
+  if ('value' in node && typeof node.value === 'string') {
+    return node.value;
+  }
+
+  if ('children' in node && Array.isArray(node.children)) {
+    const texts = node.children.map(child => extractText(child));
+
+    if (
+      node.type === 'root' ||
+      node.type === 'blockquote' ||
+      node.type === 'list'
+    ) {
+      return texts.join('\n');
+    }
+
+    return texts.join('');
+  }
+
+  return '';
 }
