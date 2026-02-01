@@ -16,4 +16,15 @@ ${channelName}님의 <영상 제목> 영상을 보고 연락드리게 됐어요.
 감사합니다.
 임해찬 드림`,
   },
+  {
+    id: 'rejection-acknowledgment',
+    name: '거절 확인',
+    subject: '[셰어텍스트] 답변 감사드립니다',
+    body: (channelName: string) => `안녕하세요, ${channelName}님!
+
+검토해주셔서 감사합니다. 혹시 나중에 생각이 바뀌시면 편하게 연락 주세요.
+
+감사합니다.
+임해찬 드림`,
+  },
 ];
