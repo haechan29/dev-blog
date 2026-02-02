@@ -52,7 +52,7 @@ export function CreatorDetail({
 
     try {
       await navigator.clipboard.writeText(
-        `https://www.sharetext.app/api/invite/${creator.id}`
+        `https://sharetext.app/api/invite/${creator.id}`
       );
       toast.success('복사되었습니다');
     } catch {
