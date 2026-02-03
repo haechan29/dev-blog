@@ -25,7 +25,10 @@ export function insertMarkdown({
     textAfter;
 
   const newCursorPosition =
-    textBefore.length + (shouldBreakBefore ? 1 : 0) + markdown.length;
+    textBefore.length +
+    (shouldBreakBefore ? 1 : 0) +
+    markdown.length +
+    (shouldBreakAfter ? 1 : 0);
 
   return { newText, newCursorPosition };
 }
