@@ -47,6 +47,7 @@ export async function sendEmail({
   );
 
   const result = await sendGmailMessage(rawEmail, replyTo?.threadId);
+  const sentAt = new Date().toISOString();
 
   await OutreachEmailQueries.createOutreachEmail({
     creatorId,
@@ -56,8 +57,10 @@ export async function sendEmail({
     direction: 'sent',
     subject,
     body,
-    sentAt: new Date().toISOString(),
+    sentAt,
   });
+
+  await CreatorQueries.updateLastMailedAt(creatorId, sentAt);
 }
 
 export async function syncEmails(): Promise<{ synced: number }> {
@@ -88,11 +91,6 @@ export async function syncEmails(): Promise<{ synced: number }> {
     try {
       await OutreachEmailQueries.createOutreachEmail(parsed);
 
-      await CreatorQueries.updateLastMailedAt(
-        parsed.creatorId,
-        parsed.sentAt
-      );
-
       syncedCount++;
     } catch (error) {
       const isUniqueViolation =
@@ -102,6 +100,8 @@ export async function syncEmails(): Promise<{ synced: number }> {
         throw error;
       }
     }
+
+    await CreatorQueries.updateLastMailedAt(parsed.creatorId, parsed.sentAt);
   }
 
   return { synced: syncedCount };
