@@ -9,29 +9,29 @@ import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
+const POST_SELECT_FIELDS = `
+  id,
+  title,
+  content,
+  tags,
+  created_at,
+  updated_at,
+  user_id,
+  series_id,
+  series_order,
+  visibility,
+  users:user_id(nickname, deleted_at, registered_at, bio, profile_image_url),
+  series:series_id(title),
+  post_stats(like_count, view_count)
+`;
+
 export async function fetchPostsByUserId(
   userId: string,
   currentUserId?: string
 ) {
   let query = supabase
     .from('posts')
-    .select(
-      `
-        id,
-        title,
-        content,
-        tags,
-        created_at,
-        updated_at,
-        user_id,
-        series_id,
-        series_order,
-        visibility,
-        users:user_id(nickname, deleted_at, registered_at),
-        series:series_id(title),
-        post_stats(like_count, view_count)
-      `
-    )
+    .select(POST_SELECT_FIELDS)
     .eq('user_id', userId);
 
   if (currentUserId !== userId) {
@@ -65,23 +65,7 @@ export async function fetchPostsOwnership(postIds: string[]) {
 export async function fetchPost(postId: string) {
   const { data, error } = await supabase
     .from('posts')
-    .select(
-      `
-        id,
-        title,
-        content,
-        tags,
-        created_at,
-        updated_at,
-        user_id,
-        series_id,
-        series_order,
-        visibility,
-        users:user_id(nickname, deleted_at, registered_at),
-        series:series_id(title),
-        post_stats(like_count, view_count)
-      `
-    )
+    .select(POST_SELECT_FIELDS)
     .eq('id', postId)
     .maybeSingle();
 
@@ -159,23 +143,7 @@ export async function createPost({
       visibility,
       user_id: userId,
     })
-    .select(
-      `
-        id,
-        title,
-        content,
-        tags,
-        created_at,
-        updated_at,
-        user_id,
-        series_id,
-        series_order,
-        visibility,
-        users:user_id(nickname, deleted_at, registered_at),
-        series:series_id(title),
-        post_stats(like_count, view_count)
-      `
-    )
+    .select(POST_SELECT_FIELDS)
     .single();
 
   if (error) {
@@ -216,23 +184,7 @@ export async function updatePost({
     .from('posts')
     .update(updates)
     .eq('id', postId)
-    .select(
-      `
-        id,
-        title,
-        content,
-        tags,
-        created_at,
-        updated_at,
-        user_id,
-        series_id,
-        series_order,
-        visibility,
-        users:user_id(nickname, deleted_at, registered_at),
-        series:series_id(title),
-        post_stats(like_count, view_count)
-      `
-    )
+    .select(POST_SELECT_FIELDS)
     .single();
 
   if (error) {

@@ -16,6 +16,8 @@ export type PostProps = {
   plainText: string;
   userId: string;
   authorName: string;
+  bio: string | null;
+  profileImageUrl: string | null;
   userStatus: UserStatus;
   seriesId: string | null;
   seriesOrder: number | null;
@@ -37,6 +39,8 @@ export function createProps(post: Post): PostProps {
     plainText: extractPlainText(post.content),
     userId: post.userId,
     authorName: post.authorName,
+    bio: post.bio,
+    profileImageUrl: post.profileImageUrl,
     userStatus: post.userStatus,
     seriesId: post.seriesId,
     seriesOrder: post.seriesOrder,

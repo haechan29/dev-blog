@@ -12,6 +12,8 @@ export function toDto(post: FeedPostEntity): PostDto {
     userId: post.user_id,
     authorName:
       post.users.nickname ?? `Guest#${post.user_id?.slice(0, 4) ?? '0000'}`,
+    bio: post.users.bio ?? null,
+    profileImageUrl: post.users.profile_image_url ?? null,
     deletedAt: post.users.deleted_at ?? null,
     registeredAt: post.users.registered_at ?? null,
     seriesId: post.series_id,

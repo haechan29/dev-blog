@@ -27,7 +27,7 @@ export async function fetchFeedPosts({
         series_id,
         series_order,
         visibility,
-        users:user_id(nickname, deleted_at, registered_at),
+        users:user_id(nickname, deleted_at, registered_at, bio, profile_image_url),
         series:series_id(title),
         post_stats!inner(like_count, view_count, popularity)
       `

@@ -9,6 +9,8 @@ export interface PostDto {
   updatedAt: string;
   userId: string;
   authorName: string;
+  bio: string | null;
+  profileImageUrl: string | null;
   deletedAt: string | null;
   registeredAt: string | null;
   seriesId: string | null;

@@ -15,6 +15,8 @@ export default class Post {
     public readonly tags: string[],
     public readonly userId: string,
     public readonly authorName: string,
+    public readonly bio: string | null,
+    public readonly profileImageUrl: string | null,
     public readonly userStatus: UserStatus,
     public readonly seriesId: string | null,
     public readonly seriesOrder: number | null,

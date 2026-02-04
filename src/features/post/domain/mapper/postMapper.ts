@@ -12,6 +12,8 @@ export function toDomain(dto: PostDto): Post {
     dto.tags,
     dto.userId,
     dto.authorName,
+    dto.bio,
+    dto.profileImageUrl,
     getUserStatus(dto),
     dto.seriesId,
     dto.seriesOrder,
