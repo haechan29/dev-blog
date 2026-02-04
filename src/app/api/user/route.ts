@@ -1,6 +1,8 @@
-import { ApiError, ValidationError } from '@/errors/errors';
+import { auth } from '@/auth';
+import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as UserQueries from '@/features/user/data/queries/userQueries';
 import { getUserId } from '@/lib/user';
+import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import 'server-only';
 
@@ -25,6 +27,13 @@ export async function GET() {
 
 export async function PATCH(request: NextRequest) {
   try {
+    const userId = (await cookies()).get('userId')?.value;
+    const authUserId = (await auth())?.user?.id;
+
+    if (!userId || !authUserId) {
+      throw new UnauthorizedError('인증되지 않은 요청입니다');
+    }
+
     const { nickname } = await request.json();
 
     if (!nickname) {
@@ -35,7 +44,7 @@ export async function PATCH(request: NextRequest) {
       throw new ValidationError('닉네임은 1-50자여야 합니다');
     }
 
-    await UserQueries.updateUser(nickname);
+    await UserQueries.updateUser({ userId, authUserId, nickname });
 
     return NextResponse.json({ data: null });
   } catch (error) {

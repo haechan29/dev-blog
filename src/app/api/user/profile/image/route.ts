@@ -36,7 +36,7 @@ export async function PUT(request: NextRequest) {
       profileUserId: userId,
     });
 
-    await ProfileQueries.updateProfile({ profileImageUrl: url });
+    await ProfileQueries.updateProfile({ userId, profileImageUrl: url });
 
     return NextResponse.json({ data: { url } });
   } catch (error) {
