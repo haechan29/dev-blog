@@ -15,8 +15,8 @@ export default function ToolbarProfileIcon({
   const displayName = !isMounted
     ? 'Guest'
     : isLoggedIn && user?.nickname
-    ? user.nickname
-    : `Guest#${user?.id?.slice(0, 4) ?? '0000'}`;
+      ? user.nickname
+      : `Guest#${user?.id?.slice(0, 4) ?? '0000'}`;
 
   useEffect(() => {
     setIsMounted(true);
@@ -28,7 +28,11 @@ export default function ToolbarProfileIcon({
       userId={user?.id}
       nickname={displayName}
     >
-      <ProfileIcon nickname={displayName} isActive={!!user && isLoggedIn} />
+      <ProfileIcon
+        nickname={displayName}
+        isActive={!!user && isLoggedIn}
+        profileImageUrl={user?.profileImageUrl}
+      />
     </ProfileDropdown>
   );
 }

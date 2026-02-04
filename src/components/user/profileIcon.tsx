@@ -2,47 +2,58 @@
 
 import { getColorIndex } from '@/lib/color';
 import clsx from 'clsx';
+import Image from 'next/image';
 
 const colors = [
-  { base: 'bg-red-400', hover: 'hover:bg-red-500' },
-  { base: 'bg-orange-400', hover: 'hover:bg-orange-500' },
-  { base: 'bg-amber-400', hover: 'hover:bg-amber-500' },
-  { base: 'bg-green-400', hover: 'hover:bg-green-500' },
-  { base: 'bg-teal-400', hover: 'hover:bg-teal-500' },
-  { base: 'bg-blue-400', hover: 'hover:bg-blue-500' },
-  { base: 'bg-indigo-400', hover: 'hover:bg-indigo-500' },
-  { base: 'bg-purple-400', hover: 'hover:bg-purple-500' },
-  { base: 'bg-pink-400', hover: 'hover:bg-pink-500' },
+  'bg-red-400',
+  'bg-orange-400',
+  'bg-amber-400',
+  'bg-green-400',
+  'bg-teal-400',
+  'bg-blue-400',
+  'bg-indigo-400',
+  'bg-purple-400',
+  'bg-pink-400',
 ];
 
 export default function ProfileIcon({
   nickname,
   isActive,
   size = 'md',
-  hoverable = true,
+  profileImageUrl = null,
 }: {
   nickname: string;
   isActive: boolean;
   size?: 'sm' | 'md' | 'lg';
-  hoverable?: boolean;
+  profileImageUrl?: string | null;
 }) {
+  const sizeClass =
+    size === 'sm' ? 'w-6 h-6' : size === 'md' ? 'w-9 h-9' : 'w-14 h-14';
+
+  if (profileImageUrl) {
+    return (
+      <div className={clsx('shrink-0 rounded-full overflow-hidden', sizeClass)}>
+        <Image
+          src={profileImageUrl}
+          alt={`${nickname} 프로필`}
+          width={100}
+          height={100}
+          className='object-cover w-full h-full'
+        />
+      </div>
+    );
+  }
+
   const initial = nickname.charAt(0).toUpperCase();
   const colorIndex = getColorIndex(nickname);
-  const baseColor = isActive ? colors[colorIndex].base : 'bg-gray-300';
-  const hoverColor = hoverable
-    ? isActive
-      ? colors[colorIndex].hover
-      : 'hover:bg-gray-400'
-    : '';
+  const baseColor = isActive ? colors[colorIndex] : 'bg-gray-300';
 
   return (
     <div
       className={clsx(
         'shrink-0 rounded-full flex items-center justify-center',
-        hoverable && 'cursor-pointer',
-        size === 'sm' ? 'w-6 h-6' : size === 'md' ? 'w-9 h-9' : 'w-14 h-14',
-        baseColor,
-        hoverColor
+        sizeClass,
+        baseColor
       )}
     >
       <span
