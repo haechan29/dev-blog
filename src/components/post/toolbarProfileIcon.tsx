@@ -30,7 +30,6 @@ export default function ToolbarProfileIcon({
     >
       <ProfileIcon
         nickname={displayName}
-        isActive={!!user && isLoggedIn}
         profileImageUrl={user?.profileImageUrl}
       />
     </ProfileDropdown>

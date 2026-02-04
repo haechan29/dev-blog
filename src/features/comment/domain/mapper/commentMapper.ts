@@ -1,6 +1,5 @@
 import { CommentResponseDto } from '@/features/comment/data/dto/commentResponseDto';
 import { Comment } from '@/features/comment/domain/model/comment';
-import { getUserStatus } from '@/features/user/domain/mapper/userMapper';
 
 export function toDomain(dto: CommentResponseDto): Comment {
   return new Comment(
@@ -12,7 +11,6 @@ export function toDomain(dto: CommentResponseDto): Comment {
     dto.createdAt,
     dto.updatedAt,
     dto.likeCount,
-    dto.userId,
-    getUserStatus(dto)
+    dto.userId
   );
 }

@@ -1,6 +1,5 @@
 import { PostDto } from '@/features/post/data/dto/postDto';
 import Post from '@/features/post/domain/model/post';
-import { getUserStatus } from '@/features/user/domain/mapper/userMapper';
 
 export function toDomain(dto: PostDto): Post {
   return new Post(
@@ -14,7 +13,6 @@ export function toDomain(dto: PostDto): Post {
     dto.authorName,
     dto.bio,
     dto.profileImageUrl,
-    getUserStatus(dto),
     dto.seriesId,
     dto.seriesOrder,
     dto.seriesTitle,

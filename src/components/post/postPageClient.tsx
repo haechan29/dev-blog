@@ -148,7 +148,6 @@ export default function PostPageClient({
         <AuthorProfile
           userId={post.userId}
           userName={post.authorName}
-          userStatus={post.userStatus}
           currentUserId={userId}
           className='mb-12'
         />

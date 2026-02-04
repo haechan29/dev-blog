@@ -3,9 +3,8 @@ import { extractPlainText } from '@/features/post/domain/lib/parse';
 import Heading from '@/features/post/domain/model/heading';
 import Post from '@/features/post/domain/model/post';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
-import { UserStatus } from '@/features/user/domain/model/user';
 
-export type PostProps = {
+export interface PostProps {
   id: string;
   title: string;
   createdAt: string;
@@ -18,14 +17,13 @@ export type PostProps = {
   authorName: string;
   bio: string | null;
   profileImageUrl: string | null;
-  userStatus: UserStatus;
   seriesId: string | null;
   seriesOrder: number | null;
   seriesTitle: string | null;
   likeCount: number;
   viewCount: number;
   visibility: PostVisibility;
-};
+}
 
 export function createProps(post: Post): PostProps {
   return {
@@ -41,7 +39,6 @@ export function createProps(post: Post): PostProps {
     authorName: post.authorName,
     bio: post.bio,
     profileImageUrl: post.profileImageUrl,
-    userStatus: post.userStatus,
     seriesId: post.seriesId,
     seriesOrder: post.seriesOrder,
     seriesTitle: post.seriesTitle,

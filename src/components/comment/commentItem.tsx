@@ -21,11 +21,7 @@ export default function CommentItem({
 
   return (
     <div className='px-6 md:px-12 xl:px-4 my-4 flex space-x-2'>
-      <ProfileIcon
-        nickname={comment.authorName}
-        isActive={comment.userStatus === 'ACTIVE'}
-        size='sm'
-      />
+      <ProfileIcon nickname={comment.authorName} size='sm' />
 
       <div className='flex-1 min-w-0'>
         <div className='flex justify-between gap-2 items-center mb-2'>

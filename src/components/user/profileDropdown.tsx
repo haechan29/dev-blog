@@ -88,11 +88,7 @@ export default function ProfileDropdown({
             className='flex items-center gap-3 p-2 cursor-pointer group'
             onClick={() => userId && router.push(`/@${userId}/posts`)}
           >
-            <ProfileIcon
-              nickname={nickname}
-              isActive={isLoggedIn}
-              hoverable={false}
-            />
+            <ProfileIcon nickname={nickname} />
             <div className='flex flex-col'>
               <div className='text-sm font-medium text-gray-900'>
                 {nickname}

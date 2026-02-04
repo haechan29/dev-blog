@@ -20,7 +20,7 @@ export default async function UserLayout({
     SubscriptionServerRepository.getSubscriptionInfo(userId),
   ]);
 
-  if (!user || user.userStatus === 'DELETED') {
+  if (!user || !!user.deletedAt) {
     notFound();
   }
 
@@ -29,7 +29,6 @@ export default async function UserLayout({
       <UserProfile
         userId={userId}
         userName={user?.nickname ?? `Guest#${userId.slice(0, 4)}`}
-        userStatus={user.userStatus}
         userBio={user.bio ?? undefined}
         initialData={subscriptionInfo}
         currentUserId={currentUserId}

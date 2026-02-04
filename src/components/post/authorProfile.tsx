@@ -4,7 +4,6 @@ import SubscribeButton from '@/components/post/subscribeButton';
 import ProfileIcon from '@/components/user/profileIcon';
 import { SubscriptionDto } from '@/features/subscription/data/dto/subscriptionDto';
 import * as SubscriptionClientRepository from '@/features/subscription/data/repository/subscriptionClientRepository';
-import { UserStatus } from '@/features/user/domain/model/user';
 import { cn } from '@/lib/utils';
 import { subscriptionKeys } from '@/queries/keys';
 import { useQuery } from '@tanstack/react-query';
@@ -13,7 +12,6 @@ import Link from 'next/link';
 export default function AuthorProfile({
   userId,
   userName,
-  userStatus,
   userBio,
   initialData,
   currentUserId,
@@ -21,7 +19,6 @@ export default function AuthorProfile({
 }: {
   userId: string;
   userName: string;
-  userStatus: UserStatus;
   userBio?: string;
   initialData?: SubscriptionDto;
   currentUserId?: string;
@@ -42,11 +39,7 @@ export default function AuthorProfile({
       )}
     >
       <div className='flex items-center gap-3 flex-1 min-w-0'>
-        <ProfileIcon
-          nickname={userName}
-          isActive={userStatus === 'ACTIVE'}
-          size='md'
-        />
+        <ProfileIcon nickname={userName} size='md' />
         <div className='flex-1 min-w-0'>
           <Link
             href={`/@${userId}/posts`}

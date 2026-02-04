@@ -18,12 +18,10 @@ const colors = [
 
 export default function ProfileIcon({
   nickname,
-  isActive,
   size = 'md',
   profileImageUrl = null,
 }: {
   nickname: string;
-  isActive: boolean;
   size?: 'sm' | 'md' | 'lg';
   profileImageUrl?: string | null;
 }) {
@@ -46,7 +44,7 @@ export default function ProfileIcon({
 
   const initial = nickname.charAt(0).toUpperCase();
   const colorIndex = getColorIndex(nickname);
-  const baseColor = isActive ? colors[colorIndex] : 'bg-gray-300';
+  const baseColor = colors[colorIndex];
 
   return (
     <div
@@ -58,9 +56,8 @@ export default function ProfileIcon({
     >
       <span
         className={clsx(
-          'font-semibold',
-          size === 'sm' ? 'text-xs' : size === 'md' ? 'text-sm' : 'text-2xl',
-          isActive ? 'text-white' : 'text-gray-600'
+          'font-semibold text-white',
+          size === 'sm' ? 'text-xs' : size === 'md' ? 'text-sm' : 'text-2xl'
         )}
       >
         {initial}

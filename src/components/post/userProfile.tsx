@@ -11,7 +11,6 @@ import ProfileIcon from '@/components/user/profileIcon';
 import { ApiError } from '@/errors/errors';
 import { SubscriptionDto } from '@/features/subscription/data/dto/subscriptionDto';
 import { useProfile } from '@/features/user/domain/hooks/useProfile';
-import { UserStatus } from '@/features/user/domain/model/user';
 import { cn } from '@/lib/utils';
 import { Edit2, ImageIcon, MoreVertical } from 'lucide-react';
 import { ReactNode, useLayoutEffect, useRef, useState } from 'react';
@@ -20,7 +19,6 @@ import toast from 'react-hot-toast';
 export default function UserProfile({
   userId,
   userName,
-  userStatus,
   userBio,
   initialData,
   currentUserId,
@@ -28,7 +26,6 @@ export default function UserProfile({
 }: {
   userId: string;
   userName: string;
-  userStatus: UserStatus;
   userBio?: string;
   initialData?: SubscriptionDto;
   currentUserId?: string;
@@ -65,11 +62,7 @@ export default function UserProfile({
   return (
     <>
       <div className={cn('flex items-center gap-4', className)}>
-        <ProfileIcon
-          nickname={userName}
-          isActive={userStatus === 'ACTIVE'}
-          size='lg'
-        />
+        <ProfileIcon nickname={userName} size='lg' />
         <div className='flex-1 min-w-0'>
           <div className='flex justify-between items-start gap-4'>
             <div className='xl:max-w-[40%] text-xl font-semibold text-gray-900 truncate'>

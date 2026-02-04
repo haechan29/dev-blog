@@ -1,5 +1,3 @@
-import { UserStatus } from '@/features/user/domain/model/user';
-
 export interface CommentItemProps {
   id: number;
   postId: string;
@@ -10,5 +8,4 @@ export interface CommentItemProps {
   isUpdated: boolean;
   likeCount: number;
   userId: string;
-  userStatus: UserStatus;
 }
