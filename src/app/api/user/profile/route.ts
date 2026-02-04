@@ -5,13 +5,13 @@ import 'server-only';
 
 export async function PATCH(request: NextRequest) {
   try {
-    const { profileImageUrl, bio } = await request.json();
+    const { bio } = await request.json();
 
     if (bio !== undefined && bio !== null && bio.length > 200) {
       throw new ValidationError('소개는 200자 이하여야 합니다');
     }
 
-    await ProfileQueries.updateProfile({ profileImageUrl, bio });
+    await ProfileQueries.updateProfile({ bio });
 
     return NextResponse.json({ data: null });
   } catch (error) {
