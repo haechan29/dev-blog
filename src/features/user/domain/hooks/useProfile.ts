@@ -5,16 +5,16 @@ import { useRouter } from 'next/navigation';
 export function useProfile() {
   const router = useRouter();
 
-  const updateBio = useMutation({
+  const updateBioMutation = useMutation({
     mutationFn: (bio: string) => ProfileClientRepository.updateProfile({ bio }),
     onSuccess: () => router.refresh(),
   });
 
-  const updateImage = useMutation({
+  const updateImageMutation = useMutation({
     mutationFn: (file: File) =>
       ProfileClientRepository.updateProfileImage(file),
     onSuccess: () => router.refresh(),
   });
 
-  return { updateBio, updateImage };
+  return { updateBioMutation, updateImageMutation };
 }
