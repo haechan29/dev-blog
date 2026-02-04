@@ -1,11 +1,18 @@
 'use client';
 
 import UserBioDialog from '@/components/post/userBioDialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import ProfileIcon from '@/components/user/profileIcon';
 import { SubscriptionDto } from '@/features/subscription/data/dto/subscriptionDto';
 import { UserStatus } from '@/features/user/domain/model/user';
 import { cn } from '@/lib/utils';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { Edit2, ImageIcon, MoreVertical } from 'lucide-react';
+import { ReactNode, useLayoutEffect, useRef, useState } from 'react';
 
 export default function UserProfile({
   userId,
@@ -35,21 +42,23 @@ export default function UserProfile({
   }, [userBio]);
 
   return (
-    <div
-      className={cn(
-        'flex items-center max-sm:justify-between max-sm:gap-4 sm:gap-12',
-        className
-      )}
-    >
-      <div className='flex items-center gap-4 flex-1 min-w-0'>
+    <>
+      <div className={cn('flex items-center gap-4', className)}>
         <ProfileIcon
           nickname={userName}
           isActive={userStatus === 'ACTIVE'}
           size='lg'
         />
         <div className='flex-1 min-w-0'>
-          <div className='xl:max-w-[40%] text-xl font-semibold text-gray-900'>
-            {userName}
+          <div className='flex justify-between items-start gap-4'>
+            <div className='xl:max-w-[40%] text-xl font-semibold text-gray-900 truncate'>
+              {userName}
+            </div>
+            {userId === currentUserId && (
+              <UserSettingsDropdown>
+                <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2 cursor-pointer shrink-0' />
+              </UserSettingsDropdown>
+            )}
           </div>
 
           {userBio && (
@@ -76,6 +85,24 @@ export default function UserProfile({
         isOpen={isDialogOpen}
         setIsOpen={setIsDialogOpen}
       />
-    </div>
+    </>
+  );
+}
+
+function UserSettingsDropdown({ children }: { children: ReactNode }) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+      <DropdownMenuContent align='end'>
+        <DropdownMenuItem className='w-full flex items-center gap-2 cursor-pointer'>
+          <ImageIcon className='w-4 h-4 text-gray-500' />
+          <div className='whitespace-nowrap text-gray-900'>프로필 변경</div>
+        </DropdownMenuItem>
+        <DropdownMenuItem className='w-full flex items-center gap-2 cursor-pointer'>
+          <Edit2 className='w-4 h-4 text-gray-500' />
+          <div className='whitespace-nowrap text-gray-900'>소개 수정</div>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
