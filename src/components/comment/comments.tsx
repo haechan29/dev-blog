@@ -102,7 +102,11 @@ export default function Comments({
           </div>
         ) : (
           <div className='flex gap-3'>
-            <ProfileIcon nickname={comments[0].authorName} size='sm' />
+            <ProfileIcon
+              nickname={comments[0].authorName}
+              size='sm'
+              profileImageUrl={comments[0].profileImageUrl}
+            />
             <div className='flex-1 min-w-0 text-sm text-gray-600 line-clamp-3'>
               {comments[0].content}
             </div>

@@ -39,7 +39,11 @@ export default function HomeSidebar({ userId }: { userId: string }) {
                   href={`/@${user.id}/posts`}
                   className='flex items-center gap-3 py-2 px-3 rounded-sm hover:bg-gray-50'
                 >
-                  <ProfileIcon nickname={user.nickname!} size='sm' />
+                  <ProfileIcon
+                    nickname={user.nickname!}
+                    size='sm'
+                    profileImageUrl={user.profileImageUrl}
+                  />
 
                   <div className='text-xs text-gray-900'>{user.nickname!}</div>
                 </Link>

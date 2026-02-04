@@ -148,6 +148,8 @@ export default function PostPageClient({
         <AuthorProfile
           userId={post.userId}
           userName={post.authorName}
+          userBio={post.bio ?? undefined}
+          userProfileImageUrl={post.profileImageUrl ?? undefined}
           currentUserId={userId}
           className='mb-12'
         />

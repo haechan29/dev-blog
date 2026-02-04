@@ -20,6 +20,7 @@ export default function UserProfile({
   userId,
   userName,
   userBio,
+  profileImageUrl,
   initialData,
   currentUserId,
   className,
@@ -27,6 +28,7 @@ export default function UserProfile({
   userId: string;
   userName: string;
   userBio?: string;
+  profileImageUrl?: string;
   initialData?: SubscriptionDto;
   currentUserId?: string;
   className?: string;
@@ -62,7 +64,11 @@ export default function UserProfile({
   return (
     <>
       <div className={cn('flex items-center gap-4', className)}>
-        <ProfileIcon nickname={userName} size='lg' />
+        <ProfileIcon
+          nickname={userName}
+          size='lg'
+          profileImageUrl={profileImageUrl}
+        />
         <div className='flex-1 min-w-0'>
           <div className='flex justify-between items-start gap-4'>
             <div className='xl:max-w-[40%] text-xl font-semibold text-gray-900 truncate'>

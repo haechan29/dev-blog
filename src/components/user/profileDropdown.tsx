@@ -20,11 +20,13 @@ export default function ProfileDropdown({
   isLoggedIn,
   userId,
   nickname,
+  profileImageUrl,
   children,
 }: {
   isLoggedIn: boolean;
   userId?: string;
   nickname: string;
+  profileImageUrl?: string;
   children: ReactNode;
 }) {
   const router = useRouterWithProgress();
@@ -88,7 +90,10 @@ export default function ProfileDropdown({
             className='flex items-center gap-3 p-2 cursor-pointer group'
             onClick={() => userId && router.push(`/@${userId}/posts`)}
           >
-            <ProfileIcon nickname={nickname} />
+            <ProfileIcon
+              nickname={nickname}
+              profileImageUrl={profileImageUrl}
+            />
             <div className='flex flex-col'>
               <div className='text-sm font-medium text-gray-900'>
                 {nickname}

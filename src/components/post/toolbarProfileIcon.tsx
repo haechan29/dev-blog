@@ -27,6 +27,7 @@ export default function ToolbarProfileIcon({
       isLoggedIn={isLoggedIn}
       userId={user?.id}
       nickname={displayName}
+      profileImageUrl={user?.profileImageUrl ?? undefined}
     >
       <ProfileIcon
         nickname={displayName}

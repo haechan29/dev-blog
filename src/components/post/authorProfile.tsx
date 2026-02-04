@@ -13,6 +13,7 @@ export default function AuthorProfile({
   userId,
   userName,
   userBio,
+  userProfileImageUrl,
   initialData,
   currentUserId,
   className,
@@ -20,6 +21,7 @@ export default function AuthorProfile({
   userId: string;
   userName: string;
   userBio?: string;
+  userProfileImageUrl?: string;
   initialData?: SubscriptionDto;
   currentUserId?: string;
   className?: string;
@@ -39,7 +41,11 @@ export default function AuthorProfile({
       )}
     >
       <div className='flex items-center gap-3 flex-1 min-w-0'>
-        <ProfileIcon nickname={userName} size='md' />
+        <ProfileIcon
+          nickname={userName}
+          size='md'
+          profileImageUrl={userProfileImageUrl}
+        />
         <div className='flex-1 min-w-0'>
           <Link
             href={`/@${userId}/posts`}
