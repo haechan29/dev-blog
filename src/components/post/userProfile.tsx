@@ -1,10 +1,11 @@
 'use client';
 
+import UserBioDialog from '@/components/post/userBioDialog';
 import ProfileIcon from '@/components/user/profileIcon';
 import { SubscriptionDto } from '@/features/subscription/data/dto/subscriptionDto';
 import { UserStatus } from '@/features/user/domain/model/user';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
+import { useLayoutEffect, useRef, useState } from 'react';
 
 export default function UserProfile({
   userId,
@@ -23,6 +24,16 @@ export default function UserProfile({
   currentUserId?: string;
   className?: string;
 }) {
+  const bioRef = useRef<HTMLDivElement>(null);
+  const [hasOverflow, setHasOverflow] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  useLayoutEffect(() => {
+    if (bioRef.current) {
+      setHasOverflow(bioRef.current.scrollWidth > bioRef.current.clientWidth);
+    }
+  }, [userBio]);
+
   return (
     <div
       className={cn(
@@ -37,18 +48,34 @@ export default function UserProfile({
           size='lg'
         />
         <div className='flex-1 min-w-0'>
-          <Link
-            href={`/@${userId}/posts`}
-            className='block text-xl font-semibold text-gray-900 hover:underline truncate'
-          >
+          <div className='xl:max-w-[40%] text-xl font-semibold text-gray-900'>
             {userName}
-          </Link>
+          </div>
 
           {userBio && (
-            <div className='text-sm text-gray-500 trunc'>{userBio}</div>
+            <div className='xl:max-w-[60%] flex items-center gap-1 text-sm'>
+              <div ref={bioRef} className='text-gray-500 truncate'>
+                {userBio}
+              </div>
+              {hasOverflow && (
+                <button
+                  onClick={() => setIsDialogOpen(true)}
+                  className='shrink-0 text-gray-500 hover:text-gray-400 cursor-pointer'
+                >
+                  더보기
+                </button>
+              )}
+            </div>
           )}
         </div>
       </div>
+
+      <UserBioDialog
+        userName={userName}
+        userBio={userBio ?? ''}
+        isOpen={isDialogOpen}
+        setIsOpen={setIsDialogOpen}
+      />
     </div>
   );
 }
