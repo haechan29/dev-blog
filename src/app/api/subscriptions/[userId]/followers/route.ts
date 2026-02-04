@@ -1,4 +1,5 @@
 import { ApiError } from '@/errors/errors';
+import { toDto } from '@/features/subscription/data/mapper/followUserMapper';
 import * as SubscriptionQueries from '@/features/subscription/data/queries/subscriptionQueries';
 import { NextRequest, NextResponse } from 'next/server';
 import 'server-only';
@@ -9,7 +10,9 @@ export async function GET(
 ) {
   try {
     const { userId } = await params;
-    const followers = await SubscriptionQueries.getFollowers(userId);
+    const followers = await SubscriptionQueries.getFollowers(userId).then(
+      following => following.map(toDto)
+    );
     return NextResponse.json({ data: followers });
   } catch (error) {
     console.error('팔로워 목록 조회가 실패했습니다', error);
