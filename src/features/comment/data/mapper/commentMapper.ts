@@ -18,6 +18,7 @@ export function toDto(comment: CommentEntity): CommentResponseDto {
     userId: comment.user_id,
     deletedAt: comment.users.deleted_at,
     registeredAt: comment.users.registered_at,
+    profileImageUrl: comment.users.profile_image_url,
   };
 }
 
@@ -34,5 +35,6 @@ export function flatToDto(comment: CommentEntityFlat): CommentResponseDto {
     userId: comment.user_id,
     deletedAt: comment.deleted_at,
     registeredAt: comment.registered_at,
+    profileImageUrl: comment.profile_image_url,
   };
 }

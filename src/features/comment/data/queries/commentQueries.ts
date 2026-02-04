@@ -73,7 +73,7 @@ export async function createComments(
         updated_at, 
         like_count, 
         user_id, 
-        users:user_id(nickname, deleted_at, registered_at)
+        users:user_id(nickname, deleted_at, registered_at, profile_image_url)
       `
     )
     .single();
@@ -102,7 +102,7 @@ export async function updateComment(commentId: number, content: string) {
         updated_at, 
         like_count, 
         user_id, 
-        users:user_id(nickname, deleted_at, registered_at)
+        users:user_id(nickname, deleted_at, registered_at, profile_image_url)
       `
     )
     .single();

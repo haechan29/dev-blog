@@ -9,4 +9,5 @@ export interface CommentResponseDto {
   userId: string;
   deletedAt: string | null;
   registeredAt: string | null;
+  profileImageUrl: string | null;
 }
