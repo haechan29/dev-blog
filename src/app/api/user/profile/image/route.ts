@@ -29,7 +29,12 @@ export async function PUT(request: NextRequest) {
       throw new ValidationError('허용되지 않는 파일 형식입니다');
     }
 
-    const url = await uploadMedia({ file, userId, type: 'image' });
+    const url = await uploadMedia({
+      file,
+      userId,
+      type: 'image',
+      profileUserId: userId,
+    });
 
     await ProfileQueries.updateProfile({ profileImageUrl: url });
 

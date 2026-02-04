@@ -12,17 +12,17 @@ const DAILY_QUOTA = 1024 * 1024 * 1024; // 1GB
 
 type MediaType = 'image' | 'audio';
 
-interface UploadMediaParams {
-  file: File;
-  userId: string;
-  type: MediaType;
-}
-
 export async function uploadMedia({
   file,
   userId,
   type,
-}: UploadMediaParams): Promise<string> {
+  profileUserId,
+}: {
+  file: File;
+  userId: string;
+  type: MediaType;
+  profileUserId?: string;
+}): Promise<string> {
   const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
   const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
@@ -49,6 +49,7 @@ export async function uploadMedia({
     sizeBytes: file.size,
     userId,
     type,
+    profileUserId,
   });
 
   const buffer = Buffer.from(await file.arrayBuffer());

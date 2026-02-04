@@ -38,6 +38,7 @@ export async function getOrphanMediaList() {
     .from('media')
     .select('id, url')
     .is('post_id', null)
+    .is('profile_user_id', null)
     .lt('created_at', oneDayAgo);
 
   if (error) {
@@ -52,11 +53,13 @@ export async function createMedia({
   sizeBytes,
   userId,
   type,
+  profileUserId,
 }: {
   url: string;
   sizeBytes: number;
   userId: string;
   type: 'image' | 'audio';
+  profileUserId?: string;
 }) {
   const { data, error } = await supabase
     .from('media')
@@ -65,6 +68,7 @@ export async function createMedia({
       size_bytes: sizeBytes,
       user_id: userId,
       type,
+      profile_user_id: profileUserId ?? null,
     })
     .select('id')
     .single();
