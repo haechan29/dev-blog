@@ -30,6 +30,7 @@ export default async function UserLayout({
         userId={userId}
         userName={user?.nickname ?? `Guest#${userId.slice(0, 4)}`}
         userStatus={user.userStatus}
+        userBio={user.bio ?? undefined}
         initialData={subscriptionInfo}
         currentUserId={currentUserId}
       />

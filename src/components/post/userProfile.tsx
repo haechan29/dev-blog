@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import ProfileIcon from '@/components/user/profileIcon';
 import { SubscriptionDto } from '@/features/subscription/data/dto/subscriptionDto';
+import { useProfile } from '@/features/user/domain/hooks/useProfile';
 import { UserStatus } from '@/features/user/domain/model/user';
 import { cn } from '@/lib/utils';
 import { Edit2, ImageIcon, MoreVertical } from 'lucide-react';
@@ -34,6 +35,8 @@ export default function UserProfile({
   const bioRef = useRef<HTMLDivElement>(null);
   const [hasOverflow, setHasOverflow] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const { updateBio, updateImage } = useProfile();
 
   useLayoutEffect(() => {
     if (bioRef.current) {
@@ -96,11 +99,11 @@ function UserSettingsDropdown({ children }: { children: ReactNode }) {
       <DropdownMenuContent align='end'>
         <DropdownMenuItem className='w-full flex items-center gap-2 cursor-pointer'>
           <ImageIcon className='w-4 h-4 text-gray-500' />
-          <div className='whitespace-nowrap text-gray-900'>프로필 변경</div>
+          <div className='whitespace-nowrap text-gray-900'>프로필 설정</div>
         </DropdownMenuItem>
         <DropdownMenuItem className='w-full flex items-center gap-2 cursor-pointer'>
           <Edit2 className='w-4 h-4 text-gray-500' />
-          <div className='whitespace-nowrap text-gray-900'>소개 수정</div>
+          <div className='whitespace-nowrap text-gray-900'>소개 설정</div>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
