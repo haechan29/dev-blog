@@ -1,83 +1,54 @@
 'use client';
 
-import SubscribeButton from '@/components/post/subscribeButton';
 import ProfileIcon from '@/components/user/profileIcon';
 import { SubscriptionDto } from '@/features/subscription/data/dto/subscriptionDto';
-import * as SubscriptionClientRepository from '@/features/subscription/data/repository/subscriptionClientRepository';
 import { UserStatus } from '@/features/user/domain/model/user';
 import { cn } from '@/lib/utils';
-import { subscriptionKeys } from '@/queries/keys';
-import { useQuery } from '@tanstack/react-query';
-import clsx from 'clsx';
 import Link from 'next/link';
 
 export default function UserProfile({
   userId,
   userName,
   userStatus,
+  userBio,
   initialData,
   currentUserId,
-  size = 'md',
   className,
 }: {
   userId: string;
   userName: string;
   userStatus: UserStatus;
+  userBio?: string;
   initialData?: SubscriptionDto;
   currentUserId?: string;
-  size?: 'md' | 'lg';
   className?: string;
 }) {
-  const { data } = useQuery({
-    queryKey: subscriptionKeys.info(userId),
-    queryFn: () => SubscriptionClientRepository.getSubscriptionInfo(userId),
-    enabled: currentUserId !== userId,
-    initialData,
-  });
-
   return (
     <div
       className={cn(
-        'flex items-center max-sm:justify-between sm:gap-12',
+        'flex items-center max-sm:justify-between max-sm:gap-4 sm:gap-12',
         className
       )}
     >
-      <div
-        className={clsx('flex items-center', size === 'lg' ? 'gap-4' : 'gap-3')}
-      >
+      <div className='flex items-center gap-4 flex-1 min-w-0'>
         <ProfileIcon
           nickname={userName}
           isActive={userStatus === 'ACTIVE'}
-          size={size}
+          size='lg'
         />
-        <div>
+        <div className='flex-1 min-w-0'>
           <Link
             href={`/@${userId}/posts`}
-            className={clsx(
-              'font-medium text-gray-900 hover:underline',
-              size === 'lg' && 'text-xl font-semibold'
-            )}
+            className='block text-xl font-semibold text-gray-900 hover:underline truncate'
           >
             {userName}
           </Link>
 
-          <div
-            className={clsx(
-              'text-gray-500',
-              size === 'lg' ? 'text-sm' : 'text-xs'
-            )}
-          >
-            {`구독자 ${data?.subscriberCount ?? 0}명`}
-          </div>
+          {userBio && (
+            <div className='text-sm text-gray-500 trunc'>{userBio}</div>
+          )}
         </div>
       </div>
-
-      {userId !== currentUserId && (
-        <SubscribeButton
-          userId={userId}
-          isSubscribed={data?.isSubscribed ?? false}
-        />
-      )}
     </div>
   );
 }

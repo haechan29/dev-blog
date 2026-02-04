@@ -2,6 +2,7 @@
 
 import Comments from '@/components/comment/comments';
 import HomeToolbar from '@/components/home/homeToolbar';
+import AuthorProfile from '@/components/post/authorProfile';
 import ForbiddenPostPage from '@/components/post/forbiddenPostPage';
 import LikeButton from '@/components/post/likeButton';
 import PostContentWrapper from '@/components/post/postContentWrapper';
@@ -11,7 +12,6 @@ import PostSeriesNav from '@/components/post/postSeriesNav';
 import PostSidebar from '@/components/post/postSidebar';
 import PostToolbar from '@/components/post/postToolbar';
 import PostVisibilityBanner from '@/components/post/postVisibilityBanner';
-import UserProfile from '@/components/post/userProfile';
 import EnterFullscreenButton from '@/components/postViewer/enterFullscreenButton';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
 import { PostForbiddenError } from '@/features/post/data/errors/postErrors';
@@ -145,7 +145,7 @@ export default function PostPageClient({
 
         <PostSeriesNav post={post} />
 
-        <UserProfile
+        <AuthorProfile
           userId={post.userId}
           userName={post.authorName}
           userStatus={post.userStatus}

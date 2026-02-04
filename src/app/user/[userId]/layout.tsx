@@ -32,7 +32,6 @@ export default async function UserLayout({
         userStatus={user.userStatus}
         initialData={subscriptionInfo}
         currentUserId={currentUserId}
-        size='lg'
       />
 
       <UserNavTabs userId={userId} />
