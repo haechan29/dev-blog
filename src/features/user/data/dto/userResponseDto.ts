@@ -5,4 +5,6 @@ export interface UserResponseDto {
   updatedAt: string | null;
   deletedAt: string | null;
   registeredAt: string | null;
+  profileImageUrl: string | null;
+  bio: string | null;
 }

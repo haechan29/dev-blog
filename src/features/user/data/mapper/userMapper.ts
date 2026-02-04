@@ -9,5 +9,7 @@ export function toDto(user: UserEntity): UserResponseDto {
     updatedAt: user.updated_at,
     deletedAt: user.deleted_at,
     registeredAt: user.registered_at,
+    profileImageUrl: user.profile_image_url,
+    bio: user.bio,
   };
 }

@@ -5,4 +5,6 @@ export interface UserEntity {
   updated_at: string | null;
   deleted_at: string | null;
   registered_at: string | null;
+  profile_image_url: string | null;
+  bio: string | null;
 }

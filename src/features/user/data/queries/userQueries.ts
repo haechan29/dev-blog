@@ -17,7 +17,9 @@ export async function fetchUser(userId: string) {
         created_at, 
         updated_at, 
         deleted_at, 
-        registered_at
+        registered_at,
+        profile_image_url,
+        bio
       `
     )
     .eq('id', userId)
