@@ -21,6 +21,11 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://sharetext.app'),
   title: 'ShareText',
   description: '누구나 글을 쓰고 읽을 수 있는 텍스트 콘텐츠 플랫폼',
+  verification: {
+    other: {
+      'naver-site-verification': '021e131414124305e2c747f031fc4b86b986155c',
+    },
+  },
   openGraph: {
     title: 'ShareText',
     description: '누구나 글을 쓰고 읽을 수 있는 텍스트 콘텐츠 플랫폼',
