@@ -1,20 +1,28 @@
 import * as ProfileClientRepository from '@/features/user/data/repository/profileClientRepository';
-import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
+import { UserProps } from '@/features/user/ui/userProps';
+import { userKeys } from '@/queries/keys';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import useUser from './useUser';
 
-export function useProfile() {
-  const router = useRouter();
+export function useProfile(initialUser?: UserProps | null) {
+  const queryClient = useQueryClient();
+
+  const { user } = useUser(initialUser);
 
   const updateBioMutation = useMutation({
     mutationFn: (bio: string) => ProfileClientRepository.updateProfile({ bio }),
-    onSuccess: () => router.refresh(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userKeys.me() });
+    },
   });
 
   const updateImageMutation = useMutation({
     mutationFn: (file: File) =>
       ProfileClientRepository.updateProfileImage(file),
-    onSuccess: () => router.refresh(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userKeys.me() });
+    },
   });
 
-  return { updateBioMutation, updateImageMutation };
+  return { user, updateBioMutation, updateImageMutation };
 }

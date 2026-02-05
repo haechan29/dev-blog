@@ -11,24 +11,19 @@ import ProfileIcon from '@/components/user/profileIcon';
 import { ApiError } from '@/errors/errors';
 import { SubscriptionDto } from '@/features/subscription/data/dto/subscriptionDto';
 import { useProfile } from '@/features/user/domain/hooks/useProfile';
+import { UserProps } from '@/features/user/ui/userProps';
 import { cn } from '@/lib/utils';
 import { Edit2, ImageIcon, MoreVertical } from 'lucide-react';
 import { ReactNode, useLayoutEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
 export default function UserProfile({
-  userId,
-  userName,
-  userBio,
-  profileImageUrl,
+  initialUser,
   initialData,
   currentUserId,
   className,
 }: {
-  userId: string;
-  userName: string;
-  userBio?: string;
-  profileImageUrl?: string;
+  initialUser: UserProps;
   initialData?: SubscriptionDto;
   currentUserId?: string;
   className?: string;
@@ -39,7 +34,8 @@ export default function UserProfile({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
 
-  const { updateBioMutation, updateImageMutation } = useProfile();
+  const { user, updateBioMutation, updateImageMutation } =
+    useProfile(initialUser);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -76,22 +72,26 @@ export default function UserProfile({
     if (bioRef.current) {
       setHasOverflow(bioRef.current.scrollWidth > bioRef.current.clientWidth);
     }
-  }, [userBio]);
+  }, [user?.bio]);
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <>
       <div className={cn('flex items-center gap-4', className)}>
         <ProfileIcon
-          nickname={userName}
+          nickname={user.nickname}
           size='lg'
-          profileImageUrl={profileImageUrl}
+          profileImageUrl={user.profileImageUrl}
         />
         <div className='flex-1 min-w-0'>
           <div className='flex justify-between items-start gap-4'>
             <div className='xl:max-w-[40%] text-xl font-semibold text-gray-900 truncate'>
-              {userName}
+              {user.nickname}
             </div>
-            {userId === currentUserId && (
+            {user.id === currentUserId && (
               <UserSettingsDropdown
                 onEditBio={() => {
                   setDialogMode('edit');
@@ -104,10 +104,10 @@ export default function UserProfile({
             )}
           </div>
 
-          {userBio && (
+          {user.bio && (
             <div className='xl:max-w-[60%] flex items-center gap-1 text-sm'>
               <div ref={bioRef} className='text-gray-500 truncate'>
-                {userBio}
+                {user.bio}
               </div>
               {hasOverflow && (
                 <button
@@ -134,8 +134,8 @@ export default function UserProfile({
       />
 
       <UserBioDialog
-        userName={userName}
-        userBio={userBio ?? ''}
+        userName={user.nickname}
+        userBio={user.bio}
         isOpen={isDialogOpen}
         setIsOpen={setIsDialogOpen}
         mode={dialogMode}

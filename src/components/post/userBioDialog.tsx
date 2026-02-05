@@ -22,7 +22,7 @@ export default function UserBioDialog({
   isLoading = false,
 }: {
   userName: string;
-  userBio: string;
+  userBio: string | null;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   mode?: 'view' | 'edit';
@@ -35,7 +35,7 @@ export default function UserBioDialog({
 
   useEffect(() => {
     if (isOpen) {
-      setBio(userBio);
+      setBio(userBio ?? '');
     }
   }, [isOpen, userBio]);
 

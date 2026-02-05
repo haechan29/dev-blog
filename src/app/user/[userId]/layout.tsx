@@ -30,10 +30,7 @@ export default async function UserLayout({
   return (
     <div className='flex flex-col gap-8 pt-(--toolbar-height) pb-20 px-6 md:px-12'>
       <UserProfile
-        userId={userId}
-        userName={user.nickname}
-        userBio={user.bio ?? undefined}
-        profileImageUrl={user.profileImageUrl ?? undefined}
+        initialUser={user}
         initialData={subscriptionInfo}
         currentUserId={currentUserId}
       />

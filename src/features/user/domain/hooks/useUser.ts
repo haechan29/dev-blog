@@ -2,11 +2,11 @@
 
 import * as UserAction from '@/features/user/domain/action/userAction';
 import * as UserClientService from '@/features/user/domain/service/userClientService';
-import { createProps } from '@/features/user/ui/userProps';
+import { createProps, UserProps } from '@/features/user/ui/userProps';
 import { userKeys } from '@/queries/keys';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-export default function useUser() {
+export default function useUser(initialUser?: UserProps | null) {
   const queryClient = useQueryClient();
 
   const { data: user } = useQuery({
@@ -15,6 +15,7 @@ export default function useUser() {
       UserClientService.fetchUser().then(user =>
         user ? createProps(user) : null
       ),
+    initialData: initialUser,
   });
 
   const createUserMutation = useMutation({
