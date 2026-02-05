@@ -2,54 +2,82 @@
 
 import { getColorIndex } from '@/lib/color';
 import clsx from 'clsx';
+import Image from 'next/image';
 
 const colors = [
-  { base: 'bg-red-400', hover: 'hover:bg-red-500' },
-  { base: 'bg-orange-400', hover: 'hover:bg-orange-500' },
-  { base: 'bg-amber-400', hover: 'hover:bg-amber-500' },
-  { base: 'bg-green-400', hover: 'hover:bg-green-500' },
-  { base: 'bg-teal-400', hover: 'hover:bg-teal-500' },
-  { base: 'bg-blue-400', hover: 'hover:bg-blue-500' },
-  { base: 'bg-indigo-400', hover: 'hover:bg-indigo-500' },
-  { base: 'bg-purple-400', hover: 'hover:bg-purple-500' },
-  { base: 'bg-pink-400', hover: 'hover:bg-pink-500' },
+  'bg-red-400',
+  'bg-orange-400',
+  'bg-amber-400',
+  'bg-green-400',
+  'bg-teal-400',
+  'bg-blue-400',
+  'bg-indigo-400',
+  'bg-purple-400',
+  'bg-pink-400',
 ];
 
 export default function ProfileIcon({
   nickname,
-  isActive,
   size = 'md',
-  hoverable = true,
+  profileImageUrl = null,
+  skeleton = false,
+  isLoading = false,
 }: {
   nickname: string;
-  isActive: boolean;
   size?: 'sm' | 'md' | 'lg';
-  hoverable?: boolean;
+  profileImageUrl?: string | null;
+  skeleton?: boolean;
+  isLoading?: boolean;
 }) {
+  const sizeClass =
+    size === 'sm' ? 'w-6 h-6' : size === 'md' ? 'w-8 h-8' : 'w-14 h-14';
+
+  if (skeleton) {
+    return (
+      <div className={clsx('shrink-0 rounded-full bg-gray-200', sizeClass)} />
+    );
+  }
+
+  if (profileImageUrl) {
+    return (
+      <div
+        className={clsx(
+          'shrink-0 rounded-full overflow-hidden relative',
+          sizeClass
+        )}
+      >
+        <Image
+          src={profileImageUrl}
+          alt={`${nickname} 프로필`}
+          width={100}
+          height={100}
+          className='object-cover w-full h-full'
+        />
+        {isLoading && (
+          <div className='absolute inset-0 bg-black/30 flex items-center justify-center'>
+            <div className='w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin' />
+          </div>
+        )}
+      </div>
+    );
+  }
+
   const initial = nickname.charAt(0).toUpperCase();
   const colorIndex = getColorIndex(nickname);
-  const baseColor = isActive ? colors[colorIndex].base : 'bg-gray-300';
-  const hoverColor = hoverable
-    ? isActive
-      ? colors[colorIndex].hover
-      : 'hover:bg-gray-400'
-    : '';
+  const baseColor = colors[colorIndex];
 
   return (
     <div
       className={clsx(
         'shrink-0 rounded-full flex items-center justify-center',
-        hoverable && 'cursor-pointer',
-        size === 'sm' ? 'w-6 h-6' : size === 'md' ? 'w-8 h-8' : 'w-14 h-14',
-        baseColor,
-        hoverColor
+        sizeClass,
+        baseColor
       )}
     >
       <span
         className={clsx(
-          'font-semibold',
-          size === 'sm' ? 'text-xs' : size === 'md' ? 'text-sm' : 'text-2xl',
-          isActive ? 'text-white' : 'text-gray-600'
+          'font-semibold text-white',
+          size === 'sm' ? 'text-xs' : size === 'md' ? 'text-sm' : 'text-2xl'
         )}
       >
         {initial}

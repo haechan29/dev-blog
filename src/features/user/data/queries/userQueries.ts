@@ -4,7 +4,6 @@ import { UserEntity } from '@/features/user/data/entities/userEntities';
 import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
 import { toDto } from '@/features/user/data/mapper/userMapper';
 import { supabase, supabaseNextAuth } from '@/lib/supabase';
-import { cookies } from 'next/headers';
 import 'server-only';
 
 export async function fetchUser(userId: string) {
@@ -17,7 +16,9 @@ export async function fetchUser(userId: string) {
         created_at, 
         updated_at, 
         deleted_at, 
-        registered_at
+        registered_at,
+        profile_image_url,
+        bio
       `
     )
     .eq('id', userId)
@@ -58,14 +59,15 @@ export async function createUserWithNickname(nickname: string) {
   return data.id as string;
 }
 
-export async function updateUser(nickname: string) {
-  const userId = (await cookies()).get('userId')?.value;
-  const authUserId = (await auth())?.user?.id;
-
-  if (!userId || !authUserId) {
-    throw new UnauthorizedError('인증되지 않은 요청입니다');
-  }
-
+export async function updateUser({
+  userId,
+  authUserId,
+  nickname,
+}: {
+  userId: string;
+  authUserId: string;
+  nickname: string;
+}) {
   const { error } = await supabase
     .from('users')
     .update({

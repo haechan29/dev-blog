@@ -1,4 +1,5 @@
 import { UnauthorizedError, ValidationError } from '@/errors/errors';
+import { FollowUserEntity } from '@/features/subscription/data/entities/followUserEntities';
 import { supabase } from '@/lib/supabase';
 import { getUserId } from '@/lib/user';
 import 'server-only';
@@ -40,7 +41,7 @@ export async function getSubscriptionInfo(followingId: string) {
 export async function getFollowers(userId: string) {
   const { data, error } = await supabase
     .from('subscriptions')
-    .select('follower:users!follower_id(id, nickname)')
+    .select('follower:users!follower_id(id, nickname, profile_image_url)')
     .eq('following_id', userId)
     .is('follower.deleted_at', null);
 
@@ -48,13 +49,13 @@ export async function getFollowers(userId: string) {
     throw new Error(error.message);
   }
 
-  return data.map(row => row.follower);
+  return data.map(row => row.follower) as unknown as FollowUserEntity[];
 }
 
 export async function getFollowing(userId: string) {
   const { data, error } = await supabase
     .from('subscriptions')
-    .select('following:users!following_id(id, nickname)')
+    .select('following:users!following_id(id, nickname, profile_image_url)')
     .eq('follower_id', userId)
     .is('following.deleted_at', null);
 
@@ -62,7 +63,7 @@ export async function getFollowing(userId: string) {
     throw new Error(error.message);
   }
 
-  return data.map(row => row.following);
+  return data.map(row => row.following) as unknown as FollowUserEntity[];
 }
 
 export async function getFollowingIds(userId: string) {

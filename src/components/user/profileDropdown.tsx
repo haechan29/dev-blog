@@ -20,11 +20,13 @@ export default function ProfileDropdown({
   isLoggedIn,
   userId,
   nickname,
+  profileImageUrl,
   children,
 }: {
   isLoggedIn: boolean;
   userId?: string;
   nickname: string;
+  profileImageUrl?: string;
   children: ReactNode;
 }) {
   const router = useRouterWithProgress();
@@ -90,8 +92,7 @@ export default function ProfileDropdown({
           >
             <ProfileIcon
               nickname={nickname}
-              isActive={isLoggedIn}
-              hoverable={false}
+              profileImageUrl={profileImageUrl}
             />
             <div className='flex flex-col'>
               <div className='text-sm font-medium text-gray-900'>

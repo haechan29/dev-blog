@@ -1,7 +1,6 @@
 import { extractHeadings } from '@/features/post/domain/lib/parse';
 import Heading from '@/features/post/domain/model/heading';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
-import { UserStatus } from '@/features/user/domain/model/user';
 
 export default class Post {
   public readonly headings: Heading[];
@@ -14,8 +13,9 @@ export default class Post {
     public readonly content: string,
     public readonly tags: string[],
     public readonly userId: string,
-    public readonly authorName: string,
-    public readonly userStatus: UserStatus,
+    public readonly authorName: string | null,
+    public readonly bio: string | null,
+    public readonly profileImageUrl: string | null,
     public readonly seriesId: string | null,
     public readonly seriesOrder: number | null,
     public readonly seriesTitle: string | null,

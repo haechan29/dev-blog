@@ -7,7 +7,7 @@ export interface SeriesDto {
   createdAt: string;
   updatedAt: string;
   userId: string;
-  authorName: string;
+  authorName: string | null;
   posts: Pick<
     PostDto,
     | 'id'

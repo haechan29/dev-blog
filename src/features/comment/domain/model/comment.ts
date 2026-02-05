@@ -1,30 +1,30 @@
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
-import { UserStatus } from '@/features/user/domain/model/user';
+import { toUserNickname } from '@/features/user/ui/userProps';
 
 export class Comment {
   constructor(
     public readonly id: number,
     public readonly postId: string,
-    public readonly authorName: string,
+    public readonly authorName: string | null,
+    public readonly profileImageUrl: string | null,
     public readonly content: string,
     public readonly createdAt: string,
     public readonly updatedAt: string,
     public readonly likeCount: number,
-    public readonly userId: string,
-    public readonly userStatus: UserStatus
+    public readonly userId: string
   ) {}
 
   toProps(): CommentItemProps {
     return {
       id: this.id,
       postId: this.postId,
-      authorName: this.authorName,
+      authorName: toUserNickname({ id: this.userId, nickname: this.authorName }),
+      profileImageUrl: this.profileImageUrl,
       content: this.content,
       createdAt: formatTime(this.createdAt),
       isUpdated: this.createdAt !== this.updatedAt,
       likeCount: this.likeCount,
       userId: this.userId,
-      userStatus: this.userStatus,
     };
   }
 }

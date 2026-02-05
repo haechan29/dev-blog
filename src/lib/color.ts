@@ -33,6 +33,7 @@ export const ringColors = [
   'ring-purple-300',
   'ring-pink-300',
 ];
+
 export function getColorIndex(str: string) {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {

@@ -3,7 +3,6 @@
 import ProfileDropdown from '@/components/user/profileDropdown';
 import ProfileIcon from '@/components/user/profileIcon';
 import useUser from '@/features/user/domain/hooks/useUser';
-import { useEffect, useState } from 'react';
 
 export default function ToolbarProfileIcon({
   isLoggedIn,
@@ -11,24 +10,22 @@ export default function ToolbarProfileIcon({
   isLoggedIn: boolean;
 }) {
   const { user } = useUser();
-  const [isMounted, setIsMounted] = useState(false);
-  const displayName = !isMounted
-    ? 'Guest'
-    : isLoggedIn && user?.nickname
-    ? user.nickname
-    : `Guest#${user?.id?.slice(0, 4) ?? '0000'}`;
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  if (!user) {
+    return <ProfileIcon nickname='' skeleton />;
+  }
 
   return (
     <ProfileDropdown
       isLoggedIn={isLoggedIn}
-      userId={user?.id}
-      nickname={displayName}
+      userId={user.id}
+      nickname={user.nickname}
+      profileImageUrl={user.profileImageUrl ?? undefined}
     >
-      <ProfileIcon nickname={displayName} isActive={!!user && isLoggedIn} />
+      <ProfileIcon
+        nickname={user.nickname}
+        profileImageUrl={user.profileImageUrl}
+      />
     </ProfileDropdown>
   );
 }

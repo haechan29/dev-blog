@@ -23,8 +23,8 @@ export default function CommentItem({
     <div className='px-6 md:px-12 xl:px-4 my-4 flex space-x-2'>
       <ProfileIcon
         nickname={comment.authorName}
-        isActive={comment.userStatus === 'ACTIVE'}
         size='sm'
+        profileImageUrl={comment.profileImageUrl}
       />
 
       <div className='flex-1 min-w-0'>

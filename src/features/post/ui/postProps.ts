@@ -1,11 +1,11 @@
 import { formatDate } from '@/features/post/domain/lib/date';
+import { toUserNickname } from '@/features/user/ui/userProps';
 import { extractPlainText } from '@/features/post/domain/lib/parse';
 import Heading from '@/features/post/domain/model/heading';
 import Post from '@/features/post/domain/model/post';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
-import { UserStatus } from '@/features/user/domain/model/user';
 
-export type PostProps = {
+export interface PostProps {
   id: string;
   title: string;
   createdAt: string;
@@ -16,14 +16,15 @@ export type PostProps = {
   plainText: string;
   userId: string;
   authorName: string;
-  userStatus: UserStatus;
+  bio: string | null;
+  profileImageUrl: string | null;
   seriesId: string | null;
   seriesOrder: number | null;
   seriesTitle: string | null;
   likeCount: number;
   viewCount: number;
   visibility: PostVisibility;
-};
+}
 
 export function createProps(post: Post): PostProps {
   return {
@@ -36,8 +37,9 @@ export function createProps(post: Post): PostProps {
     headings: post.headings,
     plainText: extractPlainText(post.content),
     userId: post.userId,
-    authorName: post.authorName,
-    userStatus: post.userStatus,
+    authorName: toUserNickname({ id: post.userId, nickname: post.authorName }),
+    bio: post.bio,
+    profileImageUrl: post.profileImageUrl,
     seriesId: post.seriesId,
     seriesOrder: post.seriesOrder,
     seriesTitle: post.seriesTitle,

@@ -1,5 +1,6 @@
 import { ApiError, ValidationError } from '@/errors/errors';
 import { uploadMedia } from '@/features/media/data/usecases/mediaUsecases';
+import * as ProfileQueries from '@/features/user/data/queries/profileQueries';
 import { getUserId } from '@/lib/user';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -9,9 +10,8 @@ const ALLOWED_IMAGE_TYPES = [
   'image/gif',
   'image/webp',
 ];
-const ALLOWED_AUDIO_TYPES = ['audio/mpeg'];
 
-export async function POST(request: NextRequest) {
+export async function PUT(request: NextRequest) {
   try {
     const userId = await getUserId();
     if (!userId) {
@@ -25,27 +25,29 @@ export async function POST(request: NextRequest) {
       throw new ValidationError('파일을 찾을 수 없습니다');
     }
 
-    const isImage = ALLOWED_IMAGE_TYPES.includes(file.type);
-    const isAudio = ALLOWED_AUDIO_TYPES.includes(file.type);
-
-    if (!isImage && !isAudio) {
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
       throw new ValidationError('허용되지 않는 파일 형식입니다');
     }
 
-    const type = isImage ? 'image' : 'audio';
+    const url = await uploadMedia({
+      file,
+      userId,
+      type: 'image',
+      profileUserId: userId,
+    });
 
-    const url = await uploadMedia({ file, userId, type });
+    await ProfileQueries.updateProfile({ userId, profileImageUrl: url });
 
     return NextResponse.json({ data: { url } });
   } catch (error) {
-    console.error('파일 업로드에 실패했습니다', error);
+    console.error('프로필 이미지 업로드에 실패했습니다', error);
 
     if (error instanceof ApiError) {
       return error.toResponse();
     }
 
     return NextResponse.json(
-      { error: '파일 업로드에 실패했습니다' },
+      { error: '프로필 이미지 업로드에 실패했습니다' },
       { status: 500 }
     );
   }

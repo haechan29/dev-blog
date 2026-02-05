@@ -8,7 +8,7 @@ export interface CommentEntity {
   updated_at: string;
   like_count: number;
   user_id: string;
-  users: Pick<UserEntity, 'nickname' | 'deleted_at' | 'registered_at'>;
+  users: Pick<UserEntity, 'nickname' | 'deleted_at' | 'registered_at' | 'profile_image_url'>;
   password_hash?: string | null;
 }
 
@@ -23,5 +23,6 @@ export interface CommentEntityFlat {
   nickname: UserEntity['nickname'];
   deleted_at: UserEntity['deleted_at'];
   registered_at: UserEntity['registered_at'];
+  profile_image_url: UserEntity['profile_image_url'];
   password_hash?: string | null;
 }
