@@ -8,9 +8,7 @@ export function toDto(comment: CommentEntity): CommentResponseDto {
   return {
     id: comment.id,
     postId: comment.post_id,
-    authorName:
-      comment.users.nickname ??
-      `Guest#${comment.user_id?.slice(0, 4) ?? '0000'}`,
+    authorName: comment.users.nickname,
     content: comment.content,
     createdAt: comment.created_at,
     updatedAt: comment.updated_at,
@@ -26,8 +24,7 @@ export function flatToDto(comment: CommentEntityFlat): CommentResponseDto {
   return {
     id: comment.id,
     postId: comment.post_id,
-    authorName:
-      comment.nickname ?? `Guest#${comment.user_id?.slice(0, 4) ?? '0000'}`,
+    authorName: comment.nickname,
     content: comment.content,
     createdAt: comment.created_at,
     updatedAt: comment.updated_at,

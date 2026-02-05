@@ -13,7 +13,7 @@ export default class Post {
     public readonly content: string,
     public readonly tags: string[],
     public readonly userId: string,
-    public readonly authorName: string,
+    public readonly authorName: string | null,
     public readonly bio: string | null,
     public readonly profileImageUrl: string | null,
     public readonly seriesId: string | null,

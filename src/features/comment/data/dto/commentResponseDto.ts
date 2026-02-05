@@ -1,7 +1,7 @@
 export interface CommentResponseDto {
   id: number;
   postId: string;
-  authorName: string;
+  authorName: string | null;
   content: string;
   createdAt: string;
   updatedAt: string;

@@ -1,4 +1,5 @@
 import { formatDate } from '@/features/post/domain/lib/date';
+import { toUserNickname } from '@/features/user/ui/userProps';
 import { extractPlainText } from '@/features/post/domain/lib/parse';
 import Heading from '@/features/post/domain/model/heading';
 import Post from '@/features/post/domain/model/post';
@@ -36,7 +37,7 @@ export function createProps(post: Post): PostProps {
     headings: post.headings,
     plainText: extractPlainText(post.content),
     userId: post.userId,
-    authorName: post.authorName,
+    authorName: toUserNickname({ id: post.userId, nickname: post.authorName }),
     bio: post.bio,
     profileImageUrl: post.profileImageUrl,
     seriesId: post.seriesId,

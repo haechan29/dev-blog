@@ -13,8 +13,7 @@ export function toDto(post: PostEntity): PostDto {
     createdAt: post.created_at,
     updatedAt: post.updated_at ?? post.created_at,
     userId: post.user_id,
-    authorName:
-      post.users.nickname ?? `Guest#${post.user_id?.slice(0, 4) ?? '0000'}`,
+    authorName: post.users.nickname,
     bio: post.users.bio,
     profileImageUrl: post.users.profile_image_url,
     deletedAt: post.users.deleted_at,
@@ -37,7 +36,7 @@ export function toFlatDto(post: PostEntityFlat): PostDto {
     createdAt: post.created_at,
     updatedAt: post.updated_at ?? post.created_at,
     userId: post.user_id,
-    authorName: post.nickname ?? `Guest#${post.user_id?.slice(0, 4) ?? '0000'}`,
+    authorName: post.nickname,
     bio: post.bio,
     profileImageUrl: post.profile_image_url,
     deletedAt: post.deleted_at,

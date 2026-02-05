@@ -7,7 +7,7 @@ export interface Series {
   createdAt: string;
   updatedAt: string;
   userId: string;
-  authorName: string;
+  authorName: string | null;
   posts: Pick<
     Post,
     | 'id'
