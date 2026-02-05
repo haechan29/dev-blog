@@ -85,6 +85,7 @@ export default function UserProfile({
           nickname={user.nickname}
           size='lg'
           profileImageUrl={user.profileImageUrl}
+          isLoading={updateImageMutation.isPending}
         />
         <div className='flex-1 min-w-0'>
           <div className='flex justify-between items-start gap-4'>

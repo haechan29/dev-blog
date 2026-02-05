@@ -21,11 +21,13 @@ export default function ProfileIcon({
   size = 'md',
   profileImageUrl = null,
   skeleton = false,
+  isLoading = false,
 }: {
   nickname: string;
   size?: 'sm' | 'md' | 'lg';
   profileImageUrl?: string | null;
   skeleton?: boolean;
+  isLoading?: boolean;
 }) {
   const sizeClass =
     size === 'sm' ? 'w-6 h-6' : size === 'md' ? 'w-8 h-8' : 'w-14 h-14';
@@ -38,7 +40,12 @@ export default function ProfileIcon({
 
   if (profileImageUrl) {
     return (
-      <div className={clsx('shrink-0 rounded-full overflow-hidden', sizeClass)}>
+      <div
+        className={clsx(
+          'shrink-0 rounded-full overflow-hidden relative',
+          sizeClass
+        )}
+      >
         <Image
           src={profileImageUrl}
           alt={`${nickname} 프로필`}
@@ -46,6 +53,11 @@ export default function ProfileIcon({
           height={100}
           className='object-cover w-full h-full'
         />
+        {isLoading && (
+          <div className='absolute inset-0 bg-black/30 flex items-center justify-center'>
+            <div className='w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin' />
+          </div>
+        )}
       </div>
     );
   }
