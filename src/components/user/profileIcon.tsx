@@ -20,13 +20,21 @@ export default function ProfileIcon({
   nickname,
   size = 'md',
   profileImageUrl = null,
+  skeleton = false,
 }: {
   nickname: string;
   size?: 'sm' | 'md' | 'lg';
   profileImageUrl?: string | null;
+  skeleton?: boolean;
 }) {
   const sizeClass =
-    size === 'sm' ? 'w-6 h-6' : size === 'md' ? 'w-9 h-9' : 'w-14 h-14';
+    size === 'sm' ? 'w-6 h-6' : size === 'md' ? 'w-8 h-8' : 'w-14 h-14';
+
+  if (skeleton) {
+    return (
+      <div className={clsx('shrink-0 rounded-full bg-gray-200', sizeClass)} />
+    );
+  }
 
   if (profileImageUrl) {
     return (
