@@ -34,11 +34,28 @@ export default function UserProfile({
   className?: string;
 }) {
   const bioRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [hasOverflow, setHasOverflow] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
 
   const { updateBioMutation, updateImageMutation } = useProfile();
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      updateImageMutation.mutate(file, {
+        onError: error => {
+          const message =
+            error instanceof ApiError
+              ? error.message
+              : '이미지 업로드에 실패했습니다';
+          toast.error(message);
+        },
+      });
+      e.target.value = '';
+    }
+  };
 
   const updateBio = (bio: string) => {
     updateBioMutation.mutate(bio, {
@@ -80,6 +97,7 @@ export default function UserProfile({
                   setDialogMode('edit');
                   setIsDialogOpen(true);
                 }}
+                onEditImage={() => fileInputRef.current?.click()}
               >
                 <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2 cursor-pointer shrink-0' />
               </UserSettingsDropdown>
@@ -107,6 +125,14 @@ export default function UserProfile({
         </div>
       </div>
 
+      <input
+        ref={fileInputRef}
+        type='file'
+        accept='image/*'
+        className='hidden'
+        onChange={handleImageChange}
+      />
+
       <UserBioDialog
         userName={userName}
         userBio={userBio ?? ''}
@@ -123,15 +149,20 @@ export default function UserProfile({
 function UserSettingsDropdown({
   children,
   onEditBio,
+  onEditImage,
 }: {
   children: ReactNode;
   onEditBio: () => void;
+  onEditImage: () => void;
 }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
-        <DropdownMenuItem className='w-full flex items-center gap-2 cursor-pointer'>
+        <DropdownMenuItem
+          className='w-full flex items-center gap-2 cursor-pointer'
+          onClick={onEditImage}
+        >
           <ImageIcon className='w-4 h-4 text-gray-500' />
           <div className='whitespace-nowrap text-gray-900'>프로필 설정</div>
         </DropdownMenuItem>
