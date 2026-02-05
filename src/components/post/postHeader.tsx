@@ -1,7 +1,7 @@
 'use client';
 
-import PostInfo from '@/components/post/postInfo';
 import PostSettingsDropdown from '@/components/post/postSettingsDropdown';
+import ProfileIcon from '@/components/user/profileIcon';
 import { PostProps } from '@/features/post/ui/postProps';
 import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
@@ -9,6 +9,7 @@ import { setIsHeaderVisible } from '@/lib/redux/post/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { MoreVertical } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -77,7 +78,21 @@ export default function PostHeader({
       )}
 
       <div className='flex justify-between items-center'>
-        <PostInfo post={post} />
+        <div className='flex gap-2 items-center text-xs'>
+          <ProfileIcon
+            nickname={post.authorName}
+            size='sm'
+            profileImageUrl={post.profileImageUrl}
+          />
+          <Link
+            href={`/@${post.userId}/posts`}
+            className='text-gray-900 hover:underline'
+          >
+            {post.authorName}
+          </Link>
+          <Divider />
+          <div className='text-gray-500'>{post.createdAt}</div>
+        </div>
 
         <PostSettingsDropdown
           skipPasswordInput={skipPasswordInput}
@@ -91,4 +106,8 @@ export default function PostHeader({
       </div>
     </div>
   );
+}
+
+function Divider() {
+  return <div className='w-[3px] h-[3px] rounded-full bg-gray-400' />;
 }

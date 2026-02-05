@@ -1,14 +1,15 @@
 'use client';
 
+import ProfileIcon from '@/components/user/profileIcon';
+import { PostProps } from '@/features/post/ui/postProps';
+import Link from 'next/link';
+
 import { LockIcon } from '@/components/lockIcon';
-import PostInfo from '@/components/post/postInfo';
 import PostSettingsDropdown from '@/components/post/postSettingsDropdown';
 import PostVisibilityToggle from '@/components/post/postVisibilityToggle';
 import Tooltip from '@/components/tooltip';
-import { PostProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
 import { Link2, MoreVertical } from 'lucide-react';
-import Link from 'next/link';
 
 const SCALE_ANIMATION_DELAY = 0.5;
 const SCROLL_ANIMATION_DELAY = 1;
@@ -167,9 +168,29 @@ export default function PostPreview({
             </div>
           )}
 
-          <PostInfo post={post} />
+          <div className='flex gap-2 items-center text-xs'>
+            <ProfileIcon
+              nickname={post.authorName}
+              size='sm'
+              profileImageUrl={post.profileImageUrl}
+            />
+            <Link
+              href={`/@${post.userId}/posts`}
+              className='text-gray-900 hover:underline'
+            >
+              {post.authorName}
+            </Link>
+            <Divider />
+            <div className='text-gray-500'>{post.createdAt}</div>
+            <Divider />
+            <div className='text-gray-500'>{`조회 ${post.viewCount}`}</div>
+          </div>
         </div>
       </div>
     </div>
   );
+}
+
+function Divider() {
+  return <div className='w-[3px] h-[3px] rounded-full bg-gray-400' />;
 }
