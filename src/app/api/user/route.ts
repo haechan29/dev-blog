@@ -1,6 +1,7 @@
 import { auth } from '@/auth';
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as UserQueries from '@/features/user/data/queries/userQueries';
+import * as ProfileUsecase from '@/features/user/data/usecases/profileUsecase';
 import { getUserId } from '@/lib/user';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
@@ -63,7 +64,15 @@ export async function PATCH(request: NextRequest) {
 
 export async function DELETE() {
   try {
+    const session = await auth();
+    const userId = session?.user?.user_id;
+
+    if (!userId) {
+      throw new UnauthorizedError('인증되지 않은 요청입니다');
+    }
+
     await Promise.all([
+      ProfileUsecase.deleteProfileMedia(userId),
       UserQueries.deleteUser(),
       UserQueries.hardDeleteAuthUser(),
     ]);
