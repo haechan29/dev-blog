@@ -131,7 +131,7 @@ export function EmailFormDialog({
           <TemplateDropdown
             onSelect={template => {
               if (mode === 'send') {
-                setSubject(template.subject);
+                setSubject(template.subject(creatorName));
               }
               setBody(template.body(creatorName));
             }}
