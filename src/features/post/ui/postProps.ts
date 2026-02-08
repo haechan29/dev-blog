@@ -1,9 +1,9 @@
 import { formatDate } from '@/features/post/domain/lib/date';
-import { toUserNickname } from '@/features/user/ui/userProps';
 import { extractPlainText } from '@/features/post/domain/lib/parse';
 import Heading from '@/features/post/domain/model/heading';
 import Post from '@/features/post/domain/model/post';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
+import { toUserNickname } from '@/features/user/ui/userProps';
 
 export interface PostProps {
   id: string;
@@ -22,7 +22,7 @@ export interface PostProps {
   seriesOrder: number | null;
   seriesTitle: string | null;
   likeCount: number;
-  viewCount: number;
+  viewCount: string | null;
   visibility: PostVisibility;
 }
 
@@ -44,7 +44,13 @@ export function createProps(post: Post): PostProps {
     seriesOrder: post.seriesOrder,
     seriesTitle: post.seriesTitle,
     likeCount: post.likeCount,
-    viewCount: post.viewCount,
+    viewCount: formatViewCount(post.viewCount),
     visibility: post.visibility,
   };
+}
+
+function formatViewCount(viewCount: number): string | null {
+  if (viewCount < 100) return null;
+  if (viewCount < 1000) return `${Math.floor(viewCount / 100) * 100}+`;
+  return `${(viewCount / 1000).toFixed(1).replace(/\.0$/, '')}K+`;
 }

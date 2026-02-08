@@ -182,8 +182,12 @@ export default function PostPreview({
             </Link>
             <Divider />
             <div className='text-gray-500'>{post.createdAt}</div>
-            <Divider />
-            <div className='text-gray-500'>{`조회 ${post.viewCount}`}</div>
+            {post.viewCount !== null && (
+              <>
+                <Divider />
+                <div className='text-gray-500'>{`조회 ${post.viewCount}`}</div>
+              </>
+            )}
           </div>
         </div>
       </div>

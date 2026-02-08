@@ -159,8 +159,12 @@ function SeriesPost({
             </div>
             <div className='flex items-center gap-2 text-xs text-gray-500'>
               <div>{post.createdAt}</div>
-              <Divider />
-              <div>조회 {post.viewCount}</div>
+              {post.viewCount !== null && (
+                <>
+                  <Divider />
+                  <div className='text-gray-500'>{`조회 ${post.viewCount}`}</div>
+                </>
+              )}
             </div>
           </div>
         </Link>
