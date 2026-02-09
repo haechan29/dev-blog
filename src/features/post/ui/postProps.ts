@@ -49,7 +49,7 @@ export function createProps(post: Post): PostProps {
   };
 }
 
-function formatViewCount(viewCount: number): string | null {
+export function formatViewCount(viewCount: number): string | null {
   if (viewCount < 100) return null;
   if (viewCount < 1000) return `${Math.floor(viewCount / 100) * 100}+`;
   return `${(viewCount / 1000).toFixed(1).replace(/\.0$/, '')}K+`;

@@ -1,5 +1,5 @@
 import { formatDate } from '@/features/post/domain/lib/date';
-import { PostProps } from '@/features/post/ui/postProps';
+import { formatViewCount, PostProps } from '@/features/post/ui/postProps';
 import { Series } from '@/features/series/domain/model/series';
 import { toUserNickname } from '@/features/user/ui/userProps';
 
@@ -38,7 +38,11 @@ export function createProps(series: Series): SeriesProps {
       nickname: series.authorName,
     }),
     posts: series.posts.map(post => {
-      return { ...post, createdAt: formatDate(post.createdAt) };
+      return {
+        ...post,
+        viewCount: formatViewCount(post.viewCount),
+        createdAt: formatDate(post.createdAt),
+      };
     }),
     postCount: series.postCount,
   };
