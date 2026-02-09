@@ -40,7 +40,9 @@ export default async function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
+  console.time('getUserId');
   const userId = await getUserId();
+  console.timeEnd('getUserId');
 
   return (
     <html lang='ko'>
