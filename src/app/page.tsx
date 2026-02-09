@@ -19,7 +19,8 @@ export default async function HomePage() {
   console.timeEnd('getFeedPosts');
   const postProps = posts.map(createProps);
 
-  return (
+  console.time('render');
+  const result = (
     <HomePageClient
       isLoggedIn={!!session}
       initialPosts={postProps}
@@ -27,4 +28,7 @@ export default async function HomePage() {
       userId={userId}
     />
   );
+  console.timeEnd('render');
+
+  return result;
 }
