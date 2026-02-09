@@ -7,7 +7,6 @@ import type { Metadata } from 'next';
 import { Geist_Mono } from 'next/font/google';
 import Script from 'next/script';
 import 'nprogress/nprogress.css';
-import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
 import { ReactNode } from 'react';
 import { Toaster } from 'react-hot-toast';
 import 'simplebar-react/dist/simplebar.min.css';
