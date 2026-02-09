@@ -10,6 +10,7 @@ export const postKeys = {
 
 export const userKeys = {
   me: () => ['user'] as const,
+  user: (userId: string) => ['user', userId] as const,
   posts: (userId: string) => ['user', userId, 'posts'] as const,
   seriesList: (userId: string) => ['user', userId, 'series'] as const,
   series: (userId: string, seriesId: string) =>
