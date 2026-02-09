@@ -1,3 +1,5 @@
+'use client';
+
 import { Content } from '@/features/write/domain/types/content';
 import useWritePostForm from '@/features/write/hooks/useWritePostForm';
 import useDebounce from '@/hooks/useDebounce';

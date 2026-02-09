@@ -16,8 +16,12 @@ import {
   remarkTextBreaks,
   remarkTextPosition,
 } from '@/lib/md/remark';
+import javascript from 'highlight.js/lib/languages/javascript';
+import plaintext from 'highlight.js/lib/languages/plaintext';
+import python from 'highlight.js/lib/languages/python';
+import typescript from 'highlight.js/lib/languages/typescript';
 import { createElement, Fragment, JSX } from 'react';
-import rehypePrettyCode from 'rehype-pretty-code';
+import rehypeHighlight from 'rehype-highlight';
 import rehypeReact from 'rehype-react';
 import rehypeSanitize from 'rehype-sanitize';
 import rehypeSlug from 'rehype-slug';
@@ -47,7 +51,9 @@ const processor = unified()
   .use(remarkDialogue) // process dialogue nodes
   .use(remarkRehype) // convert markdown AST to HTML AST
   .use(rehypeSanitize, schema) // remove unsafe HTML tags and attributes
-  .use(rehypePrettyCode) // add syntax highlighting to code blocks
+  .use(rehypeHighlight, {
+    languages: { javascript, typescript, python, plaintext },
+  }) // add syntax highlighting to code blocks
   .use(rehypeStyle) // convert inline style strings to style objects for React
   .use(rehypeSlug) // add id attributes to headings
   .use(rehypeOffset) // add offset attribute to element
