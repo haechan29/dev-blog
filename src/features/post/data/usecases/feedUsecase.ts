@@ -4,7 +4,7 @@ import { toDto } from '@/features/post/data/mapper/feedMapper';
 import * as FeedQueries from '@/features/post/data/queries/feedQueries';
 import * as SubscriptionQueries from '@/features/subscription/data/queries/subscriptionQueries';
 
-const FEED_LIMIT = 20;
+const FEED_LIMIT = 5;
 
 export async function getFeedPosts(
   cursor: string | null,
@@ -25,7 +25,7 @@ export async function getFeedPosts(
       posts: posts.map(toDto),
       nextCursor: isLastPage
         ? null
-        : posts.at(-1)?.post_stats.popularity.toString() ?? null,
+        : (posts.at(-1)?.post_stats.popularity.toString() ?? null),
     };
   }
 
@@ -68,7 +68,7 @@ export async function getFeedPosts(
     posts: scoredPosts.map(p => toDto(p)),
     nextCursor: isLastPage
       ? null
-      : posts.at(-1)?.post_stats.popularity.toString() ?? null,
+      : (posts.at(-1)?.post_stats.popularity.toString() ?? null),
   };
 }
 

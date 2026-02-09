@@ -7,7 +7,7 @@ import { flatToDto, toDto } from '@/features/comment/data/mapper/commentMapper';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
-const COMMENT_LIMIT = 20;
+const COMMENT_LIMIT = 5;
 
 export async function fetchComment(commentId: number) {
   const { data, error } = await supabase
