@@ -1,5 +1,6 @@
 import * as ProfileClientRepository from '@/features/user/data/repository/profileClientRepository';
-import { UserProps } from '@/features/user/ui/userProps';
+import * as ProfileClientService from '@/features/user/domain/service/profileClientService';
+import { createProps, UserProps } from '@/features/user/ui/userProps';
 import { userKeys } from '@/queries/keys';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
@@ -8,7 +9,10 @@ export function useProfile(initialUser?: UserProps | null) {
 
   const { data: user } = useQuery({
     queryKey: userKeys.user(initialUser?.id ?? ''),
-    queryFn: () => Promise.resolve(initialUser), // TODO: userId 기반 fetch API로 교체
+    queryFn: () =>
+      ProfileClientService.fetchUserById(initialUser!.id).then(user =>
+        user ? createProps(user) : null
+      ),
     initialData: initialUser,
     enabled: !!initialUser?.id,
   });

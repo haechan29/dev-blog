@@ -7,9 +7,10 @@ import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import 'server-only';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const userId = await getUserId();
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('id') ?? (await getUserId());
     const data = userId ? await UserQueries.fetchUser(userId) : null;
     return NextResponse.json({ data });
   } catch (error) {
