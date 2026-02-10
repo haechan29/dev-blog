@@ -11,8 +11,6 @@ import {
   remarkImg,
   remarkInsPosition,
   remarkSpacer,
-  remarkSubPosition,
-  remarkSuperPosition,
   remarkTextBreaks,
   remarkTextPosition,
 } from '@/lib/md/remark';
@@ -30,7 +28,6 @@ import remarkGfm from 'remark-gfm';
 import remarkIns from 'remark-ins';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
-import remarkSupersub from 'remark-supersub';
 import { unified } from 'unified';
 import { VFile } from 'vfile';
 
@@ -38,10 +35,7 @@ const processor = unified()
   .use(remarkParse) // parse markdown text into AST
   .use(remarkGfm, { singleTilde: false }) // support GitHub flavored markdown (tables, strikethrough, etc)
   .use(remarkIns) // support underline text
-  .use(remarkSupersub) // support subscript and superscript
   .use(remarkInsPosition) // add position to ins nodes (remarkIns doesn't provide it)
-  .use(remarkSuperPosition) // add position to superscript nodes (remarkSupersub doesn't provide it)
-  .use(remarkSubPosition) // add position to subscript nodes (remarkSupersub doesn't provide it)
   .use(remarkTextPosition) // fill missing position for text nodes (some plugins don't preserve it)
   .use(remarkTextBreaks) // convert line breaks within text content to break nodes
   .use(remarkSpacer) // convert line breaks between block elements to spacer nodes

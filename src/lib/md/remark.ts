@@ -20,22 +20,36 @@ import { VFile } from 'vfile';
 // Setting to 1 as a placeholder to satisfy the type requirement.
 const UNUSED_LINE_COLUMN = 1;
 
-const SUPERSCRIPT_MARKER = '^';
-const SUBSCRIPT_MARKER = '~';
 const INS_MARKER = '++';
 
 type DirectiveNode = ContainerDirective | LeafDirective | TextDirective;
 
 export function remarkInsPosition() {
-  return createMarkerPositionPlugin('insert', INS_MARKER);
-}
+  return (tree: Root, file: VFile) => {
+    const source = String(file.value);
+    const positions = findAllMarkerPositions(source, INS_MARKER);
 
-export function remarkSuperPosition() {
-  return createMarkerPositionPlugin('superscript', SUPERSCRIPT_MARKER);
-}
+    let count = 0;
+    visit(tree, 'insert', (node: Parent) => {
+      const pos = positions[count++];
+      if (!pos) return;
 
-export function remarkSubPosition() {
-  return createMarkerPositionPlugin('subscript', SUBSCRIPT_MARKER);
+      node.position = {
+        start: {
+          line: UNUSED_LINE_COLUMN,
+          column: UNUSED_LINE_COLUMN,
+          offset: pos.start,
+        },
+        end: {
+          line: UNUSED_LINE_COLUMN,
+          column: UNUSED_LINE_COLUMN,
+          offset: pos.end,
+        },
+      };
+
+      fillChildrenPositions(node, pos.start + INS_MARKER.length);
+    });
+  };
 }
 
 export function remarkTextPosition() {
@@ -332,37 +346,6 @@ function splitTextByLineBreaks(
   }
 
   return result;
-}
-
-function createMarkerPositionPlugin(
-  nodeType: 'insert' | 'superscript' | 'subscript',
-  marker: string
-) {
-  return (tree: Root, file: VFile) => {
-    const source = String(file.value);
-    const positions = findAllMarkerPositions(source, marker);
-
-    let count = 0;
-    visit(tree, nodeType, (node: Parent) => {
-      const pos = positions[count++];
-      if (!pos) return;
-
-      node.position = {
-        start: {
-          line: UNUSED_LINE_COLUMN,
-          column: UNUSED_LINE_COLUMN,
-          offset: pos.start,
-        },
-        end: {
-          line: UNUSED_LINE_COLUMN,
-          column: UNUSED_LINE_COLUMN,
-          offset: pos.end,
-        },
-      };
-
-      fillChildrenPositions(node, pos.start + marker.length);
-    });
-  };
 }
 
 function findAllMarkerPositions(

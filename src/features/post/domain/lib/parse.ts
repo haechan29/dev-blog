@@ -6,7 +6,6 @@ import remarkDirective from 'remark-directive';
 import remarkGfm from 'remark-gfm';
 import remarkIns from 'remark-ins';
 import remarkParse from 'remark-parse';
-import remarkSupersub from 'remark-supersub';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
 
@@ -16,7 +15,6 @@ const textProcessor = unified()
   .use(remarkParse)
   .use(remarkGfm, { singleTilde: false })
   .use(remarkIns)
-  .use(remarkSupersub)
   .use(remarkDirective)
   .use(remarkImg)
   .use(remarkBgm)
