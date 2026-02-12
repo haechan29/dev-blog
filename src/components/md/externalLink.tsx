@@ -6,11 +6,13 @@ export default function ExternalLink({
   children,
   'data-start-offset': startOffset,
   'data-end-offset': endOffset,
+  'data-variant': variant,
 }: {
   href: string;
   children: ReactNode;
   'data-start-offset': string;
   'data-end-offset': string;
+  'data-variant'?: 'standalone' | 'inline';
 }) {
   return href.startsWith('http') || href.startsWith('//') ? (
     <Link

@@ -87,6 +87,31 @@ export function rehypeMode() {
   };
 }
 
+export function rehypeLinkVariant() {
+  return (tree: Root) => {
+    visit(
+      tree,
+      'element',
+      (node: Element, _index?: number, parent?: Parent) => {
+        if (node.tagName !== 'a' || !parent) return;
+        const parentEl = parent as Element;
+        if (parentEl.tagName !== 'p') return;
+
+        const isStandalone = parentEl.children.every(
+          child =>
+            child === node ||
+            (child.type === 'text' && child.value.trim() === '') ||
+            (child.type === 'element' && (child as Element).tagName === 'br')
+        );
+
+        node.properties['data-variant'] = isStandalone
+          ? 'standalone'
+          : 'inline';
+      }
+    );
+  };
+}
+
 function parseStyleString(styleString: string): Record<string, string> {
   const styles: Record<string, string> = {};
 

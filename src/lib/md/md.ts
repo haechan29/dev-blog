@@ -4,7 +4,13 @@ import ExternalLink from '@/components/md/externalLink';
 import Figure from '@/components/md/figure';
 import ImageWithCaption from '@/components/md/imageWithCaption';
 import Spacer from '@/components/md/spacer';
-import { rehypeMode, rehypeOffset, rehypeStyle, schema } from '@/lib/md/rehype';
+import {
+  rehypeLinkVariant,
+  rehypeMode,
+  rehypeOffset,
+  rehypeStyle,
+  schema,
+} from '@/lib/md/rehype';
 import {
   remarkBgm,
   remarkDialogue,
@@ -51,6 +57,7 @@ const processor = unified()
   .use(rehypeStyle) // convert inline style strings to style objects for React
   .use(rehypeSlug) // add id attributes to headings
   .use(rehypeOffset) // add offset attribute to element
+  .use(rehypeLinkVariant) // classify links as standalone or inline
   .use(rehypeMode) // add mode attribute to element
   .use(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
