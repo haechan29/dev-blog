@@ -33,15 +33,31 @@ export default function ExternalLink({
   const [og, setOg] = useState<OgDto | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const youtubeVideoId = getYouTubeVideoId(href);
+
+  const youtubeOg =
+    youtubeVideoId && variant === 'standalone'
+      ? {
+          title: getTextContent(children),
+          description: 'YouTube',
+          image: `https://img.youtube.com/vi/${youtubeVideoId}/hqdefault.jpg`,
+          siteName: 'YouTube',
+          favicon: 'https://www.youtube.com/favicon.ico',
+          url: href,
+        }
+      : null;
+
+  const resolvedOg = youtubeOg || og;
+
   useEffect(() => {
-    if (isValidUrl(href) && variant === 'standalone') {
-      setIsLoading(true);
-      getOg(href)
-        .then(setOg)
-        .catch(() => setOg(null))
-        .finally(() => setIsLoading(false));
-    }
-  }, [href, variant]);
+    if (variant !== 'standalone' || !isValidUrl(href) || youtubeVideoId) return;
+
+    setIsLoading(true);
+    getOg(href)
+      .then(setOg)
+      .catch(() => setOg(null))
+      .finally(() => setIsLoading(false));
+  }, [href, variant, youtubeVideoId]);
 
   if (variant === 'standalone') {
     if (isLoading) {
@@ -56,25 +72,25 @@ export default function ExternalLink({
       );
     }
 
-    if (og?.title && og.description && og.image) {
+    if (resolvedOg?.title && resolvedOg.description && resolvedOg.image) {
       return (
         <Link
           {...linkProps}
           className='flex flex-col w-full sm:w-[60%] 2xl:w-[40%] overflow-hidden rounded-lg border border-gray-200 hover:bg-gray-50 no-underline my-4'
         >
-          <div className='w-full aspect-video'>
+          <div className='w-full aspect-video overflow-hidden'>
             <img
-              src={og.image}
-              alt={og.title}
+              src={resolvedOg.image}
+              alt={resolvedOg.title}
               className='h-full w-full object-cover rounded-none'
             />
           </div>
           <div className='flex flex-col gap-1 p-4'>
             <span className='truncate text-sm font-semibold text-gray-900'>
-              {og.title}
+              {resolvedOg.title}
             </span>
             <span className='line-clamp-2 text-xs text-gray-500'>
-              {og.description}
+              {resolvedOg.description}
             </span>
           </div>
         </Link>
@@ -92,4 +108,27 @@ function isValidUrl(url: string) {
   } catch {
     return false;
   }
+}
+
+function getYouTubeVideoId(url: string): string | null {
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=)([^&\s]+)/,
+    /(?:youtu\.be\/)([^?\s]+)/,
+    /(?:youtube\.com\/embed\/)([^?\s]+)/,
+  ];
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
+  }
+  return null;
+}
+
+function getTextContent(node: ReactNode): string {
+  if (typeof node === 'string') return node;
+  if (typeof node === 'number') return String(node);
+  if (Array.isArray(node)) return node.map(getTextContent).join('');
+  if (node && typeof node === 'object' && 'props' in node) {
+    return getTextContent(node.props.children);
+  }
+  return '';
 }
