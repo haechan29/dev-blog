@@ -39,3 +39,9 @@ export class NotFoundError extends ApiError {
     super(message, ErrorCode.NOT_FOUND, 404);
   }
 }
+
+export class ExternalServiceError extends ApiError {
+  constructor(message: string) {
+    super(message, ErrorCode.EXTERNAL_SERVICE_ERROR, 422);
+  }
+}
