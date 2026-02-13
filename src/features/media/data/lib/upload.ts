@@ -19,6 +19,4 @@ export async function uploadToR2({
       CacheControl: 'public, max-age=31536000',
     })
   );
-
-  return `${process.env.R2_PUBLIC_URL}/${key}`;
 }

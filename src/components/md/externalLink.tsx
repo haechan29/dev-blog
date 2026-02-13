@@ -1,8 +1,8 @@
 'use client';
 
-/* eslint-disable @next/next/no-img-element */
 import { OgDto } from '@/features/og/data/dto/ogDto';
 import { getOg } from '@/features/og/data/repository/ogClientRepository';
+import Image from 'next/image';
 import Link from 'next/link';
 import { ReactNode, useEffect, useState } from 'react';
 
@@ -79,7 +79,9 @@ export default function ExternalLink({
           className='flex flex-col w-full sm:w-[60%] 2xl:w-[40%] overflow-hidden rounded-lg border border-gray-200 hover:bg-gray-50 no-underline my-4'
         >
           <div className='w-full aspect-video overflow-hidden'>
-            <img
+            <Image
+              width={1000}
+              height={1000}
               src={resolvedOg.image}
               alt={resolvedOg.title}
               className='h-full w-full object-cover rounded-none'

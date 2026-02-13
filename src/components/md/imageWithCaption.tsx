@@ -1,5 +1,6 @@
 'use client';
 
+import { buildImageUrl } from '@/features/media/domain/lib/url';
 import clsx from 'clsx';
 import { AlertCircle } from 'lucide-react';
 import Image from 'next/image';
@@ -82,7 +83,7 @@ export default function ImageWithCaption({
           <ErrorImage />
         ) : (
           <Image
-            src={src}
+            src={buildImageUrl(src, 'original')}
             alt={alt}
             width={1000}
             height={1000}
@@ -109,11 +110,18 @@ export default function ImageWithCaption({
         {showErrorImage ? (
           <ErrorImage />
         ) : (
-          <Image
-            src={src}
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={buildImageUrl(src, '1200')}
+            srcSet={`${buildImageUrl(src, '800')} 800w, ${buildImageUrl(src, '1200')} 1200w, ${buildImageUrl(src, 'original')} 1920w`}
+            sizes={
+              size === 'large' ? '100vw' : '(min-width: 1024px) 50vw, 100vw'
+            }
             alt={alt}
             width={1000}
             height={1000}
+            decoding='async'
+            loading='lazy'
             onError={() => setIsError(true)}
             onLoad={() => setIsError(false)}
             className={clsx(
@@ -148,7 +156,7 @@ export default function ImageWithCaption({
           )}
         >
           <Image
-            src={src}
+            src={buildImageUrl(src, '1200')}
             alt={alt}
             width={1000}
             height={1000}

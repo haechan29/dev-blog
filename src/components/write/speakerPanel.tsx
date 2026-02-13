@@ -3,6 +3,7 @@
 import SpeakerSettingsDialog from '@/components/write/speakerSettingsDialog';
 import { ApiError } from '@/errors/errors';
 import * as MediaClientRepository from '@/features/media/data/repository/mediaClientRepository';
+import { buildImageUrl } from '@/features/media/domain/lib/url';
 import { parseDirectiveRanges } from '@/features/write/domain/lib/contentButton';
 import useContentToolbar from '@/features/write/hooks/useContentToolbar';
 import { colors, getColorIndex } from '@/lib/color';
@@ -315,8 +316,8 @@ export default function SpeakerPanel({
                         className='w-7 h-7 relative rounded-full overflow-hidden bg-gray-100 border-2 border-transparent hover:border-blue-500 disabled:hover:border-transparent'
                       >
                         <Image
-                          src={avatar.url}
-                          alt=''
+                          src={buildImageUrl(avatar.url, '120')}
+                          alt={`${speaker.name}의 아바타${avatarIndex + 1}`}
                           width={28}
                           height={28}
                           className='w-full h-full object-cover'

@@ -100,9 +100,11 @@ export async function uploadProfileImage({
 
   await checkQuota(userId, optimized.length);
 
-  const key = `${nanoid()}.webp`;
-  const url = await uploadToR2({
-    key,
+  const baseId = nanoid();
+  const url = `${process.env.R2_PUBLIC_URL!}/${baseId}.webp`;
+
+  await uploadToR2({
+    key: `${baseId}.webp`,
     body: optimized,
     contentType: 'image/webp',
   });
@@ -128,11 +130,12 @@ export async function uploadAudio({
   await checkQuota(userId, file.size);
 
   const buffer = Buffer.from(await file.arrayBuffer());
-  const ext = file.type.split('/')[1];
-  const key = `${nanoid()}.${ext}`;
 
-  const url = await uploadToR2({
-    key,
+  const baseId = nanoid();
+  const url = `${process.env.R2_PUBLIC_URL!}/${baseId}.webp`;
+
+  await uploadToR2({
+    key: `${nanoid()}.mpeg`,
     body: buffer,
     contentType: file.type,
   });

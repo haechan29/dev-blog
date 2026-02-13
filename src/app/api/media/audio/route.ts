@@ -1,5 +1,5 @@
 import { ApiError, ValidationError } from '@/errors/errors';
-import { uploadAudio } from '@/features/media/data/usecases/uploadAudio';
+import * as MediaUsecases from '@/features/media/data/usecases/mediaUsecases';
 import { getUserId } from '@/lib/user';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       throw new ValidationError('허용되지 않는 파일 형식입니다');
     }
 
-    const url = await uploadAudio({ file, userId });
+    const url = await MediaUsecases.uploadAudio({ file, userId });
     return NextResponse.json({ data: { url } });
   } catch (error) {
     console.error('오디오 업로드에 실패했습니다', error);

@@ -1,5 +1,6 @@
 'use client';
 
+import { buildImageUrl } from '@/features/media/domain/lib/url';
 import { colors, getColorIndex, ringColors, textColors } from '@/lib/color';
 import clsx from 'clsx';
 import Image from 'next/image';
@@ -39,7 +40,7 @@ export default function Dialogue({
     >
       {showImage ? (
         <Image
-          src={avatar}
+          src={buildImageUrl(avatar, '120')}
           alt={speaker}
           width={32}
           height={32}
