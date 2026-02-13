@@ -13,6 +13,7 @@ import { SubscriptionDto } from '@/features/subscription/data/dto/subscriptionDt
 import { useProfile } from '@/features/user/domain/hooks/useProfile';
 import { UserProps } from '@/features/user/ui/userProps';
 import { cn } from '@/lib/utils';
+import imageCompression from 'browser-image-compression';
 import { Edit2, ImageIcon, MoreVertical } from 'lucide-react';
 import { ReactNode, useLayoutEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -37,18 +38,34 @@ export default function UserProfile({
   const { user, updateBioMutation, updateImageMutation } =
     useProfile(initialUser);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      updateImageMutation.mutate(file, {
+    if (!file) return;
+
+    try {
+      const compressedFile = await imageCompression(file, {
+        maxSizeMB: 1,
+        initialQuality: 0.8,
+        maxWidthOrHeight: 256,
+        useWebWorker: true,
+      });
+
+      updateImageMutation.mutate(compressedFile, {
         onError: error => {
           const message =
             error instanceof ApiError
               ? error.message
-              : '이미지 업로드에 실패했습니다';
+              : '프로필 설정에 실패했습니다';
           toast.error(message);
         },
       });
+    } catch (error) {
+      const message =
+        error instanceof ApiError
+          ? error.message
+          : '프로필 설정에 실패했습니다';
+      toast.error(message);
+    } finally {
       e.target.value = '';
     }
   };
@@ -62,7 +79,7 @@ export default function UserProfile({
         const message =
           error instanceof ApiError
             ? error.message
-            : '프로필 수정에 실패했습니다';
+            : '프로필 설정에 실패했습니다';
         toast.error(message);
       },
     });
