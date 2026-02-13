@@ -39,7 +39,7 @@ export default function useBgmUpload({
       dispatch(setContent({ value: newText, isUserInput: false }));
 
       try {
-        const uploadedUrl = await MediaClientRepository.uploadMedia(file);
+        const uploadedUrl = await MediaClientRepository.uploadAudio(file);
 
         const currentContent = contentEditor.value;
         const updatedContent = currentContent.replace(

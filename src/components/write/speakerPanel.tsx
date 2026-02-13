@@ -91,7 +91,7 @@ export default function SpeakerPanel({
             });
 
       const uploadedUrl =
-        await MediaClientRepository.uploadMedia(compressedFile);
+        await MediaClientRepository.uploadAvatarImage(compressedFile);
       URL.revokeObjectURL(blobUrl);
 
       setSpeakers(prev =>

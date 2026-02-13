@@ -1,68 +1,191 @@
-import {
-  DailyQuotaExhaustedError,
-  RateLimitError,
-} from '@/features/media/data/errors/mediaErrors';
+import { checkQuota } from '@/features/media/data/lib/quota';
+import { uploadToR2 } from '@/features/media/data/lib/upload';
 import * as MediaQueries from '@/features/media/data/queries/mediaQueries';
-import { r2Client } from '@/lib/r2';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { nanoid } from 'nanoid';
+import sharp from 'sharp';
 
-const LIMIT_PER_MINUTE = 100 * 1024 * 1024; // 100MB
-const DAILY_QUOTA = 1024 * 1024 * 1024; // 1GB
+const SMALL_IMAGE_SIZE = 128;
 
-type MediaType = 'image' | 'audio';
-
-export async function uploadMedia({
+export async function uploadPostImage({
   file,
   userId,
-  type,
+}: {
+  file: File;
+  userId: string;
+}) {
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const optimized = await optimizeImage(buffer);
+
+  const totalSize =
+    optimized.small.length +
+    optimized.medium.length +
+    optimized.original.length;
+
+  await checkQuota(userId, totalSize);
+
+  const baseId = nanoid();
+
+  const [smallUrl, mediumUrl, originalUrl] = await Promise.all([
+    uploadToR2({
+      key: `${baseId}-800.webp`,
+      body: optimized.small,
+      contentType: 'image/webp',
+    }),
+    uploadToR2({
+      key: `${baseId}-1200.webp`,
+      body: optimized.medium,
+      contentType: 'image/webp',
+    }),
+    uploadToR2({
+      key: `${baseId}-original.webp`,
+      body: optimized.original,
+      contentType: 'image/webp',
+    }),
+  ]);
+
+  await MediaQueries.createMedia({
+    url: originalUrl,
+    sizeBytes: totalSize,
+    userId,
+    type: 'image',
+  });
+
+  return {
+    small: smallUrl,
+    medium: mediumUrl,
+    original: originalUrl,
+  };
+}
+
+export async function uploadAvatarImage({
+  file,
+  userId,
+}: {
+  file: File;
+  userId: string;
+}): Promise<string> {
+  const buffer = Buffer.from(await file.arrayBuffer());
+
+  const optimized = await sharp(buffer)
+    .rotate()
+    .resize(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE, {
+      fit: 'cover',
+    })
+    .webp({ quality: 80 })
+    .toBuffer();
+
+  await checkQuota(userId, optimized.length);
+
+  const key = `${nanoid()}.webp`;
+  const url = await uploadToR2({
+    key,
+    body: optimized,
+    contentType: 'image/webp',
+  });
+
+  await MediaQueries.createMedia({
+    url,
+    sizeBytes: optimized.length,
+    userId,
+    type: 'image',
+  });
+
+  return url;
+}
+
+export async function uploadProfileImage({
+  file,
+  userId,
   profileUserId,
 }: {
   file: File;
   userId: string;
-  type: MediaType;
-  profileUserId?: string;
+  profileUserId: string;
 }): Promise<string> {
-  const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
-  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const buffer = Buffer.from(await file.arrayBuffer());
 
-  const [usageLastMinute, usageLastDay] = await Promise.all([
-    MediaQueries.getUsageSince(userId, oneMinuteAgo),
-    MediaQueries.getUsageSince(userId, oneDayAgo),
-  ]);
+  const optimized = await sharp(buffer)
+    .rotate()
+    .resize(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE, {
+      fit: 'cover',
+    })
+    .webp({ quality: 80 })
+    .toBuffer();
 
-  if (usageLastMinute + file.size > LIMIT_PER_MINUTE) {
-    throw new RateLimitError('1분 후에 다시 시도해주세요');
-  }
+  await checkQuota(userId, optimized.length);
 
-  if (usageLastDay + file.size > DAILY_QUOTA) {
-    console.log('일일 사용량 초과', userId);
-    throw new DailyQuotaExhaustedError('오늘 사용량을 모두 사용했습니다');
-  }
+  const key = `${nanoid()}.webp`;
+  const url = await uploadToR2({
+    key,
+    body: optimized,
+    contentType: 'image/webp',
+  });
 
+  await MediaQueries.createMedia({
+    url,
+    sizeBytes: optimized.length,
+    userId,
+    type: 'image',
+    profileUserId,
+  });
+
+  return url;
+}
+
+export async function uploadAudio({
+  file,
+  userId,
+}: {
+  file: File;
+  userId: string;
+}): Promise<string> {
+  await checkQuota(userId, file.size);
+
+  const buffer = Buffer.from(await file.arrayBuffer());
   const ext = file.type.split('/')[1];
   const key = `${nanoid()}.${ext}`;
-  const url = `${process.env.R2_PUBLIC_URL}/${key}`;
+
+  const url = await uploadToR2({
+    key,
+    body: buffer,
+    contentType: file.type,
+  });
 
   await MediaQueries.createMedia({
     url,
     sizeBytes: file.size,
     userId,
-    type,
-    profileUserId,
+    type: 'audio',
   });
 
-  const buffer = Buffer.from(await file.arrayBuffer());
-
-  await r2Client.send(
-    new PutObjectCommand({
-      Bucket: process.env.R2_BUCKET_NAME,
-      Key: key,
-      Body: buffer,
-      ContentType: file.type,
-      CacheControl: 'public, max-age=31536000',
-    })
-  );
-
   return url;
+}
+
+async function optimizeImage(inputBuffer: Buffer): Promise<{
+  small: Buffer;
+  medium: Buffer;
+  original: Buffer;
+}> {
+  const normalized = sharp(inputBuffer).rotate();
+
+  const baseOptions = {
+    quality: 80,
+    effort: 4,
+  };
+
+  const [small, medium, original] = await Promise.all([
+    normalized
+      .clone()
+      .resize(800, null, { withoutEnlargement: true })
+      .webp(baseOptions)
+      .toBuffer(),
+    normalized
+      .clone()
+      .resize(1200, null, { withoutEnlargement: true })
+      .webp(baseOptions)
+      .toBuffer(),
+    normalized.clone().webp(baseOptions).toBuffer(),
+  ]);
+
+  return { small, medium, original };
 }

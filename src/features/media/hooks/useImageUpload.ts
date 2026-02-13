@@ -77,8 +77,9 @@ export default function useImageUpload({
                   useWebWorker: true,
                 });
 
-          const uploadedUrl =
-            await MediaClientRepository.uploadMedia(compressedFile);
+          const urls =
+            await MediaClientRepository.uploadPostImage(compressedFile);
+          const uploadedUrl = urls.medium;
           URL.revokeObjectURL(blobUrl);
 
           const currentContent = contentEditor.value;
