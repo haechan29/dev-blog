@@ -77,15 +77,15 @@ export default function useImageUpload({
                   useWebWorker: true,
                 });
 
-          const urls =
+          const baseUrl =
             await MediaClientRepository.uploadPostImage(compressedFile);
-          const uploadedUrl = urls.medium;
+
           URL.revokeObjectURL(blobUrl);
 
           const currentContent = contentEditor.value;
           const updatedContent = currentContent.replace(
             LOADING_IMAGE_PATTERN,
-            `:::img{url="${uploadedUrl}" size="medium"}`
+            `:::img{url="${baseUrl}" size="medium"}`
           );
           const delta = updateContentWithCursorPreserve(
             contentEditor,

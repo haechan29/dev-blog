@@ -1,10 +1,6 @@
 import { api } from '@/lib/api';
 
-export async function uploadPostImage(file: File): Promise<{
-  small: string;
-  medium: string;
-  original: string;
-}> {
+export async function uploadPostImage(file: File): Promise<string> {
   const formData = new FormData();
   formData.append('file', file);
 

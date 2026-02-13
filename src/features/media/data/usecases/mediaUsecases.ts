@@ -1,10 +1,11 @@
+import {
+  optimizePostImage,
+  optimizeProfileImage,
+} from '@/features/media/data/lib/optimize-image';
 import { checkQuota } from '@/features/media/data/lib/quota';
 import { uploadToR2 } from '@/features/media/data/lib/upload';
 import * as MediaQueries from '@/features/media/data/queries/mediaQueries';
 import { nanoid } from 'nanoid';
-import sharp from 'sharp';
-
-const SMALL_IMAGE_SIZE = 128;
 
 export async function uploadPostImage({
   file,
@@ -12,9 +13,9 @@ export async function uploadPostImage({
 }: {
   file: File;
   userId: string;
-}) {
+}): Promise<string> {
   const buffer = Buffer.from(await file.arrayBuffer());
-  const optimized = await optimizeImage(buffer);
+  const optimized = await optimizePostImage(buffer);
 
   const totalSize =
     optimized.small.length +
@@ -25,7 +26,7 @@ export async function uploadPostImage({
 
   const baseId = nanoid();
 
-  const [smallUrl, mediumUrl, originalUrl] = await Promise.all([
+  await Promise.all([
     uploadToR2({
       key: `${baseId}-800.webp`,
       body: optimized.small,
@@ -44,17 +45,13 @@ export async function uploadPostImage({
   ]);
 
   await MediaQueries.createMedia({
-    url: originalUrl,
+    url: `${process.env.R2_PUBLIC_URL!}/${baseId}-original.webp`,
     sizeBytes: totalSize,
     userId,
     type: 'image',
   });
 
-  return {
-    small: smallUrl,
-    medium: mediumUrl,
-    original: originalUrl,
-  };
+  return `${process.env.R2_PUBLIC_URL!}/${baseId}`;
 }
 
 export async function uploadAvatarImage({
@@ -66,31 +63,26 @@ export async function uploadAvatarImage({
 }): Promise<string> {
   const buffer = Buffer.from(await file.arrayBuffer());
 
-  const optimized = await sharp(buffer)
-    .rotate()
-    .resize(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE, {
-      fit: 'cover',
-    })
-    .webp({ quality: 80 })
-    .toBuffer();
+  const optimized = await optimizeProfileImage(buffer);
 
   await checkQuota(userId, optimized.length);
 
-  const key = `${nanoid()}.webp`;
-  const url = await uploadToR2({
-    key,
+  const baseId = nanoid();
+
+  await uploadToR2({
+    key: `${baseId}-120.webp`,
     body: optimized,
     contentType: 'image/webp',
   });
 
   await MediaQueries.createMedia({
-    url,
+    url: `${process.env.R2_PUBLIC_URL!}/${baseId}-120.webp`,
     sizeBytes: optimized.length,
     userId,
     type: 'image',
   });
 
-  return url;
+  return `${process.env.R2_PUBLIC_URL!}/${baseId}`;
 }
 
 export async function uploadProfileImage({
@@ -104,13 +96,7 @@ export async function uploadProfileImage({
 }): Promise<string> {
   const buffer = Buffer.from(await file.arrayBuffer());
 
-  const optimized = await sharp(buffer)
-    .rotate()
-    .resize(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE, {
-      fit: 'cover',
-    })
-    .webp({ quality: 80 })
-    .toBuffer();
+  const optimized = await optimizeProfileImage(buffer);
 
   await checkQuota(userId, optimized.length);
 
@@ -159,33 +145,4 @@ export async function uploadAudio({
   });
 
   return url;
-}
-
-async function optimizeImage(inputBuffer: Buffer): Promise<{
-  small: Buffer;
-  medium: Buffer;
-  original: Buffer;
-}> {
-  const normalized = sharp(inputBuffer).rotate();
-
-  const baseOptions = {
-    quality: 80,
-    effort: 4,
-  };
-
-  const [small, medium, original] = await Promise.all([
-    normalized
-      .clone()
-      .resize(800, null, { withoutEnlargement: true })
-      .webp(baseOptions)
-      .toBuffer(),
-    normalized
-      .clone()
-      .resize(1200, null, { withoutEnlargement: true })
-      .webp(baseOptions)
-      .toBuffer(),
-    normalized.clone().webp(baseOptions).toBuffer(),
-  ]);
-
-  return { small, medium, original };
 }

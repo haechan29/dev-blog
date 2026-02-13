@@ -28,8 +28,8 @@ export async function POST(request: NextRequest) {
       throw new ValidationError('허용되지 않는 파일 형식입니다');
     }
 
-    const url = await MediaUsecases.uploadAvatarImage({ file, userId });
-    return NextResponse.json({ data: url });
+    const baseUrl = await MediaUsecases.uploadAvatarImage({ file, userId });
+    return NextResponse.json({ data: baseUrl });
   } catch (error) {
     console.error('이미지 업로드에 실패했습니다', error);
 

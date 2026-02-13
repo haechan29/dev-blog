@@ -90,8 +90,9 @@ export default function SpeakerPanel({
               useWebWorker: true,
             });
 
-      const uploadedUrl =
+      const baseUrl =
         await MediaClientRepository.uploadAvatarImage(compressedFile);
+
       URL.revokeObjectURL(blobUrl);
 
       setSpeakers(prev =>
@@ -101,7 +102,7 @@ export default function SpeakerPanel({
                 ...speaker,
                 avatars: speaker.avatars.map(avatar =>
                   avatar.url === blobUrl
-                    ? { url: uploadedUrl, status: 'done' as const }
+                    ? { url: baseUrl, status: 'done' as const }
                     : avatar
                 ),
               }
