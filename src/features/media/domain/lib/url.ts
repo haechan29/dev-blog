@@ -8,5 +8,6 @@ export type AvatarImageVariant = (typeof AVATAR_IMAGE_VARIANTS)[number];
 export type MediaVariant = PostImageVariant | AvatarImageVariant;
 
 export function buildImageUrl(baseUrl: string, variant: MediaVariant) {
+  if (baseUrl.startsWith('blob:')) return baseUrl;
   return `${baseUrl}-${variant}.webp`;
 }
