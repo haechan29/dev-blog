@@ -1,3 +1,7 @@
+import {
+  AVATAR_IMAGE_VARIANTS,
+  POST_IMAGE_VARIANTS,
+} from '@/features/media/constants/image-variants';
 import * as MediaQueries from '@/features/media/data/queries/mediaQueries';
 import { r2Client } from '@/lib/r2';
 import { DeleteObjectCommand } from '@aws-sdk/client-s3';
@@ -16,16 +20,22 @@ export async function GET(request: NextRequest) {
     const mediaList = await MediaQueries.getOrphanMediaList();
 
     await Promise.all(
-      mediaList.map(async media => {
-        const key = media.url.split('/').pop();
-        if (key) {
-          await r2Client.send(
+      mediaList.flatMap(media => {
+        const filename = media.url.split('/').pop();
+        if (!filename) return [];
+
+        const baseKey = filename
+          .replace(/-\d+\.webp$/, '')
+          .replace('-original.webp', '');
+
+        return [...POST_IMAGE_VARIANTS, ...AVATAR_IMAGE_VARIANTS].map(variant =>
+          r2Client.send(
             new DeleteObjectCommand({
               Bucket: process.env.R2_BUCKET_NAME,
-              Key: key,
+              Key: `${baseKey}-${variant}.webp`,
             })
-          );
-        }
+          )
+        );
       })
     );
 
