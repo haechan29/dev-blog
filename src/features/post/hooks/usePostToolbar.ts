@@ -23,12 +23,10 @@ function createProps({
   switch (mode) {
     case 'empty':
       return {
-        isVisible: !postToolbar.isScrollingDown,
         mode,
       };
     case 'basic':
       return {
-        isVisible: !postToolbar.isScrollingDown,
         mode,
         title: postToolbar.title!,
       };
@@ -36,7 +34,6 @@ function createProps({
       const title = postToolbar.title!;
       const headingText = postReader.currentHeading?.text;
       return {
-        isVisible: !postToolbar.isScrollingDown,
         mode,
         breadcrumb: headingText ? title : undefined,
         title: headingText ?? title,
@@ -45,7 +42,6 @@ function createProps({
     }
     case 'expanded':
       return {
-        isVisible: !postToolbar.isScrollingDown,
         mode,
         breadcrumb: postToolbar.title!,
         title: postReader.currentHeading!.text,

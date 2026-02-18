@@ -6,22 +6,18 @@ import { PostToolbarProps } from '@/features/post/ui/postToolbarProps';
 import useThrottle from '@/hooks/useThrottle';
 import { setCurrentHeading } from '@/lib/redux/post/postReaderSlice';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
-import {
-  setIsExpanded,
-  setIsScrollingDown,
-} from '@/lib/redux/post/postToolbarSlice';
+import { setIsExpanded } from '@/lib/redux/post/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { scrollIntoElement } from '@/lib/scroll';
 import { cn } from '@/lib/utils';
 import clsx from 'clsx';
 import { ChevronDown, Menu } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 export default function PostToolbar({ className }: { className?: string }) {
   const dispatch = useDispatch<AppDispatch>();
   const postToolbar = usePostToolbar();
-  const lastScrollYRef = useRef(0);
   const throttle = useThrottle();
   const [isMounted, setIsMounted] = useState(false);
 
@@ -60,11 +56,6 @@ export default function PostToolbar({ className }: { className?: string }) {
       throttle(() => {
         if (postToolbar.mode === 'expanded') return;
 
-        const currentScrollY = window.scrollY;
-        const lastScrollY = lastScrollYRef.current;
-        dispatch(setIsScrollingDown(currentScrollY > lastScrollY));
-        lastScrollYRef.current = currentScrollY;
-
         dispatch(setIsExpanded(false));
       }, 100);
     };
@@ -83,12 +74,11 @@ export default function PostToolbar({ className }: { className?: string }) {
           'py-2 md:py-3 px-4 md:px-4',
           'xl:ml-(--sidebar-width) block xl:hidden',
           'transition-transform duration-300 ease-in-out',
-          postToolbar.isVisible ? 'translate-y-0' : '-translate-y-full',
           className
         )}
       >
         {!!postToolbar.breadcrumb && (
-          <div className='h-3 flex items-center mx-8 text-xs text-gray-400 transition-discrete duration-300 ease-in-out'>
+          <div className='mx-8 text-xs text-gray-400 transition-discrete duration-300 ease-in-out truncate'>
             {postToolbar.breadcrumb}
           </div>
         )}
