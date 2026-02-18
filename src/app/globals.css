@@ -310,7 +310,7 @@ body {
 }
 
 .prose {
-  @apply prose-base lg:prose-lg xl:prose-xl;
+  @apply prose-base lg:prose-lg xl:prose-xl text-gray-900;
 }
 
 .prose h1 {

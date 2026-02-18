@@ -31,6 +31,8 @@ export default function ImageWithCaption({
   const [isError, setIsError] = useState(false);
   const [isOversized, setIsOversized] = useState(false);
 
+  const margin = 'my-5 lg:my-6 xl:my-7';
+
   const showErrorImage = useMemo(() => {
     return isError || !src || (mode !== 'preview' && src.startsWith('blob:'));
   }, [isError, mode, src]);
@@ -75,7 +77,7 @@ export default function ImageWithCaption({
         data-start-offset={startOffset}
         data-end-offset={endOffset}
         data-size={size}
-        className='flex flex-col gap-4 items-center'
+        className={clsx('not-prose flex flex-col items-center gap-4', margin)}
       >
         {showErrorImage ? (
           <ErrorImage />
@@ -114,7 +116,7 @@ export default function ImageWithCaption({
       data-start-offset={startOffset}
       data-end-offset={endOffset}
       data-size={size}
-      className='flex flex-col gap-4 items-center'
+      className={clsx('not-prose flex flex-col gap-4 items-center', margin)}
     >
       {showErrorImage ? (
         <ErrorImage />
