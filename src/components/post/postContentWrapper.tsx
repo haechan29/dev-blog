@@ -2,7 +2,6 @@
 
 import PostRawContent from '@/components/post/postRawContent';
 import TableOfContentsItem from '@/components/post/tableOfContentsItem';
-import PostViewer from '@/components/postViewer/postViewer';
 import Heading from '@/features/post/domain/model/heading';
 import { PostProps } from '@/features/post/ui/postProps';
 import useThrottle from '@/hooks/useThrottle';
@@ -65,7 +64,6 @@ export default function PostContentWrapper({
         </div>
       )}
 
-      <PostViewer post={post} />
       <div className='mb-20'>
         {mode === 'raw' ? (
           <PostRawContent content={post.content} />

@@ -81,7 +81,7 @@ export async function processMd({
   mode,
 }: {
   source: string;
-  mode: 'preview' | 'reader' | 'viewer';
+  mode: 'preview' | 'reader';
 }) {
   const file = new VFile(source);
   file.data.mode = mode;

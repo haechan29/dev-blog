@@ -12,7 +12,6 @@ import PostSeriesNav from '@/components/post/postSeriesNav';
 import PostSidebar from '@/components/post/postSidebar';
 import PostToolbar from '@/components/post/postToolbar';
 import PostVisibilityBanner from '@/components/post/postVisibilityBanner';
-import EnterFullscreenButton from '@/components/postViewer/enterFullscreenButton';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
 import { PostForbiddenError } from '@/features/post/data/errors/postErrors';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
@@ -125,8 +124,6 @@ export default function PostPageClient({
           'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
         )}
       >
-        <EnterFullscreenButton />
-
         <PostHeader
           skipPasswordInput={isLoggedIn || isCreator}
           userId={userId}

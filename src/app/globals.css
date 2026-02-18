@@ -323,32 +323,6 @@ body {
   }
 }
 
-[data-viewer-container][data-supports-fullscreen='true'] figure,
-[data-viewer-container][data-supports-fullscreen='true'] pre {
-  max-height: var(--container-height);
-}
-
-[data-viewer-container][data-supports-fullscreen='false'] figure,
-[data-viewer-container][data-supports-fullscreen='false'] pre {
-  max-height: var(--container-width);
-}
-
-[data-viewer-container] pre {
-  min-height: 0;
-  overflow-y: auto;
-}
-
-[data-viewer-container] pre::-webkit-scrollbar {
-  width: var(--scrollbar-width);
-}
-
-[data-viewer-container] pre::-webkit-scrollbar-thumb {
-  background: rgba(128, 128, 128, 0.5);
-  border-radius: 10px;
-  border: 2px solid transparent;
-  background-clip: padding-box;
-}
-
 @keyframes shake {
   0%,
   100% {

@@ -18,10 +18,6 @@ export default function useBgmController() {
   const { isPlaying, isWaiting, isReady, currentContainerId, requestedBgm } =
     useSelector((state: RootState) => state.bgmController);
 
-  const isViewerMode = useSelector((state: RootState) => {
-    return state.postViewer.isViewerMode;
-  });
-
   const initPlayer = useCallback(
     ({
       src,
@@ -96,10 +92,4 @@ export default function useBgmController() {
       dispatch(setIsWaiting(false));
     }
   }, [dispatch, isReady, isWaiting]);
-
-  useEffect(() => {
-    dispatch(clearController());
-    audioRef.current?.pause();
-    audioRef.current = null;
-  }, [dispatch, isViewerMode]);
 }

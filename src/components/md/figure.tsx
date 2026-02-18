@@ -2,47 +2,38 @@
 
 import clsx from 'clsx';
 import { Check, Copy } from 'lucide-react';
-import { ReactNode, useCallback, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import toast from 'react-hot-toast';
 
 export default function Figure({
   children,
   'data-start-offset': startOffset,
   'data-end-offset': endOffset,
-  'data-mode': mode,
 }: {
   children: ReactNode;
   'data-start-offset': string;
   'data-end-offset': string;
-  'data-mode': 'preview' | 'reader' | 'viewer';
 }) {
   const [isCopied, setIsCopied] = useState(false);
 
-  const handleCopy = useCallback(
-    async (e: React.MouseEvent) => {
-      e.stopPropagation();
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation();
 
-      const code = (e.currentTarget as HTMLElement)
-        .closest('figure')
-        ?.querySelector('code')?.textContent;
+    const code = (e.currentTarget as HTMLElement)
+      .closest('figure')
+      ?.querySelector('code')?.textContent;
 
-      if (code) {
-        try {
-          await navigator.clipboard.writeText(code);
-          setIsCopied(true);
-          toast.success('복사되었습니다', {
-            ...(mode === 'viewer' && { id: 'viewer', toasterId: 'viewer' }),
-          });
-          setTimeout(() => setIsCopied(false), 2000);
-        } catch {
-          toast.error('복사에 실패했습니다', {
-            ...(mode === 'viewer' && { id: 'viewer', toasterId: 'viewer' }),
-          });
-        }
+    if (code) {
+      try {
+        await navigator.clipboard.writeText(code);
+        setIsCopied(true);
+        toast.success('복사되었습니다');
+        setTimeout(() => setIsCopied(false), 2000);
+      } catch {
+        toast.error('복사에 실패했습니다');
       }
-    },
-    [mode]
-  );
+    }
+  };
 
   return (
     <figure

@@ -23,7 +23,7 @@ export default function ImageWithCaption({
   src: string;
   alt?: string;
   'data-size': 'medium' | 'large';
-  'data-mode': 'preview' | 'reader' | 'viewer';
+  'data-mode': 'preview' | 'reader';
   'data-status': 'loading' | 'failed' | 'success';
   'data-caption': string;
   'data-start-offset': string;
@@ -69,34 +69,6 @@ export default function ImageWithCaption({
 
     return () => clearInterval(interval);
   }, [status]);
-
-  if (mode === 'viewer') {
-    return (
-      <div
-        data-image-with-caption
-        data-caption={caption}
-        data-start-offset={startOffset}
-        data-end-offset={endOffset}
-        className='w-full h-full relative'
-      >
-        {showErrorImage ? (
-          <ErrorImage />
-        ) : (
-          <Image
-            src={buildImageUrl(src, 'original')}
-            alt={alt}
-            width={1000}
-            height={1000}
-            onError={() => setIsError(true)}
-            onLoad={() => {
-              setIsError(false);
-            }}
-            className='w-full h-full max-w-none! object-contain'
-          />
-        )}
-      </div>
-    );
-  }
 
   if (mode === 'reader') {
     return (
