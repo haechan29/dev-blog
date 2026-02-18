@@ -310,7 +310,7 @@ body {
 }
 
 .prose {
-  @apply max-w-none prose-base lg:prose-lg xl:prose-xl;
+  @apply prose-base lg:prose-lg xl:prose-xl;
 }
 
 .prose h1 {
