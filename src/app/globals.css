@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import 'tailwind-scrollbar-hide/v4';
 @import 'tw-animate-css';
+@plugin "@tailwindcss/typography";
 
 #nprogress .bar {
   background: #ff0000 !important;
@@ -190,137 +191,6 @@ body {
 }
 
 @layer components {
-  .prose {
-    @apply max-w-none text-gray-900 leading-relaxed break-words;
-  }
-
-  .prose h1 {
-    @apply text-xl xl:text-2xl font-bold text-gray-900 py-3 leading-tight;
-  }
-
-  .prose h2 {
-    @apply text-lg xl:text-xl font-bold text-gray-900 py-2 leading-tight;
-  }
-
-  .prose h3 {
-    @apply xl:text-lg font-bold text-gray-900 py-1 leading-tight;
-  }
-
-  .prose p {
-    @apply text-base text-gray-900 leading-7;
-  }
-
-  .prose strong {
-    @apply font-bold text-gray-900;
-  }
-
-  .prose em {
-    @apply italic;
-  }
-
-  .prose small {
-    @apply text-sm;
-  }
-
-  .prose mark {
-    @apply bg-yellow-200 px-1;
-  }
-
-  .prose del {
-    @apply line-through text-gray-500;
-  }
-
-  .prose ins {
-    @apply underline;
-  }
-
-  .prose sub {
-    @apply text-xs align-sub;
-  }
-
-  .prose sup {
-    @apply text-xs align-super;
-  }
-
-  .prose a {
-    @apply text-blue-600 hover:text-blue-800 underline;
-  }
-
-  .prose ul {
-    @apply pl-6 list-disc;
-  }
-
-  .prose ol {
-    @apply pl-6 list-decimal;
-  }
-
-  .prose blockquote {
-    @apply border-l-4 border-gray-300 pl-4 italic text-gray-600 bg-gray-50 py-2;
-  }
-
-  .prose code {
-    @apply bg-gray-100 text-gray-800 px-2 py-1 rounded text-sm font-mono;
-  }
-
-  .prose pre {
-    @apply bg-gray-900 text-gray-100 p-4 rounded-md overflow-x-auto;
-  }
-
-  .prose pre code {
-    @apply bg-transparent text-gray-100 p-0;
-  }
-
-  .prose table {
-    @apply w-full border-collapse;
-  }
-
-  .prose th {
-    @apply border border-gray-300 bg-gray-100 px-4 py-2 text-left font-bold;
-  }
-
-  .prose td {
-    @apply border border-gray-300 px-4 py-2;
-  }
-
-  .prose thead th {
-    @apply bg-gray-200;
-  }
-
-  .prose tbody tr:nth-child(even) {
-    @apply bg-gray-50;
-  }
-
-  .prose hr {
-    @apply border-0 border-t border-gray-300;
-  }
-
-  .prose img {
-    @apply max-w-full h-auto rounded-lg;
-  }
-
-  .prose figcaption {
-    @apply text-sm text-gray-600 text-center italic;
-  }
-
-  .prose kbd {
-    @apply bg-gray-200 border border-gray-300 rounded px-2 py-1 text-xs font-mono;
-  }
-
-  .prose abbr {
-    @apply border-b border-dotted border-gray-400 cursor-help;
-  }
-
-  .prose address {
-    @apply not-italic;
-  }
-
-  .prose cite {
-    @apply italic;
-  }
-
-  .prose summary {
-    @apply cursor-pointer font-bold;
-  }
 }
 
 @keyframes shake {
@@ -437,4 +307,28 @@ body {
     --container-scale: 1.5;
     --toolbar-height: 5rem;
   }
+}
+
+.prose {
+  @apply max-w-none prose-base lg:prose-lg xl:prose-xl;
+}
+
+.prose h1 {
+  @apply text-xl md:text-2xl lg:text-3xl xl:text-4xl py-3;
+}
+
+.prose h2 {
+  @apply text-lg md:text-xl lg:text-2xl xl:text-3xl py-2;
+}
+
+.prose h3 {
+  @apply md:text-lg lg:text-xl xl:text-2xl py-1;
+}
+
+.prose blockquote {
+  @apply bg-gray-50 py-2;
+}
+
+.prose pre {
+  @apply bg-gray-900;
 }
