@@ -11,7 +11,6 @@ import type {
   LeafDirective,
   TextDirective,
 } from 'mdast-util-directive';
-import { toString } from 'mdast-util-to-string';
 import type { Node, Parent } from 'unist';
 import { visit } from 'unist-util-visit';
 import { VFile } from 'vfile';
@@ -172,15 +171,6 @@ export function remarkImg() {
       const { url, alt, size, status } = node.attributes || {};
       if (!url) return;
 
-      const caption = toString(node);
-      visit(node, 'text', (textNode: Text) => {
-        textNode.value = textNode.value
-          .split(/(?<!\\)#/)
-          .map(s => s.replace(/\\#/g, '#'))
-          .filter(Boolean)
-          .join('');
-      });
-
       const validSize = size === 'medium' || size === 'large' ? size : 'medium';
       const validStatus =
         status === 'failed' || status === 'success' || status === 'loading'
@@ -198,7 +188,6 @@ export function remarkImg() {
             alt: alt ?? '',
             'data-size': validSize,
             'data-status': validStatus,
-            'data-caption': caption,
           },
         },
       };

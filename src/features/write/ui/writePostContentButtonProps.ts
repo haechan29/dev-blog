@@ -1,7 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
 import {
   AlignCenter,
-  Captions,
   Code2,
   Columns,
   Expand,
@@ -330,15 +329,6 @@ export const buttonProps: Record<string, WritePostContentButtonProps> = {
     content: { type: 'icon', icon: AlignCenter, style: 'w-4 h-4' },
     position: 'content',
     value: '이미지를 설명해주세요.',
-  },
-  imageSubtitle: {
-    id: 'imageSubtitle',
-    action: 'directive',
-    category: 'image',
-    label: '이미지 자막 추가',
-    content: { type: 'icon', icon: Captions, style: 'w-5 h-5' },
-    position: 'content',
-    value: '#자막은 전체화면에서 한 문장씩 표시됩니다.',
   },
   bgm: {
     id: 'bgm',

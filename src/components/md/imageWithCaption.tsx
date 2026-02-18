@@ -15,7 +15,6 @@ export default function ImageWithCaption({
   'data-size': size,
   'data-mode': mode,
   'data-status': status,
-  'data-caption': caption,
   'data-start-offset': startOffset,
   'data-end-offset': endOffset,
   children,
@@ -25,7 +24,6 @@ export default function ImageWithCaption({
   'data-size': 'medium' | 'large';
   'data-mode': 'preview' | 'reader';
   'data-status': 'loading' | 'failed' | 'success';
-  'data-caption': string;
   'data-start-offset': string;
   'data-end-offset': string;
   children: ReactNode;
@@ -137,10 +135,7 @@ export default function ImageWithCaption({
               setIsError(false);
               const { naturalWidth, naturalHeight } = e.currentTarget;
               const ratio = naturalWidth / naturalHeight;
-              setIsOversized(
-                ratio / SCREEN_RATIO > OVERSIZE_THRESHOLD ||
-                  ratio / SCREEN_RATIO < 1 / OVERSIZE_THRESHOLD
-              );
+              setIsOversized(ratio / SCREEN_RATIO > OVERSIZE_THRESHOLD);
             }}
             className='h-auto w-full'
           />
@@ -174,7 +169,7 @@ export default function ImageWithCaption({
           {isOversized && (
             <div className='absolute top-2 right-2 bg-amber-500/50 backdrop-blur-xs text-white text-xs px-2 py-1 rounded flex items-center gap-1 shadow-sm'>
               <AlertCircle className='w-4 h-4' />
-              <span>이미지가 길어서 전체화면에서 작게 보여요</span>
+              <span>이미지가 길어서 작게 보여요</span>
             </div>
           )}
         </div>

@@ -19,7 +19,6 @@ export const schema: Options = {
       'alt',
       ['data-size', 'large', 'medium'],
       ['data-status', 'loading', 'failed', 'success'],
-      'data-caption',
     ],
     bgm: ['src', ['data-status', 'loading', 'failed']],
     dialogue: ['data-speaker', 'data-avatar'],

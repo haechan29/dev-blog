@@ -42,7 +42,7 @@ const toolbarLayout = {
   ],
   table: ['addRow', 'addColumn'],
   code: ['codeLanguage'],
-  image: ['imageLarge', 'imageSmall', 'imageCaption', 'imageSubtitle'],
+  image: ['imageLarge', 'imageSmall', 'imageCaption'],
 };
 
 export default function WritePostContentToolbar({
