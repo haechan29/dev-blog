@@ -329,6 +329,11 @@ body {
   @apply bg-gray-50 py-2;
 }
 
+.prose blockquote p:first-of-type::before,
+.prose blockquote p:last-of-type::after {
+  content: none;
+}
+
 .prose pre {
   @apply bg-gray-900;
 }
