@@ -62,7 +62,7 @@ export default function ExternalLink({
   if (variant === 'standalone') {
     if (isLoading) {
       return (
-        <div className='flex flex-col w-full sm:w-[60%] 2xl:w-[40%] overflow-hidden rounded-lg border border-gray-200 my-4 animate-pulse'>
+        <div className='not-prose flex flex-col w-full max-w-md overflow-hidden rounded-lg border border-gray-200 my-4 animate-pulse'>
           <div className='w-full aspect-video sm:max-h-[250px] bg-gray-200' />
           <div className='flex flex-col gap-2 p-4'>
             <div className='h-4 bg-gray-200 rounded w-3/4' />
@@ -76,7 +76,7 @@ export default function ExternalLink({
       return (
         <Link
           {...linkProps}
-          className='flex flex-col w-full sm:w-[60%] 2xl:w-[40%] overflow-hidden rounded-lg border border-gray-200 hover:bg-gray-50 no-underline my-4'
+          className='not-prose flex flex-col w-full max-w-md overflow-hidden rounded-lg border border-gray-200 hover:bg-gray-50 no-underline my-4'
         >
           <div className='w-full aspect-video overflow-hidden'>
             <Image
