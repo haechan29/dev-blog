@@ -139,13 +139,19 @@ export default function WritePostContentPreview({
       >
         {parsedContent.status === 'success' ? (
           <ErrorBoundary
-            fallback={<div>에러가 발생했습니다</div>}
+            fallback={
+              <div className='not-prose text-base text-gray-500'>
+                에러가 발생했습니다
+              </div>
+            }
             resetKeys={[parsedContent.value]}
           >
             {parsedContent.value}
           </ErrorBoundary>
         ) : (
-          <p className='text-gray-500'>본문을 입력하면 미리보기가 표시됩니다</p>
+          <p className='not-prose text-base text-gray-500'>
+            본문을 입력하면 미리보기가 표시됩니다
+          </p>
         )}
       </div>
     </div>
