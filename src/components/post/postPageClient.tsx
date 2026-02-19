@@ -124,7 +124,7 @@ export default function PostPageClient({
           'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
         )}
       >
-        <div className='max-w-3xl mx-auto'>
+        <div className='max-w-[65ch] mx-auto'>
           <PostHeader
             skipPasswordInput={isLoggedIn || isCreator}
             userId={userId}

@@ -7,7 +7,13 @@ import { processMd } from '@/lib/md/md';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { setIsParseError } from '@/lib/redux/write/writePostFormSlice';
 import clsx from 'clsx';
-import { MutableRefObject, useCallback, useEffect, useState } from 'react';
+import {
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -18,6 +24,8 @@ export default function WritePostContentPreview({
 }) {
   const dispatch = useDispatch<AppDispatch>();
   const debounce = useDebounce();
+  const contentPreviewRef = useRef<HTMLDivElement>(null);
+
   const {
     contentEditorStatus: { cursorPosition, cursorOffset },
   } = useSelector((state: RootState) => state.writePost);
@@ -94,10 +102,13 @@ export default function WritePostContentPreview({
   useEffect(() => {
     debounce(() => {
       if (parsedContent.status !== 'success') return;
-      if (isScrollSyncPausedRef.current) return;
-      const contentPreview = document.querySelector('[data-content-preview]');
-      if (!contentPreview) return;
-      scrollToCursorPosition(contentPreview, cursorPosition, cursorOffset);
+      if (isScrollSyncPausedRef.current || !contentPreviewRef.current) return;
+
+      scrollToCursorPosition(
+        contentPreviewRef.current,
+        cursorPosition,
+        cursorOffset
+      );
     }, 100);
   }, [
     cursorOffset,
@@ -123,8 +134,8 @@ export default function WritePostContentPreview({
         미리보기
       </div>
       <div
-        data-content-preview
-        className='prose flex-1 min-h-0 border-gray-200 border max-lg:rounded-lg lg:rounded-b-lg overflow-y-auto p-4'
+        ref={contentPreviewRef}
+        className='prose max-w-none flex-1 min-h-0 border-gray-200 border max-lg:rounded-lg lg:rounded-b-lg overflow-y-auto p-4'
       >
         {parsedContent.status === 'success' ? (
           <ErrorBoundary
