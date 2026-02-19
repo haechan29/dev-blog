@@ -30,10 +30,12 @@ export default function useWritePostContentButton({
   onImageUpload,
   onAudioUpload,
   onToggleSpeakerPanel,
+  onCrop,
 }: {
   onImageUpload: () => void;
   onAudioUpload: () => void;
   onToggleSpeakerPanel: () => void;
+  onCrop: (imageUrl: string) => void;
 }) {
   const {
     writePostForm: {
@@ -244,6 +246,30 @@ export default function useWritePostContentButton({
     [dispatch]
   );
 
+  const handleCropAction = useCallback(() => {
+    const contentEditor = document.querySelector(
+      '[data-content-editor]'
+    ) as HTMLTextAreaElement;
+    if (!contentEditor) return;
+
+    const { selectionStart, selectionEnd, value: content } = contentEditor;
+    const ranges = parseDirectiveRanges(content, 'image');
+
+    const range = ranges.find(([start, end]) => {
+      return selectionStart >= start && selectionEnd <= end;
+    });
+    if (!range) return;
+
+    const [rangeStart, rangeEnd] = range;
+    const directiveText = content.substring(rangeStart, rangeEnd);
+
+    const urlMatch = directiveText.match(/url="([^"]*)"/);
+    if (!urlMatch) return;
+
+    const imageUrl = urlMatch[1];
+    onCrop(imageUrl);
+  }, [onCrop]);
+
   const onAction = useCallback(
     (contentButtonProps: WritePostContentButtonProps) => {
       const { action } = contentButtonProps;
@@ -263,16 +289,19 @@ export default function useWritePostContentButton({
         handleCodeAction(contentButtonProps);
       } else if (action === 'toggle') {
         onToggleSpeakerPanel();
+      } else if (action === 'crop') {
+        handleCropAction();
       }
     },
     [
-      handleCodeAction,
-      handleDirectiveAction,
-      handleMarkdownAction,
-      handleTableAction,
-      onToggleSpeakerPanel,
       onImageUpload,
       onAudioUpload,
+      handleMarkdownAction,
+      handleDirectiveAction,
+      handleTableAction,
+      handleCodeAction,
+      onToggleSpeakerPanel,
+      handleCropAction,
     ]
   );
 

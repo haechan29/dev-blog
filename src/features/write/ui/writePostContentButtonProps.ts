@@ -3,6 +3,7 @@ import {
   AlignCenter,
   Code2,
   Columns,
+  Crop,
   Expand,
   Grid2x2,
   ImageIcon,
@@ -98,13 +99,22 @@ export interface ToggleButtonProps {
   target: 'speakerPanel';
 }
 
+export interface CropButtonProps {
+  id: string;
+  action: 'crop';
+  category: 'image';
+  label: string;
+  content: ButtonContent;
+}
+
 export type WritePostContentButtonProps =
   | MarkdownButtonProps
   | TableButtonProps
   | CodeButtonProps
   | DirectiveButtonProps
   | UploadButtonProps
-  | ToggleButtonProps;
+  | ToggleButtonProps
+  | CropButtonProps;
 
 export type ButtonAction = WritePostContentButtonProps['action'];
 export type ButtonCategory = WritePostContentButtonProps['category'];
@@ -329,6 +339,13 @@ export const buttonProps: Record<string, WritePostContentButtonProps> = {
     content: { type: 'icon', icon: AlignCenter, style: 'w-4 h-4' },
     position: 'content',
     value: '이미지를 설명해주세요.',
+  },
+  imageCrop: {
+    id: 'imageCrop',
+    action: 'crop',
+    category: 'image',
+    label: '이미지 자르기',
+    content: { type: 'icon', icon: Crop, style: 'w-4 h-4' },
   },
   bgm: {
     id: 'bgm',

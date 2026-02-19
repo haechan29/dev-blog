@@ -1,5 +1,6 @@
 'use client';
 
+import { buildImageUrl } from '@/features/media/domain/lib/url';
 import useScrollLock from '@/hooks/useScrollLock';
 import { X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -109,7 +110,8 @@ export default function ImageCropOverlay({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             ref={imgRef}
-            src={imageUrl}
+            crossOrigin='anonymous'
+            src={buildImageUrl(imageUrl, 'original')}
             alt='크롭할 이미지'
             className='max-h-[calc(100vh-68px)] max-w-full object-contain'
           />
