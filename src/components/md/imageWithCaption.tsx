@@ -32,6 +32,10 @@ export default function ImageWithCaption({
   const [isOversized, setIsOversized] = useState(false);
 
   const margin = 'my-5 lg:my-6 xl:my-7';
+  const imageSize = clsx(
+    'h-auto',
+    size === 'large' ? 'w-full' : 'w-[60%] min-w-[min(480px,100%)]'
+  );
 
   const showErrorImage = useMemo(() => {
     return isError || !src || (mode !== 'preview' && src.startsWith('blob:'));
@@ -87,7 +91,9 @@ export default function ImageWithCaption({
             src={buildImageUrl(src, '1200')}
             srcSet={`${buildImageUrl(src, '800')} 800w, ${buildImageUrl(src, '1200')} 1200w, ${buildImageUrl(src, 'original')} 1920w`}
             sizes={
-              size === 'large' ? '100vw' : '(min-width: 1024px) 50vw, 100vw'
+              size === 'large'
+                ? '(min-width: 896px) 896px, 100vw'
+                : '(min-width: 768px) 480px, 100vw'
             }
             alt={alt}
             width={1000}
@@ -96,12 +102,7 @@ export default function ImageWithCaption({
             loading='lazy'
             onError={() => setIsError(true)}
             onLoad={() => setIsError(false)}
-            className={clsx(
-              'h-auto',
-              size === 'large'
-                ? 'w-full max-w-4xl'
-                : 'w-full lg:w-1/2 lg:min-w-120 max-w-2xl'
-            )}
+            className={imageSize}
           />
         )}
 
@@ -121,12 +122,7 @@ export default function ImageWithCaption({
       {showErrorImage ? (
         <ErrorImage />
       ) : (
-        <div
-          className={clsx(
-            'relative',
-            size === 'large' ? 'w-full' : 'min-w-56 w-1/2'
-          )}
-        >
+        <div className={clsx('relative', imageSize)}>
           <Image
             src={buildImageUrl(src, '1200')}
             alt={alt}
@@ -139,7 +135,7 @@ export default function ImageWithCaption({
               const ratio = naturalWidth / naturalHeight;
               setIsOversized(ratio / SCREEN_RATIO > OVERSIZE_THRESHOLD);
             }}
-            className='h-auto w-full'
+            className='w-full h-auto'
           />
           {(status === 'loading' || status === 'success') && (
             <div
