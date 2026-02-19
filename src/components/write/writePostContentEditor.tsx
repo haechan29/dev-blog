@@ -1,5 +1,8 @@
 'use client';
 
+import DailyQuotaExhaustedDialog from '@/components/image/DailyQuotaExhaustedDialog';
+import { DailyQuotaExhaustedError } from '@/features/media/data/errors/mediaErrors';
+import useImageUpload from '@/features/media/hooks/useImageUpload';
 import useContentToolbar from '@/features/write/hooks/useContentToolbar';
 import useUndoHistory from '@/features/write/hooks/useUndoHistory';
 import useWritePostForm from '@/features/write/hooks/useWritePostForm';
@@ -14,7 +17,9 @@ import { setContentEditorStatus } from '@/lib/redux/write/writePostSlice';
 import clsx from 'clsx';
 import {
   ChangeEvent,
+  ClipboardEvent,
   KeyboardEvent,
+  MutableRefObject,
   UIEvent,
   useCallback,
   useEffect,
@@ -31,7 +36,11 @@ const shortcuts: Record<string, { before: string; after: string }> = {
   k: { before: '[', after: '](url)' },
 };
 
-export default function WritePostContentEditor() {
+export default function WritePostContentEditor({
+  isScrollSyncPausedRef,
+}: {
+  isScrollSyncPausedRef: MutableRefObject<boolean>;
+}) {
   const dispatch = useDispatch<AppDispatch>();
   const {
     writePostForm: {
@@ -43,9 +52,11 @@ export default function WritePostContentEditor() {
     contentToolbar: { shouldAttachToolbarToBottom },
   } = useContentToolbar();
   const { pushHistory, pushHistoryDebounced, undo, redo } = useUndoHistory();
+  const { uploadAndInsert } = useImageUpload({ isScrollSyncPausedRef });
 
   const [contentInner, setContentInner] = useState('');
   const [isLocked, setIsLocked] = useState(false);
+  const [isQuotaDialogOpen, setIsQuotaDialogOpen] = useState(true);
 
   const isContentTooLong = useMemo(
     () => contentInner.length > maxLength,
@@ -154,6 +165,26 @@ export default function WritePostContentEditor() {
     setIsLocked(false);
   }, [dispatch]);
 
+  const handlePaste = useCallback(
+    async (e: ClipboardEvent<HTMLTextAreaElement>) => {
+      const files = Array.from(e.clipboardData.files).filter(file =>
+        file.type.startsWith('image/')
+      );
+
+      if (files.length === 0) return;
+
+      try {
+        e.preventDefault();
+        await uploadAndInsert(files);
+      } catch (error) {
+        if (error instanceof DailyQuotaExhaustedError) {
+          setIsQuotaDialogOpen(true);
+        }
+      }
+    },
+    [uploadAndInsert]
+  );
+
   useScrollLock({ isLocked, allowedSelectors: ['[data-content-editor]'] });
 
   useEffect(() => {
@@ -192,36 +223,44 @@ export default function WritePostContentEditor() {
   }, [dispatch]);
 
   return (
-    <div className='flex flex-col h-full'>
-      <textarea
-        data-content-editor
-        value={contentInner}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        onChange={onChange}
-        onKeyDown={onKeyDown}
-        onScroll={onScroll}
-        placeholder='본문을 입력하세요'
-        className={clsx(
-          'flex-1 min-h-0 p-4 resize-none outline-none border scrollbar-hide',
-          shouldAttachToolbarToBottom ? 'rounded-lg' : 'rounded-b-lg',
-          isValid && !isParseError && !isContentTooLong
-            ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
-            : 'border-red-400 animate-shake',
-          !contentInner && 'bg-gray-50'
-        )}
-      />
-      <div
-        className={clsx(
-          'flex justify-end items-center gap-1 text-sm p-2',
-          contentInner.length < maxLength * 0.95 && 'hidden',
-          isContentTooLong && 'text-red-500'
-        )}
-      >
-        <div>{contentInner.length.toLocaleString()}</div>
-        <div>/</div>
-        <div>{maxLength.toLocaleString()}</div>
+    <>
+      <div className='flex flex-col h-full'>
+        <textarea
+          data-content-editor
+          value={contentInner}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          onChange={onChange}
+          onKeyDown={onKeyDown}
+          onScroll={onScroll}
+          onPaste={handlePaste}
+          placeholder='본문을 입력하세요'
+          className={clsx(
+            'flex-1 min-h-0 p-4 resize-none outline-none border scrollbar-hide',
+            shouldAttachToolbarToBottom ? 'rounded-lg' : 'rounded-b-lg',
+            isValid && !isParseError && !isContentTooLong
+              ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
+              : 'border-red-400 animate-shake',
+            !contentInner && 'bg-gray-50'
+          )}
+        />
+        <div
+          className={clsx(
+            'flex justify-end items-center gap-1 text-sm p-2',
+            contentInner.length < maxLength * 0.95 && 'hidden',
+            isContentTooLong && 'text-red-500'
+          )}
+        >
+          <div>{contentInner.length.toLocaleString()}</div>
+          <div>/</div>
+          <div>{maxLength.toLocaleString()}</div>
+        </div>
       </div>
-    </div>
+
+      <DailyQuotaExhaustedDialog
+        isOpen={isQuotaDialogOpen}
+        setIsOpen={setIsQuotaDialogOpen}
+      />
+    </>
   );
 }
