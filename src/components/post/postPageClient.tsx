@@ -124,54 +124,59 @@ export default function PostPageClient({
           'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
         )}
       >
-        <PostHeader
-          skipPasswordInput={isLoggedIn || isCreator}
-          userId={userId}
-          post={post}
-        />
-        <div className='w-full h-px bg-gray-200 mb-10' />
+        <div className='max-w-[65ch] mx-auto'>
+          <PostHeader
+            skipPasswordInput={isLoggedIn || isCreator}
+            userId={userId}
+            post={post}
+          />
+          <div className='w-full h-px bg-gray-200 mb-10' />
 
-        <PostVisibilityBanner
-          visibility={post.visibility}
-          isAuthor={post.userId === userId}
-        />
+          <PostVisibilityBanner
+            visibility={post.visibility}
+            isAuthor={post.userId === userId}
+          />
 
-        <PostContentWrapper post={post} parsedContent={parsedContent} />
+          <PostContentWrapper post={post} parsedContent={parsedContent} />
 
-        <LikeButton postId={post.id} likeCount={post.likeCount} />
+          <LikeButton postId={post.id} likeCount={post.likeCount} />
 
-        <PostSeriesNav post={post} />
+          <PostSeriesNav post={post} />
 
-        <AuthorProfile
-          userId={post.userId}
-          userName={post.authorName}
-          userBio={post.bio ?? undefined}
-          userProfileImageUrl={post.profileImageUrl ?? undefined}
-          currentUserId={userId}
-          className='mb-12'
-        />
+          <AuthorProfile
+            userId={post.userId}
+            userName={post.authorName}
+            userBio={post.bio ?? undefined}
+            userProfileImageUrl={post.profileImageUrl ?? undefined}
+            currentUserId={userId}
+            className='mb-12'
+          />
 
-        <Comments
-          isLoggedIn={isLoggedIn}
-          userId={userId}
-          postId={post.id}
-          initialComments={initialComments}
-        />
+          <Comments
+            isLoggedIn={isLoggedIn}
+            userId={userId}
+            postId={post.id}
+            initialComments={initialComments}
+          />
 
-        <div className='flex flex-col'>
-          {recommendedPosts.map(post => (
-            <div key={post.id}>
-              <div className='h-px bg-gray-200 mb-8' />
-              <PostPreview post={post} userId={userId} />
-            </div>
-          ))}
+          <div className='flex flex-col'>
+            {recommendedPosts.map(post => (
+              <div key={post.id}>
+                <div className='h-px bg-gray-200 mb-8' />
+                <PostPreview post={post} userId={userId} />
+              </div>
+            ))}
 
-          <div ref={ref} />
-          {isFetchingNextPage && (
-            <div className='flex justify-center py-4'>
-              <Loader2 strokeWidth={3} className='animate-spin text-gray-400' />
-            </div>
-          )}
+            <div ref={ref} />
+            {isFetchingNextPage && (
+              <div className='flex justify-center py-4'>
+                <Loader2
+                  strokeWidth={3}
+                  className='animate-spin text-gray-400'
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </>
