@@ -2,8 +2,10 @@
 
 import DailyQuotaExhaustedDialog from '@/components/image/DailyQuotaExhaustedDialog';
 import Tooltip from '@/components/tooltip';
+import ImageCropOverlay from '@/components/write/imageCropOverlay';
 import { DailyQuotaExhaustedError } from '@/features/media/data/errors/mediaErrors';
 import useBgmUpload from '@/features/media/hooks/useBgmUpload';
+import useImageCrop from '@/features/media/hooks/useImageCrop';
 import useImageUpload from '@/features/media/hooks/useImageUpload';
 import useContentToolbar from '@/features/write/hooks/useContentToolbar';
 import useWritePostContentButton from '@/features/write/hooks/useWritePostContentButton';
@@ -42,7 +44,7 @@ const toolbarLayout = {
   ],
   table: ['addRow', 'addColumn'],
   code: ['codeLanguage'],
-  image: ['imageLarge', 'imageSmall', 'imageCaption'],
+  image: ['imageCrop', 'imageLarge', 'imageSmall', 'imageCaption'],
 };
 
 export default function WritePostContentToolbar({
@@ -54,20 +56,25 @@ export default function WritePostContentToolbar({
   setIsSpeakerPanelOpen: (open: boolean) => void;
   isScrollSyncPausedRef: MutableRefObject<boolean>;
 }) {
+  const [cropImageUrl, setCropImageUrl] = useState<string | null>(null);
+  const [isQuotaDialogOpen, setIsQuotaDialogOpen] = useState(false);
+
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const audioInputRef = useRef<HTMLInputElement | null>(null);
+
   const { uploadAndInsert: uploadImage } = useImageUpload({
     isScrollSyncPausedRef,
   });
   const { uploadAndInsert: uploadAudio } = useBgmUpload({
     isScrollSyncPausedRef,
   });
-  const [isQuotaDialogOpen, setIsQuotaDialogOpen] = useState(false);
+  const { cropAndReplace } = useImageCrop({ isScrollSyncPausedRef });
 
   const { activeCategory, onAction } = useWritePostContentButton({
     onImageUpload: () => imageInputRef.current?.click(),
     onAudioUpload: () => audioInputRef.current?.click(),
     onToggleSpeakerPanel: () => setIsSpeakerPanelOpen(!isSpeakerPanelOpen),
+    onCrop: imageUrl => setCropImageUrl(imageUrl),
   });
   const {
     contentToolbar: { shouldAttachToolbarToBottom, toolbarTranslateY },
@@ -157,6 +164,24 @@ export default function WritePostContentToolbar({
           );
         })}
       </div>
+
+      <ImageCropOverlay
+        imageUrl={cropImageUrl ?? ''}
+        isOpen={cropImageUrl !== null}
+        setIsOpen={open => !open && setCropImageUrl(null)}
+        onConfirm={async croppedFile => {
+          if (!cropImageUrl) return;
+
+          try {
+            await cropAndReplace(croppedFile, cropImageUrl);
+            setCropImageUrl(null);
+          } catch (error) {
+            if (error instanceof DailyQuotaExhaustedError) {
+              setIsQuotaDialogOpen(true);
+            }
+          }
+        }}
+      />
 
       <DailyQuotaExhaustedDialog
         isOpen={isQuotaDialogOpen}

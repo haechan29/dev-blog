@@ -53,10 +53,16 @@ export default function ImageWithCaption({
       overlayRef.current.style.setProperty('--reveal-angle', '360deg');
       setTimeout(() => {
         overlayRef.current?.style.setProperty('opacity', '0');
+        setTimeout(() => {
+          overlayRef.current?.style.setProperty('--reveal-angle', '0deg');
+        }, 300);
       }, 200);
     }
 
     if (status !== 'loading') return;
+
+    overlayRef.current?.style.setProperty('opacity', '1');
+
     let progress = 0.08;
     const interval = setInterval(() => {
       let amount: number;
