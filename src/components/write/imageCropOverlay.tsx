@@ -26,6 +26,8 @@ export default function ImageCropOverlay({
     if (!imgRef.current || !completedCrop) return;
     const img = imgRef.current;
 
+    if (img.naturalWidth === 0 || img.naturalHeight === 0) return;
+
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -79,13 +81,26 @@ export default function ImageCropOverlay({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [completedCrop, handleCancel, handleConfirm, isOpen]);
 
+  useEffect(() => {
+    if (isOpen) {
+      setCrop(undefined);
+      setCompletedCrop(undefined);
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
-    <div className='fixed inset-0 z-50 bg-neutral-900 flex flex-col'>
+    <div
+      role='dialog'
+      aria-modal='true'
+      aria-label='이미지 크롭'
+      className='fixed inset-0 z-50 bg-neutral-900 flex flex-col'
+    >
       <div className='flex justify-between items-center p-2 text-white'>
         <button
           onClick={handleCancel}
+          aria-label='닫기'
           className='p-2 ml-2 hover:bg-white/10 rounded-full'
         >
           <X size={20} />
