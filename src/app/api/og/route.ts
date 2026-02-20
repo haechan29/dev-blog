@@ -20,6 +20,10 @@ export async function GET(request: NextRequest) {
       throw new ValidationError('유효하지 않은 URL입니다');
     }
 
+    if (!isAllowedUrl(url)) {
+      throw new ValidationError('허용되지 않는 URL입니다');
+    }
+
     const { result } = await ogs({
       url,
       fetchOptions: {
@@ -51,7 +55,7 @@ export async function GET(request: NextRequest) {
       },
       {
         headers: {
-          'Cache-Control': 'public, max-age=86400, s-maxage=86400',
+          'Cache-Control': 'public, max-age=0, s-maxage=86400',
         },
       }
     );
@@ -67,4 +71,21 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+function isAllowedUrl(urlString: string): boolean {
+  const url = new URL(urlString);
+
+  if (url.protocol !== 'https:') return false;
+
+  const hostname = url.hostname;
+
+  if (hostname === 'localhost') return false;
+  if (hostname.startsWith('127.')) return false; // localhost의 IP 버전 (loopback 주소)
+  if (hostname.startsWith('192.168.')) return false; // 192.168.x.x: 가정용 공유기에서 흔히 쓰는 사설 IP 대역
+  if (hostname.startsWith('10.')) return false; // 10.x.x.x: 회사나 클라우드에서 흔히 쓰는 사설 IP 대역
+  if (hostname.match(/^172\.(1[6-9]|2[0-9]|3[01])\./)) return false; // 172.16.x.x ~ 172.31.x.x: 또 다른 사설 IP 대역
+  if (hostname === '169.254.169.254') return false; // 169.254.169.254: 클라우드 메타데이터 서버 주소
+
+  return true;
 }
