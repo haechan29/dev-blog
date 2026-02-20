@@ -310,19 +310,33 @@ body {
 }
 
 .prose {
-  @apply prose-base lg:prose-lg xl:prose-xl text-gray-900;
+  @apply text-gray-900;
 }
 
 .prose h1 {
-  @apply text-xl md:text-2xl lg:text-3xl xl:text-4xl py-3;
+  @apply text-2xl;
 }
 
 .prose h2 {
-  @apply text-lg md:text-xl lg:text-2xl xl:text-3xl py-2;
+  @apply text-xl;
 }
 
 .prose h3 {
-  @apply md:text-lg lg:text-xl xl:text-2xl py-1;
+  @apply text-lg;
+}
+
+.prose h4,
+.prose h5,
+.prose h6 {
+  @apply text-base;
+}
+
+.prose a {
+  @apply text-blue-600 hover:text-blue-800;
+}
+
+.prose img {
+  @apply rounded-lg;
 }
 
 .prose blockquote {
@@ -334,6 +348,51 @@ body {
   content: none;
 }
 
-.prose pre {
-  @apply bg-gray-900;
+.prose code:not(pre code) {
+  @apply bg-gray-100 px-2 py-1 rounded;
+}
+
+.prose code:not(pre code)::before,
+.prose code:not(pre code)::after {
+  content: none;
+}
+
+.prose mark {
+  @apply bg-yellow-200 px-1;
+}
+
+.prose kbd {
+  @apply bg-gray-200 border border-gray-300 rounded px-2 py-1 text-xs font-mono;
+}
+
+.prose del {
+  @apply line-through text-gray-500;
+}
+
+.prose tbody tr:nth-child(even) {
+  @apply bg-gray-50;
+}
+
+.prose p,
+.prose video,
+.prose iframe,
+.prose details {
+  @apply my-0;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6,
+.prose img,
+.prose blockquote,
+.prose pre,
+.prose ul,
+.prose ol,
+.prose table,
+.prose figure,
+.prose hr {
+  @apply my-4;
 }
