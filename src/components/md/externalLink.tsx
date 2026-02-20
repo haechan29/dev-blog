@@ -84,7 +84,7 @@ export default function ExternalLink({
               height={1000}
               src={resolvedOg.image}
               alt={resolvedOg.title}
-              className='h-full w-full object-cover rounded-none'
+              className='h-full w-full object-cover'
             />
           </div>
           <div className='flex flex-col gap-1 p-4'>
