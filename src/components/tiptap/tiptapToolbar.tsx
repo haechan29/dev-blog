@@ -30,7 +30,6 @@ export default function TiptapToolbar({ editor }: TiptapToolbarProps) {
 
   return (
     <div className='flex flex-wrap gap-1 p-2 border-b bg-gray-50'>
-      {/* 텍스트 서식 */}
       <button
         onClick={() => editor.chain().focus().toggleBold().run()}
         className={buttonClass(editor.isActive('bold'))}
@@ -64,7 +63,6 @@ export default function TiptapToolbar({ editor }: TiptapToolbarProps) {
 
       <div className='w-px bg-gray-300 mx-1' />
 
-      {/* 제목 */}
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
         className={buttonClass(editor.isActive('heading', { level: 1 }))}
@@ -86,7 +84,6 @@ export default function TiptapToolbar({ editor }: TiptapToolbarProps) {
 
       <div className='w-px bg-gray-300 mx-1' />
 
-      {/* 목록 */}
       <button
         onClick={() => editor.chain().focus().toggleBulletList().run()}
         className={buttonClass(editor.isActive('bulletList'))}
@@ -102,7 +99,6 @@ export default function TiptapToolbar({ editor }: TiptapToolbarProps) {
 
       <div className='w-px bg-gray-300 mx-1' />
 
-      {/* 기타 */}
       <button
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
         className={buttonClass(editor.isActive('blockquote'))}
@@ -141,6 +137,18 @@ export default function TiptapToolbar({ editor }: TiptapToolbarProps) {
         className={buttonClass(editor.isActive('dialogue'))}
       >
         💬
+      </button>
+
+      <button
+        onClick={() => {
+          const src = window.prompt('BGM 소스 URL을 입력하세요:');
+          if (src) {
+            editor.chain().focus().setBgm({ src }).run();
+          }
+        }}
+        className={buttonClass(editor.isActive('bgm'))}
+      >
+        🎵
       </button>
     </div>
   );

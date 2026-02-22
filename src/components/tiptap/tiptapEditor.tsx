@@ -1,5 +1,6 @@
 'use client';
 
+import BgmNode from '@/components/tiptap/nodes/bgm/bgmNode';
 import DialogueNode from '@/components/tiptap/nodes/dialogue/dialogueNode';
 import ImageWithCaptionNode from '@/components/tiptap/nodes/imageWithCaption/imageWithCaptionNode';
 import TiptapToolbar from '@/components/tiptap/tiptapToolbar';
@@ -22,6 +23,7 @@ export default function TiptapEditor() {
       }),
       ImageWithCaptionNode,
       DialogueNode,
+      BgmNode,
     ],
     content: '<p>여기에 글을 작성하세요...</p>',
     immediatelyRender: false,
