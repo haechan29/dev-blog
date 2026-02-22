@@ -1,5 +1,7 @@
 'use client';
 
+import DialogueNode from '@/components/tiptap/nodes/dialogue/dialogueNode';
+import ImageWithCaptionNode from '@/components/tiptap/nodes/imageWithCaption/imageWithCaptionNode';
 import TiptapToolbar from '@/components/tiptap/tiptapToolbar';
 import Link from '@tiptap/extension-link';
 import Underline from '@tiptap/extension-underline';
@@ -18,9 +20,11 @@ export default function TiptapEditor() {
       Link.configure({
         openOnClick: false,
       }),
+      ImageWithCaptionNode,
+      DialogueNode,
     ],
     content: '<p>여기에 글을 작성하세요...</p>',
-    immediatelyRender: false, // 이 줄 추가
+    immediatelyRender: false,
     editorProps: {
       attributes: {
         class:

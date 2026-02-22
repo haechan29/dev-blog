@@ -21,6 +21,13 @@ export default function TiptapToolbar({ editor }: TiptapToolbarProps) {
     }
   };
 
+  const addDialogue = () => {
+    const speaker = window.prompt('화자명을 입력하세요:');
+    if (speaker) {
+      editor.chain().focus().setDialogue({ speaker }).run();
+    }
+  };
+
   return (
     <div className='flex flex-wrap gap-1 p-2 border-b bg-gray-50'>
       {/* 텍스트 서식 */}
@@ -113,6 +120,27 @@ export default function TiptapToolbar({ editor }: TiptapToolbarProps) {
         className={buttonClass(false)}
       >
         ─
+      </button>
+
+      <div className='w-px bg-gray-300 mx-1' />
+
+      <button
+        onClick={() => {
+          const url = window.prompt('이미지 URL을 입력하세요:');
+          if (url) {
+            editor.chain().focus().setImageWithCaption({ src: url }).run();
+          }
+        }}
+        className={buttonClass(false)}
+      >
+        🖼️
+      </button>
+
+      <button
+        onClick={addDialogue}
+        className={buttonClass(editor.isActive('dialogue'))}
+      >
+        💬
       </button>
     </div>
   );
