@@ -13,6 +13,8 @@ declare module '@tiptap/core' {
         src: string;
         alt?: string;
         size?: 'medium' | 'large';
+        id?: string;
+        status?: 'loading' | 'failed' | null;
       }) => ReturnType;
     };
   }
@@ -24,8 +26,6 @@ const ImageWithCaptionNode = Node.create<ImageWithCaptionOptions>({
   group: 'block',
 
   content: 'inline*',
-
-  selectable: true,
 
   addOptions() {
     return {
@@ -42,7 +42,13 @@ const ImageWithCaptionNode = Node.create<ImageWithCaptionOptions>({
         default: '',
       },
       size: {
-        default: 'large',
+        default: 'medium',
+      },
+      id: {
+        default: null,
+      },
+      status: {
+        default: null,
       },
     };
   },
