@@ -42,6 +42,7 @@ export async function searchPosts(
 export async function createPost(params: {
   title: string;
   content: string;
+  contentJson?: object;
   tags: string[];
   password: string;
   visibility: PostVisibility;

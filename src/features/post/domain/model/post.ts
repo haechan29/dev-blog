@@ -11,6 +11,7 @@ export default class Post {
     public readonly createdAt: string,
     public readonly updatedAt: string,
     public readonly content: string,
+    public readonly contentJson: object | null,
     public readonly tags: string[],
     public readonly userId: string,
     public readonly authorName: string | null,

@@ -13,6 +13,7 @@ const POST_SELECT_FIELDS = `
   id,
   title,
   content,
+  content_json,
   tags,
   created_at,
   updated_at,
@@ -121,6 +122,7 @@ export async function searchPosts(
 export async function createPost({
   title,
   content,
+  contentJson,
   tags,
   passwordHash,
   visibility,
@@ -128,6 +130,7 @@ export async function createPost({
 }: {
   title: string;
   content: string;
+  contentJson?: object;
   tags: string[];
   passwordHash: string | null;
   visibility: PostVisibility;
@@ -138,6 +141,7 @@ export async function createPost({
     .insert({
       title,
       content,
+      content_json: contentJson,
       tags,
       password_hash: passwordHash,
       visibility,
