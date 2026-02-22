@@ -3,6 +3,7 @@
 import { ApiError } from '@/errors/errors';
 import { DailyQuotaExhaustedError } from '@/features/media/data/errors/mediaErrors';
 import * as MediaClientRepository from '@/features/media/data/repository/mediaClientRepository';
+import { updateNodeById } from '@/lib/tiptap';
 import { Editor } from '@tiptap/react';
 import imageCompression from 'browser-image-compression';
 import { nanoid } from 'nanoid';
@@ -10,7 +11,7 @@ import { useCallback } from 'react';
 import toast from 'react-hot-toast';
 
 export default function useTiptapImageUpload(editor: Editor | null) {
-  const uploadAndInsert = useCallback(
+  const uploadImage = useCallback(
     async (files: File[]) => {
       if (!editor || files.length === 0) return;
 
@@ -40,9 +41,12 @@ export default function useTiptapImageUpload(editor: Editor | null) {
 
           URL.revokeObjectURL(blobUrl);
 
-          updateNodeById(editor, id, { src: uploadedUrl, status: 'success' });
+          updateNodeById(editor, 'imageWithCaption', id, {
+            src: uploadedUrl,
+            status: 'success',
+          });
         } catch (error) {
-          updateNodeById(editor, id, { status: 'failed' });
+          updateNodeById(editor, 'imageWithCaption', id, { status: 'failed' });
 
           if (error instanceof DailyQuotaExhaustedError) {
             throw error;
@@ -59,23 +63,5 @@ export default function useTiptapImageUpload(editor: Editor | null) {
     [editor]
   );
 
-  return { uploadAndInsert };
-}
-
-function updateNodeById(
-  editor: Editor,
-  id: string,
-  attrs: Record<string, unknown>
-) {
-  const { state } = editor;
-  const { tr } = state;
-
-  state.doc.descendants((node, pos) => {
-    if (node.type.name === 'imageWithCaption' && node.attrs.id === id) {
-      tr.setNodeMarkup(pos, undefined, { ...node.attrs, ...attrs });
-      return false;
-    }
-  });
-
-  editor.view.dispatch(tr);
+  return { uploadImage };
 }

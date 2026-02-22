@@ -1,6 +1,8 @@
 'use client';
 
+import ImageCropOverlay from '@/components/write/imageCropOverlay';
 import { buildImageUrl } from '@/features/media/domain/lib/url';
+import useTiptapImageCrop from '@/features/media/hooks/useTiptapImageCrop';
 import { NodeViewProps, NodeViewWrapper } from '@tiptap/react';
 import clsx from 'clsx';
 import { AlertCircle, Crop } from 'lucide-react';
@@ -9,13 +11,17 @@ import { useEffect, useRef, useState } from 'react';
 export default function ImageWithCaptionView({
   node,
   updateAttributes,
+  editor,
 }: NodeViewProps) {
-  const { src, alt, size, status } = node.attrs;
+  const { src, alt, size, status, id } = node.attrs;
   const [isError, setIsError] = useState(false);
   const [showToolbar, setShowToolbar] = useState(false);
+  const [isCropOpen, setIsCropOpen] = useState(false);
 
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const { cropImage } = useTiptapImageCrop(editor);
 
   const imageSize = clsx(
     'h-auto',
@@ -43,6 +49,9 @@ export default function ImageWithCaptionView({
       overlayRef.current.style.setProperty('--reveal-angle', '360deg');
       setTimeout(() => {
         overlayRef.current?.style.setProperty('opacity', '0');
+        setTimeout(() => {
+          overlayRef.current?.style.setProperty('--reveal-angle', '0deg');
+        }, 300);
       }, 200);
       return;
     }
@@ -91,7 +100,11 @@ export default function ImageWithCaptionView({
             />
 
             {showToolbar && (
-              <ImageToolbar size={size} updateAttributes={updateAttributes} />
+              <ImageToolbar
+                size={size}
+                updateAttributes={updateAttributes}
+                onCropClick={() => setIsCropOpen(true)}
+              />
             )}
 
             {(status === 'loading' || status === 'success') && (
@@ -135,6 +148,16 @@ export default function ImageWithCaptionView({
           )}
         </div>
       )}
+
+      <ImageCropOverlay
+        imageUrl={src}
+        isOpen={isCropOpen}
+        setIsOpen={setIsCropOpen}
+        onConfirm={async croppedFile => {
+          await cropImage(croppedFile, id);
+          setIsCropOpen(false);
+        }}
+      />
     </NodeViewWrapper>
   );
 }
@@ -142,19 +165,21 @@ export default function ImageWithCaptionView({
 function ImageToolbar({
   size,
   updateAttributes,
+  onCropClick,
 }: {
   size: 'medium' | 'large';
   updateAttributes: (attrs: Record<string, unknown>) => void;
+  onCropClick: () => void;
 }) {
   return (
     <div className='absolute top-2 left-1/2 -translate-x-1/2 z-10'>
-      <div className='flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 p-1'>
+      <div className='flex items-center gap-1 bg-gray-800 rounded-lg shadow-lg p-1'>
         <button
           className={clsx(
             'px-2 py-1.5 text-sm rounded-md transition-colors',
             size === 'medium'
-              ? 'text-blue-600 font-medium'
-              : 'text-gray-500 hover:text-gray-700'
+              ? 'text-white font-medium bg-gray-700'
+              : 'text-gray-400 hover:text-white hover:bg-gray-700'
           )}
           onClick={() => updateAttributes({ size: 'medium' })}
         >
@@ -164,25 +189,23 @@ function ImageToolbar({
           className={clsx(
             'px-2 py-1.5 text-sm rounded-md transition-colors',
             size === 'large'
-              ? 'text-blue-600 font-medium'
-              : 'text-gray-500 hover:text-gray-700'
+              ? 'text-white font-medium bg-gray-700'
+              : 'text-gray-400 hover:text-white hover:bg-gray-700'
           )}
           onClick={() => updateAttributes({ size: 'large' })}
         >
           크게
         </button>
 
-        <div className='w-px h-5 bg-gray-300' />
+        <div className='w-px h-5 bg-gray-600' />
 
         <button
-          className='flex items-center gap-1 px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors'
-          onClick={() => console.log('자르기 클릭')}
+          className='flex items-center gap-1 px-2 py-1.5 text-sm text-gray-300 hover:text-white hover:bg-gray-700 rounded-md transition-colors'
+          onClick={onCropClick}
         >
           <Crop className='w-4 h-4' />
           <span className='hidden sm:inline'>자르기</span>
         </button>
-
-        <div className='w-px h-5 bg-gray-300' />
       </div>
     </div>
   );

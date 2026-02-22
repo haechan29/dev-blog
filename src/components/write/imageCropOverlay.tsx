@@ -128,7 +128,7 @@ export default function ImageCropOverlay({
             crossOrigin='anonymous'
             src={buildImageUrl(imageUrl, 'original')}
             alt='크롭할 이미지'
-            className='max-h-[calc(100vh-68px)] max-w-full object-contain'
+            className='max-h-[calc(100vh-68px)] max-w-full object-contain rounded-none! m-0!'
           />
         </ReactCrop>
       </div>

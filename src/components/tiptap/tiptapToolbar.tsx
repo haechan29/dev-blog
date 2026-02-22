@@ -4,13 +4,9 @@ import useTiptapImageUpload from '@/features/media/hooks/useTiptapImageUpload';
 import { Editor } from '@tiptap/react';
 import { useRef } from 'react';
 
-interface TiptapToolbarProps {
-  editor: Editor | null;
-}
-
-export default function TiptapToolbar({ editor }: TiptapToolbarProps) {
+export default function TiptapToolbar({ editor }: { editor: Editor | null }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { uploadAndInsert } = useTiptapImageUpload(editor);
+  const { uploadImage } = useTiptapImageUpload(editor);
 
   if (!editor) return null;
 
@@ -43,7 +39,7 @@ export default function TiptapToolbar({ editor }: TiptapToolbarProps) {
         onChange={e => {
           const files = e.target.files;
           if (files && files.length > 0) {
-            uploadAndInsert(Array.from(files));
+            uploadImage(Array.from(files));
           }
           e.target.value = '';
         }}
