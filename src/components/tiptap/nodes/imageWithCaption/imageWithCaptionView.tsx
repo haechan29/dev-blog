@@ -1,16 +1,10 @@
 'use client';
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { buildImageUrl } from '@/features/media/domain/lib/url';
 import { NodeViewContent, NodeViewProps, NodeViewWrapper } from '@tiptap/react';
 import clsx from 'clsx';
-import { AlertCircle } from 'lucide-react';
-import { ReactNode, useEffect, useRef, useState } from 'react';
+import { AlertCircle, Crop, Type } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function ImageWithCaptionView({
   node,
@@ -19,12 +13,29 @@ export default function ImageWithCaptionView({
   const { src, alt, size, status } = node.attrs;
   const [isError, setIsError] = useState(false);
   const [showCaptionInput, setShowCaptionInput] = useState(false);
+  const [showToolbar, setShowToolbar] = useState(false);
+
   const overlayRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const imageSize = clsx(
     'h-auto',
     size === 'large' ? 'w-full' : 'w-[60%] min-w-[min(480px,100%)]'
   );
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        setShowToolbar(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (!overlayRef.current) return;
@@ -59,56 +70,64 @@ export default function ImageWithCaptionView({
   }, [status]);
 
   return (
-    <NodeViewWrapper className='not-prose flex flex-col items-center gap-4 my-5 lg:my-6 xl:my-7'>
+    <NodeViewWrapper className='flex flex-col items-center gap-4 my-5 lg:my-6 xl:my-7'>
       {isError || !src ? (
         <div className='flex items-center justify-center p-4 rounded-xl bg-gray-200 text-gray-700'>
           이미지를 불러올 수 없습니다
         </div>
       ) : (
-        <div className={clsx('relative', imageSize)}>
-          <ImageSettingsDropdown
-            size={size}
-            updateAttributes={updateAttributes}
-            onAddCaption={() => setShowCaptionInput(true)}
-          >
+        <div
+          ref={containerRef}
+          className={clsx('relative', imageSize)}
+          onClick={() => setShowToolbar(true)}
+        >
+          <div className='relative'>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={buildImageUrl(src, '1200')}
               alt={alt}
               onError={() => setIsError(true)}
               onLoad={() => setIsError(false)}
-              className='w-full h-auto cursor-pointer'
+              className='w-full h-auto'
             />
-          </ImageSettingsDropdown>
 
-          {(status === 'loading' || status === 'success') && (
-            <div
-              ref={overlayRef}
-              className='absolute inset-0 bg-black/30 rounded flex items-center justify-center'
-              style={{
-                maskImage:
-                  'conic-gradient(from 0deg, transparent var(--reveal-angle, 0deg), black var(--reveal-angle, 0deg))',
-                transition:
-                  '--reveal-angle 200ms linear, opacity 300ms ease-out',
-              }}
-            >
-              {status === 'loading' && (
-                <div className='flex flex-col items-center gap-2 text-white drop-shadow-md'>
-                  <div className='w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin' />
-                  <span className='text-sm font-medium'>업로드 중...</span>
-                </div>
-              )}
-            </div>
-          )}
+            {showToolbar && (
+              <ImageToolbar
+                size={size}
+                updateAttributes={updateAttributes}
+                onAddCaption={() => setShowCaptionInput(true)}
+              />
+            )}
 
-          {status === 'failed' && (
-            <div className='absolute inset-0 flex items-center justify-center bg-black/50 rounded'>
-              <div className='flex flex-col items-center gap-2 text-white drop-shadow-md'>
-                <AlertCircle className='w-6 h-6' />
-                <span className='text-sm font-medium'>업로드 실패</span>
+            {(status === 'loading' || status === 'success') && (
+              <div
+                ref={overlayRef}
+                className='absolute inset-0 bg-black/30 rounded flex items-center justify-center'
+                style={{
+                  maskImage:
+                    'conic-gradient(from 0deg, transparent var(--reveal-angle, 0deg), black var(--reveal-angle, 0deg))',
+                  transition:
+                    '--reveal-angle 200ms linear, opacity 300ms ease-out',
+                }}
+              >
+                {status === 'loading' && (
+                  <div className='flex flex-col items-center gap-2 text-white drop-shadow-md'>
+                    <div className='w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin' />
+                    <span className='text-sm font-medium'>업로드 중...</span>
+                  </div>
+                )}
               </div>
-            </div>
-          )}
+            )}
+
+            {status === 'failed' && (
+              <div className='absolute inset-0 flex items-center justify-center bg-black/50 rounded'>
+                <div className='flex flex-col items-center gap-2 text-white drop-shadow-md'>
+                  <AlertCircle className='w-6 h-6' />
+                  <span className='text-sm font-medium'>업로드 실패</span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -119,29 +138,61 @@ export default function ImageWithCaptionView({
   );
 }
 
-function ImageSettingsDropdown({
+function ImageToolbar({
   size,
   updateAttributes,
   onAddCaption,
-  children,
 }: {
   size: 'medium' | 'large';
   updateAttributes: (attrs: Record<string, unknown>) => void;
   onAddCaption: () => void;
-  children: ReactNode;
 }) {
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem onClick={() => updateAttributes({ size: 'medium' })}>
-          Medium {size === 'medium' && '✓'}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => updateAttributes({ size: 'large' })}>
-          Large {size === 'large' && '✓'}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={onAddCaption}>캡션 추가</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className='absolute top-2 left-1/2 -translate-x-1/2 z-10'>
+      <div className='flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 p-1'>
+        <button
+          className={clsx(
+            'px-2 py-1.5 text-sm rounded-md transition-colors',
+            size === 'medium'
+              ? 'text-blue-600 font-medium'
+              : 'text-gray-500 hover:text-gray-700'
+          )}
+          onClick={() => updateAttributes({ size: 'medium' })}
+        >
+          보통
+        </button>
+        <button
+          className={clsx(
+            'px-2 py-1.5 text-sm rounded-md transition-colors',
+            size === 'large'
+              ? 'text-blue-600 font-medium'
+              : 'text-gray-500 hover:text-gray-700'
+          )}
+          onClick={() => updateAttributes({ size: 'large' })}
+        >
+          크게
+        </button>
+
+        <div className='w-px h-5 bg-gray-300' />
+
+        <button
+          className='flex items-center gap-1 px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors'
+          onClick={() => console.log('자르기 클릭')}
+        >
+          <Crop className='w-4 h-4' />
+          <span className='hidden sm:inline'>자르기</span>
+        </button>
+
+        <div className='w-px h-5 bg-gray-300' />
+
+        <button
+          className='flex items-center gap-1 px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors'
+          onClick={onAddCaption}
+        >
+          <Type className='w-4 h-4' />
+          <span className='hidden sm:inline'>설명</span>
+        </button>
+      </div>
+    </div>
   );
 }
