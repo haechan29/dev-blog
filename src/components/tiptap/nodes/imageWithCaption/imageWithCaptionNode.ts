@@ -25,8 +25,6 @@ const ImageWithCaptionNode = Node.create<ImageWithCaptionOptions>({
 
   group: 'block',
 
-  content: 'inline*',
-
   addOptions() {
     return {
       HTMLAttributes: {},
@@ -68,7 +66,7 @@ const ImageWithCaptionNode = Node.create<ImageWithCaptionOptions>({
         'data-image-with-caption': '',
       }),
       ['img', { src: HTMLAttributes.src, alt: HTMLAttributes.alt }],
-      ['figcaption', 0],
+      ['figcaption', {}, HTMLAttributes.alt || ''],
     ];
   },
 

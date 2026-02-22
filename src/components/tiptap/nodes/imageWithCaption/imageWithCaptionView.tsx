@@ -1,9 +1,9 @@
 'use client';
 
 import { buildImageUrl } from '@/features/media/domain/lib/url';
-import { NodeViewContent, NodeViewProps, NodeViewWrapper } from '@tiptap/react';
+import { NodeViewProps, NodeViewWrapper } from '@tiptap/react';
 import clsx from 'clsx';
-import { AlertCircle, Crop, Type } from 'lucide-react';
+import { AlertCircle, Crop } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 export default function ImageWithCaptionView({
@@ -12,7 +12,6 @@ export default function ImageWithCaptionView({
 }: NodeViewProps) {
   const { src, alt, size, status } = node.attrs;
   const [isError, setIsError] = useState(false);
-  const [showCaptionInput, setShowCaptionInput] = useState(false);
   const [showToolbar, setShowToolbar] = useState(false);
 
   const overlayRef = useRef<HTMLDivElement | null>(null);
@@ -92,11 +91,7 @@ export default function ImageWithCaptionView({
             />
 
             {showToolbar && (
-              <ImageToolbar
-                size={size}
-                updateAttributes={updateAttributes}
-                onAddCaption={() => setShowCaptionInput(true)}
-              />
+              <ImageToolbar size={size} updateAttributes={updateAttributes} />
             )}
 
             {(status === 'loading' || status === 'success') && (
@@ -128,11 +123,17 @@ export default function ImageWithCaptionView({
               </div>
             )}
           </div>
-        </div>
-      )}
 
-      {(node.textContent || showCaptionInput) && (
-        <NodeViewContent className='text-center text-sm text-gray-600 min-w-[100px] focus:outline-none' />
+          {(node.attrs.alt || showToolbar) && (
+            <input
+              type='text'
+              value={node.attrs.alt || ''}
+              onChange={e => updateAttributes({ alt: e.target.value })}
+              placeholder='설명을 입력하세요'
+              className='text-center text-sm text-gray-600 w-full focus:outline-none bg-transparent'
+            />
+          )}
+        </div>
       )}
     </NodeViewWrapper>
   );
@@ -141,11 +142,9 @@ export default function ImageWithCaptionView({
 function ImageToolbar({
   size,
   updateAttributes,
-  onAddCaption,
 }: {
   size: 'medium' | 'large';
   updateAttributes: (attrs: Record<string, unknown>) => void;
-  onAddCaption: () => void;
 }) {
   return (
     <div className='absolute top-2 left-1/2 -translate-x-1/2 z-10'>
@@ -184,14 +183,6 @@ function ImageToolbar({
         </button>
 
         <div className='w-px h-5 bg-gray-300' />
-
-        <button
-          className='flex items-center gap-1 px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors'
-          onClick={onAddCaption}
-        >
-          <Type className='w-4 h-4' />
-          <span className='hidden sm:inline'>설명</span>
-        </button>
       </div>
     </div>
   );

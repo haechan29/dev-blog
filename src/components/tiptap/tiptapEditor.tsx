@@ -9,12 +9,13 @@ import Underline from '@tiptap/extension-underline';
 import { EditorContent, JSONContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 
-interface TiptapEditorProps {
+export default function TiptapEditor({
+  initialContent,
+  onSave,
+}: {
   initialContent?: JSONContent;
   onSave?: (json: JSONContent) => void;
-}
-
-export default function TiptapEditor({ initialContent, onSave }: TiptapEditorProps) {
+}) {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -34,8 +35,7 @@ export default function TiptapEditor({ initialContent, onSave }: TiptapEditorPro
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class:
-          'prose prose-sm sm:prose-base max-w-none focus:outline-none min-h-full p-4',
+        class: 'prose max-w-none focus:outline-none min-h-full p-4',
       },
     },
   });
