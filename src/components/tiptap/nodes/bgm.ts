@@ -1,4 +1,4 @@
-import BgmView from '@/components/tiptap/nodes/bgm/bgmView';
+import Bgm from '@/components/tiptap/editor/views/bgm';
 import { Node, mergeAttributes } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 
@@ -14,12 +14,12 @@ declare module '@tiptap/core' {
   }
 }
 
-const BgmNode = Node.create<BgmOptions>({
+export default Node.create<BgmOptions>({
   name: 'bgm',
 
   group: 'block',
 
-  atom: true, // 내부 콘텐츠 없이 단일 블록으로 동작
+  atom: true,
 
   selectable: true,
 
@@ -38,8 +38,8 @@ const BgmNode = Node.create<BgmOptions>({
       },
       status: {
         default: null,
-        parseHTML: (element) => element.getAttribute('data-status'),
-        renderHTML: (attributes) => {
+        parseHTML: element => element.getAttribute('data-status'),
+        renderHTML: attributes => {
           if (!attributes.status) return {};
           return { 'data-status': attributes.status };
         },
@@ -65,13 +65,13 @@ const BgmNode = Node.create<BgmOptions>({
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(BgmView);
+    return ReactNodeViewRenderer(Bgm);
   },
 
   addCommands() {
     return {
       setBgm:
-        (options) =>
+        options =>
         ({ commands }) => {
           return commands.insertContent({
             type: this.name,
@@ -81,5 +81,3 @@ const BgmNode = Node.create<BgmOptions>({
     };
   },
 });
-
-export default BgmNode;

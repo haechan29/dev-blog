@@ -1,4 +1,4 @@
-import TiptapEditor from '@/components/tiptap/tiptapEditor';
+import TiptapEditor from '@/components/tiptap/editor/tiptapEditor';
 import * as PostServerService from '@/features/post/domain/service/postServerService';
 import { notFound } from 'next/navigation';
 

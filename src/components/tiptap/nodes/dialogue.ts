@@ -1,4 +1,4 @@
-import DialogueView from '@/components/tiptap/nodes/dialogue/dialogueView';
+import Dialogue from '@/components/tiptap/editor/views/dialogue';
 import { Node, mergeAttributes } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 
@@ -9,12 +9,15 @@ export interface DialogueOptions {
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     dialogue: {
-      setDialogue: (options: { speaker: string; avatar?: string }) => ReturnType;
+      setDialogue: (options: {
+        speaker: string;
+        avatar?: string;
+      }) => ReturnType;
     };
   }
 }
 
-const DialogueNode = Node.create<DialogueOptions>({
+export default Node.create<DialogueOptions>({
   name: 'dialogue',
 
   group: 'block',
@@ -61,7 +64,7 @@ const DialogueNode = Node.create<DialogueOptions>({
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(DialogueView);
+    return ReactNodeViewRenderer(Dialogue);
   },
 
   addCommands() {
@@ -78,5 +81,3 @@ const DialogueNode = Node.create<DialogueOptions>({
     };
   },
 });
-
-export default DialogueNode;

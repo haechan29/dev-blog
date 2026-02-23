@@ -1,9 +1,9 @@
 'use client';
 
-import BgmNode from '@/components/tiptap/nodes/bgm/bgmNode';
-import DialogueNode from '@/components/tiptap/nodes/dialogue/dialogueNode';
-import ImageWithCaptionNode from '@/components/tiptap/nodes/imageWithCaption/imageWithCaptionNode';
-import TiptapToolbar from '@/components/tiptap/tiptapToolbar';
+import TiptapToolbar from '@/components/tiptap/editor/tiptapToolbar';
+import BgmNode from '@/components/tiptap/nodes/bgm';
+import DialogueNode from '@/components/tiptap/nodes/dialogue';
+import ImageWithCaptionNode from '@/components/tiptap/nodes/imageWithCaption';
 import Link from '@tiptap/extension-link';
 import Underline from '@tiptap/extension-underline';
 import { EditorContent, JSONContent, useEditor } from '@tiptap/react';

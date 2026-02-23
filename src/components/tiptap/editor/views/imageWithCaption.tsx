@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from 'react';
 const SCREEN_RATIO = 16 / 9;
 const OVERSIZE_THRESHOLD = 3;
 
-export default function ImageWithCaptionView({
+export default function ImageWithCaption({
   node,
   updateAttributes,
   editor,

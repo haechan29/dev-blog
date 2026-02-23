@@ -1,4 +1,4 @@
-import ImageWithCaptionView from '@/components/tiptap/nodes/imageWithCaption/imageWithCaptionView';
+import ImageWithCaption from '@/components/tiptap/editor/views/imageWithCaption';
 import { Node, mergeAttributes } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 
@@ -20,7 +20,7 @@ declare module '@tiptap/core' {
   }
 }
 
-const ImageWithCaptionNode = Node.create<ImageWithCaptionOptions>({
+export default Node.create<ImageWithCaptionOptions>({
   name: 'imageWithCaption',
 
   group: 'block',
@@ -71,7 +71,7 @@ const ImageWithCaptionNode = Node.create<ImageWithCaptionOptions>({
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(ImageWithCaptionView);
+    return ReactNodeViewRenderer(ImageWithCaption);
   },
 
   addCommands() {
@@ -87,5 +87,3 @@ const ImageWithCaptionNode = Node.create<ImageWithCaptionOptions>({
     };
   },
 });
-
-export default ImageWithCaptionNode;

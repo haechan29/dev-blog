@@ -1,6 +1,6 @@
 'use client';
 
-import TiptapEditor from '@/components/tiptap/tiptapEditor';
+import TiptapEditor from '@/components/tiptap/editor/tiptapEditor';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { JSONContent } from '@tiptap/react';
 import { useRouter } from 'next/navigation';
