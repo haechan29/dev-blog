@@ -1,8 +1,10 @@
 'use client';
 
 import BgmNode from '@/components/tiptap/nodes/bgm';
+import DialogueNode from '@/components/tiptap/nodes/dialogue';
 import ImageWithCaptionNode from '@/components/tiptap/nodes/imageWithCaption';
 import Bgm from '@/components/tiptap/renderer/views/bgm';
+import Dialogue from '@/components/tiptap/renderer/views/dialogue';
 import ImageWithCaption from '@/components/tiptap/renderer/views/imageWithCaption';
 import { JSONContent } from '@tiptap/core';
 import Link from '@tiptap/extension-link';
@@ -17,7 +19,7 @@ export default function TiptapRenderer({ content }: { content: JSONContent }) {
       Underline,
       Link,
       ImageWithCaptionNode,
-      // DialogueNode,
+      DialogueNode,
       BgmNode,
     ],
     content,
@@ -30,12 +32,11 @@ export default function TiptapRenderer({ content }: { content: JSONContent }) {
             size={node.attrs.size}
           />
         ),
-        // dialogue: ({ node }) => (
-        //   <Dialogue
-        //     speaker={node.attrs.speaker}
-        //     avatar={node.attrs.avatar}
-        //   />
-        // ),
+        dialogue: ({ node, children }) => (
+          <Dialogue speaker={node.attrs.speaker} avatar={node.attrs.avatar}>
+            {children}
+          </Dialogue>
+        ),
         bgm: ({ node }) => <Bgm id={node.attrs.id} src={node.attrs.src} />,
       },
     },
