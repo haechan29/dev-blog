@@ -6,7 +6,11 @@ import useTiptapImageCrop from '@/features/media/hooks/useTiptapImageCrop';
 import { NodeViewProps, NodeViewWrapper } from '@tiptap/react';
 import clsx from 'clsx';
 import { AlertCircle, Crop } from 'lucide-react';
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
+
+const SCREEN_RATIO = 16 / 9;
+const OVERSIZE_THRESHOLD = 3;
 
 export default function ImageWithCaptionView({
   node,
@@ -17,6 +21,7 @@ export default function ImageWithCaptionView({
   const [isError, setIsError] = useState(false);
   const [showToolbar, setShowToolbar] = useState(false);
   const [isCropOpen, setIsCropOpen] = useState(false);
+  const [isOversized, setIsOversized] = useState(false);
 
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -90,12 +95,18 @@ export default function ImageWithCaptionView({
           onClick={() => setShowToolbar(true)}
         >
           <div className='relative'>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src={buildImageUrl(src, '1200')}
               alt={alt}
+              width={1000}
+              height={1000}
               onError={() => setIsError(true)}
-              onLoad={() => setIsError(false)}
+              onLoad={e => {
+                setIsError(false);
+                const { naturalWidth, naturalHeight } = e.currentTarget;
+                const ratio = naturalWidth / naturalHeight;
+                setIsOversized(ratio / SCREEN_RATIO > OVERSIZE_THRESHOLD);
+              }}
               className='w-full h-auto'
             />
 
@@ -133,6 +144,13 @@ export default function ImageWithCaptionView({
                   <AlertCircle className='w-6 h-6' />
                   <span className='text-sm font-medium'>업로드 실패</span>
                 </div>
+              </div>
+            )}
+
+            {isOversized && !showToolbar && (
+              <div className='absolute top-2 right-2 bg-amber-500/50 backdrop-blur-xs text-white text-xs px-2 py-1 rounded flex items-center gap-1 shadow-sm'>
+                <AlertCircle className='w-4 h-4' />
+                <span>이미지가 길어서 작게 보여요</span>
               </div>
             )}
           </div>
