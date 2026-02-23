@@ -1,5 +1,6 @@
 'use client';
 
+import DialogueToolbar from '@/components/tiptap/editor/dialogueToolbar';
 import TiptapToolbar from '@/components/tiptap/editor/tiptapToolbar';
 import BgmNode from '@/components/tiptap/nodes/bgm';
 import DialogueNode from '@/components/tiptap/nodes/dialogue';
@@ -8,6 +9,7 @@ import Link from '@tiptap/extension-link';
 import Underline from '@tiptap/extension-underline';
 import { EditorContent, JSONContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import { useState } from 'react';
 
 export default function TiptapEditor({
   initialContent,
@@ -16,6 +18,8 @@ export default function TiptapEditor({
   initialContent?: JSONContent;
   onSave?: (json: JSONContent) => void;
 }) {
+  const [isDialogueToolbarOpen, setIsDialogueToolbarOpen] = useState(false);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -48,7 +52,15 @@ export default function TiptapEditor({
 
   return (
     <div className='h-full flex flex-col border rounded-lg overflow-hidden'>
-      <TiptapToolbar editor={editor} />
+      <TiptapToolbar
+        editor={editor}
+        onDialogueAdd={() => setIsDialogueToolbarOpen(true)}
+      />
+      <DialogueToolbar
+        editor={editor}
+        isOpen={isDialogueToolbarOpen}
+        setIsOpen={setIsDialogueToolbarOpen}
+      />
       <div className='flex-1 overflow-y-auto'>
         <EditorContent editor={editor} className='h-full' />
       </div>

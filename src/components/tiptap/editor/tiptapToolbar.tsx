@@ -5,7 +5,13 @@ import useTiptapImageUpload from '@/features/media/hooks/useTiptapImageUpload';
 import { Editor } from '@tiptap/react';
 import { useRef } from 'react';
 
-export default function TiptapToolbar({ editor }: { editor: Editor | null }) {
+export default function TiptapToolbar({
+  editor,
+  onDialogueAdd,
+}: {
+  editor: Editor | null;
+  onDialogueAdd: () => void;
+}) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
 
@@ -23,13 +29,6 @@ export default function TiptapToolbar({ editor }: { editor: Editor | null }) {
     const url = window.prompt('URL을 입력하세요:');
     if (url) {
       editor.chain().focus().setLink({ href: url }).run();
-    }
-  };
-
-  const addDialogue = () => {
-    const speaker = window.prompt('화자명을 입력하세요:');
-    if (speaker) {
-      editor.chain().focus().setDialogue({ speaker }).run();
     }
   };
 
@@ -169,7 +168,10 @@ export default function TiptapToolbar({ editor }: { editor: Editor | null }) {
         </button>
 
         <button
-          onClick={addDialogue}
+          onClick={() => {
+            editor.chain().focus().setDialogue({ speaker: '화자 1' }).run();
+            onDialogueAdd();
+          }}
           className={buttonClass(editor.isActive('dialogue'))}
         >
           💬

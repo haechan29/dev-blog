@@ -33,7 +33,7 @@ export default function Dialogue({
           onError={() => setIsError(true)}
           className={clsx(
             ringColors[colorIndex],
-            'w-8 h-8 rounded-full object-cover shrink-0 ring-2'
+            'w-8 h-8 rounded-full! m-0! object-cover shrink-0 ring-2'
           )}
         />
       ) : (
