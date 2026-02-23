@@ -3,6 +3,7 @@
 import DialogueToolbar from '@/components/tiptap/editor/dialogueToolbar';
 import TiptapToolbar from '@/components/tiptap/editor/tiptapToolbar';
 import BgmNode from '@/components/tiptap/nodes/bgm';
+import CodeBlock from '@/components/tiptap/nodes/codeBlock';
 import DialogueNode from '@/components/tiptap/nodes/dialogue';
 import ImageWithCaptionNode from '@/components/tiptap/nodes/imageWithCaption';
 import Link from '@tiptap/extension-link';
@@ -26,7 +27,9 @@ export default function TiptapEditor({
         heading: {
           levels: [1, 2, 3],
         },
+        codeBlock: false,
       }),
+      CodeBlock,
       Underline,
       Link.configure({
         openOnClick: false,
