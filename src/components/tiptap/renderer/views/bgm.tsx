@@ -4,13 +4,17 @@ import { canTouch } from '@/lib/browser';
 import { createRipple } from '@/lib/dom';
 import { setRequestedBgm } from '@/lib/redux/bgmControllerSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
-import { NodeViewProps, NodeViewWrapper } from '@tiptap/react';
 import clsx from 'clsx';
 import { AlertCircle, Loader2, Music } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 
-export default function Bgm({ node, selected }: NodeViewProps) {
-  const { id, src, status } = node.attrs;
+export default function Bgm({
+  id: containerId,
+  src,
+}: {
+  id: string;
+  src: string;
+}) {
   const dispatch = useDispatch<AppDispatch>();
 
   const {
@@ -20,21 +24,14 @@ export default function Bgm({ node, selected }: NodeViewProps) {
     currentContainerId,
   } = useSelector((state: RootState) => state.bgmController);
 
-  const isCurrentContainer = currentContainerId === id;
+  const isCurrentContainer = currentContainerId === containerId;
   const isPlaying = isControllerPlaying && isCurrentContainer;
-  const isWaiting =
-    status === 'loading' || (isControllerWaiting && isCurrentContainer);
-  const isError =
-    status === 'failed' || (isControllerError && isCurrentContainer);
+  const isWaiting = isControllerWaiting && isCurrentContainer;
+  const isError = isControllerError && isCurrentContainer;
   const isDisabled = isWaiting || isError;
 
   return (
-    <NodeViewWrapper
-      className={clsx(
-        'my-4 flex justify-end w-fit ml-auto',
-        selected && 'ring-2 ring-blue-300 rounded-lg'
-      )}
-    >
+    <div className='flex flex-col items-end my-4'>
       <div
         className={clsx(
           'w-fit p-2 rounded-lg transition-colors duration-300 ease-in-out',
@@ -46,7 +43,7 @@ export default function Bgm({ node, selected }: NodeViewProps) {
           onClick={e => {
             if (isDisabled) return;
             if (canTouch) createRipple(e);
-            dispatch(setRequestedBgm({ src, containerId: id }));
+            dispatch(setRequestedBgm({ src, containerId }));
           }}
           className={clsx(
             'p-2 w-fit h-fit rounded-md bg-white relative group',
@@ -86,6 +83,6 @@ export default function Bgm({ node, selected }: NodeViewProps) {
           )}
         </button>
       </div>
-    </NodeViewWrapper>
+    </div>
   );
 }

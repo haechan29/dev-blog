@@ -33,6 +33,9 @@ export default Node.create<BgmOptions>({
 
   addAttributes() {
     return {
+      id: {
+        default: null,
+      },
       src: {
         default: '',
       },
@@ -65,7 +68,9 @@ export default Node.create<BgmOptions>({
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(Bgm);
+    return ReactNodeViewRenderer(Bgm, {
+      className: 'flex justify-end',
+    });
   },
 
   addCommands() {

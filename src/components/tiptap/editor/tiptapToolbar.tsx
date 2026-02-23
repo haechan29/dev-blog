@@ -1,12 +1,16 @@
 'use client';
 
+import useTiptapBgmUpload from '@/features/media/hooks/useTiptapBgmUpload';
 import useTiptapImageUpload from '@/features/media/hooks/useTiptapImageUpload';
 import { Editor } from '@tiptap/react';
 import { useRef } from 'react';
 
 export default function TiptapToolbar({ editor }: { editor: Editor | null }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const audioInputRef = useRef<HTMLInputElement>(null);
+
   const { uploadImage } = useTiptapImageUpload(editor);
+  const { uploadBgm } = useTiptapBgmUpload(editor);
 
   if (!editor) return null;
 
@@ -45,6 +49,21 @@ export default function TiptapToolbar({ editor }: { editor: Editor | null }) {
         }}
         className='hidden'
       />
+
+      <input
+        ref={audioInputRef}
+        type='file'
+        accept='audio/mpeg'
+        onChange={async e => {
+          const file = e.target.files?.[0];
+          if (file) {
+            await uploadBgm(file);
+          }
+          e.target.value = '';
+        }}
+        className='hidden'
+      />
+
       <div className='flex flex-wrap gap-1 p-2 border-b bg-gray-50'>
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
@@ -157,12 +176,7 @@ export default function TiptapToolbar({ editor }: { editor: Editor | null }) {
         </button>
 
         <button
-          onClick={() => {
-            const src = window.prompt('BGM 소스 URL을 입력하세요:');
-            if (src) {
-              editor.chain().focus().setBgm({ src }).run();
-            }
-          }}
+          onClick={() => audioInputRef.current?.click()}
           className={buttonClass(editor.isActive('bgm'))}
         >
           🎵
