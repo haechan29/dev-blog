@@ -6,6 +6,7 @@ import BgmNode from '@/components/tiptap/nodes/bgm';
 import CodeBlock from '@/components/tiptap/nodes/codeBlock';
 import DialogueNode from '@/components/tiptap/nodes/dialogue';
 import ImageWithCaptionNode from '@/components/tiptap/nodes/imageWithCaption';
+import LinkCardNode from '@/components/tiptap/nodes/linkCard';
 import Link from '@tiptap/extension-link';
 import Underline from '@tiptap/extension-underline';
 import { EditorContent, JSONContent, useEditor } from '@tiptap/react';
@@ -37,6 +38,7 @@ export default function TiptapEditor({
       ImageWithCaptionNode,
       DialogueNode,
       BgmNode,
+      LinkCardNode,
     ],
     content: initialContent ?? '<p>여기에 글을 작성하세요...</p>',
     immediatelyRender: false,
