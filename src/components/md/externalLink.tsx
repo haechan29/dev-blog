@@ -6,6 +6,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ReactNode, useEffect, useState } from 'react';
 
+type Variant = 'vertical' | 'horizontal' | 'inline';
+
 export default function ExternalLink({
   href,
   children,
@@ -17,7 +19,7 @@ export default function ExternalLink({
   children: ReactNode;
   'data-start-offset': string;
   'data-end-offset': string;
-  'data-variant'?: 'standalone' | 'inline';
+  'data-variant'?: Variant;
 }) {
   const isExternal = href.startsWith('http') || href.startsWith('//');
   const linkProps = {
@@ -34,23 +36,23 @@ export default function ExternalLink({
   const [isLoading, setIsLoading] = useState(false);
 
   const youtubeVideoId = getYouTubeVideoId(href);
+  const domain = getDomain(href);
 
-  const youtubeOg =
-    youtubeVideoId && variant === 'standalone'
+  const youtubeOg: OgDto | null =
+    youtubeVideoId && (variant === 'vertical' || variant === 'horizontal')
       ? {
           title: getTextContent(children),
-          description: 'YouTube',
+          description: null,
           image: `https://img.youtube.com/vi/${youtubeVideoId}/hqdefault.jpg`,
           siteName: 'YouTube',
-          favicon: 'https://www.youtube.com/favicon.ico',
-          url: href,
         }
       : null;
 
   const resolvedOg = youtubeOg || og;
 
   useEffect(() => {
-    if (variant !== 'standalone' || !isValidUrl(href) || youtubeVideoId) return;
+    if (variant === 'inline') return;
+    if (!isValidUrl(href) || youtubeVideoId) return;
 
     setIsLoading(true);
     getOg(href)
@@ -59,11 +61,17 @@ export default function ExternalLink({
       .finally(() => setIsLoading(false));
   }, [href, variant, youtubeVideoId]);
 
-  if (variant === 'standalone') {
-    if (isLoading) {
+  // 인라인: 기본 링크
+  if (variant === 'inline') {
+    return <Link {...linkProps}>{children}</Link>;
+  }
+
+  // 세로/가로 로딩 중
+  if (isLoading) {
+    if (variant === 'vertical') {
       return (
         <div className='not-prose flex flex-col w-full max-w-md overflow-hidden rounded-lg border border-gray-200 my-4 animate-pulse'>
-          <div className='w-full aspect-video sm:max-h-[250px] bg-gray-200' />
+          <div className='w-full aspect-video bg-gray-200' />
           <div className='flex flex-col gap-2 p-4'>
             <div className='h-4 bg-gray-200 rounded w-3/4' />
             <div className='h-3 bg-gray-200 rounded w-full' />
@@ -71,8 +79,22 @@ export default function ExternalLink({
         </div>
       );
     }
+    // horizontal 로딩
+    return (
+      <div className='not-prose flex w-full max-w-lg overflow-hidden rounded-lg border border-gray-200 my-4 animate-pulse'>
+        <div className='w-24 h-24 sm:w-32 sm:h-32 bg-gray-200 shrink-0' />
+        <div className='flex flex-col gap-2 p-4 flex-1'>
+          <div className='h-4 bg-gray-200 rounded w-3/4' />
+          <div className='h-3 bg-gray-200 rounded w-full' />
+          <div className='h-3 bg-gray-200 rounded w-1/2' />
+        </div>
+      </div>
+    );
+  }
 
-    if (resolvedOg?.title && resolvedOg.description && resolvedOg.image) {
+  // 세로 카드
+  if (variant === 'vertical') {
+    if (resolvedOg?.title && resolvedOg.image) {
       return (
         <Link
           {...linkProps}
@@ -91,13 +113,57 @@ export default function ExternalLink({
             <span className='truncate text-sm font-semibold text-gray-900'>
               {resolvedOg.title}
             </span>
-            <span className='line-clamp-2 text-xs text-gray-500'>
-              {resolvedOg.description}
+            {resolvedOg.description && (
+              <span className='line-clamp-2 text-xs text-gray-500'>
+                {resolvedOg.description}
+              </span>
+            )}
+            <span className='text-xs text-gray-400'>
+              {resolvedOg.siteName || domain}
             </span>
           </div>
         </Link>
       );
     }
+    // OG 실패 시 기본 링크로 폴백
+    return <Link {...linkProps}>{children}</Link>;
+  }
+
+  // 가로 카드
+  if (variant === 'horizontal') {
+    if (resolvedOg?.title && resolvedOg.image) {
+      return (
+        <Link
+          {...linkProps}
+          className='not-prose flex w-full max-w-lg overflow-hidden rounded-lg border border-gray-200 hover:bg-gray-50 no-underline my-4'
+        >
+          <div className='w-24 h-24 sm:w-32 sm:h-32 overflow-hidden shrink-0'>
+            <Image
+              width={200}
+              height={200}
+              src={resolvedOg.image}
+              alt={resolvedOg.title}
+              className='h-full w-full object-cover m-0! rounded-none!'
+            />
+          </div>
+          <div className='flex flex-col justify-center gap-1 p-4 flex-1 min-w-0'>
+            <span className='truncate text-sm font-semibold text-gray-900'>
+              {resolvedOg.title}
+            </span>
+            {resolvedOg.description && (
+              <span className='line-clamp-2 text-xs text-gray-500'>
+                {resolvedOg.description}
+              </span>
+            )}
+            <span className='text-xs text-gray-400'>
+              {resolvedOg.siteName || domain}
+            </span>
+          </div>
+        </Link>
+      );
+    }
+    // OG 실패 시 기본 링크로 폴백
+    return <Link {...linkProps}>{children}</Link>;
   }
 
   return <Link {...linkProps}>{children}</Link>;
@@ -109,6 +175,14 @@ function isValidUrl(url: string) {
     return true;
   } catch {
     return false;
+  }
+}
+
+function getDomain(url: string): string {
+  try {
+    return new URL(url).hostname.replace('www.', '');
+  } catch {
+    return url;
   }
 }
 
