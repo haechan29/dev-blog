@@ -29,12 +29,14 @@ import {
   X,
 } from 'lucide-react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 
 type Variant = 'vertical' | 'horizontal';
 
 export default function LinkCard({
   node,
+  getPos,
   updateAttributes,
   deleteNode,
   editor,
@@ -43,23 +45,41 @@ export default function LinkCard({
 
   const [og, setOg] = useState<OgDto | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFailed, setIsFailed] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editUrl, setEditUrl] = useState(href);
   const [isUrlValid, setIsUrlValid] = useState(true);
 
   const domain = getDomain(href);
 
+  const convertToInline = useCallback(() => {
+    const pos = getPos();
+    if (typeof pos !== 'number') return;
+
+    editor
+      .chain()
+      .focus()
+      .insertContentAt(
+        { from: pos, to: pos + node.nodeSize },
+        {
+          type: 'text',
+          text: og?.title || href,
+          marks: [
+            {
+              type: 'link',
+              attrs: { href, isNewlyInserted: false },
+            },
+          ],
+        }
+      )
+      .run();
+  }, [editor, getPos, href, node.nodeSize, og?.title]);
+
   const handleVariantChange = (
     newVariant: 'vertical' | 'horizontal' | 'inline'
   ) => {
     if (newVariant === 'inline') {
-      const linkText = og?.title || href;
-      deleteNode();
-      editor
-        .chain()
-        .focus()
-        .insertContent(`<a href="${href}">${linkText}</a>`)
-        .run();
+      convertToInline();
     } else {
       updateAttributes({ variant: newVariant });
     }
@@ -79,9 +99,13 @@ export default function LinkCard({
   };
 
   useEffect(() => {
-    if (!isValidUrl(href)) return;
+    if (!isValidUrl(href)) {
+      setIsFailed(true);
+      return;
+    }
 
     setIsLoading(true);
+    setIsFailed(false);
     getOg(href)
       .then(data => {
         const youtubeVideoId = getYouTubeVideoId(href);
@@ -89,8 +113,14 @@ export default function LinkCard({
           data.image = `https://img.youtube.com/vi/${youtubeVideoId}/hqdefault.jpg`;
         }
         setOg(data);
+        if (!data.title || !data.image) {
+          setIsFailed(true);
+        }
       })
-      .catch(() => setOg(null))
+      .catch(() => {
+        setOg(null);
+        setIsFailed(true);
+      })
       .finally(() => setIsLoading(false));
   }, [href]);
 
@@ -101,23 +131,19 @@ export default function LinkCard({
     }
   }, [isEditDialogOpen, href]);
 
+  useEffect(() => {
+    if (isFailed) {
+      toast.error('미리보기를 불러오지 못했습니다');
+      convertToInline();
+    }
+  }, [convertToInline, isFailed]);
+
   if (isLoading) {
     return <LoadingSkeleton variant={variant} />;
   }
 
-  if (!og?.title || !og.image) {
-    return (
-      <NodeViewWrapper className='not-prose my-4 relative'>
-        <a
-          href={href}
-          target='_blank'
-          rel='noopener noreferrer'
-          className='text-blue-600 hover:underline'
-        >
-          {href}
-        </a>
-      </NodeViewWrapper>
-    );
+  if (og === null || !og.title || !og.image) {
+    return null;
   }
 
   if (variant === 'vertical') {
