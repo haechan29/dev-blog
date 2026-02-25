@@ -28,10 +28,22 @@ export default function TiptapToolbar({
   const addLink = () => {
     const url = window.prompt('URL을 입력하세요:');
     if (url) {
-      editor.chain().focus().setLink({ href: url }).run();
+      editor
+        .chain()
+        .focus()
+        .insertContent({
+          type: 'text',
+          text: url,
+          marks: [
+            {
+              type: 'link',
+              attrs: { href: url, isNewlyInserted: true },
+            },
+          ],
+        })
+        .run();
     }
   };
-
   return (
     <>
       <input

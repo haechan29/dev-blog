@@ -2,13 +2,13 @@
 
 import DialogueToolbar from '@/components/tiptap/editor/dialogueToolbar';
 import TiptapToolbar from '@/components/tiptap/editor/tiptapToolbar';
+import LinkPasteMenu from '@/components/tiptap/editor/views/linkPasteMenu';
 import BgmNode from '@/components/tiptap/nodes/bgm';
 import CodeBlock from '@/components/tiptap/nodes/codeBlock';
 import DialogueNode from '@/components/tiptap/nodes/dialogue';
 import ImageWithCaptionNode from '@/components/tiptap/nodes/imageWithCaption';
+import InlineLinkNode from '@/components/tiptap/nodes/inlineLink';
 import LinkCardNode from '@/components/tiptap/nodes/linkCard';
-import Link from '@tiptap/extension-link';
-import Underline from '@tiptap/extension-underline';
 import { EditorContent, JSONContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { useState } from 'react';
@@ -29,12 +29,10 @@ export default function TiptapEditor({
           levels: [1, 2, 3],
         },
         codeBlock: false,
+        link: false,
       }),
       CodeBlock,
-      Underline,
-      Link.configure({
-        openOnClick: false,
-      }),
+      InlineLinkNode,
       ImageWithCaptionNode,
       DialogueNode,
       BgmNode,
@@ -69,6 +67,7 @@ export default function TiptapEditor({
       <div className='flex-1 overflow-y-auto'>
         <EditorContent editor={editor} className='h-full' />
       </div>
+      <LinkPasteMenu editor={editor} />
       {onSave && (
         <div className='p-2 border-t'>
           <button
