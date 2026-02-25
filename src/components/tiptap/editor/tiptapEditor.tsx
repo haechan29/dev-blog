@@ -3,12 +3,17 @@
 import DialogueToolbar from '@/components/tiptap/editor/dialogueToolbar';
 import TiptapToolbar from '@/components/tiptap/editor/tiptapToolbar';
 import LinkPasteMenu from '@/components/tiptap/editor/views/linkPasteMenu';
+import TableMenu from '@/components/tiptap/editor/views/tableMenu';
 import BgmNode from '@/components/tiptap/nodes/bgm';
 import CodeBlock from '@/components/tiptap/nodes/codeBlock';
 import DialogueNode from '@/components/tiptap/nodes/dialogue';
 import ImageWithCaptionNode from '@/components/tiptap/nodes/imageWithCaption';
 import InlineLinkNode from '@/components/tiptap/nodes/inlineLink';
 import LinkCardNode from '@/components/tiptap/nodes/linkCard';
+import { Table } from '@tiptap/extension-table';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
+import TableRow from '@tiptap/extension-table-row';
 import { EditorContent, JSONContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { useState } from 'react';
@@ -37,6 +42,12 @@ export default function TiptapEditor({
       DialogueNode,
       BgmNode,
       LinkCardNode,
+      Table.configure({
+        resizable: true,
+      }),
+      TableRow,
+      TableHeader,
+      TableCell,
     ],
     content: initialContent ?? '<p>여기에 글을 작성하세요...</p>',
     immediatelyRender: false,
@@ -68,6 +79,7 @@ export default function TiptapEditor({
         <EditorContent editor={editor} className='h-full' />
       </div>
       <LinkPasteMenu editor={editor} />
+      <TableMenu editor={editor} />
       {onSave && (
         <div className='p-2 border-t'>
           <button

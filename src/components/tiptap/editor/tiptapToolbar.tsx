@@ -198,6 +198,19 @@ export default function TiptapToolbar({
         >
           🎵
         </button>
+
+        <button
+          onClick={() =>
+            editor
+              .chain()
+              .focus()
+              .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+              .run()
+          }
+          className={buttonClass(editor.isActive('table'))}
+        >
+          표
+        </button>
       </div>
 
       <LinkEditDialog
