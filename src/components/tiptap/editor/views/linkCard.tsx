@@ -1,23 +1,16 @@
 'use client';
 
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import LinkEditDialog from '@/components/write/linkEditDialog';
 import { OgDto } from '@/features/og/data/dto/ogDto';
 import { getOg } from '@/features/og/data/repository/ogClientRepository';
 import { NodeViewProps, NodeViewWrapper } from '@tiptap/react';
-import clsx from 'clsx';
 import {
   ExternalLink,
   LayoutList,
@@ -26,7 +19,6 @@ import {
   Square,
   Trash2,
   Type,
-  X,
 } from 'lucide-react';
 import Image from 'next/image';
 import { useCallback, useEffect, useState } from 'react';
@@ -47,8 +39,6 @@ export default function LinkCard({
   const [isLoading, setIsLoading] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editUrl, setEditUrl] = useState(href);
-  const [isUrlValid, setIsUrlValid] = useState(true);
 
   const domain = getDomain(href);
 
@@ -85,15 +75,6 @@ export default function LinkCard({
     }
   };
 
-  const handleUrlSave = () => {
-    if (!editUrl.trim() || !isValidUrl(editUrl)) {
-      setIsUrlValid(false);
-      return;
-    }
-    updateAttributes({ href: editUrl });
-    setIsEditDialogOpen(false);
-  };
-
   const handleOpenLink = () => {
     window.open(href, '_blank', 'noopener,noreferrer');
   };
@@ -125,13 +106,6 @@ export default function LinkCard({
   }, [href]);
 
   useEffect(() => {
-    if (!isEditDialogOpen) {
-      setEditUrl(href);
-      setIsUrlValid(true);
-    }
-  }, [isEditDialogOpen, href]);
-
-  useEffect(() => {
     if (isFailed) {
       toast.error('미리보기를 불러오지 못했습니다');
       convertToInline();
@@ -158,12 +132,10 @@ export default function LinkCard({
         />
         <LinkEditDialog
           isOpen={isEditDialogOpen}
-          setIsOpen={setIsEditDialogOpen}
-          editUrl={editUrl}
-          setEditUrl={setEditUrl}
-          isUrlValid={isUrlValid}
-          setIsUrlValid={setIsUrlValid}
-          onSave={handleUrlSave}
+          onOpenChange={setIsEditDialogOpen}
+          initialUrl={href}
+          onSave={url => updateAttributes({ href: url })}
+          title='링크 편집'
         />
         <a href={href} target='_blank' rel='noopener noreferrer'>
           <div className='w-full aspect-video overflow-hidden'>
@@ -204,12 +176,10 @@ export default function LinkCard({
       />
       <LinkEditDialog
         isOpen={isEditDialogOpen}
-        setIsOpen={setIsEditDialogOpen}
-        editUrl={editUrl}
-        setEditUrl={setEditUrl}
-        isUrlValid={isUrlValid}
-        setIsUrlValid={setIsUrlValid}
-        onSave={handleUrlSave}
+        onOpenChange={setIsEditDialogOpen}
+        initialUrl={href}
+        onSave={url => updateAttributes({ href: url })}
+        title='링크 편집'
       />
       <a
         href={href}
@@ -319,78 +289,6 @@ function LinkCardDropdown({
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
-  );
-}
-
-function LinkEditDialog({
-  isOpen,
-  setIsOpen,
-  editUrl,
-  setEditUrl,
-  isUrlValid,
-  setIsUrlValid,
-  onSave,
-}: {
-  isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
-  editUrl: string;
-  setEditUrl: (url: string) => void;
-  isUrlValid: boolean;
-  setIsUrlValid: (isValid: boolean) => void;
-  onSave: () => void;
-}) {
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent showCloseButton={false} className='gap-0 rounded-sm'>
-        <DialogTitle className='sr-only'>링크 편집</DialogTitle>
-        <DialogDescription className='sr-only'>
-          링크 URL을 수정할 수 있습니다.
-        </DialogDescription>
-
-        <div className='text-xl font-bold mt-2 mb-6'>링크 편집</div>
-
-        <input
-          className={clsx(
-            'w-full border p-3 mb-2 rounded-sm outline-none',
-            isUrlValid
-              ? 'border-gray-200 hover:border-blue-500 focus:border-blue-500'
-              : 'border-red-400 animate-shake',
-            editUrl ? 'bg-white' : 'bg-gray-50'
-          )}
-          type='url'
-          value={editUrl}
-          onChange={e => {
-            setEditUrl(e.target.value);
-            setIsUrlValid(true);
-          }}
-          onKeyDown={e => {
-            if (e.key === 'Enter') onSave();
-          }}
-          placeholder='https://example.com'
-          autoFocus
-        />
-
-        {!isUrlValid && (
-          <p className='text-red-500 text-sm mb-6'>
-            올바른 URL을 입력해주세요.
-          </p>
-        )}
-
-        {isUrlValid && <div className='mb-6' />}
-
-        <div className='flex justify-between items-center'>
-          <button
-            className='flex justify-center items-center px-6 h-10 rounded-sm font-bold text-white bg-blue-600 hover:bg-blue-500'
-            onClick={onSave}
-          >
-            완료
-          </button>
-          <DialogClose asChild>
-            <X className='w-10 h-10 p-2 cursor-pointer' />
-          </DialogClose>
-        </div>
-      </DialogContent>
-    </Dialog>
   );
 }
 

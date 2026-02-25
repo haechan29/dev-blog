@@ -1,9 +1,10 @@
 'use client';
 
+import LinkEditDialog from '@/components/write/linkEditDialog';
 import useTiptapBgmUpload from '@/features/media/hooks/useTiptapBgmUpload';
 import useTiptapImageUpload from '@/features/media/hooks/useTiptapImageUpload';
 import { Editor } from '@tiptap/react';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 export default function TiptapToolbar({
   editor,
@@ -15,8 +16,29 @@ export default function TiptapToolbar({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
 
+  const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
+
   const { uploadImage } = useTiptapImageUpload(editor);
   const { uploadBgm } = useTiptapBgmUpload(editor);
+
+  const handleLinkInsert = (url: string) => {
+    if (!editor) return;
+
+    editor
+      .chain()
+      .focus()
+      .insertContent({
+        type: 'text',
+        text: url,
+        marks: [
+          {
+            type: 'link',
+            attrs: { href: url, isNewlyInserted: true },
+          },
+        ],
+      })
+      .run();
+  };
 
   if (!editor) return null;
 
@@ -25,25 +47,6 @@ export default function TiptapToolbar({
       isActive ? 'bg-gray-800 text-white' : 'bg-gray-100 hover:bg-gray-200'
     }`;
 
-  const addLink = () => {
-    const url = window.prompt('URL을 입력하세요:');
-    if (url) {
-      editor
-        .chain()
-        .focus()
-        .insertContent({
-          type: 'text',
-          text: url,
-          marks: [
-            {
-              type: 'link',
-              attrs: { href: url, isNewlyInserted: true },
-            },
-          ],
-        })
-        .run();
-    }
-  };
   return (
     <>
       <input
@@ -101,7 +104,7 @@ export default function TiptapToolbar({
           S
         </button>
         <button
-          onClick={addLink}
+          onClick={() => setIsLinkDialogOpen(true)}
           className={buttonClass(editor.isActive('link'))}
         >
           🔗
@@ -196,6 +199,13 @@ export default function TiptapToolbar({
           🎵
         </button>
       </div>
+
+      <LinkEditDialog
+        isOpen={isLinkDialogOpen}
+        onOpenChange={setIsLinkDialogOpen}
+        onSave={handleLinkInsert}
+        title='링크 추가'
+      />
     </>
   );
 }
