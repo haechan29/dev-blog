@@ -9,7 +9,11 @@ export interface BgmOptions {
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     bgm: {
-      setBgm: (options: { src: string }) => ReturnType;
+      setBgm: (options: {
+        id: string;
+        src: string;
+        status?: string | null;
+      }) => ReturnType;
     };
   }
 }

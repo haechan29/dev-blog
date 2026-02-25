@@ -14,9 +14,10 @@ export default function useTiptapBgmUpload(editor: Editor | null) {
 
       const id = nanoid();
 
-      editor.commands.insertContent({
-        type: 'bgm',
-        attrs: { id, src: '', status: 'loading' },
+      editor.commands.setBgm({
+        id,
+        src: '',
+        status: 'loading',
       });
 
       try {
