@@ -1,9 +1,10 @@
 'use client';
 
 import DialogueToolbar from '@/components/tiptap/editor/dialogueToolbar';
+import FloatingMenu from '@/components/tiptap/editor/floatingMenu';
+import LinkPasteMenu from '@/components/tiptap/editor/linkPasteMenu';
+import TableMenu from '@/components/tiptap/editor/tableMenu';
 import TiptapToolbar from '@/components/tiptap/editor/tiptapToolbar';
-import LinkPasteMenu from '@/components/tiptap/editor/views/linkPasteMenu';
-import TableMenu from '@/components/tiptap/editor/views/tableMenu';
 import BgmNode from '@/components/tiptap/nodes/bgm';
 import CodeBlock from '@/components/tiptap/nodes/codeBlock';
 import DialogueNode from '@/components/tiptap/nodes/dialogue';
@@ -78,6 +79,7 @@ export default function TiptapEditor({
       <div className='flex-1 overflow-y-auto'>
         <EditorContent editor={editor} className='h-full' />
       </div>
+      <FloatingMenu editor={editor} />
       <LinkPasteMenu editor={editor} />
       <TableMenu editor={editor} />
       {onSave && (

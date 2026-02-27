@@ -66,6 +66,7 @@ export default function LinkPasteMenu({ editor }: { editor: Editor | null }) {
   return (
     <BubbleMenu
       editor={editor}
+      pluginKey='link-paste-menu'
       options={{
         placement: 'right-start',
         onHide: handleHide,

@@ -21,6 +21,7 @@ export default function TableMenu({ editor }: { editor: Editor | null }) {
   return (
     <BubbleMenu
       editor={editor}
+      pluginKey='table-menu'
       options={{
         placement: 'top',
         offset: 8,
