@@ -33,9 +33,9 @@ export default function FloatingMenu({ editor }: { editor: Editor | null }) {
       isStrike: editor?.isActive('strike') ?? false,
       isLink: editor?.isActive('link') ?? false,
       isText:
-        editor?.isActive('paragraph') &&
-        !editor?.isActive('blockquote') &&
-        !editor?.isActive('codeBlock'),
+        editor !== null &&
+        editor.isActive('paragraph') &&
+        !editor.isActive('blockquote'),
       isHeading1: editor?.isActive('heading', { level: 1 }) ?? false,
       isHeading2: editor?.isActive('heading', { level: 2 }) ?? false,
       isHeading3: editor?.isActive('heading', { level: 3 }) ?? false,
@@ -74,7 +74,13 @@ export default function FloatingMenu({ editor }: { editor: Editor | null }) {
     {
       label: '인용',
       icon: Quote,
-      action: () => editor.chain().focus().toggleBlockquote().run(),
+      action: () => {
+        if (editor.isActive('heading') || editor.isActive('codeBlock')) {
+          editor.chain().focus().setParagraph().toggleBlockquote().run();
+        } else {
+          editor.chain().focus().toggleBlockquote().run();
+        }
+      },
       active: editorState?.isBlockquote ?? false,
     },
     {

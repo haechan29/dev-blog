@@ -6,10 +6,11 @@ import LinkPasteMenu from '@/components/tiptap/editor/linkPasteMenu';
 import TableMenu from '@/components/tiptap/editor/tableMenu';
 import TiptapToolbar from '@/components/tiptap/editor/tiptapToolbar';
 import BgmNode from '@/components/tiptap/nodes/bgm';
-import CodeBlock from '@/components/tiptap/nodes/codeBlock';
+import BlockQuoteNode from '@/components/tiptap/nodes/blockQuote';
+import CodeBlockNode from '@/components/tiptap/nodes/codeBlock';
 import DialogueNode from '@/components/tiptap/nodes/dialogue';
 import ImageWithCaptionNode from '@/components/tiptap/nodes/imageWithCaption';
-import InlineLinkNode from '@/components/tiptap/nodes/inlineLink';
+import LinkNode from '@/components/tiptap/nodes/link';
 import LinkCardNode from '@/components/tiptap/nodes/linkCard';
 import { Table } from '@tiptap/extension-table';
 import TableCell from '@tiptap/extension-table-cell';
@@ -36,9 +37,11 @@ export default function TiptapEditor({
         },
         codeBlock: false,
         link: false,
+        blockquote: false,
       }),
-      CodeBlock,
-      InlineLinkNode,
+      CodeBlockNode,
+      LinkNode,
+      BlockQuoteNode,
       ImageWithCaptionNode,
       DialogueNode,
       BgmNode,

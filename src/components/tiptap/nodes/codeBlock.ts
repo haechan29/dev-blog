@@ -1,10 +1,10 @@
-import CodeBlock from '@/components/tiptap/editor/views/codeBlock';
-import BaseCodeBlock from '@tiptap/extension-code-block';
+import CodeBlockView from '@/components/tiptap/editor/views/codeBlock';
+import CodeBlock from '@tiptap/extension-code-block';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 
-export default BaseCodeBlock.extend({
+export default CodeBlock.extend({
   addNodeView() {
-    return ReactNodeViewRenderer(CodeBlock);
+    return ReactNodeViewRenderer(CodeBlockView);
   },
 }).configure({
   enableTabIndentation: true,
