@@ -3,8 +3,8 @@
 import DialogueToolbar from '@/components/tiptap/editor/dialogueToolbar';
 import FloatingMenu from '@/components/tiptap/editor/floatingMenu';
 import LinkPasteMenu from '@/components/tiptap/editor/linkPasteMenu';
+import PlusMenu from '@/components/tiptap/editor/plusMenu';
 import TableMenu from '@/components/tiptap/editor/tableMenu';
-import TiptapToolbar from '@/components/tiptap/editor/tiptapToolbar';
 import BgmNode from '@/components/tiptap/nodes/bgm';
 import BlockQuoteNode from '@/components/tiptap/nodes/blockQuote';
 import CodeBlockNode from '@/components/tiptap/nodes/codeBlock';
@@ -69,19 +69,14 @@ export default function TiptapEditor({
   };
 
   return (
-    <div className='h-full flex flex-col border rounded-lg overflow-hidden'>
-      <TiptapToolbar
-        editor={editor}
-        onDialogueAdd={() => setIsDialogueToolbarOpen(true)}
-      />
+    <div className='h-full flex flex-col'>
       <DialogueToolbar
         editor={editor}
         isOpen={isDialogueToolbarOpen}
         setIsOpen={setIsDialogueToolbarOpen}
       />
-      <div className='flex-1 overflow-y-auto'>
-        <EditorContent editor={editor} className='h-full' />
-      </div>
+      <EditorContent editor={editor} className='h-full' />
+      <PlusMenu editor={editor} />
       <FloatingMenu editor={editor} />
       <LinkPasteMenu editor={editor} />
       <TableMenu editor={editor} />
