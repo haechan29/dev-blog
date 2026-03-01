@@ -3,16 +3,17 @@
 
 import TiptapEditor from '@/components/tiptap/editor/tiptapEditor';
 import ProfileIcon from '@/components/user/profileIcon';
+import TableOfContents, { TocAnchor } from '@/components/write/tableOfContents';
 import useUser from '@/features/user/domain/hooks/useUser';
 import clsx from 'clsx';
 import { useState } from 'react';
 
 export default function WriteNewPage() {
   const [title, setTitle] = useState('');
+  const [anchors, setAnchors] = useState<TocAnchor[]>([]);
   const { user } = useUser();
 
   const handleNext = () => {
-    // TODO: 2단계(메타데이터 입력)로 이동
     console.log('다음 단계로 이동', { title });
   };
 
@@ -31,8 +32,10 @@ export default function WriteNewPage() {
       {/* 왼쪽 사이드바 영역 (빈 상태) */}
       <div className='fixed top-0 left-0 w-(--sidebar-width) h-full max-xl:hidden' />
 
-      {/* 오른쪽 목차 영역 (빈 상태) */}
-      <div className='fixed top-0 right-0 w-(--toc-width) mr-(--toc-margin) h-full max-xl:hidden' />
+      {/* 오른쪽 목차 영역 */}
+      <div className='fixed top-0 right-0 w-(--toc-width) mr-(--toc-margin) h-full max-xl:hidden'>
+        <TableOfContents anchors={anchors} showPlaceholder />
+      </div>
 
       {/* 본문 영역 */}
       <div
@@ -72,7 +75,7 @@ export default function WriteNewPage() {
 
           {/* Tiptap 에디터 */}
           <div className='mb-20'>
-            <TiptapEditor />
+            <TiptapEditor onAnchorsChange={setAnchors} />
           </div>
         </div>
       </div>

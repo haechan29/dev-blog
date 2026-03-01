@@ -12,9 +12,11 @@ import DialogueNode from '@/components/tiptap/nodes/dialogue';
 import ImageWithCaptionNode from '@/components/tiptap/nodes/imageWithCaption';
 import LinkNode from '@/components/tiptap/nodes/link';
 import LinkCardNode from '@/components/tiptap/nodes/linkCard';
+import { TocAnchor } from '@/components/write/tableOfContents';
 import { Table } from '@tiptap/extension-table';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
+import { TableOfContents } from '@tiptap/extension-table-of-contents';
 import TableRow from '@tiptap/extension-table-row';
 import { EditorContent, JSONContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -23,9 +25,11 @@ import { useState } from 'react';
 export default function TiptapEditor({
   initialContent,
   onSave,
+  onAnchorsChange,
 }: {
   initialContent?: JSONContent;
   onSave?: (json: JSONContent) => void;
+  onAnchorsChange?: (anchors: TocAnchor[]) => void;
 }) {
   const [isDialogueToolbarOpen, setIsDialogueToolbarOpen] = useState(false);
 
@@ -52,6 +56,13 @@ export default function TiptapEditor({
       TableRow,
       TableHeader,
       TableCell,
+      TableOfContents.configure({
+        onUpdate: anchors => {
+          if (onAnchorsChange) {
+            onAnchorsChange(anchors as TocAnchor[]);
+          }
+        },
+      }),
     ],
     content: initialContent ?? '<p>여기에 글을 작성하세요...</p>',
     immediatelyRender: false,
