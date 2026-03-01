@@ -7,11 +7,13 @@ import clsx from 'clsx';
 import {
   Bold,
   ChevronDown,
+  Code,
   Heading1,
   Heading2,
   Heading3,
   Italic,
   Link,
+  Quote,
   Strikethrough,
   Text,
   Underline,
@@ -30,11 +32,15 @@ export default function FloatingMenu({ editor }: { editor: Editor | null }) {
       isUnderline: editor?.isActive('underline') ?? false,
       isStrike: editor?.isActive('strike') ?? false,
       isLink: editor?.isActive('link') ?? false,
-      isParagraph:
-        editor?.isActive('paragraph') && !editor?.isActive('blockquote'),
+      isText:
+        editor?.isActive('paragraph') &&
+        !editor?.isActive('blockquote') &&
+        !editor?.isActive('codeBlock'),
       isHeading1: editor?.isActive('heading', { level: 1 }) ?? false,
       isHeading2: editor?.isActive('heading', { level: 2 }) ?? false,
       isHeading3: editor?.isActive('heading', { level: 3 }) ?? false,
+      isBlockquote: editor?.isActive('blockquote') ?? false,
+      isCodeBlock: editor?.isActive('codeBlock') ?? false,
     }),
   });
 
@@ -45,7 +51,7 @@ export default function FloatingMenu({ editor }: { editor: Editor | null }) {
       label: '본문',
       icon: Text,
       action: () => editor.chain().focus().setParagraph().run(),
-      active: editorState?.isParagraph ?? false,
+      active: editorState?.isText ?? false,
     },
     {
       label: '큰 제목',
@@ -64,6 +70,18 @@ export default function FloatingMenu({ editor }: { editor: Editor | null }) {
       icon: Heading3,
       action: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
       active: editorState?.isHeading3 ?? false,
+    },
+    {
+      label: '인용',
+      icon: Quote,
+      action: () => editor.chain().focus().toggleBlockquote().run(),
+      active: editorState?.isBlockquote ?? false,
+    },
+    {
+      label: '코드',
+      icon: Code,
+      action: () => editor.chain().focus().toggleCodeBlock().run(),
+      active: editorState?.isCodeBlock ?? false,
     },
   ];
 
@@ -121,7 +139,7 @@ export default function FloatingMenu({ editor }: { editor: Editor | null }) {
               <ChevronDown size={14} />
             </button>
             {showStyleDropdown && (
-              <div className='absolute top-full left-0 mt-1 bg-white shadow-lg rounded-lg border border-gray-200 py-1 min-w-[140px] z-10'>
+              <div className='absolute top-full left-0 mt-1 bg-popover shadow-md rounded-md border p-1 min-w-32 z-10'>
                 {styleOptions.map(option => (
                   <button
                     key={option.label}
@@ -130,8 +148,9 @@ export default function FloatingMenu({ editor }: { editor: Editor | null }) {
                       setShowStyleDropdown(false);
                     }}
                     className={clsx(
-                      'w-full text-left px-3 py-1.5 text-sm hover:bg-gray-100 flex items-center gap-2',
-                      option.active && 'bg-gray-100 font-medium'
+                      'w-full text-left px-2 py-1.5 text-sm rounded-sm flex items-center gap-2',
+                      'hover:bg-accent hover:text-accent-foreground',
+                      option.active && 'bg-accent font-medium'
                     )}
                   >
                     <option.icon size={16} />
