@@ -4,12 +4,14 @@
 import TiptapEditor from '@/components/tiptap/editor/tiptapEditor';
 import ProfileIcon from '@/components/user/profileIcon';
 import TableOfContents, { TocAnchor } from '@/components/write/tableOfContents';
+import TagInput from '@/components/write/tagInput';
 import useUser from '@/features/user/domain/hooks/useUser';
 import clsx from 'clsx';
 import { useState } from 'react';
 
 export default function WriteNewPage() {
   const [title, setTitle] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
   const [anchors, setAnchors] = useState<TocAnchor[]>([]);
   const { user } = useUser();
 
@@ -58,6 +60,8 @@ export default function WriteNewPage() {
             rows={1}
             className='w-full text-3xl font-bold outline-none mt-8 mb-6 resize-none scrollbar-hide'
           />
+
+          <TagInput tags={tags} onChange={setTags} className='mb-6' />
 
           {/* 작성자 프로필 (미리보기) */}
           <div className='flex gap-2 items-center text-xs mb-10'>
