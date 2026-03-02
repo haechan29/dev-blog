@@ -2,12 +2,15 @@
 
 import TiptapEditor from '@/components/tiptap/editor/tiptapEditor';
 import ProfileIcon from '@/components/user/profileIcon';
+import NewWriteToolbar from '@/components/write/newWriteToolbar';
 import PublishDialog from '@/components/write/publishDialog';
 import TableOfContents, { TocAnchor } from '@/components/write/tableOfContents';
 import TagInput from '@/components/write/tagInput';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import useUser from '@/features/user/domain/hooks/useUser';
+import { UserProps } from '@/features/user/ui/userProps';
 import clsx from 'clsx';
+import { Heart } from 'lucide-react';
 import { useState } from 'react';
 
 export default function NewWritePageClient({
@@ -47,26 +50,14 @@ export default function NewWritePageClient({
 
   return (
     <>
-      {/* 상단 툴바 */}
-      <div className='fixed top-0 left-0 right-0 h-(--toolbar-height) bg-white border-b z-50 flex items-center justify-end px-6'>
-        <button
-          onClick={handleNext}
-          className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'
-        >
-          다음
-        </button>
-      </div>
       <NewWriteToolbar onNext={handleNext} isPending={isPending} />
 
-      {/* 왼쪽 사이드바 영역 (빈 상태) */}
       <div className='fixed top-0 left-0 w-(--sidebar-width) h-full max-xl:hidden' />
 
-      {/* 오른쪽 목차 영역 */}
       <div className='fixed top-0 right-0 w-(--toc-width) mr-(--toc-margin) h-full max-xl:hidden'>
         <TableOfContents anchors={anchors} showPlaceholder />
       </div>
 
-      {/* 본문 영역 */}
       <div
         className={clsx(
           'mt-(--toolbar-height) mb-12 px-6 md:px-12 xl:px-18',
@@ -75,39 +66,40 @@ export default function NewWritePageClient({
         )}
       >
         <div className='max-w-[65ch] mx-auto'>
-          {/* 제목 입력 */}
-          <textarea
-            value={title}
-            onChange={e => {
-              setTitle(e.target.value);
-              e.target.style.height = 'auto';
-              e.target.style.height = e.target.scrollHeight + 'px';
-            }}
-            placeholder='제목을 입력하세요'
-            rows={1}
-            className='w-full text-3xl font-bold outline-none mt-8 mb-6 resize-none scrollbar-hide'
-          />
-
-          <TagInput tags={tags} onChange={setTags} className='mb-6' />
-
-          {/* 작성자 프로필 (미리보기) */}
-          <div className='flex gap-2 items-center text-xs mb-10'>
-            <ProfileIcon
-              nickname={user?.nickname ?? ''}
-              size='sm'
-              profileImageUrl={user?.profileImageUrl ?? undefined}
+          <div data-post-header className='flex flex-col gap-6 mb-10'>
+            <textarea
+              value={title}
+              onChange={e => {
+                setTitle(e.target.value);
+                e.target.style.height = 'auto';
+                e.target.style.height = e.target.scrollHeight + 'px';
+              }}
+              placeholder='제목'
+              rows={1}
+              className='w-full text-3xl font-bold outline-none resize-none scrollbar-hide placeholder:text-gray-400'
             />
-            <span className='text-gray-900'>{user?.nickname}</span>
-            <div className='w-[3px] h-[3px] rounded-full bg-gray-400' />
-            <span className='text-gray-500'>방금 전</span>
+
+            <TagInput tags={tags} onChange={setTags} />
+
+            <div className='flex gap-2 items-center text-xs'>
+              <ProfileIcon
+                nickname={user?.nickname ?? ''}
+                size='sm'
+                profileImageUrl={user?.profileImageUrl ?? undefined}
+              />
+              <span className='text-gray-900'>{user?.nickname}</span>
+              <div className='w-[3px] h-[3px] rounded-full bg-gray-400' />
+              <span className='text-gray-500'>방금 전</span>
+            </div>
           </div>
 
           <div className='w-full h-px bg-gray-200 mb-10' />
 
-          {/* Tiptap 에디터 */}
-          <div className='mb-20'>
-            <TiptapEditor onAnchorsChange={setAnchors} />
-          </div>
+          <TiptapEditor onAnchorsChange={setAnchors} className='mb-20' />
+
+          <LikeButtonPreview />
+          <AuthorProfilePreview user={user ?? null} />
+          <CommentsPreview />
         </div>
       </div>
 
@@ -119,5 +111,45 @@ export default function NewWritePageClient({
         isPending={isPending}
       />
     </>
+  );
+}
+
+function LikeButtonPreview() {
+  return (
+    <div className='flex justify-center mb-20 pointer-events-none'>
+      <div className='flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200'>
+        <Heart size={20} className='text-gray-400' />
+        <div className='text-sm text-gray-600'>0</div>
+      </div>
+    </div>
+  );
+}
+
+function AuthorProfilePreview({ user }: { user: UserProps | null }) {
+  return (
+    <div className='flex items-center gap-3 mb-12 pointer-events-none'>
+      <ProfileIcon
+        nickname={user?.nickname ?? ''}
+        size='md'
+        profileImageUrl={user?.profileImageUrl ?? undefined}
+      />
+      <div className='flex-1 min-w-0'>
+        <div className='font-medium text-gray-900 truncate'>
+          {user?.nickname}
+        </div>
+        {user?.bio && (
+          <div className='text-xs text-gray-500 truncate'>{user.bio}</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function CommentsPreview() {
+  return (
+    <div className='w-full p-4 mb-12 bg-gray-50 rounded-lg text-left pointer-events-none'>
+      <div className='mb-2 text-sm font-medium text-gray-700'>댓글 0개</div>
+      <div className='text-sm text-gray-500'>첫 번째 댓글을 작성해보세요</div>
+    </div>
   );
 }

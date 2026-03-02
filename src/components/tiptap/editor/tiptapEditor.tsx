@@ -20,14 +20,17 @@ import { TableOfContents } from '@tiptap/extension-table-of-contents';
 import TableRow from '@tiptap/extension-table-row';
 import { EditorContent, JSONContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import clsx from 'clsx';
 import { useState } from 'react';
 
 export default function TiptapEditor({
   initialContent,
   onAnchorsChange,
+  className,
 }: {
   initialContent?: JSONContent;
   onAnchorsChange?: (anchors: TocAnchor[]) => void;
+  className?: string;
 }) {
   const [isDialogueToolbarOpen, setIsDialogueToolbarOpen] = useState(false);
 
@@ -62,11 +65,14 @@ export default function TiptapEditor({
         },
       }),
     ],
-    content: initialContent ?? '<p>여기에 글을 작성하세요...</p>',
+    content: initialContent ?? '',
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: 'prose max-w-none focus:outline-none min-h-full p-4',
+        class: clsx(
+          'prose max-w-none focus:outline-none min-h-[30vh]',
+          className
+        ),
       },
     },
   });
@@ -78,7 +84,14 @@ export default function TiptapEditor({
         isOpen={isDialogueToolbarOpen}
         setIsOpen={setIsDialogueToolbarOpen}
       />
-      <EditorContent editor={editor} className='h-full' />
+      <div className='min-h-[30vh] relative'>
+        {(!editor || editor.isEmpty) && (
+          <div className='prose max-w-none text-gray-400! absolute'>
+            여기에 글을 작성하세요
+          </div>
+        )}
+        <EditorContent editor={editor} />
+      </div>
       <PlusMenu editor={editor} />
       <FloatingMenu editor={editor} />
       <LinkPasteMenu editor={editor} />
