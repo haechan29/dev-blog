@@ -1,16 +1,13 @@
 'use client';
 
-import clsx from 'clsx';
 import { useEffect, useRef, useState } from 'react';
 
 export default function TagInput({
   tags,
   onChange,
-  className,
 }: {
   tags: string[];
   onChange: (tags: string[]) => void;
-  className?: string;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -46,7 +43,7 @@ export default function TagInput({
   };
 
   return (
-    <div className={clsx('flex flex-wrap gap-2', className)}>
+    <div className='flex flex-wrap gap-3'>
       {tags.map(tag => (
         <button
           key={tag}

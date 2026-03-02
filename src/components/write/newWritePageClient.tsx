@@ -56,6 +56,7 @@ export default function NewWritePageClient({
           다음
         </button>
       </div>
+      <NewWriteToolbar onNext={handleNext} isPending={isPending} />
 
       {/* 왼쪽 사이드바 영역 (빈 상태) */}
       <div className='fixed top-0 left-0 w-(--sidebar-width) h-full max-xl:hidden' />

@@ -24,11 +24,9 @@ import { useState } from 'react';
 
 export default function TiptapEditor({
   initialContent,
-  onSave,
   onAnchorsChange,
 }: {
   initialContent?: JSONContent;
-  onSave?: (json: JSONContent) => void;
   onAnchorsChange?: (anchors: TocAnchor[]) => void;
 }) {
   const [isDialogueToolbarOpen, setIsDialogueToolbarOpen] = useState(false);
@@ -73,12 +71,6 @@ export default function TiptapEditor({
     },
   });
 
-  const handleSave = () => {
-    if (editor && onSave) {
-      onSave(editor.getJSON());
-    }
-  };
-
   return (
     <div className='h-full flex flex-col'>
       <DialogueToolbar
@@ -91,16 +83,6 @@ export default function TiptapEditor({
       <FloatingMenu editor={editor} />
       <LinkPasteMenu editor={editor} />
       <TableMenu editor={editor} />
-      {onSave && (
-        <div className='p-2 border-t'>
-          <button
-            onClick={handleSave}
-            className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'
-          >
-            저장
-          </button>
-        </div>
-      )}
     </div>
   );
 }
