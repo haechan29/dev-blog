@@ -21,17 +21,20 @@ import TableRow from '@tiptap/extension-table-row';
 import { EditorContent, JSONContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import clsx from 'clsx';
-import { useState } from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 
-export default function TiptapEditor({
-  initialContent,
-  onAnchorsChange,
-  className,
-}: {
-  initialContent?: JSONContent;
-  onAnchorsChange?: (anchors: TocAnchor[]) => void;
-  className?: string;
-}) {
+export interface TiptapEditorRef {
+  getJSON: () => JSONContent | undefined;
+}
+
+const TiptapEditor = forwardRef<
+  TiptapEditorRef,
+  {
+    initialContent?: JSONContent;
+    onAnchorsChange?: (anchors: TocAnchor[]) => void;
+    className?: string;
+  }
+>(function TiptapEditor({ initialContent, onAnchorsChange, className }, ref) {
   const [isDialogueToolbarOpen, setIsDialogueToolbarOpen] = useState(false);
 
   const editor = useEditor({
@@ -77,6 +80,10 @@ export default function TiptapEditor({
     },
   });
 
+  useImperativeHandle(ref, () => ({
+    getJSON: () => editor?.getJSON(),
+  }));
+
   return (
     <div className='h-full flex flex-col'>
       <DialogueToolbar
@@ -98,4 +105,6 @@ export default function TiptapEditor({
       <TableMenu editor={editor} />
     </div>
   );
-}
+});
+
+export default TiptapEditor;

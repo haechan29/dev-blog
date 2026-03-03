@@ -1,17 +1,24 @@
 'use client';
 
-import TiptapEditor from '@/components/tiptap/editor/tiptapEditor';
+import TiptapEditor, {
+  TiptapEditorRef,
+} from '@/components/tiptap/editor/tiptapEditor';
 import ProfileIcon from '@/components/user/profileIcon';
 import NewWriteToolbar from '@/components/write/newWriteToolbar';
 import PublishDialog from '@/components/write/publishDialog';
 import TableOfContents, { TocAnchor } from '@/components/write/tableOfContents';
 import TagInput from '@/components/write/tagInput';
+import { ApiError } from '@/errors/errors';
+import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
+import { createProps } from '@/features/post/ui/postProps';
 import useUser from '@/features/user/domain/hooks/useUser';
 import { UserProps } from '@/features/user/ui/userProps';
+import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import clsx from 'clsx';
 import { Heart } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 
 export default function NewWritePageClient({
   skipPasswordInput,
@@ -23,7 +30,11 @@ export default function NewWritePageClient({
   const [anchors, setAnchors] = useState<TocAnchor[]>([]);
   const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
   const [isPending, setIsPending] = useState(false);
+
+  const editorRef = useRef<TiptapEditorRef>(null);
+
   const { user } = useUser();
+  const router = useRouterWithProgress();
 
   const handleNext = () => {
     setIsPublishDialogOpen(true);
@@ -33,16 +44,30 @@ export default function NewWritePageClient({
     visibility: PostVisibility;
     password: string;
   }) => {
+    const contentJson = editorRef.current?.getJSON();
+    if (!contentJson) return;
+
     setIsPending(true);
     try {
-      // TODO: 발행 API 호출
-      console.log('발행', { title, tags, ...data });
-      // await publishPost({ title, tags, content, ...data });
+      const post = await PostClientService.createPost({
+        title,
+        content: '',
+        contentJson,
+        tags,
+        password: data.password,
+        visibility: data.visibility,
+      });
+      const postProps = createProps(post);
 
       setIsPublishDialogOpen(false);
-      // 발행 후 리다이렉트 등 처리
+      router.push(`/read/${postProps.id}`);
     } catch (error) {
-      console.error('발행 실패', error);
+      const message =
+        error instanceof ApiError
+          ? error.message
+          : '게시글 생성에 실패했습니다';
+
+      toast.error(message);
     } finally {
       setIsPending(false);
     }
@@ -95,7 +120,11 @@ export default function NewWritePageClient({
 
           <div className='w-full h-px bg-gray-200 mb-10' />
 
-          <TiptapEditor onAnchorsChange={setAnchors} className='mb-20' />
+          <TiptapEditor
+            ref={editorRef}
+            onAnchorsChange={setAnchors}
+            className='mb-20'
+          />
 
           <LikeButtonPreview />
           <AuthorProfilePreview user={user ?? null} />
