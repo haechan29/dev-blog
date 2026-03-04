@@ -70,6 +70,7 @@ export async function updatePost({
   postId: string;
   title?: string;
   content?: string;
+  contentJson?: object;
   tags?: string[];
   password?: string;
   seriesId?: string | null;

@@ -55,6 +55,7 @@ export async function updatePost(params: {
   postId: string;
   title?: string;
   content?: string;
+  contentJson?: object;
   tags?: string[];
   password?: string;
   seriesId?: string | null;
