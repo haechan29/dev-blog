@@ -40,7 +40,12 @@ export default async function PostPage({
         initialComments={commentProps}
         initialPosts={postProps}
         initialCursor={nextCursor}
-        parsedContent={<PostParsedContent content={post.content} />}
+        parsedContent={
+          <PostParsedContent
+            content={post.content}
+            contentJson={post.contentJson}
+          />
+        }
       />
     );
   } catch (error) {

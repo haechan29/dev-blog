@@ -7,6 +7,7 @@ export function toDto(post: FeedPostEntity): PostDto {
     title: post.title,
     tags: post.tags,
     content: post.content,
+    contentJson: post.content_json,
     createdAt: post.created_at,
     updatedAt: post.updated_at ?? post.created_at,
     userId: post.user_id,
