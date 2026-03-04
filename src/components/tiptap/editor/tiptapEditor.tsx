@@ -15,9 +15,11 @@ import DialogueNode from '@/components/tiptap/nodes/dialogue';
 import ImageWithCaptionNode from '@/components/tiptap/nodes/imageWithCaption';
 import LinkCardNode from '@/components/tiptap/nodes/linkCard';
 import { TocAnchor } from '@/components/write/tableOfContents';
+import { uploadImage } from '@/features/media/utils/uploadImage';
 import { Blockquote } from '@tiptap/extension-blockquote';
 import CharacterCount from '@tiptap/extension-character-count';
 import CodeBlock from '@tiptap/extension-code-block';
+import { FileHandler } from '@tiptap/extension-file-handler';
 import Link from '@tiptap/extension-link';
 import { Table } from '@tiptap/extension-table';
 import TableCell from '@tiptap/extension-table-cell';
@@ -116,6 +118,16 @@ const TiptapEditor = forwardRef<
             className: 'flex justify-end',
           });
         },
+      }),
+      FileHandler.configure({
+        allowedMimeTypes: [
+          'image/jpeg',
+          'image/png',
+          'image/gif',
+          'image/webp',
+        ],
+        onPaste: uploadImage,
+        onDrop: uploadImage,
       }),
     ],
     content: initialContent ?? '',

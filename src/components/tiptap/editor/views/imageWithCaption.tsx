@@ -2,7 +2,7 @@
 
 import ImageCropOverlay from '@/components/write/imageCropOverlay';
 import { buildImageUrl } from '@/features/media/domain/lib/url';
-import useImageCrop from '@/features/media/hooks/useImageCrop';
+import { cropImage } from '@/features/media/utils/cropImage';
 import { NodeViewProps, NodeViewWrapper } from '@tiptap/react';
 import clsx from 'clsx';
 import { AlertCircle, Crop } from 'lucide-react';
@@ -26,8 +26,6 @@ export default function ImageWithCaption({
 
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  const { cropImage } = useImageCrop(editor);
 
   const imageSize = clsx(
     'h-auto',
@@ -183,7 +181,7 @@ export default function ImageWithCaption({
         isOpen={isCropOpen}
         setIsOpen={setIsCropOpen}
         onConfirm={async croppedFile => {
-          await cropImage(croppedFile, id);
+          await cropImage(editor, croppedFile, id);
           setIsCropOpen(false);
         }}
       />

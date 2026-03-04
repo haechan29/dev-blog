@@ -1,7 +1,7 @@
 'use client';
 
-import useBgmUpload from '@/features/media/hooks/useBgmUpload';
-import useImageUpload from '@/features/media/hooks/useImageUpload';
+import { uploadBgm } from '@/features/media/utils/uploadBgm';
+import { uploadImage } from '@/features/media/utils/uploadImage';
 import { Editor } from '@tiptap/react';
 import { FloatingMenu } from '@tiptap/react/menus';
 import {
@@ -20,9 +20,6 @@ export default function PlusMenu({ editor }: { editor: Editor | null }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-
-  const { uploadImage } = useImageUpload(editor);
-  const { uploadBgm } = useBgmUpload(editor);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -103,8 +100,8 @@ export default function PlusMenu({ editor }: { editor: Editor | null }) {
         multiple
         onChange={e => {
           const files = e.target.files;
-          if (files && files.length > 0) {
-            uploadImage(Array.from(files));
+          if (editor && files && files.length > 0) {
+            uploadImage(editor, Array.from(files));
           }
           e.target.value = '';
         }}
@@ -117,8 +114,8 @@ export default function PlusMenu({ editor }: { editor: Editor | null }) {
         accept='audio/mpeg'
         onChange={async e => {
           const file = e.target.files?.[0];
-          if (file) {
-            await uploadBgm(file);
+          if (editor && file) {
+            await uploadBgm(editor, file);
           }
           e.target.value = '';
         }}
