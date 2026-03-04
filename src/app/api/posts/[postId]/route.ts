@@ -84,12 +84,22 @@ export async function PATCH(
     }
 
     if (content || contentJson) {
-      await MediaQueries.unlinkMediaListFromPost(postId);
-
-      const imageUrls = contentJson
+      const newImageUrls = contentJson
         ? extractImageUrlsFromJson(contentJson)
         : extractImageUrls(content);
-      await MediaQueries.linkMediaListToPost(postId, imageUrls);
+
+      const oldMedia = await MediaQueries.getMediaListByPostId(postId);
+      const oldImageUrls = oldMedia.map(m => m.url);
+
+      const toDetach = oldImageUrls.filter(url => !newImageUrls.includes(url));
+      const toAttach = newImageUrls.filter(url => !oldImageUrls.includes(url));
+
+      await Promise.all([
+        toDetach.length > 0 &&
+          MediaQueries.unlinkMediaListFromPost(postId, toDetach),
+        toAttach.length > 0 &&
+          MediaQueries.linkMediaListToPost(postId, toAttach),
+      ]);
     }
 
     const updated = await PostQueries.updatePost({
