@@ -1,6 +1,7 @@
 'use client';
 
 import LinkEditDialog from '@/components/write/linkEditDialog';
+import { NodeSelection } from '@tiptap/pm/state';
 import { Editor, useEditorState } from '@tiptap/react';
 import { BubbleMenu } from '@tiptap/react/menus';
 import clsx from 'clsx';
@@ -123,8 +124,14 @@ export default function FloatingMenu({ editor }: { editor: Editor | null }) {
           onHide: () => setShowStyleDropdown(false),
         }}
         shouldShow={({ editor }) => {
-          const { empty } = editor.state.selection;
-          return !empty;
+          const { selection } = editor.state;
+          const { empty } = selection;
+
+          if (empty || selection instanceof NodeSelection) {
+            return false;
+          }
+
+          return true;
         }}
       >
         <div className='bg-popover text-popover-foreground shadow-md rounded-md border flex items-center gap-1 p-1'>
