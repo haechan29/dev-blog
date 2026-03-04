@@ -65,12 +65,13 @@ export default function TagInput({
             type='text'
             value={inputValue}
             onChange={e => setInputValue(e.target.value)}
+            maxLength={20}
             onBlur={addTag}
             onKeyDown={handleKeyDown}
             className='absolute inset-0 text-xs px-2 py-1 border border-gray-300 rounded-full outline-none'
           />
         </div>
-      ) : (
+      ) : tags.length < 10 ? (
         <button
           type='button'
           onClick={() => setIsEditing(true)}
@@ -78,7 +79,7 @@ export default function TagInput({
         >
           + 태그 추가
         </button>
-      )}
+      ) : null}
     </div>
   );
 }

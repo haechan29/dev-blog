@@ -13,6 +13,7 @@ import ImageWithCaptionNode from '@/components/tiptap/nodes/imageWithCaption';
 import LinkNode from '@/components/tiptap/nodes/link';
 import LinkCardNode from '@/components/tiptap/nodes/linkCard';
 import { TocAnchor } from '@/components/write/tableOfContents';
+import CharacterCount from '@tiptap/extension-character-count';
 import { Table } from '@tiptap/extension-table';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
@@ -25,6 +26,7 @@ import { forwardRef, useImperativeHandle, useState } from 'react';
 
 export interface TiptapEditorRef {
   getJSON: () => JSONContent | undefined;
+  isEmpty: () => boolean;
 }
 
 const TiptapEditor = forwardRef<
@@ -46,6 +48,9 @@ const TiptapEditor = forwardRef<
         codeBlock: false,
         link: false,
         blockquote: false,
+      }),
+      CharacterCount.configure({
+        limit: 30000,
       }),
       CodeBlockNode,
       LinkNode,
@@ -82,6 +87,7 @@ const TiptapEditor = forwardRef<
 
   useImperativeHandle(ref, () => ({
     getJSON: () => editor?.getJSON(),
+    isEmpty: () => editor?.isEmpty ?? true,
   }));
 
   return (

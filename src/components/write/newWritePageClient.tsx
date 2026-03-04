@@ -37,6 +37,14 @@ export default function NewWritePageClient({
   const router = useRouterWithProgress();
 
   const handleNext = () => {
+    if (!title.trim()) {
+      toast.error('제목을 입력해주세요');
+      return;
+    }
+    if (editorRef.current?.isEmpty()) {
+      toast.error('내용을 입력해주세요');
+      return;
+    }
     setIsPublishDialogOpen(true);
   };
 
@@ -101,6 +109,7 @@ export default function NewWritePageClient({
               }}
               placeholder='제목'
               rows={1}
+              maxLength={100}
               className='w-full text-3xl font-bold outline-none resize-none scrollbar-hide placeholder:text-gray-400'
             />
 

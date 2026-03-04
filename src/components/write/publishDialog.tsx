@@ -170,6 +170,7 @@ export default function PublishDialog({
                   setPassword(e.target.value);
                   setIsPasswordValid(true);
                 }}
+                maxLength={100}
                 placeholder='비밀번호를 입력하세요'
               />
             </div>
