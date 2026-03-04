@@ -1,59 +1,32 @@
+'use client';
+
 import { ApiError } from '@/errors/errors';
 import { DailyQuotaExhaustedError } from '@/features/media/data/errors/mediaErrors';
 import * as MediaClientRepository from '@/features/media/data/repository/mediaClientRepository';
-import { insertMarkdown } from '@/features/write/domain/lib/insertMarkdown';
-import { scrollToCaretIfNeeded } from '@/lib/offset';
-import { AppDispatch } from '@/lib/redux/store';
-import { setContent } from '@/lib/redux/write/writePostFormSlice';
-import { MutableRefObject, useCallback } from 'react';
+import { updateNodeById } from '@/lib/tiptap';
+import { Editor } from '@tiptap/react';
+import { nanoid } from 'nanoid';
+import { useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useDispatch } from 'react-redux';
 
-const LOADING_BGM_PATTERN = /::bgm\{[^}]*status="loading"[^}]*\}/;
-
-export default function useBgmUpload({
-  isScrollSyncPausedRef,
-}: {
-  isScrollSyncPausedRef?: MutableRefObject<boolean>;
-}) {
-  const dispatch = useDispatch<AppDispatch>();
-
-  const uploadAndInsert = useCallback(
+export default function useBgmUpload(editor: Editor | null) {
+  const uploadBgm = useCallback(
     async (file: File) => {
-      const contentEditor = document.querySelector(
-        '[data-content-editor]'
-      ) as HTMLTextAreaElement;
-      if (!contentEditor) return;
+      if (!editor) return;
 
-      if (isScrollSyncPausedRef) isScrollSyncPausedRef.current = true;
+      const id = nanoid();
 
-      const cursorPosition = contentEditor.selectionStart;
-      const content = contentEditor.value;
-
-      const { newText, newCursorPosition } = insertMarkdown({
-        content,
-        cursorPosition,
-        markdown: `::bgm{src="" status="loading"}\n`,
+      editor.commands.setBgm({
+        id,
+        src: '',
+        status: 'loading',
       });
-
-      dispatch(setContent({ value: newText, isUserInput: false }));
 
       try {
         const uploadedUrl = await MediaClientRepository.uploadAudio(file);
-
-        const currentContent = contentEditor.value;
-        const updatedContent = currentContent.replace(
-          LOADING_BGM_PATTERN,
-          `::bgm{src="${uploadedUrl}"}`
-        );
-        dispatch(setContent({ value: updatedContent, isUserInput: false }));
+        updateNodeById(editor, 'bgm', id, { src: uploadedUrl, status: null });
       } catch (error) {
-        const currentContent = contentEditor.value;
-        const updatedContent = currentContent.replace(
-          LOADING_BGM_PATTERN,
-          `::bgm{src="" status="failed"}`
-        );
-        dispatch(setContent({ value: updatedContent, isUserInput: false }));
+        updateNodeById(editor, 'bgm', id, { status: 'failed' });
 
         if (error instanceof DailyQuotaExhaustedError) {
           throw error;
@@ -65,16 +38,9 @@ export default function useBgmUpload({
             : 'BGM 업로드에 실패했습니다';
         toast.error(message);
       }
-
-      setTimeout(() => {
-        if (isScrollSyncPausedRef) isScrollSyncPausedRef.current = false;
-        contentEditor.focus();
-        contentEditor.setSelectionRange(newCursorPosition, newCursorPosition);
-        scrollToCaretIfNeeded(contentEditor);
-      }, 100);
     },
-    [dispatch, isScrollSyncPausedRef]
+    [editor]
   );
 
-  return { uploadAndInsert };
+  return { uploadBgm };
 }

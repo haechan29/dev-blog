@@ -4,7 +4,7 @@ import Logo from '@/components/logo';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
 
-export default function NewWriteToolbar({
+export default function WriteToolbar({
   onNext,
   isPending,
 }: {

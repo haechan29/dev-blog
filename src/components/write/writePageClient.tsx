@@ -4,13 +4,14 @@ import TiptapEditor, {
   TiptapEditorRef,
 } from '@/components/tiptap/editor/tiptapEditor';
 import ProfileIcon from '@/components/user/profileIcon';
-import NewWriteToolbar from '@/components/write/newWriteToolbar';
 import PublishDialog from '@/components/write/publishDialog';
 import TableOfContents, { TocAnchor } from '@/components/write/tableOfContents';
 import TagInput from '@/components/write/tagInput';
+import WriteToolbar from '@/components/write/writeToolbar';
 import { ApiError } from '@/errors/errors';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
+import useBgmController from '@/features/post/hooks/useBgmController';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
 import useUser from '@/features/user/domain/hooks/useUser';
 import useRouterWithProgress from '@/hooks/useRouterWithProgress';
@@ -38,6 +39,8 @@ export default function WritePageClient({
 
   const { user } = useUser();
   const router = useRouterWithProgress();
+
+  useBgmController();
 
   const handleNext = () => {
     if (!title.trim()) {
@@ -100,7 +103,7 @@ export default function WritePageClient({
 
   return (
     <>
-      <NewWriteToolbar onNext={handleNext} isPending={isPending} />
+      <WriteToolbar onNext={handleNext} isPending={isPending} />
 
       <div className='fixed top-0 left-0 w-(--sidebar-width) h-full max-xl:hidden' />
 

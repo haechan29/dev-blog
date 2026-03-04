@@ -1,7 +1,7 @@
 'use client';
 
-import useTiptapBgmUpload from '@/features/media/hooks/useTiptapBgmUpload';
-import useTiptapImageUpload from '@/features/media/hooks/useTiptapImageUpload';
+import useBgmUpload from '@/features/media/hooks/useBgmUpload';
+import useImageUpload from '@/features/media/hooks/useImageUpload';
 import { Editor } from '@tiptap/react';
 import { FloatingMenu } from '@tiptap/react/menus';
 import {
@@ -21,8 +21,8 @@ export default function PlusMenu({ editor }: { editor: Editor | null }) {
   const audioInputRef = useRef<HTMLInputElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const { uploadImage } = useTiptapImageUpload(editor);
-  const { uploadBgm } = useTiptapBgmUpload(editor);
+  const { uploadImage } = useImageUpload(editor);
+  const { uploadBgm } = useBgmUpload(editor);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {

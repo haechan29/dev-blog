@@ -60,11 +60,9 @@ export default function TableOfContents({
           <li key={anchor.id}>
             <button
               onClick={() => handleClick(anchor)}
-              style={
-                {
-                  '--indent': `${(anchor.level - minLevel) * 0.5}rem`,
-                } as React.CSSProperties
-              }
+              style={{
+                '--indent': `${(anchor.level - minLevel) * 0.5}rem`,
+              }}
               className={clsx(
                 'w-full text-left text-sm hover:text-blue-500 truncate pl-(--indent)',
                 anchor.isActive ? 'text-blue-500' : 'text-gray-500'

@@ -1,35 +1,20 @@
+'use client';
+
 import { ApiError } from '@/errors/errors';
 import { DailyQuotaExhaustedError } from '@/features/media/data/errors/mediaErrors';
 import * as MediaClientRepository from '@/features/media/data/repository/mediaClientRepository';
-import { AppDispatch } from '@/lib/redux/store';
-import { setContent } from '@/lib/redux/write/writePostFormSlice';
+import { updateNodeById } from '@/lib/tiptap';
+import { Editor } from '@tiptap/react';
 import imageCompression from 'browser-image-compression';
-import { MutableRefObject, useCallback } from 'react';
+import { useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useDispatch } from 'react-redux';
 
-export default function useImageCrop({
-  isScrollSyncPausedRef,
-}: {
-  isScrollSyncPausedRef?: MutableRefObject<boolean>;
-}) {
-  const dispatch = useDispatch<AppDispatch>();
+export default function useImageCrop(editor: Editor | null) {
+  const cropImage = useCallback(
+    async (croppedFile: File, nodeId: string) => {
+      if (!editor) return;
 
-  const cropAndReplace = useCallback(
-    async (croppedFile: File, originalUrl: string) => {
-      const contentEditor = document.querySelector(
-        '[data-content-editor]'
-      ) as HTMLTextAreaElement;
-      if (!contentEditor) return;
-
-      if (isScrollSyncPausedRef) isScrollSyncPausedRef.current = true;
-
-      const content = contentEditor.value;
-      const loadingContent = content.replace(
-        `url="${originalUrl}"`,
-        `url="${originalUrl}" status="loading"`
-      );
-      dispatch(setContent({ value: loadingContent, isUserInput: false }));
+      updateNodeById(editor, 'imageWithCaption', nodeId, { status: 'loading' });
 
       try {
         const compressedFile =
@@ -42,22 +27,17 @@ export default function useImageCrop({
                 useWebWorker: true,
               });
 
-        const baseUrl =
+        const uploadedUrl =
           await MediaClientRepository.uploadPostImage(compressedFile);
 
-        const currentContent = contentEditor.value;
-        const updatedContent = currentContent.replace(
-          `url="${originalUrl}" status="loading"`,
-          `url="${baseUrl}"`
-        );
-        dispatch(setContent({ value: updatedContent, isUserInput: false }));
+        updateNodeById(editor, 'imageWithCaption', nodeId, {
+          src: uploadedUrl,
+          status: 'success',
+        });
       } catch (error) {
-        const currentContent = contentEditor.value;
-        const revertedContent = currentContent.replace(
-          `url="${originalUrl}" status="loading"`,
-          `url="${originalUrl}"`
-        );
-        dispatch(setContent({ value: revertedContent, isUserInput: false }));
+        updateNodeById(editor, 'imageWithCaption', nodeId, {
+          status: undefined,
+        });
 
         if (error instanceof DailyQuotaExhaustedError) {
           throw error;
@@ -68,12 +48,10 @@ export default function useImageCrop({
             ? error.message
             : '이미지 업로드에 실패했습니다';
         toast.error(message);
-      } finally {
-        if (isScrollSyncPausedRef) isScrollSyncPausedRef.current = false;
       }
     },
-    [dispatch, isScrollSyncPausedRef]
+    [editor]
   );
 
-  return { cropAndReplace };
+  return { cropImage };
 }

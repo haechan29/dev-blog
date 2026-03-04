@@ -2,7 +2,7 @@
 
 import ImageCropOverlay from '@/components/write/imageCropOverlay';
 import { buildImageUrl } from '@/features/media/domain/lib/url';
-import useTiptapImageCrop from '@/features/media/hooks/useTiptapImageCrop';
+import useImageCrop from '@/features/media/hooks/useImageCrop';
 import { NodeViewProps, NodeViewWrapper } from '@tiptap/react';
 import clsx from 'clsx';
 import { AlertCircle, Crop } from 'lucide-react';
@@ -27,7 +27,7 @@ export default function ImageWithCaption({
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { cropImage } = useTiptapImageCrop(editor);
+  const { cropImage } = useImageCrop(editor);
 
   const imageSize = clsx(
     'h-auto',

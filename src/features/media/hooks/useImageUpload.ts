@@ -1,70 +1,29 @@
+'use client';
+
 import { ApiError } from '@/errors/errors';
 import { DailyQuotaExhaustedError } from '@/features/media/data/errors/mediaErrors';
 import * as MediaClientRepository from '@/features/media/data/repository/mediaClientRepository';
-import { insertMarkdown } from '@/features/write/domain/lib/insertMarkdown';
-import { AppDispatch } from '@/lib/redux/store';
-import { setContent } from '@/lib/redux/write/writePostFormSlice';
+import { updateNodeById } from '@/lib/tiptap';
+import { Editor } from '@tiptap/react';
 import imageCompression from 'browser-image-compression';
-import { MutableRefObject, useCallback } from 'react';
+import { nanoid } from 'nanoid';
+import { useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useDispatch } from 'react-redux';
 
-const LOADING_IMAGE_PATTERN = /:::img\{[^}]*status="loading"[^}]*\}/;
-
-function updateContentWithCursorPreserve(
-  contentEditor: HTMLTextAreaElement,
-  dispatch: AppDispatch,
-  newContent: string
-) {
-  const prevLength = contentEditor.value.length;
-  const cursorStart = contentEditor.selectionStart;
-  const cursorEnd = contentEditor.selectionEnd;
-
-  dispatch(setContent({ value: newContent, isUserInput: false }));
-
-  const delta = newContent.length - prevLength;
-  const newCursorStart = Math.max(0, cursorStart + delta);
-  const newCursorEnd = Math.max(0, cursorEnd + delta);
-
-  requestAnimationFrame(() => {
-    contentEditor.setSelectionRange(newCursorStart, newCursorEnd);
-  });
-
-  return delta;
-}
-
-export default function useImageUpload({
-  isScrollSyncPausedRef,
-}: {
-  isScrollSyncPausedRef?: MutableRefObject<boolean>;
-}) {
-  const dispatch = useDispatch<AppDispatch>();
-
-  const uploadAndInsert = useCallback(
+export default function useImageUpload(editor: Editor | null) {
+  const uploadImage = useCallback(
     async (files: File[]) => {
-      if (files.length === 0) return;
-
-      const contentEditor = document.querySelector(
-        '[data-content-editor]'
-      ) as HTMLTextAreaElement;
-      if (!contentEditor) return;
-
-      if (isScrollSyncPausedRef) isScrollSyncPausedRef.current = true;
-
-      let cursorPosition = contentEditor.selectionStart;
+      if (!editor || files.length === 0) return;
 
       for (const file of files) {
+        const id = nanoid();
         const blobUrl = URL.createObjectURL(file);
 
-        const content = contentEditor.value;
-        const { newText, newCursorPosition } = insertMarkdown({
-          content,
-          cursorPosition,
-          markdown: `:::img{url="${blobUrl}" status="loading" size="medium"}\n:::`,
-        });
-
-        updateContentWithCursorPreserve(contentEditor, dispatch, newText);
-        cursorPosition = newCursorPosition;
+        editor
+          .chain()
+          .focus()
+          .setImageWithCaption({ src: blobUrl, id, status: 'loading' })
+          .run();
 
         try {
           const compressedFile =
@@ -77,34 +36,17 @@ export default function useImageUpload({
                   useWebWorker: true,
                 });
 
-          const baseUrl =
+          const uploadedUrl =
             await MediaClientRepository.uploadPostImage(compressedFile);
 
           URL.revokeObjectURL(blobUrl);
 
-          const currentContent = contentEditor.value;
-          const updatedContent = currentContent.replace(
-            LOADING_IMAGE_PATTERN,
-            `:::img{url="${baseUrl}" size="medium"}`
-          );
-          const delta = updateContentWithCursorPreserve(
-            contentEditor,
-            dispatch,
-            updatedContent
-          );
-          cursorPosition += delta;
+          updateNodeById(editor, 'imageWithCaption', id, {
+            src: uploadedUrl,
+            status: 'success',
+          });
         } catch (error) {
-          const currentContent = contentEditor.value;
-          const updatedContent = currentContent.replace(
-            LOADING_IMAGE_PATTERN,
-            `:::img{url="${blobUrl}" status="failed" size="medium"}`
-          );
-          const delta = updateContentWithCursorPreserve(
-            contentEditor,
-            dispatch,
-            updatedContent
-          );
-          cursorPosition += delta;
+          updateNodeById(editor, 'imageWithCaption', id, { status: 'failed' });
 
           if (error instanceof DailyQuotaExhaustedError) {
             throw error;
@@ -116,14 +58,10 @@ export default function useImageUpload({
               : '이미지 업로드에 실패했습니다';
           toast.error(message);
         }
-
-        await new Promise(resolve => setTimeout(resolve, 300));
       }
-
-      if (isScrollSyncPausedRef) isScrollSyncPausedRef.current = false;
     },
-    [dispatch, isScrollSyncPausedRef]
+    [editor]
   );
 
-  return { uploadAndInsert };
+  return { uploadImage };
 }
