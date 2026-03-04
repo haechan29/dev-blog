@@ -21,6 +21,7 @@ import CharacterCount from '@tiptap/extension-character-count';
 import CodeBlock from '@tiptap/extension-code-block';
 import { FileHandler } from '@tiptap/extension-file-handler';
 import Link from '@tiptap/extension-link';
+import Placeholder from '@tiptap/extension-placeholder';
 import { Table } from '@tiptap/extension-table';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
@@ -129,15 +130,15 @@ const TiptapEditor = forwardRef<
         onPaste: uploadImage,
         onDrop: uploadImage,
       }),
+      Placeholder.configure({
+        placeholder: '여기에 글을 작성하세요',
+      }),
     ],
     content: initialContent ?? '',
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: clsx(
-          'prose max-w-none focus:outline-none min-h-[30vh]',
-          className
-        ),
+        class: clsx('prose max-w-none focus:outline-none', className),
       },
     },
   });
@@ -155,11 +156,6 @@ const TiptapEditor = forwardRef<
         setIsOpen={setIsDialogueToolbarOpen}
       />
       <div className='min-h-[30vh] relative'>
-        {(!editor || editor.isEmpty) && (
-          <div className='prose max-w-none text-gray-400! absolute'>
-            여기에 글을 작성하세요
-          </div>
-        )}
         <EditorContent editor={editor} />
       </div>
       <PlusMenu editor={editor} />
