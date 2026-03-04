@@ -1,14 +1,17 @@
-'use client';
-
 import BgmNode from '@/components/tiptap/nodes/bgm';
 import DialogueNode from '@/components/tiptap/nodes/dialogue';
 import ImageWithCaptionNode from '@/components/tiptap/nodes/imageWithCaption';
-import Bgm from '@/components/tiptap/renderer/views/bgm';
-import Dialogue from '@/components/tiptap/renderer/views/dialogue';
-import ImageWithCaption from '@/components/tiptap/renderer/views/imageWithCaption';
+import LinkCardNode from '@/components/tiptap/nodes/linkCard';
+import BgmView from '@/components/tiptap/renderer/views/bgm';
+import CodeBlockView from '@/components/tiptap/renderer/views/codeBlock';
+import DialogueView from '@/components/tiptap/renderer/views/dialogue';
+import ImageWithCaptionView from '@/components/tiptap/renderer/views/imageWithCaption';
+import LinkCardView from '@/components/tiptap/renderer/views/linkCard';
 import { JSONContent } from '@tiptap/core';
-import Link from '@tiptap/extension-link';
-import Underline from '@tiptap/extension-underline';
+import { Table } from '@tiptap/extension-table';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
+import TableRow from '@tiptap/extension-table-row';
 import StarterKit from '@tiptap/starter-kit';
 import { renderToReactElement } from '@tiptap/static-renderer/pm/react';
 
@@ -16,8 +19,11 @@ export default function TiptapRenderer({ content }: { content: JSONContent }) {
   const element = renderToReactElement({
     extensions: [
       StarterKit,
-      Underline,
-      Link,
+      Table,
+      TableRow,
+      TableHeader,
+      TableCell,
+      LinkCardNode,
       ImageWithCaptionNode,
       DialogueNode,
       BgmNode,
@@ -26,18 +32,22 @@ export default function TiptapRenderer({ content }: { content: JSONContent }) {
     options: {
       nodeMapping: {
         imageWithCaption: ({ node }) => (
-          <ImageWithCaption
+          <ImageWithCaptionView
             src={node.attrs.src}
             alt={node.attrs.alt}
             size={node.attrs.size}
           />
         ),
         dialogue: ({ node, children }) => (
-          <Dialogue speaker={node.attrs.speaker} avatar={node.attrs.avatar}>
+          <DialogueView speaker={node.attrs.speaker} avatar={node.attrs.avatar}>
             {children}
-          </Dialogue>
+          </DialogueView>
         ),
-        bgm: ({ node }) => <Bgm id={node.attrs.id} src={node.attrs.src} />,
+        bgm: ({ node }) => <BgmView id={node.attrs.id} src={node.attrs.src} />,
+        codeBlock: ({ children }) => <CodeBlockView>{children}</CodeBlockView>,
+        linkCard: ({ node }) => (
+          <LinkCardView href={node.attrs.href} variant={node.attrs.variant} />
+        ),
       },
     },
   });

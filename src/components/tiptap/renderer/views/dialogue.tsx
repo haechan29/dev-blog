@@ -1,3 +1,5 @@
+'use client';
+
 import { buildImageUrl } from '@/features/media/domain/lib/url';
 import { colors, getColorIndex, ringColors, textColors } from '@/lib/color';
 import clsx from 'clsx';

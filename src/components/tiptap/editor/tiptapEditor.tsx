@@ -5,21 +5,31 @@ import FloatingMenu from '@/components/tiptap/editor/floatingMenu';
 import LinkPasteMenu from '@/components/tiptap/editor/linkPasteMenu';
 import PlusMenu from '@/components/tiptap/editor/plusMenu';
 import TableMenu from '@/components/tiptap/editor/tableMenu';
+import BgmView from '@/components/tiptap/editor/views/bgm';
+import CodeBlockView from '@/components/tiptap/editor/views/codeBlock';
+import DialogueView from '@/components/tiptap/editor/views/dialogue';
+import ImageWithCaptionView from '@/components/tiptap/editor/views/imageWithCaption';
+import LinkCardView from '@/components/tiptap/editor/views/linkCard';
 import BgmNode from '@/components/tiptap/nodes/bgm';
-import BlockQuoteNode from '@/components/tiptap/nodes/blockQuote';
-import CodeBlockNode from '@/components/tiptap/nodes/codeBlock';
 import DialogueNode from '@/components/tiptap/nodes/dialogue';
 import ImageWithCaptionNode from '@/components/tiptap/nodes/imageWithCaption';
-import LinkNode from '@/components/tiptap/nodes/link';
 import LinkCardNode from '@/components/tiptap/nodes/linkCard';
 import { TocAnchor } from '@/components/write/tableOfContents';
+import { Blockquote } from '@tiptap/extension-blockquote';
 import CharacterCount from '@tiptap/extension-character-count';
+import CodeBlock from '@tiptap/extension-code-block';
+import Link from '@tiptap/extension-link';
 import { Table } from '@tiptap/extension-table';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import { TableOfContents } from '@tiptap/extension-table-of-contents';
 import TableRow from '@tiptap/extension-table-row';
-import { EditorContent, JSONContent, useEditor } from '@tiptap/react';
+import {
+  EditorContent,
+  JSONContent,
+  ReactNodeViewRenderer,
+  useEditor,
+} from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import clsx from 'clsx';
 import { forwardRef, useImperativeHandle, useState } from 'react';
@@ -45,20 +55,13 @@ const TiptapEditor = forwardRef<
         heading: {
           levels: [1, 2, 3],
         },
+        blockquote: false,
         codeBlock: false,
         link: false,
-        blockquote: false,
       }),
       CharacterCount.configure({
         limit: 30000,
       }),
-      CodeBlockNode,
-      LinkNode,
-      BlockQuoteNode,
-      ImageWithCaptionNode,
-      DialogueNode,
-      BgmNode,
-      LinkCardNode,
       Table.configure({
         resizable: true,
       }),
@@ -70,6 +73,48 @@ const TiptapEditor = forwardRef<
           if (onAnchorsChange) {
             onAnchorsChange(anchors as TocAnchor[]);
           }
+        },
+      }),
+      Blockquote.extend({
+        content: '(paragraph | imageWithCaption)*',
+      }),
+      CodeBlock.configure({
+        enableTabIndentation: true,
+      }).extend({
+        addNodeView() {
+          return ReactNodeViewRenderer(CodeBlockView);
+        },
+      }),
+      Link.extend({
+        addAttributes() {
+          return {
+            ...this.parent?.(),
+            isNewlyInserted: {
+              default: true,
+            },
+          };
+        },
+      }),
+      LinkCardNode.extend({
+        addNodeView() {
+          return ReactNodeViewRenderer(LinkCardView);
+        },
+      }),
+      ImageWithCaptionNode.extend({
+        addNodeView() {
+          return ReactNodeViewRenderer(ImageWithCaptionView);
+        },
+      }),
+      DialogueNode.extend({
+        addNodeView() {
+          return ReactNodeViewRenderer(DialogueView);
+        },
+      }),
+      BgmNode.extend({
+        addNodeView() {
+          return ReactNodeViewRenderer(BgmView, {
+            className: 'flex justify-end',
+          });
         },
       }),
     ],
