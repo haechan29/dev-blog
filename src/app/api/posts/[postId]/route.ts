@@ -4,7 +4,10 @@ import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries'
 import * as MediaQueries from '@/features/media/data/queries/mediaQueries';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as PostUsecase from '@/features/post/data/usecases/postUsecase';
-import { extractImageUrls } from '@/features/post/domain/lib/url';
+import {
+  extractImageUrls,
+  extractImageUrlsFromJson,
+} from '@/features/post/domain/lib/url';
 import { r2Client } from '@/lib/r2';
 import { getUserId } from '@/lib/user';
 import { DeleteObjectCommand } from '@aws-sdk/client-s3';
@@ -42,6 +45,7 @@ export async function PATCH(
     const {
       title,
       content,
+      contentJson,
       tags,
       password,
       seriesId,
@@ -79,10 +83,12 @@ export async function PATCH(
       }
     }
 
-    if (content) {
+    if (content || contentJson) {
       await MediaQueries.unlinkMediaListFromPost(postId);
 
-      const imageUrls = extractImageUrls(content);
+      const imageUrls = contentJson
+        ? extractImageUrlsFromJson(contentJson)
+        : extractImageUrls(content);
       await MediaQueries.linkMediaListToPost(postId, imageUrls);
     }
 
@@ -90,6 +96,7 @@ export async function PATCH(
       postId,
       title,
       content,
+      contentJson,
       tags,
       seriesId,
       seriesOrder,

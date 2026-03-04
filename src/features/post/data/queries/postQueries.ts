@@ -7,6 +7,7 @@ import { toDto } from '@/features/post/data/mapper/postMapper';
 import Post from '@/features/post/domain/model/post';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import { supabase } from '@/lib/supabase';
+import { JSONContent } from '@tiptap/core';
 import 'server-only';
 
 const POST_SELECT_FIELDS = `
@@ -161,6 +162,7 @@ export async function updatePost({
   postId,
   title,
   content,
+  contentJson,
   tags,
   seriesId,
   seriesOrder,
@@ -169,6 +171,7 @@ export async function updatePost({
   postId: string;
   title?: string;
   content?: string;
+  contentJson?: JSONContent;
   tags?: string[];
   seriesId?: string | null;
   seriesOrder?: number | null;
@@ -178,6 +181,7 @@ export async function updatePost({
     updated_at: new Date().toISOString(),
     ...(title !== undefined && { title }),
     ...(content !== undefined && { content }),
+    ...(contentJson !== undefined && { content_json: contentJson }),
     ...(tags !== undefined && { tags }),
     ...(seriesId !== undefined && { series_id: seriesId }),
     ...(seriesOrder !== undefined && { series_order: seriesOrder }),
