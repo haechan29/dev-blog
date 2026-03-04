@@ -123,22 +123,15 @@ export default function FloatingMenu({ editor }: { editor: Editor | null }) {
           onHide: () => setShowStyleDropdown(false),
         }}
         shouldShow={({ editor }) => {
-          const { selection } = editor.state;
-          const { empty } = selection;
-
-          if (!empty) return true;
-
-          const { $from } = selection;
-          const isEmptyLine = $from.parent.content.size === 0;
-          return isEmptyLine;
+          const { empty } = editor.state.selection;
+          return !empty;
         }}
       >
-        <div className='bg-white shadow-lg rounded-lg border border-gray-200 flex items-center gap-1 p-1'>
-          {/* 단락 스타일 드롭다운 */}
+        <div className='bg-popover text-popover-foreground shadow-md rounded-md border flex items-center gap-1 p-1'>
           <div className='relative'>
             <button
               onClick={() => setShowStyleDropdown(!showStyleDropdown)}
-              className='px-2 py-1 rounded hover:bg-gray-100 flex items-center gap-1.5 text-sm'
+              className='px-2 py-1 rounded hover:bg-accent flex items-center gap-1.5 text-sm'
             >
               <currentStyle.icon size={16} />
               {currentStyle.label}
@@ -167,15 +160,13 @@ export default function FloatingMenu({ editor }: { editor: Editor | null }) {
             )}
           </div>
 
-          {/* 구분선 */}
-          <div className='w-px h-6 bg-gray-300 mx-1' />
+          <div className='w-px h-6 bg-border mx-1' />
 
-          {/* 인라인 서식 버튼 */}
           <button
             onClick={() => editor.chain().focus().toggleBold().run()}
             className={clsx(
-              'p-1.5 rounded hover:bg-gray-100',
-              editorState?.isBold && 'bg-gray-200'
+              'p-1.5 rounded hover:bg-accent',
+              editorState?.isBold && 'bg-accent'
             )}
           >
             <Bold size={16} />
@@ -183,8 +174,8 @@ export default function FloatingMenu({ editor }: { editor: Editor | null }) {
           <button
             onClick={() => editor.chain().focus().toggleItalic().run()}
             className={clsx(
-              'p-1.5 rounded hover:bg-gray-100',
-              editorState?.isItalic && 'bg-gray-200'
+              'p-1.5 rounded hover:bg-accent',
+              editorState?.isItalic && 'bg-accent'
             )}
           >
             <Italic size={16} />
@@ -192,8 +183,8 @@ export default function FloatingMenu({ editor }: { editor: Editor | null }) {
           <button
             onClick={() => editor.chain().focus().toggleUnderline().run()}
             className={clsx(
-              'p-1.5 rounded hover:bg-gray-100',
-              editorState?.isUnderline && 'bg-gray-200'
+              'p-1.5 rounded hover:bg-accent',
+              editorState?.isUnderline && 'bg-accent'
             )}
           >
             <Underline size={16} />
@@ -201,8 +192,8 @@ export default function FloatingMenu({ editor }: { editor: Editor | null }) {
           <button
             onClick={() => editor.chain().focus().toggleStrike().run()}
             className={clsx(
-              'p-1.5 rounded hover:bg-gray-100',
-              editorState?.isStrike && 'bg-gray-200'
+              'p-1.5 rounded hover:bg-accent',
+              editorState?.isStrike && 'bg-accent'
             )}
           >
             <Strikethrough size={16} />
@@ -210,8 +201,8 @@ export default function FloatingMenu({ editor }: { editor: Editor | null }) {
           <button
             onClick={() => setIsLinkDialogOpen(true)}
             className={clsx(
-              'p-1.5 rounded hover:bg-gray-100',
-              editorState?.isLink && 'bg-gray-200'
+              'p-1.5 rounded hover:bg-accent',
+              editorState?.isLink && 'bg-accent'
             )}
           >
             <Link size={16} />
