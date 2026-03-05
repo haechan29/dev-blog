@@ -31,6 +31,11 @@ export default function TiptapRenderer({ content }: { content: JSONContent }) {
     content,
     options: {
       nodeMapping: {
+        horizontalRule: () => (
+          <div className='py-4'>
+            <hr className='border-t border-gray-200' />
+          </div>
+        ),
         imageWithCaption: ({ node }) => (
           <ImageWithCaptionView
             src={node.attrs.src}

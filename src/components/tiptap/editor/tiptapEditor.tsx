@@ -8,6 +8,7 @@ import TableMenu from '@/components/tiptap/editor/tableMenu';
 import BgmView from '@/components/tiptap/editor/views/bgm';
 import CodeBlockView from '@/components/tiptap/editor/views/codeBlock';
 import DialogueView from '@/components/tiptap/editor/views/dialogue';
+import HorizontalRuleView from '@/components/tiptap/editor/views/horizontalRule';
 import ImageWithCaptionView from '@/components/tiptap/editor/views/imageWithCaption';
 import LinkCardView from '@/components/tiptap/editor/views/linkCard';
 import BgmNode from '@/components/tiptap/nodes/bgm';
@@ -19,7 +20,9 @@ import { uploadImage } from '@/features/media/utils/uploadImage';
 import { Blockquote } from '@tiptap/extension-blockquote';
 import CharacterCount from '@tiptap/extension-character-count';
 import CodeBlock from '@tiptap/extension-code-block';
+import DragHandle from '@tiptap/extension-drag-handle-react';
 import { FileHandler } from '@tiptap/extension-file-handler';
+import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Table } from '@tiptap/extension-table';
@@ -51,6 +54,7 @@ const TiptapEditor = forwardRef<
   }
 >(function TiptapEditor({ initialContent, onAnchorsChange, className }, ref) {
   const [isDialogueToolbarOpen, setIsDialogueToolbarOpen] = useState(false);
+  const [isDragMenuOpen, setIsDragMenuOpen] = useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -61,6 +65,7 @@ const TiptapEditor = forwardRef<
         blockquote: false,
         codeBlock: false,
         link: false,
+        horizontalRule: false,
       }),
       CharacterCount.configure({
         limit: 30000,
@@ -96,6 +101,11 @@ const TiptapEditor = forwardRef<
               default: true,
             },
           };
+        },
+      }),
+      HorizontalRule.extend({
+        addNodeView() {
+          return ReactNodeViewRenderer(HorizontalRuleView);
         },
       }),
       LinkCardNode.extend({
@@ -156,6 +166,66 @@ const TiptapEditor = forwardRef<
         setIsOpen={setIsDialogueToolbarOpen}
       />
       <div className='min-h-[30vh] relative'>
+        {editor && (
+          <DragHandle
+            editor={editor}
+            onNodeChange={() => {
+              setIsDragMenuOpen(false);
+            }}
+          >
+            <div className='relative'>
+              <button
+                className='w-6 h-6 flex items-center justify-center cursor-grab hover:bg-gray-100 rounded'
+                onClick={() => {
+                  setIsDragMenuOpen(!isDragMenuOpen);
+                }}
+              >
+                ⋮⋮
+              </button>
+
+              {isDragMenuOpen && (
+                <div className='absolute left-0 top-full mt-1 bg-white border rounded-lg shadow-lg py-1 min-w-[150px] z-50'>
+                  <button
+                    className='w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100'
+                    onClick={() => {
+                      editor.chain().focus().setParagraph().run();
+                      setIsDragMenuOpen(false);
+                    }}
+                  >
+                    텍스트
+                  </button>
+                  <button
+                    className='w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100'
+                    onClick={() => {
+                      editor.chain().focus().setHeading({ level: 1 }).run();
+                      setIsDragMenuOpen(false);
+                    }}
+                  >
+                    제목 1
+                  </button>
+                  <button
+                    className='w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100'
+                    onClick={() => {
+                      editor.chain().focus().setHeading({ level: 2 }).run();
+                      setIsDragMenuOpen(false);
+                    }}
+                  >
+                    제목 2
+                  </button>
+                  <button
+                    className='w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100'
+                    onClick={() => {
+                      editor.chain().focus().toggleBulletList().run();
+                      setIsDragMenuOpen(false);
+                    }}
+                  >
+                    글머리 기호
+                  </button>
+                </div>
+              )}
+            </div>
+          </DragHandle>
+        )}
         <EditorContent editor={editor} />
       </div>
       <PlusMenu editor={editor} />
