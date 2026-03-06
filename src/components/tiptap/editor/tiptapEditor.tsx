@@ -38,6 +38,7 @@ import {
 } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import clsx from 'clsx';
+import { GripVertical, Trash2 } from 'lucide-react';
 import {
   forwardRef,
   useEffect,
@@ -208,13 +209,13 @@ const TiptapEditor = forwardRef<
                   setIsDragMenuOpen(!isDragMenuOpen);
                 }}
               >
-                ⋮⋮
+                <GripVertical className='w-4 h-4 text-gray-400' />
               </button>
 
               {isDragMenuOpen && (
-                <div className='absolute left-0 top-full mt-1 bg-white border rounded-lg shadow-lg py-1 min-w-[120px] z-50'>
+                <div className='absolute left-0 top-full mt-1 bg-popover text-popover-foreground shadow-md rounded-md border p-1 min-w-32 z-50'>
                   <button
-                    className='w-full px-3 py-1.5 text-left text-sm hover:bg-red-50 text-red-600 flex items-center gap-2'
+                    className='w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground cursor-pointer'
                     onClick={() => {
                       if (currentNodeRef.current) {
                         const { pos, node } = currentNodeRef.current;
@@ -230,7 +231,8 @@ const TiptapEditor = forwardRef<
                       setIsDragMenuOpen(false);
                     }}
                   >
-                    🗑️ 삭제
+                    <Trash2 className='w-4 h-4 text-gray-500' />
+                    <div className='shrink-0 text-gray-900'>삭제</div>
                   </button>
                 </div>
               )}
