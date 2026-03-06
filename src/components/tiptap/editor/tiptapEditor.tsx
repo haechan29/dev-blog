@@ -1,5 +1,6 @@
 'use client';
 
+import BlockMenu from '@/components/tiptap/editor/blockMenu';
 import DialogueToolbar from '@/components/tiptap/editor/dialogueToolbar';
 import FloatingMenu from '@/components/tiptap/editor/floatingMenu';
 import LinkPasteMenu from '@/components/tiptap/editor/linkPasteMenu';
@@ -19,7 +20,6 @@ import { uploadImage } from '@/features/media/utils/uploadImage';
 import { Blockquote } from '@tiptap/extension-blockquote';
 import CharacterCount from '@tiptap/extension-character-count';
 import CodeBlock from '@tiptap/extension-code-block';
-import DragHandle from '@tiptap/extension-drag-handle-react';
 import { FileHandler } from '@tiptap/extension-file-handler';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import Link from '@tiptap/extension-link';
@@ -29,7 +29,6 @@ import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import { TableOfContents } from '@tiptap/extension-table-of-contents';
 import TableRow from '@tiptap/extension-table-row';
-import { Node as TipTapNode } from '@tiptap/pm/model';
 import {
   EditorContent,
   JSONContent,
@@ -38,14 +37,7 @@ import {
 } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import clsx from 'clsx';
-import { GripVertical, Trash2 } from 'lucide-react';
-import {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 
 export interface TiptapEditorRef {
   getJSON: () => JSONContent | undefined;
@@ -61,10 +53,6 @@ const TiptapEditor = forwardRef<
   }
 >(function TiptapEditor({ initialContent, onAnchorsChange, className }, ref) {
   const [isDialogueToolbarOpen, setIsDialogueToolbarOpen] = useState(false);
-  const [isDragMenuOpen, setIsDragMenuOpen] = useState(false);
-
-  const dragMenuRef = useRef<HTMLDivElement>(null);
-  const currentNodeRef = useRef<{ node: TipTapNode; pos: number } | null>(null);
 
   const editor = useEditor({
     extensions: [
@@ -168,22 +156,6 @@ const TiptapEditor = forwardRef<
     isEmpty: () => editor?.isEmpty ?? true,
   }));
 
-  useEffect(() => {
-    if (!isDragMenuOpen) return;
-
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        dragMenuRef.current &&
-        !dragMenuRef.current.contains(e.target as Node)
-      ) {
-        setIsDragMenuOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isDragMenuOpen]);
-
   return (
     <div className='h-full flex flex-col'>
       <DialogueToolbar
@@ -192,56 +164,9 @@ const TiptapEditor = forwardRef<
         setIsOpen={setIsDialogueToolbarOpen}
       />
       <div className='min-h-[30vh] relative'>
-        {editor && (
-          <DragHandle
-            editor={editor}
-            onNodeChange={({ node, pos }) => {
-              currentNodeRef.current = node ? { node, pos } : null;
-            }}
-          >
-            <div ref={dragMenuRef} className='relative'>
-              <button
-                className={clsx(
-                  'w-6 h-6 flex items-center justify-center cursor-grab hover:bg-gray-100 rounded',
-                  isDragMenuOpen && 'bg-gray-100'
-                )}
-                onClick={() => {
-                  setIsDragMenuOpen(!isDragMenuOpen);
-                }}
-              >
-                <GripVertical className='w-4 h-4 text-gray-400' />
-              </button>
-
-              {isDragMenuOpen && (
-                <div className='absolute left-0 top-full mt-1 bg-popover text-popover-foreground shadow-md rounded-md border p-1 min-w-32 z-50'>
-                  <button
-                    className='w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground cursor-pointer'
-                    onClick={() => {
-                      if (currentNodeRef.current) {
-                        const { pos, node } = currentNodeRef.current;
-                        editor
-                          .chain()
-                          .focus()
-                          .deleteRange({
-                            from: pos,
-                            to: pos + node.nodeSize,
-                          })
-                          .run();
-                      }
-                      setIsDragMenuOpen(false);
-                    }}
-                  >
-                    <Trash2 className='w-4 h-4 text-gray-500' />
-                    <div className='shrink-0 text-gray-900'>삭제</div>
-                  </button>
-                </div>
-              )}
-            </div>
-          </DragHandle>
-        )}
         <EditorContent editor={editor} />
       </div>
-      {/* <PlusMenu editor={editor} /> */}
+      <BlockMenu editor={editor} />
       <FloatingMenu editor={editor} />
       <LinkPasteMenu editor={editor} />
       <TableMenu editor={editor} />
