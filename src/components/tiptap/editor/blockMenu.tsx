@@ -35,6 +35,14 @@ export default function BlockMenu({ editor }: { editor: Editor | null }) {
   return (
     <DragHandle
       editor={editor}
+      onElementDragEnd={() => {
+        const dropCursor = document.querySelector(
+          '.prosemirror-dropcursor-block, .prosemirror-dropcursor-inline'
+        );
+        if (dropCursor) {
+          dropCursor.remove();
+        }
+      }}
       onNodeChange={({ node, pos }) => {
         currentNodeRef.current = node ? { node, pos } : null;
         setIsDragMenuOpen(false);

@@ -64,6 +64,10 @@ const TiptapEditor = forwardRef<
         codeBlock: false,
         link: false,
         horizontalRule: false,
+        dropcursor: {
+          color: '#6B9FED',
+          width: 2,
+        },
       }),
       CharacterCount.configure({
         limit: 30000,
