@@ -29,7 +29,7 @@ import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import { TableOfContents } from '@tiptap/extension-table-of-contents';
 import TableRow from '@tiptap/extension-table-row';
-import { Node } from '@tiptap/pm/model';
+import { Node as TipTapNode } from '@tiptap/pm/model';
 import {
   EditorContent,
   JSONContent,
@@ -38,7 +38,13 @@ import {
 } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import clsx from 'clsx';
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 
 export interface TiptapEditorRef {
   getJSON: () => JSONContent | undefined;
@@ -56,7 +62,8 @@ const TiptapEditor = forwardRef<
   const [isDialogueToolbarOpen, setIsDialogueToolbarOpen] = useState(false);
   const [isDragMenuOpen, setIsDragMenuOpen] = useState(false);
 
-  const currentNodeRef = useRef<{ node: Node; pos: number } | null>(null);
+  const dragMenuRef = useRef<HTMLDivElement>(null);
+  const currentNodeRef = useRef<{ node: TipTapNode; pos: number } | null>(null);
 
   const editor = useEditor({
     extensions: [
@@ -160,6 +167,22 @@ const TiptapEditor = forwardRef<
     isEmpty: () => editor?.isEmpty ?? true,
   }));
 
+  useEffect(() => {
+    if (!isDragMenuOpen) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        dragMenuRef.current &&
+        !dragMenuRef.current.contains(e.target as Node)
+      ) {
+        setIsDragMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isDragMenuOpen]);
+
   return (
     <div className='h-full flex flex-col'>
       <DialogueToolbar
@@ -172,13 +195,15 @@ const TiptapEditor = forwardRef<
           <DragHandle
             editor={editor}
             onNodeChange={({ node, pos }) => {
-              setIsDragMenuOpen(false);
               currentNodeRef.current = node ? { node, pos } : null;
             }}
           >
-            <div className='relative'>
+            <div ref={dragMenuRef} className='relative'>
               <button
-                className='w-6 h-6 flex items-center justify-center cursor-grab hover:bg-gray-100 rounded'
+                className={clsx(
+                  'w-6 h-6 flex items-center justify-center cursor-grab hover:bg-gray-100 rounded',
+                  isDragMenuOpen && 'bg-gray-100'
+                )}
                 onClick={() => {
                   setIsDragMenuOpen(!isDragMenuOpen);
                 }}
