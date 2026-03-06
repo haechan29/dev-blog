@@ -3,7 +3,6 @@
 import DialogueToolbar from '@/components/tiptap/editor/dialogueToolbar';
 import FloatingMenu from '@/components/tiptap/editor/floatingMenu';
 import LinkPasteMenu from '@/components/tiptap/editor/linkPasteMenu';
-import PlusMenu from '@/components/tiptap/editor/plusMenu';
 import TableMenu from '@/components/tiptap/editor/tableMenu';
 import BgmView from '@/components/tiptap/editor/views/bgm';
 import CodeBlockView from '@/components/tiptap/editor/views/codeBlock';
@@ -30,6 +29,7 @@ import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import { TableOfContents } from '@tiptap/extension-table-of-contents';
 import TableRow from '@tiptap/extension-table-row';
+import { Node } from '@tiptap/pm/model';
 import {
   EditorContent,
   JSONContent,
@@ -38,7 +38,7 @@ import {
 } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import clsx from 'clsx';
-import { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 
 export interface TiptapEditorRef {
   getJSON: () => JSONContent | undefined;
@@ -55,6 +55,8 @@ const TiptapEditor = forwardRef<
 >(function TiptapEditor({ initialContent, onAnchorsChange, className }, ref) {
   const [isDialogueToolbarOpen, setIsDialogueToolbarOpen] = useState(false);
   const [isDragMenuOpen, setIsDragMenuOpen] = useState(false);
+
+  const currentNodeRef = useRef<{ node: Node; pos: number } | null>(null);
 
   const editor = useEditor({
     extensions: [
@@ -169,8 +171,9 @@ const TiptapEditor = forwardRef<
         {editor && (
           <DragHandle
             editor={editor}
-            onNodeChange={() => {
+            onNodeChange={({ node, pos }) => {
               setIsDragMenuOpen(false);
+              currentNodeRef.current = node ? { node, pos } : null;
             }}
           >
             <div className='relative'>
@@ -184,42 +187,25 @@ const TiptapEditor = forwardRef<
               </button>
 
               {isDragMenuOpen && (
-                <div className='absolute left-0 top-full mt-1 bg-white border rounded-lg shadow-lg py-1 min-w-[150px] z-50'>
+                <div className='absolute left-0 top-full mt-1 bg-white border rounded-lg shadow-lg py-1 min-w-[120px] z-50'>
                   <button
-                    className='w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100'
+                    className='w-full px-3 py-1.5 text-left text-sm hover:bg-red-50 text-red-600 flex items-center gap-2'
                     onClick={() => {
-                      editor.chain().focus().setParagraph().run();
+                      if (currentNodeRef.current) {
+                        const { pos, node } = currentNodeRef.current;
+                        editor
+                          .chain()
+                          .focus()
+                          .deleteRange({
+                            from: pos,
+                            to: pos + node.nodeSize,
+                          })
+                          .run();
+                      }
                       setIsDragMenuOpen(false);
                     }}
                   >
-                    텍스트
-                  </button>
-                  <button
-                    className='w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100'
-                    onClick={() => {
-                      editor.chain().focus().setHeading({ level: 1 }).run();
-                      setIsDragMenuOpen(false);
-                    }}
-                  >
-                    제목 1
-                  </button>
-                  <button
-                    className='w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100'
-                    onClick={() => {
-                      editor.chain().focus().setHeading({ level: 2 }).run();
-                      setIsDragMenuOpen(false);
-                    }}
-                  >
-                    제목 2
-                  </button>
-                  <button
-                    className='w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100'
-                    onClick={() => {
-                      editor.chain().focus().toggleBulletList().run();
-                      setIsDragMenuOpen(false);
-                    }}
-                  >
-                    글머리 기호
+                    🗑️ 삭제
                   </button>
                 </div>
               )}
@@ -228,7 +214,7 @@ const TiptapEditor = forwardRef<
         )}
         <EditorContent editor={editor} />
       </div>
-      <PlusMenu editor={editor} />
+      {/* <PlusMenu editor={editor} /> */}
       <FloatingMenu editor={editor} />
       <LinkPasteMenu editor={editor} />
       <TableMenu editor={editor} />
