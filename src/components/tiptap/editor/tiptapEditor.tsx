@@ -70,6 +70,7 @@ const TiptapEditor = forwardRef<
       }),
       Table.configure({
         resizable: true,
+        allowTableNodeSelection: true,
       }),
       TableRow,
       TableHeader,

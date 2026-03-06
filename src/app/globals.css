@@ -421,7 +421,12 @@ body {
 
 .ProseMirror-selectednode::before {
   content: '';
-  @apply absolute inset-y-0 -inset-x-2 rounded bg-blue-500/15;
+  @apply absolute -inset-x-2 rounded bg-blue-500/15;
+  @apply inset-y-0;
+}
+
+.ProseMirror-selectednode:has(table)::before {
+  @apply -inset-y-2;
 }
 
 .ProseMirror.resize-cursor {

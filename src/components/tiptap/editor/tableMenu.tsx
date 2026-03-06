@@ -2,7 +2,7 @@
 
 import { Editor } from '@tiptap/react';
 import { BubbleMenu } from '@tiptap/react/menus';
-import { Columns, Rows } from 'lucide-react';
+import { Columns, Rows, Trash2 } from 'lucide-react';
 
 export default function TableMenu({ editor }: { editor: Editor | null }) {
   if (!editor) return null;
@@ -52,6 +52,16 @@ export default function TableMenu({ editor }: { editor: Editor | null }) {
           className='flex items-center gap-1.5 px-2 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors'
         >
           <Columns size={16} />열 추가
+        </button>
+
+        <div className='w-px h-5 bg-gray-200' />
+
+        <button
+          onClick={() => editor.chain().focus().deleteTable().run()}
+          className='flex items-center gap-1.5 px-2 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors'
+        >
+          <Trash2 size={16} />
+          삭제
         </button>
       </div>
     </BubbleMenu>
