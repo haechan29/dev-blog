@@ -419,13 +419,13 @@ body {
   @apply outline-none relative;
 }
 
-.ProseMirror-selectednode::before {
+.ProseMirror-selectednode::after {
   content: '';
   @apply absolute -inset-x-2 rounded bg-blue-500/15;
   @apply inset-y-0;
 }
 
-.ProseMirror-selectednode:has(table)::before {
+.ProseMirror-selectednode:has(table)::after {
   @apply -inset-y-2;
 }
 
@@ -433,7 +433,7 @@ body {
   cursor: col-resize;
 }
 
-.tiptap p.is-editor-empty:first-child::before {
+.tiptap > p.is-editor-empty:only-child::before {
   content: attr(data-placeholder);
   color: #9ca3af;
   pointer-events: none;
