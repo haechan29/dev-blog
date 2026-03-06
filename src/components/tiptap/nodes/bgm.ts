@@ -23,8 +23,6 @@ export default Node.create<BgmOptions>({
 
   atom: true,
 
-  selectable: true,
-
   draggable: true,
 
   addOptions() {

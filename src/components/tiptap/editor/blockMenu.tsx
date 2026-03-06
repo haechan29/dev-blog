@@ -69,6 +69,11 @@ export default function BlockMenu({ editor }: { editor: Editor | null }) {
           onClick={() => {
             setIsDragMenuOpen(!isDragMenuOpen);
             setIsPlusMenuOpen(false);
+
+            if (!isDragMenuOpen && currentNodeRef.current) {
+              const { pos } = currentNodeRef.current;
+              editor.chain().focus().setNodeSelection(pos).run();
+            }
           }}
         >
           <GripVertical className='w-4 h-4 text-gray-400' />

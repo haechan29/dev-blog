@@ -22,8 +22,6 @@ export default Node.create<DialogueOptions>({
 
   content: 'inline*',
 
-  selectable: true,
-
   addOptions() {
     return {
       HTMLAttributes: {},

@@ -22,8 +22,6 @@ export default Node.create<LinkCardOptions>({
 
   atom: true,
 
-  selectable: true,
-
   addOptions() {
     return {
       HTMLAttributes: {},

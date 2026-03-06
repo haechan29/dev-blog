@@ -415,6 +415,15 @@ body {
   font-weight: 600;
 }
 
+.ProseMirror-selectednode {
+  @apply outline-none relative;
+}
+
+.ProseMirror-selectednode::before {
+  content: '';
+  @apply absolute inset-y-0 -inset-x-2 rounded bg-blue-500/15;
+}
+
 .ProseMirror.resize-cursor {
   cursor: col-resize;
 }

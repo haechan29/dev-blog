@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { AlertCircle, Loader2, Music } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 
-export default function Bgm({ node, selected }: NodeViewProps) {
+export default function Bgm({ node }: NodeViewProps) {
   const { id, src, status } = node.attrs;
   const dispatch = useDispatch<AppDispatch>();
 
@@ -29,12 +29,7 @@ export default function Bgm({ node, selected }: NodeViewProps) {
   const isDisabled = isWaiting || isError;
 
   return (
-    <NodeViewWrapper
-      className={clsx(
-        'my-4 flex justify-end w-fit ml-auto',
-        selected && 'ring-2 ring-blue-300 rounded-lg'
-      )}
-    >
+    <NodeViewWrapper className='my-4 flex justify-end w-fit ml-auto'>
       <div
         className={clsx(
           'w-fit p-2 rounded-lg transition-colors duration-300 ease-in-out',

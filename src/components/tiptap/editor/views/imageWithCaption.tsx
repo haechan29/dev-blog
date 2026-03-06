@@ -16,7 +16,6 @@ export default function ImageWithCaption({
   node,
   updateAttributes,
   editor,
-  selected,
 }: NodeViewProps) {
   const { src, alt, size, status, id } = node.attrs;
   const [isError, setIsError] = useState(false);
@@ -84,12 +83,7 @@ export default function ImageWithCaption({
   return (
     <NodeViewWrapper className='flex flex-col items-center gap-4 my-5 lg:my-6 xl:my-7'>
       {isError || !src ? (
-        <div
-          className={clsx(
-            'flex items-center justify-center p-4 rounded-xl bg-gray-200 text-gray-700',
-            selected && 'ring-2 ring-blue-300'
-          )}
-        >
+        <div className='flex items-center justify-center p-4 rounded-xl bg-gray-200 text-gray-700'>
           이미지를 불러올 수 없습니다
         </div>
       ) : (
@@ -98,12 +92,7 @@ export default function ImageWithCaption({
           className={clsx('relative', imageSize)}
           onClick={() => setShowToolbar(true)}
         >
-          <div
-            className={clsx(
-              'relative',
-              selected && 'ring-2 ring-blue-300 rounded-lg'
-            )}
-          >
+          <div className='relative'>
             <Image
               src={buildImageUrl(src, '1200')}
               alt={alt}

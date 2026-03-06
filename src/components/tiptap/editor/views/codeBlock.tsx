@@ -6,7 +6,7 @@ import { Check, Copy } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 
-export default function CodeBlock({ node, selected }: NodeViewProps) {
+export default function CodeBlock({ node }: NodeViewProps) {
   const [isCopied, setIsCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -25,12 +25,7 @@ export default function CodeBlock({ node, selected }: NodeViewProps) {
   };
 
   return (
-    <NodeViewWrapper
-      className={clsx(
-        'group relative',
-        selected && 'ring-2 ring-blue-300 rounded-lg'
-      )}
-    >
+    <NodeViewWrapper className='group relative'>
       <pre>
         <button
           onClick={handleCopy}

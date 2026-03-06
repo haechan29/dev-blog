@@ -23,8 +23,6 @@ export default Node.create<ImageWithCaptionOptions>({
 
   group: 'block',
 
-  selectable: true,
-
   addOptions() {
     return {
       HTMLAttributes: {},
