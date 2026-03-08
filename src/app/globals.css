@@ -421,8 +421,8 @@ body {
 
 .ProseMirror-selectednode::after {
   content: '';
-  @apply absolute -inset-x-2 rounded bg-blue-500/15;
-  @apply inset-y-0;
+  @apply absolute -inset-x-2 rounded bg-blue-500/15 inset-y-0;
+  pointer-events: none;
 }
 
 .ProseMirror-selectednode:has(table)::after {

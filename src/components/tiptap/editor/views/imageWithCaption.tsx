@@ -16,34 +16,19 @@ export default function ImageWithCaption({
   node,
   updateAttributes,
   editor,
+  selected,
 }: NodeViewProps) {
   const { src, alt, size, status, id } = node.attrs;
   const [isError, setIsError] = useState(false);
-  const [showToolbar, setShowToolbar] = useState(false);
   const [isCropOpen, setIsCropOpen] = useState(false);
   const [isOversized, setIsOversized] = useState(false);
 
   const overlayRef = useRef<HTMLDivElement | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const imageSize = clsx(
     'h-auto',
     size === 'large' ? 'w-full' : 'w-[60%] min-w-[min(480px,100%)]'
   );
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
-        setShowToolbar(false);
-      }
-    };
-
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, []);
 
   useEffect(() => {
     if (!overlayRef.current) return;
@@ -87,11 +72,7 @@ export default function ImageWithCaption({
           이미지를 불러올 수 없습니다
         </div>
       ) : (
-        <div
-          ref={containerRef}
-          className={clsx('relative', imageSize)}
-          onClick={() => setShowToolbar(true)}
-        >
+        <div className={clsx('relative', imageSize)}>
           <div className='relative'>
             <Image
               src={buildImageUrl(src, '1200')}
@@ -108,7 +89,7 @@ export default function ImageWithCaption({
               className='w-full h-auto'
             />
 
-            {showToolbar && (
+            {selected && (
               <ImageToolbar
                 size={size}
                 updateAttributes={updateAttributes}
@@ -145,7 +126,7 @@ export default function ImageWithCaption({
               </div>
             )}
 
-            {isOversized && !showToolbar && (
+            {isOversized && !selected && (
               <div className='absolute top-2 right-2 bg-amber-500/50 backdrop-blur-xs text-white text-xs px-2 py-1 rounded flex items-center gap-1 shadow-sm'>
                 <AlertCircle className='w-4 h-4' />
                 <span>이미지가 길어서 작게 보여요</span>
@@ -153,7 +134,7 @@ export default function ImageWithCaption({
             )}
           </div>
 
-          {(node.attrs.alt || showToolbar) && (
+          {(node.attrs.alt || selected) && (
             <input
               type='text'
               value={node.attrs.alt || ''}
