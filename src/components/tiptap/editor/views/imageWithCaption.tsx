@@ -158,6 +158,8 @@ export default function ImageWithCaption({
               type='text'
               value={node.attrs.alt || ''}
               onChange={e => updateAttributes({ alt: e.target.value })}
+              onMouseDown={e => e.stopPropagation()}
+              onClick={e => e.stopPropagation()}
               placeholder='설명을 입력하세요'
               className='text-center text-sm text-gray-600 w-full focus:outline-none bg-transparent'
             />
