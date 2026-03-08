@@ -4,6 +4,7 @@ import DragMenuDropdown from '@/components/tiptap/editor/dragMenuDropdown';
 import PlusMenuDropdown from '@/components/tiptap/editor/plusMenuDropdown';
 import { uploadBgm } from '@/features/media/utils/uploadBgm';
 import { uploadImage } from '@/features/media/utils/uploadImage';
+import { clearDropCursor } from '@/lib/tiptap';
 import DragHandle from '@tiptap/extension-drag-handle-react';
 import { Node as TipTapNode } from '@tiptap/pm/model';
 import { Editor } from '@tiptap/react';
@@ -39,14 +40,7 @@ export default function BlockMenu({ editor }: { editor: Editor | null }) {
   return (
     <DragHandle
       editor={editor}
-      onElementDragEnd={() => {
-        const dropCursor = document.querySelector(
-          '.prosemirror-dropcursor-block, .prosemirror-dropcursor-inline'
-        );
-        if (dropCursor) {
-          dropCursor.remove();
-        }
-      }}
+      onElementDragEnd={clearDropCursor}
       onNodeChange={({ node, pos }) => {
         currentNodeRef.current = node ? { node, pos } : null;
         setIsDragMenuOpen(false);

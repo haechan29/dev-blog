@@ -18,3 +18,12 @@ export function updateNodeById(
 
   editor.view.dispatch(tr);
 }
+
+export function clearDropCursor(): void {
+  const dropCursor = document.querySelector(
+    '.prosemirror-dropcursor-block, .prosemirror-dropcursor-inline'
+  );
+  if (dropCursor) {
+    dropCursor.remove();
+  }
+}

@@ -1,7 +1,7 @@
 import { ApiError } from '@/errors/errors';
 import { DailyQuotaExhaustedError } from '@/features/media/data/errors/mediaErrors';
 import * as MediaClientRepository from '@/features/media/data/repository/mediaClientRepository';
-import { updateNodeById } from '@/lib/tiptap';
+import { clearDropCursor, updateNodeById } from '@/lib/tiptap';
 import { Editor } from '@tiptap/core';
 import imageCompression from 'browser-image-compression';
 import { nanoid } from 'nanoid';
@@ -12,6 +12,8 @@ export async function uploadImage(
   files: File[]
 ): Promise<void> {
   if (files.length === 0) return;
+
+  clearDropCursor();
 
   for (const file of files) {
     const id = nanoid();
