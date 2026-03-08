@@ -20,6 +20,7 @@ export async function fetchFeedPosts({
         id,
         title,
         content,
+        content_json,
         tags,
         created_at,
         updated_at,

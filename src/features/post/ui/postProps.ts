@@ -4,6 +4,7 @@ import Heading from '@/features/post/domain/model/heading';
 import Post from '@/features/post/domain/model/post';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import { toUserNickname } from '@/features/user/ui/userProps';
+import { JSONContent } from '@tiptap/core';
 
 export interface PostProps {
   id: string;
@@ -12,6 +13,7 @@ export interface PostProps {
   updatedAt: string;
   tags: string[];
   content: string;
+  contentJson: JSONContent | null;
   headings: Heading[];
   plainText: string;
   userId: string;
@@ -34,6 +36,7 @@ export function createProps(post: Post): PostProps {
     updatedAt: formatDate(post.updatedAt),
     tags: post.tags,
     content: post.content,
+    contentJson: post.contentJson,
     headings: post.headings,
     plainText: extractPlainText(post.content),
     userId: post.userId,

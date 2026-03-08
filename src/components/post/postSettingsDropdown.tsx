@@ -58,7 +58,7 @@ export default function PostSettingsDropdown({
           break;
         }
         case 'edit': {
-          router.push(`/read/${post.id}/edit?step=write`);
+          router.push(`/read/${post.id}/edit`);
           break;
         }
         case 'delete': {

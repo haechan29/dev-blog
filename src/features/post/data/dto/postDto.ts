@@ -5,6 +5,7 @@ export interface PostDto {
   title: string;
   tags: string[];
   content: string;
+  contentJson: object | null;
   createdAt: string;
   updatedAt: string;
   userId: string;

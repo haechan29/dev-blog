@@ -153,14 +153,11 @@ export default function PostPreview({
           )}
         >
           {tags.length > 0 && (
-            <div className='w-full flex overflow-x-auto scrollbar-hide gap-2'>
-              {tags.map((tag, index) => (
+            <div className='w-full flex overflow-x-auto scrollbar-hide gap-3'>
+              {tags.map(tag => (
                 <div
                   key={tag}
-                  className={clsx(
-                    'text-xs px-2 py-1 border border-gray-300 rounded-full whitespace-nowrap',
-                    index >= 3 && 'max-w-20 text-ellipsis overflow-clip'
-                  )}
+                  className='text-xs px-2 py-1 border border-gray-300 rounded-full whitespace-nowrap'
                 >
                   {tag}
                 </div>

@@ -1,12 +1,15 @@
 import { auth } from '@/auth';
-import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries';
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
+import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries';
 import * as MediaQueries from '@/features/media/data/queries/mediaQueries';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as FeedUsecase from '@/features/post/data/usecases/feedUsecase';
 import * as PostUsecase from '@/features/post/data/usecases/postUsecase';
 import * as SearchUsecase from '@/features/post/data/usecases/searchUsecase';
-import { extractImageUrls } from '@/features/post/domain/lib/url';
+import {
+  extractImageUrls,
+  extractImageUrlsFromJson,
+} from '@/features/post/domain/lib/url';
 import { PostStatCreationError } from '@/features/postStat/data/errors/postStatErrors';
 import * as PostStatQueries from '@/features/postStat/data/queries/postStatQueries';
 import { getUserId } from '@/lib/user';
@@ -74,7 +77,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { title, content, password, tags, visibility } = await request.json();
+    const { title, content, contentJson, password, tags, visibility } =
+      await request.json();
 
     const session = await auth();
     const userId = await getUserId();
@@ -82,7 +86,7 @@ export async function POST(request: NextRequest) {
     if (!title) {
       throw new ValidationError('제목을 찾을 수 없습니다');
     }
-    if (!content) {
+    if (!content && !contentJson) {
       throw new ValidationError('내용을 찾을 수 없습니다');
     }
     if (!userId) {
@@ -95,17 +99,23 @@ export async function POST(request: NextRequest) {
       throw new ValidationError('비밀번호를 찾을 수 없습니다');
     }
 
-    const passwordHash = skipPasswordCheck ? null : await bcrypt.hash(password, 10);
+    const passwordHash = skipPasswordCheck
+      ? null
+      : await bcrypt.hash(password, 10);
+
     const post = await PostQueries.createPost({
       title,
       content,
+      contentJson,
       tags,
       passwordHash,
       visibility,
       userId,
     });
 
-    const imageUrls = extractImageUrls(content);
+    const imageUrls = contentJson
+      ? extractImageUrlsFromJson(contentJson)
+      : extractImageUrls(content);
 
     await Promise.all([
       PostStatQueries.createPostStat(post.id),

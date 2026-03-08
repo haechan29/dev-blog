@@ -40,7 +40,7 @@ export default function HomeToolbar({
 
       <div className='flex items-center gap-3'>
         <Link
-          href={`/write?step=write`}
+          href={`/write`}
           className={clsx(
             'text-sm font-semibold py-2 px-4 rounded-full',
             'bg-gray-100 hover:bg-gray-200'

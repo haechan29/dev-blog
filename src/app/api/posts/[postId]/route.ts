@@ -4,7 +4,10 @@ import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries'
 import * as MediaQueries from '@/features/media/data/queries/mediaQueries';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as PostUsecase from '@/features/post/data/usecases/postUsecase';
-import { extractImageUrls } from '@/features/post/domain/lib/url';
+import {
+  extractImageUrls,
+  extractImageUrlsFromJson,
+} from '@/features/post/domain/lib/url';
 import { r2Client } from '@/lib/r2';
 import { getUserId } from '@/lib/user';
 import { DeleteObjectCommand } from '@aws-sdk/client-s3';
@@ -42,6 +45,7 @@ export async function PATCH(
     const {
       title,
       content,
+      contentJson,
       tags,
       password,
       seriesId,
@@ -79,17 +83,30 @@ export async function PATCH(
       }
     }
 
-    if (content) {
-      await MediaQueries.unlinkMediaListFromPost(postId);
+    if (content || contentJson) {
+      const newImageUrls = contentJson
+        ? extractImageUrlsFromJson(contentJson)
+        : extractImageUrls(content);
 
-      const imageUrls = extractImageUrls(content);
-      await MediaQueries.linkMediaListToPost(postId, imageUrls);
+      const oldMedia = await MediaQueries.getMediaListByPostId(postId);
+      const oldImageUrls = oldMedia.map(m => m.url);
+
+      const toDetach = oldImageUrls.filter(url => !newImageUrls.includes(url));
+      const toAttach = newImageUrls.filter(url => !oldImageUrls.includes(url));
+
+      await Promise.all([
+        toDetach.length > 0 &&
+          MediaQueries.unlinkMediaListFromPost(postId, toDetach),
+        toAttach.length > 0 &&
+          MediaQueries.linkMediaListToPost(postId, toAttach),
+      ]);
     }
 
     const updated = await PostQueries.updatePost({
       postId,
       title,
       content,
+      contentJson,
       tags,
       seriesId,
       seriesOrder,

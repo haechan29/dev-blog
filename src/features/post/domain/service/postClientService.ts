@@ -42,6 +42,7 @@ export async function searchPosts(
 export async function createPost(params: {
   title: string;
   content: string;
+  contentJson?: object;
   tags: string[];
   password: string;
   visibility: PostVisibility;
@@ -54,6 +55,7 @@ export async function updatePost(params: {
   postId: string;
   title?: string;
   content?: string;
+  contentJson?: object;
   tags?: string[];
   password?: string;
   seriesId?: string | null;

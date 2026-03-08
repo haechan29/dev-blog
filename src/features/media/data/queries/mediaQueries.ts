@@ -93,11 +93,17 @@ export async function linkMediaListToPost(postId: string, urls: string[]) {
   }
 }
 
-export async function unlinkMediaListFromPost(postId: string) {
-  const { error } = await supabase
+export async function unlinkMediaListFromPost(postId: string, urls?: string[]) {
+  let query = supabase
     .from('media')
     .update({ post_id: null })
     .eq('post_id', postId);
+
+  if (urls && urls.length > 0) {
+    query = query.in('url', urls);
+  }
+
+  const { error } = await query;
 
   if (error) {
     throw new Error(error.message);

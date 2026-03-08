@@ -396,3 +396,47 @@ body {
 .prose hr {
   @apply my-4;
 }
+
+.prose table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.prose th,
+.prose td {
+  border: 1px solid #d1d5db;
+  padding: 8px 12px;
+  text-align: left;
+  position: relative;
+}
+
+.prose th {
+  background-color: #f3f4f6;
+  font-weight: 600;
+}
+
+.ProseMirror-selectednode {
+  @apply outline-none relative;
+}
+
+.ProseMirror-selectednode::after {
+  content: '';
+  @apply absolute -inset-x-2 rounded bg-blue-500/15 inset-y-0;
+  pointer-events: none;
+}
+
+.ProseMirror-selectednode:has(table)::after {
+  @apply -inset-y-2;
+}
+
+.ProseMirror.resize-cursor {
+  cursor: col-resize;
+}
+
+.tiptap > p.is-editor-empty:only-child::before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  pointer-events: none;
+  float: left;
+  height: 0;
+}

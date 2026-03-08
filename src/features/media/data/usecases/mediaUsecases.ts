@@ -132,10 +132,10 @@ export async function uploadAudio({
   const buffer = Buffer.from(await file.arrayBuffer());
 
   const baseId = nanoid();
-  const url = `${process.env.R2_PUBLIC_URL!}/${baseId}.webp`;
+  const url = `${process.env.R2_PUBLIC_URL!}/${baseId}.mpeg`;
 
   await uploadToR2({
-    key: `${nanoid()}.mpeg`,
+    key: `${baseId}.mpeg`,
     body: buffer,
     contentType: file.type,
   });
