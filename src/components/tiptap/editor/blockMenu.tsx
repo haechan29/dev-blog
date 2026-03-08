@@ -2,6 +2,8 @@
 
 import DragMenuDropdown from '@/components/tiptap/editor/dragMenuDropdown';
 import PlusMenuDropdown from '@/components/tiptap/editor/plusMenuDropdown';
+import { uploadBgm } from '@/features/media/utils/uploadBgm';
+import { uploadImage } from '@/features/media/utils/uploadImage';
 import DragHandle from '@tiptap/extension-drag-handle-react';
 import { Node as TipTapNode } from '@tiptap/pm/model';
 import { Editor } from '@tiptap/react';
@@ -15,6 +17,8 @@ export default function BlockMenu({ editor }: { editor: Editor | null }) {
 
   const menuRef = useRef<HTMLDivElement>(null);
   const currentNodeRef = useRef<{ node: TipTapNode; pos: number } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const audioInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!isDragMenuOpen && !isPlusMenuOpen) return;
@@ -91,8 +95,38 @@ export default function BlockMenu({ editor }: { editor: Editor | null }) {
           <PlusMenuDropdown
             editor={editor}
             onClose={() => setIsPlusMenuOpen(false)}
+            fileInputRef={fileInputRef}
+            audioInputRef={audioInputRef}
           />
         )}
+
+        <input
+          ref={fileInputRef}
+          type='file'
+          accept='image/*'
+          multiple
+          onChange={e => {
+            const files = e.target.files;
+            if (files && files.length > 0 && editor) {
+              uploadImage(editor, Array.from(files));
+            }
+            e.target.value = '';
+          }}
+          className='hidden'
+        />
+        <input
+          ref={audioInputRef}
+          type='file'
+          accept='audio/mpeg'
+          onChange={async e => {
+            const file = e.target.files?.[0];
+            if (file && editor) {
+              await uploadBgm(editor, file);
+            }
+            e.target.value = '';
+          }}
+          className='hidden'
+        />
 
         {isDragMenuOpen && (
           <DragMenuDropdown
