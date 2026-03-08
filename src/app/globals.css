@@ -397,20 +397,20 @@ body {
   @apply my-4;
 }
 
-.ProseMirror table {
+.prose table {
   border-collapse: collapse;
   width: 100%;
 }
 
-.ProseMirror th,
-.ProseMirror td {
+.prose th,
+.prose td {
   border: 1px solid #d1d5db;
   padding: 8px 12px;
   text-align: left;
   position: relative;
 }
 
-.ProseMirror th {
+.prose th {
   background-color: #f3f4f6;
   font-weight: 600;
 }
