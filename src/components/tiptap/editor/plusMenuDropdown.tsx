@@ -37,7 +37,6 @@ export default function PlusMenuDropdown({
       icon: List,
       action: () => {
         editor.chain().focus().toggleBulletList().run();
-        onClose();
       },
     },
     {
@@ -64,7 +63,7 @@ export default function PlusMenuDropdown({
       label: '대사',
       icon: MessageSquare,
       action: () => {
-        editor.chain().focus().setDialogue({ speaker: '화자 1' }).run();
+        editor.chain().focus().setDialogue({ speaker: '화자' }).run();
         onClose();
       },
     },

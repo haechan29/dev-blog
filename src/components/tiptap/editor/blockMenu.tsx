@@ -59,7 +59,7 @@ export default function BlockMenu({ editor }: { editor: Editor | null }) {
               editor
                 .chain()
                 .focus()
-                .setTextSelection(pos + node.nodeSize)
+                .setTextSelection(pos + node.nodeSize - 1)
                 .run();
             }
           }}
