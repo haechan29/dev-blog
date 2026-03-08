@@ -5,6 +5,7 @@ import LinkCardNode from '@/components/tiptap/nodes/linkCard';
 import BgmView from '@/components/tiptap/renderer/views/bgm';
 import CodeBlockView from '@/components/tiptap/renderer/views/codeBlock';
 import DialogueView from '@/components/tiptap/renderer/views/dialogue';
+import HorizontalRuleView from '@/components/tiptap/renderer/views/horizontalRule';
 import ImageWithCaptionView from '@/components/tiptap/renderer/views/imageWithCaption';
 import LinkCardView from '@/components/tiptap/renderer/views/linkCard';
 import { JSONContent } from '@tiptap/core';
@@ -31,11 +32,7 @@ export default function TiptapRenderer({ content }: { content: JSONContent }) {
     content,
     options: {
       nodeMapping: {
-        horizontalRule: () => (
-          <div className='py-4'>
-            <hr className='border-t border-gray-200' />
-          </div>
-        ),
+        horizontalRule: () => <HorizontalRuleView />,
         imageWithCaption: ({ node }) => (
           <ImageWithCaptionView
             src={node.attrs.src}
