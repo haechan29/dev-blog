@@ -1,4 +1,6 @@
 import { Node, mergeAttributes } from '@tiptap/core';
+import { ReactNodeViewRenderer } from '@tiptap/react';
+import DialogueView from '@/components/tiptap/editor/views/dialogue';
 
 export interface DialogueOptions {
   HTMLAttributes: Record<string, unknown>;
@@ -57,6 +59,10 @@ export default Node.create<DialogueOptions>({
       }),
       ['div', { class: 'dialogue-content' }, 0],
     ];
+  },
+
+  addNodeView() {
+    return ReactNodeViewRenderer(DialogueView);
   },
 
   addCommands() {

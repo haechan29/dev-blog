@@ -1,3 +1,5 @@
+'use client';
+
 import BgmNode from '@/components/tiptap/nodes/bgm';
 import DialogueNode from '@/components/tiptap/nodes/dialogue';
 import ImageWithCaptionNode from '@/components/tiptap/nodes/imageWithCaption';

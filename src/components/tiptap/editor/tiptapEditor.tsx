@@ -5,12 +5,8 @@ import DialogueToolbar from '@/components/tiptap/editor/dialogueToolbar';
 import FloatingMenu from '@/components/tiptap/editor/floatingMenu';
 import LinkPasteMenu from '@/components/tiptap/editor/linkPasteMenu';
 import TableMenu from '@/components/tiptap/editor/tableMenu';
-import BgmView from '@/components/tiptap/editor/views/bgm';
 import CodeBlockView from '@/components/tiptap/editor/views/codeBlock';
-import DialogueView from '@/components/tiptap/editor/views/dialogue';
 import HorizontalRuleView from '@/components/tiptap/editor/views/horizontalRule';
-import ImageWithCaptionView from '@/components/tiptap/editor/views/imageWithCaption';
-import LinkCardView from '@/components/tiptap/editor/views/linkCard';
 import BgmNode from '@/components/tiptap/nodes/bgm';
 import DialogueNode from '@/components/tiptap/nodes/dialogue';
 import ImageWithCaptionNode from '@/components/tiptap/nodes/imageWithCaption';
@@ -111,28 +107,10 @@ const TiptapEditor = forwardRef<
           return ReactNodeViewRenderer(HorizontalRuleView);
         },
       }),
-      LinkCardNode.extend({
-        addNodeView() {
-          return ReactNodeViewRenderer(LinkCardView);
-        },
-      }),
-      ImageWithCaptionNode.extend({
-        addNodeView() {
-          return ReactNodeViewRenderer(ImageWithCaptionView);
-        },
-      }),
-      DialogueNode.extend({
-        addNodeView() {
-          return ReactNodeViewRenderer(DialogueView);
-        },
-      }),
-      BgmNode.extend({
-        addNodeView() {
-          return ReactNodeViewRenderer(BgmView, {
-            className: 'flex justify-end',
-          });
-        },
-      }),
+      LinkCardNode,
+      ImageWithCaptionNode,
+      DialogueNode,
+      BgmNode,
       FileHandler.configure({
         allowedMimeTypes: [
           'image/jpeg',

@@ -1,4 +1,6 @@
 import { Node, mergeAttributes } from '@tiptap/core';
+import { ReactNodeViewRenderer } from '@tiptap/react';
+import BgmView from '@/components/tiptap/editor/views/bgm';
 
 export interface BgmOptions {
   HTMLAttributes: Record<string, unknown>;
@@ -65,6 +67,12 @@ export default Node.create<BgmOptions>({
         src: HTMLAttributes.src,
       }),
     ];
+  },
+
+  addNodeView() {
+    return ReactNodeViewRenderer(BgmView, {
+      className: 'flex justify-end',
+    });
   },
 
   addCommands() {
