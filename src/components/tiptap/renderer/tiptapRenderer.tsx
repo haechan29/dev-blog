@@ -52,6 +52,11 @@ export default function TiptapRenderer({ content }: { content: JSONContent }) {
         linkCard: ({ node }) => (
           <LinkCardView href={node.attrs.href} variant={node.attrs.variant} />
         ),
+        paragraph: ({ children }) => {
+          const isEmpty =
+            !children || (Array.isArray(children) && children.length === 0);
+          return <p>{isEmpty ? <br /> : children}</p>;
+        },
       },
     },
   });
