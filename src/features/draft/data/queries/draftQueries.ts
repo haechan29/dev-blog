@@ -116,3 +116,11 @@ export async function updateDraft({
 
   return toDto(data as unknown as DraftEntity);
 }
+
+export async function deleteDraft(draftId: string): Promise<void> {
+  const { error } = await supabase.from('drafts').delete().eq('id', draftId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
