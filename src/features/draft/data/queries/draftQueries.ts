@@ -1,5 +1,5 @@
-import { DraftEntity } from '@/features/draft/data/entities/draftEntities';
 import { DraftDto } from '@/features/draft/data/dto/draftDto';
+import { DraftEntity } from '@/features/draft/data/entities/draftEntities';
 import { toDto } from '@/features/draft/data/mapper/draftMapper';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
@@ -30,3 +30,89 @@ export async function fetchDraftsByUserId(userId: string): Promise<DraftDto[]> {
   return (data as unknown as DraftEntity[]).map(toDto);
 }
 
+export async function createDraft({
+  userId,
+  postId,
+  title,
+  contentJson,
+  tags,
+}: {
+  userId: string;
+  postId: string | null;
+  title: string;
+  contentJson: object | null;
+  tags: string[];
+}): Promise<DraftDto> {
+  const { data, error } = await supabase
+    .from('drafts')
+    .insert({
+      user_id: userId,
+      post_id: postId,
+      title,
+      content_json: contentJson,
+      tags,
+    })
+    .select(DRAFT_SELECT_FIELDS)
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return toDto(data as unknown as DraftEntity);
+}
+
+export async function fetchDraftOwnership(
+  draftId: string
+): Promise<{ id: string; userId: string } | null> {
+  const { data, error } = await supabase
+    .from('drafts')
+    .select('id,user_id')
+    .eq('id', draftId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  return { id: data.id as string, userId: data.user_id as string };
+}
+
+export async function updateDraft({
+  draftId,
+  postId,
+  title,
+  contentJson,
+  tags,
+}: {
+  draftId: string;
+  postId?: string | null;
+  title?: string;
+  contentJson?: object | null;
+  tags?: string[];
+}): Promise<DraftDto> {
+  const update: Record<string, unknown> = {
+    ...(postId !== undefined && { post_id: postId }),
+    ...(title !== undefined && { title }),
+    ...(contentJson !== undefined && { content_json: contentJson }),
+    ...(tags !== undefined && { tags }),
+    updated_at: new Date().toISOString(),
+  };
+
+  const { data, error } = await supabase
+    .from('drafts')
+    .update(update)
+    .eq('id', draftId)
+    .select(DRAFT_SELECT_FIELDS)
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return toDto(data as unknown as DraftEntity);
+}
