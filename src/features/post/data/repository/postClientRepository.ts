@@ -58,6 +58,7 @@ export async function createPost(requestDto: {
   tags: string[];
   password: string;
   visibility: PostVisibility;
+  draftId?: string;
 }): Promise<PostDto> {
   const response = await api.post(`/api/posts`, requestDto);
   return response.data;
@@ -76,6 +77,7 @@ export async function updatePost({
   seriesId?: string | null;
   seriesOrder?: number | null;
   visibility?: PostVisibility;
+  draftId?: string;
 }): Promise<PostDto> {
   const response = await api.patch(`/api/posts/${postId}`, requestBody);
   return response.data;
