@@ -199,7 +199,7 @@ export default function PublishDialog({
             {isPending ? (
               <Loader2 size={18} strokeWidth={3} className='animate-spin' />
             ) : step === 'password' || skipPasswordInput ? (
-              '발행'
+              '완료'
             ) : (
               '다음'
             )}

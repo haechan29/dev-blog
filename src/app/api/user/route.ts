@@ -1,7 +1,6 @@
 import { auth } from '@/auth';
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as UserQueries from '@/features/user/data/queries/userQueries';
-import * as ProfileUsecase from '@/features/user/data/usecases/profileUsecase';
 import { getUserId } from '@/lib/user';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
@@ -73,7 +72,6 @@ export async function DELETE() {
     }
 
     await Promise.all([
-      ProfileUsecase.deleteProfileMedia(userId),
       UserQueries.deleteUser(),
       UserQueries.hardDeleteAuthUser(),
     ]);

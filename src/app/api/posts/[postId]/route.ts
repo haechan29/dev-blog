@@ -1,16 +1,9 @@
 import { auth } from '@/auth';
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries';
-import * as MediaQueries from '@/features/media/data/queries/mediaQueries';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as PostUsecase from '@/features/post/data/usecases/postUsecase';
-import {
-  extractImageUrls,
-  extractImageUrlsFromJson,
-} from '@/features/post/domain/lib/url';
-import { r2Client } from '@/lib/r2';
 import { getUserId } from '@/lib/user';
-import { DeleteObjectCommand } from '@aws-sdk/client-s3';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -83,25 +76,6 @@ export async function PATCH(
       }
     }
 
-    if (content || contentJson) {
-      const newImageUrls = contentJson
-        ? extractImageUrlsFromJson(contentJson)
-        : extractImageUrls(content);
-
-      const oldMedia = await MediaQueries.getMediaListByPostId(postId);
-      const oldImageUrls = oldMedia.map(m => m.url);
-
-      const toDetach = oldImageUrls.filter(url => !newImageUrls.includes(url));
-      const toAttach = newImageUrls.filter(url => !oldImageUrls.includes(url));
-
-      await Promise.all([
-        toDetach.length > 0 &&
-          MediaQueries.unlinkMediaListFromPost(postId, toDetach),
-        toAttach.length > 0 &&
-          MediaQueries.linkMediaListToPost(postId, toAttach),
-      ]);
-    }
-
     const updated = await PostQueries.updatePost({
       postId,
       title,
@@ -166,22 +140,6 @@ export async function DELETE(
         throw new UnauthorizedError('비밀번호가 일치하지 않습니다');
       }
     }
-
-    const mediaList = await MediaQueries.getMediaListByPostId(postId);
-
-    await Promise.all(
-      mediaList.map(async media => {
-        const key = media.url.split('/').pop();
-        if (key) {
-          await r2Client.send(
-            new DeleteObjectCommand({
-              Bucket: process.env.R2_BUCKET_NAME,
-              Key: key,
-            })
-          );
-        }
-      })
-    );
 
     await PostQueries.deletePost(postId);
 

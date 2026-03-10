@@ -32,7 +32,6 @@ export async function PUT(request: NextRequest) {
     const url = await MediaUsecases.uploadProfileImage({
       file,
       userId,
-      profileUserId: userId,
     });
 
     await ProfileQueries.updateProfile({ userId, profileImageUrl: url });

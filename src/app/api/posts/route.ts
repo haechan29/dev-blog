@@ -1,15 +1,10 @@
 import { auth } from '@/auth';
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries';
-import * as MediaQueries from '@/features/media/data/queries/mediaQueries';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as FeedUsecase from '@/features/post/data/usecases/feedUsecase';
 import * as PostUsecase from '@/features/post/data/usecases/postUsecase';
 import * as SearchUsecase from '@/features/post/data/usecases/searchUsecase';
-import {
-  extractImageUrls,
-  extractImageUrlsFromJson,
-} from '@/features/post/domain/lib/url';
 import { PostStatCreationError } from '@/features/postStat/data/errors/postStatErrors';
 import * as PostStatQueries from '@/features/postStat/data/queries/postStatQueries';
 import { getUserId } from '@/lib/user';
@@ -113,14 +108,7 @@ export async function POST(request: NextRequest) {
       userId,
     });
 
-    const imageUrls = contentJson
-      ? extractImageUrlsFromJson(contentJson)
-      : extractImageUrls(content);
-
-    await Promise.all([
-      PostStatQueries.createPostStat(post.id),
-      MediaQueries.linkMediaListToPost(post.id, imageUrls),
-    ]);
+    await PostStatQueries.createPostStat(post.id);
 
     return NextResponse.json({ data: post });
   } catch (error) {

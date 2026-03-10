@@ -88,11 +88,9 @@ export async function uploadAvatarImage({
 export async function uploadProfileImage({
   file,
   userId,
-  profileUserId,
 }: {
   file: File;
   userId: string;
-  profileUserId: string;
 }): Promise<string> {
   const buffer = Buffer.from(await file.arrayBuffer());
 
@@ -114,7 +112,6 @@ export async function uploadProfileImage({
     sizeBytes: optimized.length,
     userId,
     type: 'image',
-    profileUserId,
   });
 
   return url;

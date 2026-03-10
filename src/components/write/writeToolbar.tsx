@@ -31,7 +31,7 @@ export default function WriteToolbar({
           isPending ? 'opacity-50' : 'hover:bg-blue-500'
         )}
       >
-        {isPending ? <Loader2 size={16} className='animate-spin' /> : '다음'}
+        {isPending ? <Loader2 size={16} className='animate-spin' /> : '발행'}
       </button>
     </div>
   );
