@@ -5,12 +5,13 @@ import * as DraftClientRepository from '@/features/draft/data/repository/draftCl
 import { draftKeys } from '@/queries/keys';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-export default function useDrafts() {
+export default function useDrafts(initialData?: DraftDto[]) {
   const queryClient = useQueryClient();
 
   const { data: drafts } = useQuery({
     queryKey: draftKeys.list(),
     queryFn: DraftClientRepository.getDrafts,
+    initialData,
   });
 
   const saveDraftMutation = useMutation({

@@ -17,7 +17,7 @@ export default function DraftSidebar({
   drafts: DraftDto[] | undefined;
   isVisible: boolean;
   setIsVisible: (isVisible: boolean) => void;
-  onDraftSelect: (draftId: string | null) => void;
+  onDraftSelect: (draftId: string) => void;
 }) {
   useScrollLock({ isLocked: isVisible });
 

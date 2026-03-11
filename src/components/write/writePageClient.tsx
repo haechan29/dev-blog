@@ -22,33 +22,53 @@ import { draftKeys } from '@/queries/keys';
 import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Heart } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+
+function getInitialState(
+  post: PostProps | undefined,
+  initialDrafts: DraftDto[] | undefined
+) {
+  const matched =
+    post && initialDrafts
+      ? initialDrafts.find(d => d.postId === post.id)
+      : undefined;
+  return {
+    title: matched?.title ?? post?.title ?? '',
+    tags: matched?.tags ?? post?.tags ?? [],
+    contentJson: matched?.contentJson ?? post?.contentJson ?? undefined,
+    currentDraftId: matched?.id ?? null,
+  };
+}
 
 export default function WritePageClient({
   post,
   skipPasswordInput,
+  initialDrafts,
 }: {
   post?: PostProps;
   skipPasswordInput: boolean;
+  initialDrafts?: DraftDto[];
 }) {
   const isEditMode = !!post;
+  const initial = getInitialState(post, initialDrafts);
 
-  const [title, setTitle] = useState(post?.title ?? '');
-  const [tags, setTags] = useState<string[]>(post?.tags ?? []);
+  const [title, setTitle] = useState(initial.title);
+  const [tags, setTags] = useState<string[]>(initial.tags);
+  const [currentDraftId, setCurrentDraftId] = useState<string | null>(
+    initial.currentDraftId
+  );
   const [anchors, setAnchors] = useState<TocAnchor[]>([]);
   const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
   const [isPending, setIsPending] = useState(false);
-  const [currentDraftId, setCurrentDraftId] = useState<string | null>(null);
   const [isDraftSidebarVisible, setIsDraftSidebarVisible] = useState(false);
 
   const editorRef = useRef<TiptapEditorRef>(null);
-  const hasInitializedFromPost = useRef(false);
 
   const { user } = useUser();
+  const { drafts } = useDrafts(initialDrafts);
   const router = useRouterWithProgress();
   const queryClient = useQueryClient();
-  const { drafts } = useDrafts();
 
   useBgmController();
 
@@ -58,25 +78,13 @@ export default function WritePageClient({
     editorRef.current?.setContent(draft.contentJson);
   };
 
-  useEffect(() => {
-    if (!currentDraftId || !drafts) return;
-    const draft = drafts.find(d => d.id === currentDraftId);
-    if (!draft) return;
-    applyDraftToEditor(draft);
-  }, [currentDraftId, drafts]);
-
-  useEffect(() => {
-    if (!isEditMode || !post || !drafts) return;
-
-    if (hasInitializedFromPost.current) return;
-    hasInitializedFromPost.current = true;
-
-    const matched = drafts.find(d => d.postId === post.id);
-
-    if (matched) {
-      setCurrentDraftId(matched.id);
+  const handleDraftSelect = (draftId: string) => {
+    const draft = drafts?.find(d => d.id === draftId);
+    if (draft) {
+      applyDraftToEditor(draft);
+      setCurrentDraftId(draftId);
     }
-  }, [isEditMode, post, drafts]);
+  };
 
   const handleNext = () => {
     if (!title.trim()) {
@@ -152,7 +160,7 @@ export default function WritePageClient({
         drafts={drafts}
         isVisible={isDraftSidebarVisible}
         setIsVisible={setIsDraftSidebarVisible}
-        onDraftSelect={setCurrentDraftId}
+        onDraftSelect={handleDraftSelect}
       />
 
       <div className='fixed top-0 right-0 w-(--toc-width) mr-(--toc-margin) h-full max-xl:hidden'>
@@ -199,7 +207,7 @@ export default function WritePageClient({
 
           <TiptapEditor
             ref={editorRef}
-            initialContent={post?.contentJson ?? undefined}
+            initialContent={initial.contentJson}
             onAnchorsChange={setAnchors}
             className='mb-20'
           />

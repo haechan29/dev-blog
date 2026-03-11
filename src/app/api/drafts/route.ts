@@ -1,16 +1,12 @@
 import { ApiError, UnauthorizedError } from '@/errors/errors';
 import * as DraftQueries from '@/features/draft/data/queries/draftQueries';
+import * as DraftUsecase from '@/features/draft/data/usecases/draftUsecase';
 import { getUserId } from '@/lib/user';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    const userId = await getUserId();
-    if (!userId) {
-      throw new UnauthorizedError('인증되지 않은 요청입니다');
-    }
-
-    const data = await DraftQueries.fetchDraftsByUserId(userId);
+    const data = await DraftUsecase.getDrafts();
     return NextResponse.json({ data });
   } catch (error) {
     console.error('임시저장 목록 조회에 실패했습니다', error);
