@@ -1,3 +1,7 @@
+export const draftKeys = {
+  list: () => ['drafts'] as const,
+};
+
 export const postKeys = {
   list: (excludeId?: string) =>
     excludeId ? (['posts', { excludeId }] as const) : (['posts'] as const),

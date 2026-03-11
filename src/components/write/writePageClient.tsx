@@ -4,43 +4,137 @@ import TiptapEditor, {
   TiptapEditorRef,
 } from '@/components/tiptap/editor/tiptapEditor';
 import ProfileIcon from '@/components/user/profileIcon';
+import { DeleteDraftDialog } from '@/components/write/deleteDraftDialog';
+import DraftSidebar from '@/components/write/draftSidebar';
 import PublishDialog from '@/components/write/publishDialog';
 import TableOfContents, { TocAnchor } from '@/components/write/tableOfContents';
 import TagInput from '@/components/write/tagInput';
 import WriteToolbar from '@/components/write/writeToolbar';
 import { ApiError } from '@/errors/errors';
+import { DraftDto } from '@/features/draft/data/dto/draftDto';
+import useDrafts from '@/features/draft/hooks/useDrafts';
+import useSaveShortcut from '@/features/draft/hooks/useSaveShortcut';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import useBgmController from '@/features/post/hooks/useBgmController';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
 import useUser from '@/features/user/domain/hooks/useUser';
 import useRouterWithProgress from '@/hooks/useRouterWithProgress';
+import { draftKeys } from '@/queries/keys';
+import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Heart } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+
+function getInitialState(
+  post: PostProps | undefined,
+  initialDrafts: DraftDto[] | undefined
+) {
+  const matched =
+    post && initialDrafts
+      ? initialDrafts.find(d => d.postId === post.id)
+      : undefined;
+  return {
+    title: matched?.title ?? post?.title ?? '',
+    tags: matched?.tags ?? post?.tags ?? [],
+    contentJson: matched?.contentJson ?? post?.contentJson ?? undefined,
+    currentDraftId: matched?.id ?? null,
+  };
+}
 
 export default function WritePageClient({
   post,
   skipPasswordInput,
+  initialDrafts,
 }: {
   post?: PostProps;
   skipPasswordInput: boolean;
+  initialDrafts?: DraftDto[];
 }) {
   const isEditMode = !!post;
+  const initial = getInitialState(post, initialDrafts);
 
-  const [title, setTitle] = useState(post?.title ?? '');
-  const [tags, setTags] = useState<string[]>(post?.tags ?? []);
+  const [title, setTitle] = useState(initial.title);
+  const [tags, setTags] = useState<string[]>(initial.tags);
+  const [currentDraftId, setCurrentDraftId] = useState<string | null>(
+    initial.currentDraftId
+  );
   const [anchors, setAnchors] = useState<TocAnchor[]>([]);
+  const [isDraftSidebarVisible, setIsDraftSidebarVisible] = useState(false);
+
   const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
-  const [isPending, setIsPending] = useState(false);
+  const [isPublishPending, setIsPublishPending] = useState(false);
+  const [saveJustSucceeded, setSaveJustSucceeded] = useState(false);
+
+  const [isDeleteDraftDialogOpen, setIsDeleteDraftDialogOpen] = useState(false);
+  const [deleteTargetDraftId, setDeleteTargetDraftId] = useState<string | null>(
+    null
+  );
 
   const editorRef = useRef<TiptapEditorRef>(null);
+  const saveSucceededTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
 
   const { user } = useUser();
+  const { drafts, saveDraftMutation, deleteDraftMutation } =
+    useDrafts(initialDrafts);
   const router = useRouterWithProgress();
+  const queryClient = useQueryClient();
 
   useBgmController();
+
+  useEffect(() => {
+    return () => {
+      if (saveSucceededTimeoutRef.current) {
+        clearTimeout(saveSucceededTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const applyDraftToEditor = (draft: DraftDto) => {
+    setTitle(draft.title ?? '');
+    setTags(draft.tags ?? []);
+    editorRef.current?.setContent(draft.contentJson);
+  };
+
+  const handleDraftSelect = (draftId: string) => {
+    const draft = drafts?.find(d => d.id === draftId);
+    if (draft) {
+      applyDraftToEditor(draft);
+      setCurrentDraftId(draftId);
+    }
+  };
+
+  const handleDraftDeleteClick = (draftId: string) => {
+    setDeleteTargetDraftId(draftId);
+    setIsDeleteDraftDialogOpen(true);
+  };
+
+  const handleDraftDelete = () => {
+    if (!deleteTargetDraftId) return;
+
+    deleteDraftMutation.mutate(deleteTargetDraftId, {
+      onSuccess: () => {
+        toast.success('임시저장 글이 삭제되었습니다');
+
+        if (currentDraftId === deleteTargetDraftId) {
+          setCurrentDraftId(null);
+        }
+
+        setDeleteTargetDraftId(null);
+        setIsDeleteDraftDialogOpen(false);
+      },
+      onError: error => {
+        const message =
+          error instanceof ApiError
+            ? error.message
+            : '임시저장 글 삭제에 실패했습니다';
+        toast.error(message);
+      },
+    });
+  };
 
   const handleNext = () => {
     if (!title.trim()) {
@@ -54,6 +148,45 @@ export default function WritePageClient({
     setIsPublishDialogOpen(true);
   };
 
+  const handleSave = () => {
+    if (isPublishPending || saveDraftMutation.isPending) return;
+
+    saveDraftMutation.mutate(
+      {
+        draftId: currentDraftId,
+        postId: post?.id ?? null,
+        title,
+        contentJson: editorRef.current?.getJSON(),
+        tags,
+      },
+      {
+        onSuccess: savedDraft => {
+          setCurrentDraftId(savedDraft.id);
+
+          if (saveSucceededTimeoutRef.current) {
+            clearTimeout(saveSucceededTimeoutRef.current);
+          }
+          setSaveJustSucceeded(true);
+          saveSucceededTimeoutRef.current = setTimeout(() => {
+            setSaveJustSucceeded(false);
+          }, 1000);
+        },
+        onError: error => {
+          const message =
+            error instanceof ApiError
+              ? error.message
+              : '임시저장에 실패했습니다';
+          toast.error(message);
+        },
+      }
+    );
+  };
+
+  useSaveShortcut({
+    enabled: !isPublishDialogOpen,
+    onSave: handleSave,
+  });
+
   const handlePublish = async (data: {
     visibility: PostVisibility;
     password: string;
@@ -61,7 +194,7 @@ export default function WritePageClient({
     const contentJson = editorRef.current?.getJSON();
     if (!contentJson) return;
 
-    setIsPending(true);
+    setIsPublishPending(true);
     try {
       if (isEditMode) {
         await PostClientService.updatePost({
@@ -71,6 +204,10 @@ export default function WritePageClient({
           tags,
           password: data.password,
           visibility: data.visibility,
+          draftId: currentDraftId ?? undefined,
+        });
+        queryClient.invalidateQueries({
+          queryKey: draftKeys.list(),
         });
         setIsPublishDialogOpen(false);
         router.push(`/read/${post.id}`);
@@ -82,8 +219,12 @@ export default function WritePageClient({
           tags,
           password: data.password,
           visibility: data.visibility,
+          draftId: currentDraftId ?? undefined,
         });
         const postProps = createProps(newPost);
+        queryClient.invalidateQueries({
+          queryKey: draftKeys.list(),
+        });
         setIsPublishDialogOpen(false);
         router.push(`/read/${postProps.id}`);
       }
@@ -97,15 +238,30 @@ export default function WritePageClient({
 
       toast.error(message);
     } finally {
-      setIsPending(false);
+      setIsPublishPending(false);
     }
   };
 
   return (
     <>
-      <WriteToolbar onNext={handleNext} isPending={isPending} />
+      <WriteToolbar
+        hasDrafts={(drafts?.length ?? 0) > 0}
+        onOpenDraftSidebar={() => setIsDraftSidebarVisible(true)}
+        onNext={handleNext}
+        isPublishPending={isPublishPending}
+        onSave={handleSave}
+        isSavePending={saveDraftMutation.isPending}
+        saveJustSucceeded={saveJustSucceeded}
+      />
 
-      <div className='fixed top-0 left-0 w-(--sidebar-width) h-full max-xl:hidden' />
+      <DraftSidebar
+        currentDraftId={currentDraftId}
+        drafts={drafts}
+        isVisible={isDraftSidebarVisible}
+        setIsVisible={setIsDraftSidebarVisible}
+        onSelectDraft={handleDraftSelect}
+        onDeleteDraft={handleDraftDeleteClick}
+      />
 
       <div className='fixed top-0 right-0 w-(--toc-width) mr-(--toc-margin) h-full max-xl:hidden'>
         <TableOfContents anchors={anchors} showPlaceholder />
@@ -151,7 +307,7 @@ export default function WritePageClient({
 
           <TiptapEditor
             ref={editorRef}
-            initialContent={post?.contentJson ?? undefined}
+            initialContent={initial.contentJson}
             onAnchorsChange={setAnchors}
             className='mb-20'
           />
@@ -167,8 +323,18 @@ export default function WritePageClient({
         onClose={() => setIsPublishDialogOpen(false)}
         onPublish={handlePublish}
         skipPasswordInput={skipPasswordInput}
-        isPending={isPending}
+        isPending={isPublishPending}
       />
+
+      {deleteTargetDraftId && (
+        <DeleteDraftDialog
+          draftId={deleteTargetDraftId}
+          isOpen={isDeleteDraftDialogOpen}
+          setIsOpen={setIsDeleteDraftDialogOpen}
+          isPending={deleteDraftMutation.isPending}
+          onDelete={handleDraftDelete}
+        />
+      )}
     </>
   );
 }

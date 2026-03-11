@@ -2,6 +2,7 @@ import { auth } from '@/auth';
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
+import * as DraftQueries from '@/features/draft/data/queries/draftQueries';
 import * as FeedUsecase from '@/features/post/data/usecases/feedUsecase';
 import * as PostUsecase from '@/features/post/data/usecases/postUsecase';
 import * as SearchUsecase from '@/features/post/data/usecases/searchUsecase';
@@ -72,8 +73,15 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { title, content, contentJson, password, tags, visibility } =
-      await request.json();
+    const {
+      title,
+      content,
+      contentJson,
+      password,
+      tags,
+      visibility,
+      draftId,
+    } = await request.json();
 
     const session = await auth();
     const userId = await getUserId();
@@ -109,6 +117,18 @@ export async function POST(request: NextRequest) {
     });
 
     await PostStatQueries.createPostStat(post.id);
+
+    if (draftId) {
+      try {
+        const ownership = await DraftQueries.fetchDraftOwnership(draftId);
+
+        if (ownership && ownership.userId === userId) {
+          await DraftQueries.deleteDraft(draftId);
+        }
+      } catch (error) {
+        console.error('임시저장 삭제에 실패했습니다', error);
+      }
+    }
 
     return NextResponse.json({ data: post });
   } catch (error) {

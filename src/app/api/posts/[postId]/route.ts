@@ -2,6 +2,7 @@ import { auth } from '@/auth';
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
+import * as DraftQueries from '@/features/draft/data/queries/draftQueries';
 import * as PostUsecase from '@/features/post/data/usecases/postUsecase';
 import { getUserId } from '@/lib/user';
 import bcrypt from 'bcryptjs';
@@ -44,6 +45,7 @@ export async function PATCH(
       seriesId,
       seriesOrder,
       visibility,
+      draftId,
     } = await request.json();
 
     const session = await auth();
@@ -86,6 +88,18 @@ export async function PATCH(
       seriesOrder,
       visibility,
     });
+
+    if (draftId) {
+      try {
+        const ownership = await DraftQueries.fetchDraftOwnership(draftId);
+
+        if (ownership && ownership.userId === userId) {
+          await DraftQueries.deleteDraft(draftId);
+        }
+      } catch (error) {
+        console.error('임시저장 삭제에 실패했습니다', error);
+      }
+    }
 
     return NextResponse.json({ data: updated });
   } catch (error) {

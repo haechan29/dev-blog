@@ -2,8 +2,9 @@ import { auth } from '@/auth';
 import ForbiddenPostPage from '@/components/post/forbiddenPostPage';
 import WritePageClient from '@/components/write/writePageClient';
 import * as CreatorServerRepository from '@/features/creator/data/repository/creatorServerRepository';
+import * as DraftServerRepository from '@/features/draft/data/repository/draftServerRepository';
 import { PostForbiddenError } from '@/features/post/data/errors/postErrors';
-import { getPost } from '@/features/post/domain/service/postServerService';
+import * as PostServerService from '@/features/post/domain/service/postServerService';
 import { createProps } from '@/features/post/ui/postProps';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -20,7 +21,10 @@ export default async function EditPage({
   const { postId } = await params;
 
   try {
-    const post = await getPost(postId).then(createProps);
+    const [post, drafts] = await Promise.all([
+      PostServerService.getPost(postId).then(createProps),
+      DraftServerRepository.getDrafts(),
+    ]);
 
     if (post.userId !== userId) {
       redirect('/');
@@ -33,7 +37,11 @@ export default async function EditPage({
 
     return (
       <Suspense>
-        <WritePageClient skipPasswordInput={skipPasswordInput} post={post} />
+        <WritePageClient
+          skipPasswordInput={skipPasswordInput}
+          post={post}
+          initialDrafts={drafts}
+        />
       </Suspense>
     );
   } catch (error) {
