@@ -50,11 +50,10 @@ export async function PATCH(
   }
 }
 
-export async function DELETE({
-  params,
-}: {
-  params: Promise<{ draftId: string }>;
-}) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ draftId: string }> }
+) {
   try {
     const userId = await getUserId();
     if (!userId) {
