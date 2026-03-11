@@ -9,10 +9,12 @@ export default function Sidebar({
   isVisible,
   onClose,
   children,
+  className,
 }: {
   isVisible: boolean;
   onClose: () => void;
   children: ReactNode;
+  className?: string;
 }) {
   const startRef = useRef<[number, number] | null>(null);
   const scrollDirectionRef = useRef<'horizontal' | 'vertical' | null>(null);
@@ -92,7 +94,8 @@ export default function Sidebar({
           'flex flex-col bg-white',
           'pb-2 md:pb-3 px-4 md:px-6',
           'transition-transform duration-300 ease-in-out',
-          !isVisible && 'max-xl:-translate-x-full'
+          !isVisible && 'max-xl:-translate-x-full',
+          className
         )}
       >
         <div className='xl:hidden flex items-center gap-2 md:gap-3 py-2 md:py-3'>

@@ -200,6 +200,8 @@ export default function WritePageClient({
   return (
     <>
       <WriteToolbar
+        hasDrafts={(drafts?.length ?? 0) > 0}
+        onOpenDraftSidebar={() => setIsDraftSidebarVisible(true)}
         onNext={handleNext}
         isPublishPending={isPublishPending}
         onSave={handleSave}

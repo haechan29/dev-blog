@@ -2,15 +2,19 @@
 
 import Logo from '@/components/logo';
 import clsx from 'clsx';
-import { Check, Loader2 } from 'lucide-react';
+import { Check, Loader2, Menu } from 'lucide-react';
 
 export default function WriteToolbar({
+  hasDrafts,
+  onOpenDraftSidebar,
   onNext,
   isPublishPending,
   onSave,
   isSavePending,
   saveJustSucceeded,
 }: {
+  hasDrafts: boolean;
+  onOpenDraftSidebar: () => void;
   onNext: () => void;
   isPublishPending: boolean;
   onSave: () => void;
@@ -26,7 +30,20 @@ export default function WriteToolbar({
         'py-2 md:py-3 px-4 md:px-6 gap-4 bg-white/80 backdrop-blur-md'
       )}
     >
-      <Logo />
+      <div className='flex items-center'>
+        <Logo className='hidden xl:block' />
+
+        {hasDrafts && (
+          <button
+            type='button'
+            onClick={onOpenDraftSidebar}
+            className='xl:hidden shrink-0 p-2 -m-2 items-center justify-center'
+            aria-label='임시저장 목록 열기'
+          >
+            <Menu className='w-6 h-6 text-gray-500' />
+          </button>
+        )}
+      </div>
 
       <div className='flex-1' />
 

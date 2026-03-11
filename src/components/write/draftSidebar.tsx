@@ -26,7 +26,11 @@ export default function DraftSidebar({
   }, [setIsVisible]);
 
   return (
-    <Sidebar isVisible={isVisible} onClose={() => setIsVisible(false)}>
+    <Sidebar
+      isVisible={isVisible}
+      onClose={() => setIsVisible(false)}
+      className='py-1.5'
+    >
       {drafts && drafts.length > 0 && (
         <DraftSidebarNav
           drafts={drafts}
