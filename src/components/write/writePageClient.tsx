@@ -22,7 +22,7 @@ import { draftKeys } from '@/queries/keys';
 import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Heart } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
 function getInitialState(
@@ -60,17 +60,29 @@ export default function WritePageClient({
   );
   const [anchors, setAnchors] = useState<TocAnchor[]>([]);
   const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
-  const [isPending, setIsPending] = useState(false);
+  const [isPublishPending, setIsPublishPending] = useState(false);
+  const [saveJustSucceeded, setSaveJustSucceeded] = useState(false);
   const [isDraftSidebarVisible, setIsDraftSidebarVisible] = useState(false);
 
   const editorRef = useRef<TiptapEditorRef>(null);
+  const saveSucceededTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
 
   const { user } = useUser();
-  const { drafts } = useDrafts(initialDrafts);
+  const { drafts, saveDraftMutation } = useDrafts(initialDrafts);
   const router = useRouterWithProgress();
   const queryClient = useQueryClient();
 
   useBgmController();
+
+  useEffect(() => {
+    return () => {
+      if (saveSucceededTimeoutRef.current) {
+        clearTimeout(saveSucceededTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const applyDraftToEditor = (draft: DraftDto) => {
     setTitle(draft.title ?? '');
@@ -98,6 +110,40 @@ export default function WritePageClient({
     setIsPublishDialogOpen(true);
   };
 
+  const handleSave = () => {
+    if (isPublishPending || saveDraftMutation.isPending) return;
+
+    saveDraftMutation.mutate(
+      {
+        draftId: currentDraftId,
+        postId: post?.id ?? null,
+        title,
+        contentJson: editorRef.current?.getJSON(),
+        tags,
+      },
+      {
+        onSuccess: savedDraft => {
+          setCurrentDraftId(savedDraft.id);
+
+          if (saveSucceededTimeoutRef.current) {
+            clearTimeout(saveSucceededTimeoutRef.current);
+          }
+          setSaveJustSucceeded(true);
+          saveSucceededTimeoutRef.current = setTimeout(() => {
+            setSaveJustSucceeded(false);
+          }, 1000);
+        },
+        onError: error => {
+          const message =
+            error instanceof ApiError
+              ? error.message
+              : '임시저장에 실패했습니다';
+          toast.error(message);
+        },
+      }
+    );
+  };
+
   const handlePublish = async (data: {
     visibility: PostVisibility;
     password: string;
@@ -105,7 +151,7 @@ export default function WritePageClient({
     const contentJson = editorRef.current?.getJSON();
     if (!contentJson) return;
 
-    setIsPending(true);
+    setIsPublishPending(true);
     try {
       if (isEditMode) {
         await PostClientService.updatePost({
@@ -147,13 +193,19 @@ export default function WritePageClient({
 
       toast.error(message);
     } finally {
-      setIsPending(false);
+      setIsPublishPending(false);
     }
   };
 
   return (
     <>
-      <WriteToolbar onNext={handleNext} isPending={isPending} />
+      <WriteToolbar
+        onNext={handleNext}
+        isPublishPending={isPublishPending}
+        onSave={handleSave}
+        isSavePending={saveDraftMutation.isPending}
+        saveJustSucceeded={saveJustSucceeded}
+      />
 
       <DraftSidebar
         currentDraftId={currentDraftId}
@@ -223,7 +275,7 @@ export default function WritePageClient({
         onClose={() => setIsPublishDialogOpen(false)}
         onPublish={handlePublish}
         skipPasswordInput={skipPasswordInput}
-        isPending={isPending}
+        isPending={isPublishPending}
       />
     </>
   );

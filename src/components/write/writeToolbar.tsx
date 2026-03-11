@@ -2,15 +2,23 @@
 
 import Logo from '@/components/logo';
 import clsx from 'clsx';
-import { Loader2 } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 
 export default function WriteToolbar({
   onNext,
-  isPending,
+  isPublishPending,
+  onSave,
+  isSavePending,
+  saveJustSucceeded,
 }: {
   onNext: () => void;
-  isPending: boolean;
+  isPublishPending: boolean;
+  onSave: () => void;
+  isSavePending: boolean;
+  saveJustSucceeded: boolean;
 }) {
+  const isAnyPending = isPublishPending || isSavePending;
+
   return (
     <div
       className={clsx(
@@ -23,15 +31,37 @@ export default function WriteToolbar({
       <div className='flex-1' />
 
       <button
-        onClick={onNext}
-        disabled={isPending}
+        onClick={onSave}
+        disabled={isAnyPending}
         className={clsx(
-          'h-9 text-sm font-semibold py-2 px-4 rounded-full',
-          'bg-blue-600 text-white',
-          isPending ? 'opacity-50' : 'hover:bg-blue-500'
+          'h-9 text-sm font-semibold py-2 px-4 rounded-full cursor-pointer',
+          'border border-gray-300 text-gray-700 bg-white',
+          isAnyPending ? 'opacity-50' : 'hover:bg-gray-50'
         )}
       >
-        {isPending ? <Loader2 size={16} className='animate-spin' /> : '발행'}
+        {isSavePending ? (
+          <Loader2 size={16} className='animate-spin' />
+        ) : saveJustSucceeded ? (
+          <Check strokeWidth={3} size={16} className='text-blue-600' />
+        ) : (
+          '저장'
+        )}
+      </button>
+
+      <button
+        onClick={onNext}
+        disabled={isAnyPending}
+        className={clsx(
+          'h-9 text-sm font-semibold py-2 px-4 rounded-full cursor-pointer',
+          'bg-blue-600 text-white',
+          isAnyPending ? 'opacity-50' : 'hover:bg-blue-500'
+        )}
+      >
+        {isPublishPending ? (
+          <Loader2 size={16} className='animate-spin' />
+        ) : (
+          '발행'
+        )}
       </button>
     </div>
   );
