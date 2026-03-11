@@ -12,6 +12,7 @@ import WriteToolbar from '@/components/write/writeToolbar';
 import { ApiError } from '@/errors/errors';
 import { DraftDto } from '@/features/draft/data/dto/draftDto';
 import useDrafts from '@/features/draft/hooks/useDrafts';
+import useSaveShortcut from '@/features/draft/hooks/useSaveShortcut';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import useBgmController from '@/features/post/hooks/useBgmController';
@@ -143,6 +144,11 @@ export default function WritePageClient({
       }
     );
   };
+
+  useSaveShortcut({
+    enabled: !isPublishDialogOpen,
+    onSave: handleSave,
+  });
 
   const handlePublish = async (data: {
     visibility: PostVisibility;
