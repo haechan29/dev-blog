@@ -4,6 +4,7 @@ import TiptapEditor, {
   TiptapEditorRef,
 } from '@/components/tiptap/editor/tiptapEditor';
 import ProfileIcon from '@/components/user/profileIcon';
+import { DeleteDraftDialog } from '@/components/write/deleteDraftDialog';
 import DraftSidebar from '@/components/write/draftSidebar';
 import PublishDialog from '@/components/write/publishDialog';
 import TableOfContents, { TocAnchor } from '@/components/write/tableOfContents';
@@ -60,10 +61,16 @@ export default function WritePageClient({
     initial.currentDraftId
   );
   const [anchors, setAnchors] = useState<TocAnchor[]>([]);
+  const [isDraftSidebarVisible, setIsDraftSidebarVisible] = useState(false);
+
   const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
   const [isPublishPending, setIsPublishPending] = useState(false);
   const [saveJustSucceeded, setSaveJustSucceeded] = useState(false);
-  const [isDraftSidebarVisible, setIsDraftSidebarVisible] = useState(false);
+
+  const [isDeleteDraftDialogOpen, setIsDeleteDraftDialogOpen] = useState(false);
+  const [deleteTargetDraftId, setDeleteTargetDraftId] = useState<string | null>(
+    null
+  );
 
   const editorRef = useRef<TiptapEditorRef>(null);
   const saveSucceededTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
@@ -71,7 +78,8 @@ export default function WritePageClient({
   );
 
   const { user } = useUser();
-  const { drafts, saveDraftMutation } = useDrafts(initialDrafts);
+  const { drafts, saveDraftMutation, deleteDraftMutation } =
+    useDrafts(initialDrafts);
   const router = useRouterWithProgress();
   const queryClient = useQueryClient();
 
@@ -97,6 +105,35 @@ export default function WritePageClient({
       applyDraftToEditor(draft);
       setCurrentDraftId(draftId);
     }
+  };
+
+  const handleDraftDeleteClick = (draftId: string) => {
+    setDeleteTargetDraftId(draftId);
+    setIsDeleteDraftDialogOpen(true);
+  };
+
+  const handleDraftDelete = () => {
+    if (!deleteTargetDraftId) return;
+
+    deleteDraftMutation.mutate(deleteTargetDraftId, {
+      onSuccess: () => {
+        toast.success('임시저장 글이 삭제되었습니다');
+
+        if (currentDraftId === deleteTargetDraftId) {
+          setCurrentDraftId(null);
+        }
+
+        setDeleteTargetDraftId(null);
+        setIsDeleteDraftDialogOpen(false);
+      },
+      onError: error => {
+        const message =
+          error instanceof ApiError
+            ? error.message
+            : '임시저장 글 삭제에 실패했습니다';
+        toast.error(message);
+      },
+    });
   };
 
   const handleNext = () => {
@@ -220,7 +257,8 @@ export default function WritePageClient({
         drafts={drafts}
         isVisible={isDraftSidebarVisible}
         setIsVisible={setIsDraftSidebarVisible}
-        onDraftSelect={handleDraftSelect}
+        onSelectDraft={handleDraftSelect}
+        onDeleteDraft={handleDraftDeleteClick}
       />
 
       <div className='fixed top-0 right-0 w-(--toc-width) mr-(--toc-margin) h-full max-xl:hidden'>
@@ -285,6 +323,16 @@ export default function WritePageClient({
         skipPasswordInput={skipPasswordInput}
         isPending={isPublishPending}
       />
+
+      {deleteTargetDraftId && (
+        <DeleteDraftDialog
+          draftId={deleteTargetDraftId}
+          isOpen={isDeleteDraftDialogOpen}
+          setIsOpen={setIsDeleteDraftDialogOpen}
+          isPending={deleteDraftMutation.isPending}
+          onDelete={handleDraftDelete}
+        />
+      )}
     </>
   );
 }

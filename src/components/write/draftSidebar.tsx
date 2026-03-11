@@ -11,13 +11,15 @@ export default function DraftSidebar({
   drafts,
   isVisible,
   setIsVisible,
-  onDraftSelect,
+  onSelectDraft,
+  onDeleteDraft,
 }: {
   currentDraftId: string | null;
   drafts: DraftDto[] | undefined;
   isVisible: boolean;
   setIsVisible: (isVisible: boolean) => void;
-  onDraftSelect: (draftId: string) => void;
+  onSelectDraft: (draftId: string) => void;
+  onDeleteDraft: (draftId: string) => void;
 }) {
   useScrollLock({ isLocked: isVisible });
 
@@ -35,10 +37,11 @@ export default function DraftSidebar({
         <DraftSidebarNav
           drafts={drafts}
           currentDraftId={currentDraftId}
-          onSelect={draftId => {
-            onDraftSelect(draftId);
+          onSelectDraft={draftId => {
+            onSelectDraft(draftId);
             setIsVisible(false);
           }}
+          onDeleteDraft={onDeleteDraft}
         />
       )}
     </Sidebar>
