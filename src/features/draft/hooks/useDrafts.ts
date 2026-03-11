@@ -35,13 +35,8 @@ export default function useDrafts(initialData?: DraftDto[]) {
         draftKeys.list(),
         (old: DraftDto[] | undefined) => {
           if (!old) return [savedDraft];
-          const idx = old.findIndex(d => d.id === savedDraft.id);
-          if (idx >= 0) {
-            const next = [...old];
-            next[idx] = savedDraft;
-            return next;
-          }
-          return [savedDraft, ...old];
+          const filtered = old.filter(d => d.id !== savedDraft.id);
+          return [savedDraft, ...filtered];
         }
       );
     },

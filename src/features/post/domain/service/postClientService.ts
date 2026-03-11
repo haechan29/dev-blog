@@ -46,6 +46,7 @@ export async function createPost(params: {
   tags: string[];
   password: string;
   visibility: PostVisibility;
+  draftId?: string;
 }) {
   const dto = await PostClientRepository.createPost(params);
   return toDomain(dto);
@@ -61,6 +62,7 @@ export async function updatePost(params: {
   seriesId?: string | null;
   seriesOrder?: number | null;
   visibility?: PostVisibility;
+  draftId?: string;
 }) {
   const post = await PostClientRepository.updatePost(params);
   return toDomain(post);

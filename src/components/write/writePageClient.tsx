@@ -204,6 +204,7 @@ export default function WritePageClient({
           tags,
           password: data.password,
           visibility: data.visibility,
+          draftId: currentDraftId ?? undefined,
         });
         queryClient.invalidateQueries({
           queryKey: draftKeys.list(),
@@ -218,6 +219,7 @@ export default function WritePageClient({
           tags,
           password: data.password,
           visibility: data.visibility,
+          draftId: currentDraftId ?? undefined,
         });
         const postProps = createProps(newPost);
         queryClient.invalidateQueries({
