@@ -31,7 +31,7 @@ export default function DraftSidebar({
     <Sidebar
       isVisible={isVisible}
       onClose={() => setIsVisible(false)}
-      className='py-1.5'
+      className='max-xl:pt-1.5'
     >
       {drafts && drafts.length > 0 && (
         <DraftSidebarNav

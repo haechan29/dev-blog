@@ -53,7 +53,7 @@ export default function DraftSidebarNav({
                   <DropdownMenuTrigger asChild>
                     <button
                       onClick={e => e.stopPropagation()}
-                      className='p-2 -m-1 rounded-full hover:bg-gray-200 cursor-pointer'
+                      className='p-2 -m-2 rounded-full hover:bg-gray-200 cursor-pointer'
                     >
                       <MoreVertical className='w-4 h-4 text-gray-400' />
                     </button>
