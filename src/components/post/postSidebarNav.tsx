@@ -4,6 +4,7 @@ import { PostProps } from '@/features/post/ui/postProps';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import SimpleBar from 'simplebar-react';
 
 export default function PostSidebarNav({
   currentPostId,
@@ -63,37 +64,39 @@ export default function PostSidebarNav({
   }, [currentSeriesId]);
 
   return (
-    <div className='flex flex-col flex-1 overflow-y-auto'>
-      {seriesList.map(([seriesId, seriesPosts]) => (
-        <div key={seriesId}>
-          <NavCategory
-            posts={seriesPosts}
-            isActive={
-              !openSeriesIds.has(seriesId) && currentSeriesId === seriesId
-            }
-            onToggle={() => toggleSeries(seriesId)}
-          />
-          {openSeriesIds.has(seriesId) && (
-            <NavPostList posts={seriesPosts} currentPostId={currentPostId} />
-          )}
-        </div>
-      ))}
+    <SimpleBar className='flex-1 min-h-0 simplebar-hover'>
+      <div className='flex flex-col flex-1'>
+        {seriesList.map(([seriesId, seriesPosts]) => (
+          <div key={seriesId}>
+            <NavCategory
+              posts={seriesPosts}
+              isActive={
+                !openSeriesIds.has(seriesId) && currentSeriesId === seriesId
+              }
+              onToggle={() => toggleSeries(seriesId)}
+            />
+            {openSeriesIds.has(seriesId) && (
+              <NavPostList posts={seriesPosts} currentPostId={currentPostId} />
+            )}
+          </div>
+        ))}
 
-      {noSeriesPosts.map(post => (
-        <Link
-          key={post.id}
-          href={`/read/${post.id}`}
-          className={clsx(
-            'flex w-full py-3 pl-3 pr-3 rounded-sm hover:text-blue-500 items-center gap-2',
-            post.id === currentPostId
-              ? 'bg-blue-50 font-semibold text-blue-500'
-              : 'text-gray-900'
-          )}
-        >
-          <div className='text-sm truncate'>{post.title}</div>
-        </Link>
-      ))}
-    </div>
+        {noSeriesPosts.map(post => (
+          <Link
+            key={post.id}
+            href={`/read/${post.id}`}
+            className={clsx(
+              'flex w-full py-3 pl-3 pr-3 rounded-sm hover:text-blue-500 items-center gap-2',
+              post.id === currentPostId
+                ? 'bg-blue-50 font-semibold text-blue-500'
+                : 'text-gray-900'
+            )}
+          >
+            <div className='text-sm truncate'>{post.title}</div>
+          </Link>
+        ))}
+      </div>
+    </SimpleBar>
   );
 }
 

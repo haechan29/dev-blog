@@ -4,6 +4,7 @@ import TiptapEditor, {
   TiptapEditorRef,
 } from '@/components/tiptap/editor/tiptapEditor';
 import ProfileIcon from '@/components/user/profileIcon';
+import DraftSidebar from '@/components/write/draftSidebar';
 import PublishDialog from '@/components/write/publishDialog';
 import TableOfContents, { TocAnchor } from '@/components/write/tableOfContents';
 import TagInput from '@/components/write/tagInput';
@@ -36,6 +37,8 @@ export default function WritePageClient({
   const [anchors, setAnchors] = useState<TocAnchor[]>([]);
   const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
   const [isPending, setIsPending] = useState(false);
+  const [currentDraftId, setCurrentDraftId] = useState<string | null>(null);
+  const [isDraftSidebarVisible, setIsDraftSidebarVisible] = useState(false);
 
   const editorRef = useRef<TiptapEditorRef>(null);
 
@@ -114,7 +117,12 @@ export default function WritePageClient({
     <>
       <WriteToolbar onNext={handleNext} isPending={isPending} />
 
-      <div className='fixed top-0 left-0 w-(--sidebar-width) h-full max-xl:hidden' />
+      <DraftSidebar
+        currentDraftId={currentDraftId}
+        isVisible={isDraftSidebarVisible}
+        setIsVisible={setIsDraftSidebarVisible}
+        onDraftSelect={setCurrentDraftId}
+      />
 
       <div className='fixed top-0 right-0 w-(--toc-width) mr-(--toc-margin) h-full max-xl:hidden'>
         <TableOfContents anchors={anchors} showPlaceholder />
