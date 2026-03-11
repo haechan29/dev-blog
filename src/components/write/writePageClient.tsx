@@ -10,6 +10,8 @@ import TableOfContents, { TocAnchor } from '@/components/write/tableOfContents';
 import TagInput from '@/components/write/tagInput';
 import WriteToolbar from '@/components/write/writeToolbar';
 import { ApiError } from '@/errors/errors';
+import { DraftDto } from '@/features/draft/data/dto/draftDto';
+import useDrafts from '@/features/draft/hooks/useDrafts';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import useBgmController from '@/features/post/hooks/useBgmController';
@@ -20,7 +22,7 @@ import { draftKeys } from '@/queries/keys';
 import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Heart } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
 export default function WritePageClient({
@@ -41,12 +43,40 @@ export default function WritePageClient({
   const [isDraftSidebarVisible, setIsDraftSidebarVisible] = useState(false);
 
   const editorRef = useRef<TiptapEditorRef>(null);
+  const hasInitializedFromPost = useRef(false);
 
   const { user } = useUser();
   const router = useRouterWithProgress();
   const queryClient = useQueryClient();
+  const { drafts } = useDrafts();
 
   useBgmController();
+
+  const applyDraftToEditor = (draft: DraftDto) => {
+    setTitle(draft.title ?? '');
+    setTags(draft.tags ?? []);
+    editorRef.current?.setContent(draft.contentJson);
+  };
+
+  useEffect(() => {
+    if (!currentDraftId || !drafts) return;
+    const draft = drafts.find(d => d.id === currentDraftId);
+    if (!draft) return;
+    applyDraftToEditor(draft);
+  }, [currentDraftId, drafts]);
+
+  useEffect(() => {
+    if (!isEditMode || !post || !drafts) return;
+
+    if (hasInitializedFromPost.current) return;
+    hasInitializedFromPost.current = true;
+
+    const matched = drafts.find(d => d.postId === post.id);
+
+    if (matched) {
+      setCurrentDraftId(matched.id);
+    }
+  }, [isEditMode, post, drafts]);
 
   const handleNext = () => {
     if (!title.trim()) {
@@ -119,6 +149,7 @@ export default function WritePageClient({
 
       <DraftSidebar
         currentDraftId={currentDraftId}
+        drafts={drafts}
         isVisible={isDraftSidebarVisible}
         setIsVisible={setIsDraftSidebarVisible}
         onDraftSelect={setCurrentDraftId}

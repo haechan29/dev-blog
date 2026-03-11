@@ -2,23 +2,23 @@
 
 import Sidebar from '@/components/sidebar';
 import DraftSidebarNav from '@/components/write/draftSidebarNav';
-import useDrafts from '@/features/draft/hooks/useDrafts';
+import { DraftDto } from '@/features/draft/data/dto/draftDto';
 import useScrollLock from '@/hooks/useScrollLock';
 import { useEffect } from 'react';
 
 export default function DraftSidebar({
   currentDraftId,
+  drafts,
   isVisible,
   setIsVisible,
   onDraftSelect,
 }: {
   currentDraftId: string | null;
+  drafts: DraftDto[] | undefined;
   isVisible: boolean;
   setIsVisible: (isVisible: boolean) => void;
-  onDraftSelect?: (draftId: string | null) => void;
+  onDraftSelect: (draftId: string | null) => void;
 }) {
-  const { drafts } = useDrafts();
-
   useScrollLock({ isLocked: isVisible });
 
   useEffect(() => {
@@ -28,7 +28,14 @@ export default function DraftSidebar({
   return (
     <Sidebar isVisible={isVisible} onClose={() => setIsVisible(false)}>
       {drafts && drafts.length > 0 && (
-        <DraftSidebarNav drafts={drafts} currentDraftId={currentDraftId} />
+        <DraftSidebarNav
+          drafts={drafts}
+          currentDraftId={currentDraftId}
+          onSelect={draftId => {
+            onDraftSelect(draftId);
+            setIsVisible(false);
+          }}
+        />
       )}
     </Sidebar>
   );

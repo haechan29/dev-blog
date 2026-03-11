@@ -38,6 +38,7 @@ import { forwardRef, useImperativeHandle, useState } from 'react';
 export interface TiptapEditorRef {
   getJSON: () => JSONContent | undefined;
   isEmpty: () => boolean;
+  setContent: (content: JSONContent | null) => void;
 }
 
 const TiptapEditor = forwardRef<
@@ -137,6 +138,9 @@ const TiptapEditor = forwardRef<
   useImperativeHandle(ref, () => ({
     getJSON: () => editor?.getJSON(),
     isEmpty: () => editor?.isEmpty ?? true,
+    setContent: content => {
+      editor?.commands.setContent(content ?? '');
+    },
   }));
 
   return (
