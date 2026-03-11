@@ -15,6 +15,8 @@ import useBgmController from '@/features/post/hooks/useBgmController';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
 import useUser from '@/features/user/domain/hooks/useUser';
 import useRouterWithProgress from '@/hooks/useRouterWithProgress';
+import { draftKeys } from '@/queries/keys';
+import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Heart } from 'lucide-react';
 import { useRef, useState } from 'react';
@@ -39,6 +41,7 @@ export default function WritePageClient({
 
   const { user } = useUser();
   const router = useRouterWithProgress();
+  const queryClient = useQueryClient();
 
   useBgmController();
 
@@ -72,6 +75,9 @@ export default function WritePageClient({
           password: data.password,
           visibility: data.visibility,
         });
+        queryClient.invalidateQueries({
+          queryKey: draftKeys.list(),
+        });
         setIsPublishDialogOpen(false);
         router.push(`/read/${post.id}`);
       } else {
@@ -84,6 +90,9 @@ export default function WritePageClient({
           visibility: data.visibility,
         });
         const postProps = createProps(newPost);
+        queryClient.invalidateQueries({
+          queryKey: draftKeys.list(),
+        });
         setIsPublishDialogOpen(false);
         router.push(`/read/${postProps.id}`);
       }
