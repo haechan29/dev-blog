@@ -1,7 +1,6 @@
 'use client';
 
 import PostRawContent from '@/components/post/postRawContent';
-import TableOfContentsItem from '@/components/post/tableOfContentsItem';
 import Heading from '@/features/post/domain/types/heading';
 import { PostProps } from '@/features/post/ui/postProps';
 import useThrottle from '@/hooks/useThrottle';
@@ -60,7 +59,7 @@ export default function PostContentWrapper({
           <div className='block xl:hidden text-xl xl:text-2xl font-bold text-gray-900 mt-4 mb-2 leading-tight'>
             목차
           </div>
-          <TableOfContentsItem headings={post.headings} />
+          {/* <TableOfContentsItem headings={post.headings} /> */}
         </div>
       )}
 

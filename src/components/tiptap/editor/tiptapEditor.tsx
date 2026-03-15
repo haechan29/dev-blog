@@ -11,7 +11,7 @@ import BgmNode from '@/components/tiptap/nodes/bgm';
 import DialogueNode from '@/components/tiptap/nodes/dialogue';
 import ImageWithCaptionNode from '@/components/tiptap/nodes/imageWithCaption';
 import LinkCardNode from '@/components/tiptap/nodes/linkCard';
-import { TocAnchor } from '@/components/write/tableOfContents';
+import TocAnchor from '@/features/post/domain/types/tocAnchor';
 import { uploadImage } from '@/features/media/utils/uploadImage';
 import { Blockquote } from '@tiptap/extension-blockquote';
 import CharacterCount from '@tiptap/extension-character-count';

@@ -11,21 +11,24 @@ import PostSeriesNav from '@/components/post/postSeriesNav';
 import PostSidebar from '@/components/post/postSidebar';
 import PostToolbar from '@/components/post/postToolbar';
 import PostVisibilityBanner from '@/components/post/postVisibilityBanner';
+import TableOfContents from '@/components/post/tableOfContents';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
 import { PostForbiddenError } from '@/features/post/data/errors/postErrors';
 import { renderContentElement } from '@/features/post/domain/lib/render';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
+import Heading from '@/features/post/domain/types/heading';
 import useBgmController from '@/features/post/hooks/useBgmController';
 import useRecordView from '@/features/post/hooks/useRecordView';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { setHeadings, setTitle } from '@/lib/redux/post/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
+import { scrollIntoElement } from '@/lib/scroll';
 import { postKeys } from '@/queries/keys';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useDispatch } from 'react-redux';
 
@@ -47,6 +50,8 @@ export default function PostPageClient({
   initialCursor: string | null;
 }) {
   const dispatch = useDispatch<AppDispatch>();
+
+  const [currentHeadingId, setCurrentHeadingId] = useState<string | null>(null);
 
   const { ref, inView } = useInView();
 
@@ -104,7 +109,24 @@ export default function PostPageClient({
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const { headings, contentElement } = renderContentElement(post.contentJson);
+  const { headings, contentElement } = useMemo(
+    () => renderContentElement(post.contentJson),
+    [post.contentJson]
+  );
+
+  const handleHeadingClick = (heading: Heading) => {
+    const element = document.getElementById(heading.id);
+    if (element) {
+      scrollIntoElement(
+        element,
+        {
+          behavior: 'smooth',
+          block: 'start',
+        },
+        () => setCurrentHeadingId(heading.id)
+      );
+    }
+  };
 
   if (error instanceof PostForbiddenError) {
     return <ForbiddenPostPage isLoggedIn={isLoggedIn} />;
@@ -131,18 +153,27 @@ export default function PostPageClient({
             post={post}
           />
           <div className='w-full h-px bg-gray-200 mb-10' />
-
           <PostVisibilityBanner
             visibility={post.visibility}
             isAuthor={post.userId === userId}
           />
 
+          {headings.length > 0 && (
+            <div className='mb-10 xl:mb-0'>
+              <div className='block xl:hidden text-xl xl:text-2xl font-bold text-gray-900 mt-4 mb-2 leading-tight'>
+                목차
+              </div>
+              <TableOfContents
+                headings={headings}
+                currentHeadingId={activeHeadingId}
+                onItemClick={handleHeadingClick}
+              />
+            </div>
+          )}
+
           <div className='prose max-w-none mb-20'>{contentElement}</div>
-
           <LikeButton postId={post.id} likeCount={post.likeCount} />
-
           <PostSeriesNav post={post} />
-
           <AuthorProfile
             userId={post.userId}
             userName={post.authorName}
@@ -151,14 +182,12 @@ export default function PostPageClient({
             currentUserId={userId}
             className='mb-12'
           />
-
           <Comments
             isLoggedIn={isLoggedIn}
             userId={userId}
             postId={post.id}
             initialComments={initialComments}
           />
-
           <div className='flex flex-col'>
             {recommendedPosts.map(post => (
               <div key={post.id}>
