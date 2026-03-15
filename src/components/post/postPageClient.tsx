@@ -15,6 +15,7 @@ import TableOfContents from '@/components/post/tableOfContents';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
 import { PostForbiddenError } from '@/features/post/data/errors/postErrors';
 import { renderContentElement } from '@/features/post/domain/lib/render';
+import { getToolbarHeightPx } from '@/features/post/domain/lib/toolbarHeight';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import Heading from '@/features/post/domain/types/heading';
 import useActiveHeading from '@/features/post/hooks/useActiveHeading';
@@ -24,7 +25,6 @@ import { createProps, PostProps } from '@/features/post/ui/postProps';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
 import { setHeadings, setTitle } from '@/lib/redux/post/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
-import { scrollIntoElement } from '@/lib/scroll';
 import { postKeys } from '@/queries/keys';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
@@ -98,10 +98,11 @@ export default function PostPageClient({
   const handleHeadingClick = (heading: Heading) => {
     const element = document.getElementById(heading.id);
     if (element) {
-      scrollIntoElement(element, {
-        behavior: 'smooth',
-        block: 'start',
-      });
+      const top =
+        element.getBoundingClientRect().top +
+        window.scrollY -
+        getToolbarHeightPx();
+      window.scrollTo({ top, behavior: 'smooth' });
     }
   };
 
