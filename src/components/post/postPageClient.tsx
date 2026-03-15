@@ -17,6 +17,7 @@ import { PostForbiddenError } from '@/features/post/data/errors/postErrors';
 import { renderContentElement } from '@/features/post/domain/lib/render';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import Heading from '@/features/post/domain/types/heading';
+import useActiveHeading from '@/features/post/hooks/useActiveHeading';
 import useBgmController from '@/features/post/hooks/useBgmController';
 import useRecordView from '@/features/post/hooks/useRecordView';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
@@ -28,7 +29,7 @@ import { postKeys } from '@/queries/keys';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useDispatch } from 'react-redux';
 
@@ -50,9 +51,6 @@ export default function PostPageClient({
   initialCursor: string | null;
 }) {
   const dispatch = useDispatch<AppDispatch>();
-
-  const [currentHeadingId, setCurrentHeadingId] = useState<string | null>(null);
-
   const { ref, inView } = useInView();
 
   const {
@@ -91,6 +89,22 @@ export default function PostPageClient({
     [pages]
   );
 
+  const { headings, contentElement } = useMemo(
+    () => renderContentElement(post.contentJson),
+    [post.contentJson]
+  );
+  const currentHeadingId = useActiveHeading(headings);
+
+  const handleHeadingClick = (heading: Heading) => {
+    const element = document.getElementById(heading.id);
+    if (element) {
+      scrollIntoElement(element, {
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  };
+
   useRecordView(initialPost.id);
   useBgmController();
 
@@ -108,25 +122,6 @@ export default function PostPageClient({
       fetchNextPage();
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
-
-  const { headings, contentElement } = useMemo(
-    () => renderContentElement(post.contentJson),
-    [post.contentJson]
-  );
-
-  const handleHeadingClick = (heading: Heading) => {
-    const element = document.getElementById(heading.id);
-    if (element) {
-      scrollIntoElement(
-        element,
-        {
-          behavior: 'smooth',
-          block: 'start',
-        },
-        () => setCurrentHeadingId(heading.id)
-      );
-    }
-  };
 
   if (error instanceof PostForbiddenError) {
     return <ForbiddenPostPage isLoggedIn={isLoggedIn} />;
@@ -165,7 +160,7 @@ export default function PostPageClient({
               </div>
               <TableOfContents
                 headings={headings}
-                currentHeadingId={activeHeadingId}
+                currentHeadingId={currentHeadingId}
                 onItemClick={handleHeadingClick}
               />
             </div>
