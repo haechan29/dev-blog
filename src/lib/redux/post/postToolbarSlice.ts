@@ -1,5 +1,5 @@
-import Heading from '@/features/post/domain/model/heading';
 import PostToolbar from '@/features/post/domain/model/postToolbar';
+import Heading from '@/features/post/domain/types/heading';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: PostToolbar = {

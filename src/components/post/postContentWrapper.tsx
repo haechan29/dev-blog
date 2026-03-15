@@ -2,7 +2,7 @@
 
 import PostRawContent from '@/components/post/postRawContent';
 import TableOfContentsItem from '@/components/post/tableOfContentsItem';
-import Heading from '@/features/post/domain/model/heading';
+import Heading from '@/features/post/domain/types/heading';
 import { PostProps } from '@/features/post/ui/postProps';
 import useThrottle from '@/hooks/useThrottle';
 import { setCurrentHeading } from '@/lib/redux/post/postReaderSlice';
@@ -86,7 +86,7 @@ function findHeadingByScroll() {
   (Array.from(headingElements) as HTMLElement[]).forEach(element => {
     const heading: Heading = {
       id: element.id,
-      text: element.textContent || '',
+      textContent: element.textContent || '',
       level: parseInt(element.tagName.substring(1)),
     };
     positionMap.set(heading, element.offsetTop);

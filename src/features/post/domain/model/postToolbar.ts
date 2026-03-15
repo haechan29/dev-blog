@@ -1,4 +1,4 @@
-import Heading from '@/features/post/domain/model/heading';
+import Heading from '@/features/post/domain/types/heading';
 
 export default interface PostToolbar {
   isHeaderVisible: boolean;

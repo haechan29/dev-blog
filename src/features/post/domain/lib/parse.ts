@@ -1,4 +1,4 @@
-import Heading from '@/features/post/domain/model/heading';
+import Heading from '@/features/post/domain/types/heading';
 import { remarkBgm, remarkDialogue, remarkImg } from '@/lib/md/remark';
 import GithubSlugger from 'github-slugger';
 import { Node, Parent, Root } from 'mdast';
@@ -37,7 +37,7 @@ export function extractHeadings(content: string): Heading[] {
 
     headings.push({
       id,
-      text,
+      textContent: text,
       level: node.depth,
     });
   });

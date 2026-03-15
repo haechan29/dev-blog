@@ -1,5 +1,5 @@
 import { extractHeadings } from '@/features/post/domain/lib/parse';
-import Heading from '@/features/post/domain/model/heading';
+import Heading from '@/features/post/domain/types/heading';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 
 export default class Post {

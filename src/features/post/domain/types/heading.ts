@@ -1,5 +1,5 @@
 export default interface Heading {
   id: string;
-  text: string;
+  textContent: string;
   level: number;
 }

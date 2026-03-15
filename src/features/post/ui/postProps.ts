@@ -1,7 +1,7 @@
 import { formatDate } from '@/features/post/domain/lib/date';
 import { extractPlainText } from '@/features/post/domain/lib/parse';
-import Heading from '@/features/post/domain/model/heading';
 import Post from '@/features/post/domain/model/post';
+import Heading from '@/features/post/domain/types/heading';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import { toUserNickname } from '@/features/user/ui/userProps';
 import { JSONContent } from '@tiptap/core';

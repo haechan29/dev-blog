@@ -32,7 +32,7 @@ function createProps({
       };
     case 'collapsed': {
       const title = postToolbar.title!;
-      const headingText = postReader.currentHeading?.text;
+      const headingText = postReader.currentHeading?.textContent;
       return {
         mode,
         breadcrumb: headingText ? title : undefined,
@@ -44,7 +44,7 @@ function createProps({
       return {
         mode,
         breadcrumb: postToolbar.title!,
-        title: postReader.currentHeading!.text,
+        title: postReader.currentHeading!.textContent,
         headings: postToolbar.headings,
       };
   }

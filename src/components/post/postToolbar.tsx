@@ -1,6 +1,6 @@
 'use client';
 
-import Heading from '@/features/post/domain/model/heading';
+import Heading from '@/features/post/domain/types/heading';
 import usePostToolbar from '@/features/post/hooks/usePostToolbar';
 import { PostToolbarProps } from '@/features/post/ui/postToolbarProps';
 import useThrottle from '@/hooks/useThrottle';
@@ -128,10 +128,10 @@ function Content({
                 className={clsx(
                   'truncate text-left transition-discrete|opacity duration-300 ease-in',
                   postToolbar.mode === 'expanded' ||
-                    postToolbar.title === heading.text
+                    postToolbar.title === heading.textContent
                     ? 'h-6 opacity-100'
                     : 'h-0 opacity-0',
-                  postToolbar.title === heading.text
+                  postToolbar.title === heading.textContent
                     ? 'text-gray-900 font-semibold'
                     : 'text-gray-400',
                   postToolbar.mode === 'expanded' && 'my-1 md:my-2',
@@ -144,7 +144,7 @@ function Content({
                       : '0px',
                 }}
               >
-                {heading.text}
+                {heading.textContent}
               </button>
             ))}
           </div>

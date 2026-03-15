@@ -1,5 +1,5 @@
-import Heading from '@/features/post/domain/model/heading';
 import PostReader from '@/features/post/domain/model/postReader';
+import Heading from '@/features/post/domain/types/heading';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: PostReader = {

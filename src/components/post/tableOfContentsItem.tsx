@@ -1,6 +1,6 @@
 'use client';
 
-import Heading from '@/features/post/domain/model/heading';
+import Heading from '@/features/post/domain/types/heading';
 import { setCurrentHeading } from '@/lib/redux/post/postReaderSlice';
 import { AppDispatch, RootState } from '@/lib/redux/store';
 import { scrollIntoElement } from '@/lib/scroll';
@@ -69,7 +69,7 @@ export default function TableOfContentsItem({
                   : 'xl:text-gray-500'
               )}
             >
-              {heading.text}
+              {heading.textContent}
             </button>
           </li>
         ))}
