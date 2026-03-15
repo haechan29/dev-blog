@@ -10,6 +10,7 @@ import DialogueView from '@/components/tiptap/renderer/views/dialogue';
 import HorizontalRuleView from '@/components/tiptap/renderer/views/horizontalRule';
 import ImageWithCaptionView from '@/components/tiptap/renderer/views/imageWithCaption';
 import LinkCardView from '@/components/tiptap/renderer/views/linkCard';
+import Heading from '@/features/post/domain/types/heading';
 import { JSONContent } from '@tiptap/core';
 import { Table } from '@tiptap/extension-table';
 import TableCell from '@tiptap/extension-table-cell';
@@ -17,9 +18,15 @@ import TableHeader from '@tiptap/extension-table-header';
 import TableRow from '@tiptap/extension-table-row';
 import StarterKit from '@tiptap/starter-kit';
 import { renderToReactElement } from '@tiptap/static-renderer/pm/react';
+import GithubSlugger from 'github-slugger';
 
-export default function TiptapRenderer({ content }: { content: JSONContent }) {
-  const element = renderToReactElement({
+export function renderContentElement(contentJson: JSONContent | null) {
+  if (!contentJson) return { headings: [], element: null };
+
+  const slugger = new GithubSlugger();
+  const headings: Heading[] = [];
+
+  const contentElement = renderToReactElement({
     extensions: [
       StarterKit,
       Table,
@@ -31,9 +38,18 @@ export default function TiptapRenderer({ content }: { content: JSONContent }) {
       DialogueNode,
       BgmNode,
     ],
-    content,
+    content: contentJson,
     options: {
       nodeMapping: {
+        heading: ({ node, children }) => {
+          const level = node.attrs.level as number;
+          const textContent = node.textContent;
+          const id = slugger.slug(textContent);
+          headings.push({ id, level, textContent });
+
+          const Tag = `h${level}` as keyof JSX.IntrinsicElements;
+          return <Tag id={id}>{children}</Tag>;
+        },
         horizontalRule: () => <HorizontalRuleView />,
         imageWithCaption: ({ node }) => (
           <ImageWithCaptionView
@@ -61,5 +77,5 @@ export default function TiptapRenderer({ content }: { content: JSONContent }) {
     },
   });
 
-  return <div className='prose max-w-none'>{element}</div>;
+  return { headings, contentElement } as const;
 }

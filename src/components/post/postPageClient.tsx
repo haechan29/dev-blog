@@ -5,7 +5,6 @@ import HomeToolbar from '@/components/home/homeToolbar';
 import AuthorProfile from '@/components/post/authorProfile';
 import ForbiddenPostPage from '@/components/post/forbiddenPostPage';
 import LikeButton from '@/components/post/likeButton';
-import PostContentWrapper from '@/components/post/postContentWrapper';
 import PostHeader from '@/components/post/postHeader';
 import PostPreview from '@/components/post/postPreview';
 import PostSeriesNav from '@/components/post/postSeriesNav';
@@ -14,6 +13,7 @@ import PostToolbar from '@/components/post/postToolbar';
 import PostVisibilityBanner from '@/components/post/postVisibilityBanner';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
 import { PostForbiddenError } from '@/features/post/data/errors/postErrors';
+import { renderContentElement } from '@/features/post/domain/lib/render';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import useBgmController from '@/features/post/hooks/useBgmController';
 import useRecordView from '@/features/post/hooks/useRecordView';
@@ -25,7 +25,7 @@ import { postKeys } from '@/queries/keys';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
-import { ReactNode, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useDispatch } from 'react-redux';
 
@@ -37,7 +37,6 @@ export default function PostPageClient({
   initialComments,
   initialPosts,
   initialCursor,
-  parsedContent,
 }: {
   isLoggedIn: boolean;
   isCreator: boolean;
@@ -46,7 +45,6 @@ export default function PostPageClient({
   initialComments: CommentItemProps[];
   initialPosts: PostProps[];
   initialCursor: string | null;
-  parsedContent: ReactNode;
 }) {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -106,6 +104,8 @@ export default function PostPageClient({
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  const { headings, contentElement } = renderContentElement(post.contentJson);
+
   if (error instanceof PostForbiddenError) {
     return <ForbiddenPostPage isLoggedIn={isLoggedIn} />;
   }
@@ -137,7 +137,7 @@ export default function PostPageClient({
             isAuthor={post.userId === userId}
           />
 
-          <PostContentWrapper post={post} parsedContent={parsedContent} />
+          <div className='prose max-w-none mb-20'>{contentElement}</div>
 
           <LikeButton postId={post.id} likeCount={post.likeCount} />
 
