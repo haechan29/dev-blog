@@ -1,6 +1,6 @@
+import DialogueView from '@/components/tiptap/editor/views/dialogue';
 import { Node, mergeAttributes } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
-import DialogueView from '@/components/tiptap/editor/views/dialogue';
 
 export interface DialogueOptions {
   HTMLAttributes: Record<string, unknown>;
@@ -34,9 +34,15 @@ export default Node.create<DialogueOptions>({
     return {
       speaker: {
         default: '',
+        parseHTML: element => element.getAttribute('data-speaker') ?? '',
+        renderHTML: attributes =>
+          attributes.speaker ? { 'data-speaker': attributes.speaker } : {},
       },
       avatar: {
         default: '',
+        parseHTML: element => element.getAttribute('data-avatar') ?? '',
+        renderHTML: attributes =>
+          attributes.avatar ? { 'data-avatar': attributes.avatar } : {},
       },
     };
   },
@@ -54,10 +60,8 @@ export default Node.create<DialogueOptions>({
       'div',
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
         'data-dialogue': '',
-        'data-speaker': HTMLAttributes.speaker,
-        'data-avatar': HTMLAttributes.avatar,
       }),
-      ['div', { class: 'dialogue-content' }, 0],
+      0,
     ];
   },
 

@@ -1,6 +1,6 @@
+import ImageWithCaptionView from '@/components/tiptap/editor/views/imageWithCaption';
 import { Node, mergeAttributes } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
-import ImageWithCaptionView from '@/components/tiptap/editor/views/imageWithCaption';
 
 export interface ImageWithCaptionOptions {
   HTMLAttributes: Record<string, unknown>;
@@ -14,7 +14,7 @@ declare module '@tiptap/core' {
         alt?: string;
         size?: 'medium' | 'large';
         id?: string;
-        status?: 'loading' | 'failed' | null;
+        status?: 'loading' | 'failed' | 'success';
       }) => ReturnType;
     };
   }
@@ -46,7 +46,7 @@ export default Node.create<ImageWithCaptionOptions>({
         default: null,
       },
       status: {
-        default: null,
+        default: 'success',
       },
     };
   },
@@ -55,6 +55,30 @@ export default Node.create<ImageWithCaptionOptions>({
     return [
       {
         tag: 'figure[data-image-with-caption]',
+        getAttrs: dom => {
+          if (!(dom instanceof HTMLElement)) return {};
+
+          const img = dom.querySelector('img');
+          const sizeRaw = dom.getAttribute('data-size');
+          const size =
+            sizeRaw === 'medium' || sizeRaw === 'large' ? sizeRaw : 'medium';
+
+          const statusRaw = dom.getAttribute('data-status');
+          const status =
+            statusRaw === 'loading' ||
+            statusRaw === 'failed' ||
+            statusRaw === 'success'
+              ? statusRaw
+              : 'success';
+
+          return {
+            src: img?.getAttribute('src') ?? '',
+            alt: img?.getAttribute('alt') ?? '',
+            size,
+            id: dom.getAttribute('data-id') ?? null,
+            status,
+          };
+        },
       },
     ];
   },
@@ -62,8 +86,11 @@ export default Node.create<ImageWithCaptionOptions>({
   renderHTML({ HTMLAttributes }) {
     return [
       'figure',
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+      mergeAttributes(this.options.HTMLAttributes, {
         'data-image-with-caption': '',
+        'data-size': HTMLAttributes.size,
+        'data-id': HTMLAttributes.id,
+        'data-status': HTMLAttributes.status,
       }),
       ['img', { src: HTMLAttributes.src, alt: HTMLAttributes.alt }],
       ['figcaption', {}, HTMLAttributes.alt || ''],
