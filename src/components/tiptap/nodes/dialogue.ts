@@ -22,7 +22,7 @@ export default Node.create<DialogueOptions>({
 
   group: 'block',
 
-  content: 'inline*',
+  content: 'paragraph*',
 
   addOptions() {
     return {
@@ -77,7 +77,12 @@ export default Node.create<DialogueOptions>({
           return commands.insertContent({
             type: this.name,
             attrs: options,
-            content: [{ type: 'text', text: '대사를 입력하세요.' }],
+            content: [
+              {
+                type: 'paragraph',
+                content: [{ type: 'text', text: '대사를 입력하세요.' }],
+              },
+            ],
           });
         },
     };
