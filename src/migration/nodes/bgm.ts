@@ -1,0 +1,86 @@
+import { Node, mergeAttributes } from '@tiptap/core';
+
+export interface BgmOptions {
+  HTMLAttributes: Record<string, unknown>;
+}
+
+declare module '@tiptap/core' {
+  interface Commands<ReturnType> {
+    bgm: {
+      setBgm: (options: {
+        id: string;
+        src: string;
+        status?: string | null;
+      }) => ReturnType;
+    };
+  }
+}
+
+const BgmNode = Node.create<BgmOptions>({
+  name: 'bgm',
+
+  group: 'block',
+
+  atom: true,
+
+  draggable: true,
+
+  addOptions() {
+    return {
+      HTMLAttributes: {},
+    };
+  },
+
+  addAttributes() {
+    return {
+      id: {
+        default: null as string | null,
+        parseHTML: element => element.getAttribute('id'),
+        renderHTML: attributes => (attributes.id ? { id: attributes.id } : {}),
+      },
+      src: {
+        default: '',
+        parseHTML: element => element.getAttribute('src') ?? '',
+        renderHTML: attributes =>
+          attributes.src ? { src: attributes.src } : {},
+      },
+      status: {
+        default: null as string | null,
+        parseHTML: element => element.getAttribute('data-status'),
+        renderHTML: attributes =>
+          attributes.status ? { 'data-status': attributes.status } : {},
+      },
+    };
+  },
+
+  parseHTML() {
+    return [
+      {
+        tag: 'bgm',
+      },
+    ];
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    return [
+      'bgm',
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+    ];
+  },
+
+  addCommands() {
+    return {
+      setBgm:
+        options =>
+        ({ commands }) => {
+          return commands.insertContent({
+            type: this.name,
+            attrs: options,
+          });
+        },
+    };
+  },
+});
+
+export default BgmNode;
+
