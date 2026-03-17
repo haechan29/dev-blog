@@ -1,6 +1,4 @@
-import ImageWithCaptionView from '@/components/tiptap/editor/views/imageWithCaption';
 import { Node, mergeAttributes } from '@tiptap/core';
-import { ReactNodeViewRenderer } from '@tiptap/react';
 
 export interface ImageWithCaptionOptions {
   HTMLAttributes: Record<string, unknown>;
@@ -95,10 +93,6 @@ export default Node.create<ImageWithCaptionOptions>({
       ['img', { src: HTMLAttributes.src, alt: HTMLAttributes.alt }],
       ['figcaption', {}, HTMLAttributes.alt || ''],
     ];
-  },
-
-  addNodeView() {
-    return ReactNodeViewRenderer(ImageWithCaptionView);
   },
 
   addCommands() {

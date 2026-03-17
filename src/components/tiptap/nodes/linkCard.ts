@@ -1,6 +1,4 @@
 import { Node, mergeAttributes } from '@tiptap/core';
-import { ReactNodeViewRenderer } from '@tiptap/react';
-import LinkCardView from '@/components/tiptap/editor/views/linkCard';
 
 export interface LinkCardOptions {
   HTMLAttributes: Record<string, unknown>;
@@ -65,10 +63,6 @@ export default Node.create<LinkCardOptions>({
         'data-link-card': '',
       }),
     ];
-  },
-
-  addNodeView() {
-    return ReactNodeViewRenderer(LinkCardView);
   },
 
   addCommands() {
