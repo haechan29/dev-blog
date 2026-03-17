@@ -23,11 +23,7 @@ import useBgmController from '@/features/post/hooks/useBgmController';
 import useRecordView from '@/features/post/hooks/useRecordView';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
-import {
-  setHeadings,
-  setIsContentVisible,
-  setTitle,
-} from '@/lib/redux/post/postToolbarSlice';
+import { setHeadings, setTitle } from '@/lib/redux/post/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { postKeys } from '@/queries/keys';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
@@ -127,22 +123,6 @@ export default function PostPageClient({
       fetchNextPage();
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
-
-  useEffect(() => {
-    const postContent = document.querySelector('[data-post-content]');
-    if (!postContent) return;
-
-    const postContentObserver = new IntersectionObserver(
-      entries => {
-        dispatch(setIsContentVisible(entries[0].isIntersecting));
-      },
-      {
-        rootMargin: '10% 0px -90% 0px',
-      }
-    );
-    postContentObserver.observe(postContent);
-    return () => postContentObserver.disconnect();
-  }, [dispatch]);
 
   if (error instanceof PostForbiddenError) {
     return <ForbiddenPostPage isLoggedIn={isLoggedIn} />;
