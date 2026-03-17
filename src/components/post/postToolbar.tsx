@@ -1,180 +1,167 @@
 'use client';
 
 import Heading from '@/features/post/domain/types/heading';
-import usePostToolbar from '@/features/post/hooks/usePostToolbar';
-import { PostToolbarProps } from '@/features/post/ui/postToolbarProps';
 import useThrottle from '@/hooks/useThrottle';
-import { setCurrentHeading } from '@/lib/redux/post/postReaderSlice';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
-import { setIsExpanded } from '@/lib/redux/post/postToolbarSlice';
-import { AppDispatch } from '@/lib/redux/store';
-import { scrollIntoElement } from '@/lib/scroll';
+import { AppDispatch, RootState } from '@/lib/redux/store';
 import { cn } from '@/lib/utils';
 import clsx from 'clsx';
 import { ChevronDown, Menu } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-export default function PostToolbar({ className }: { className?: string }) {
+export default function PostToolbar({
+  title = '',
+  headings = [],
+  currentHeadingId = null,
+  onHeadingClick = () => {},
+  className,
+}: {
+  title?: string;
+  headings?: Heading[];
+  currentHeadingId?: string | null;
+  onHeadingClick?: (heading: Heading) => void;
+  className?: string;
+}) {
   const dispatch = useDispatch<AppDispatch>();
-  const postToolbar = usePostToolbar();
+  const isHeaderVisible = useSelector(
+    (state: RootState) => state.postToolbar.isHeaderVisible
+  );
   const throttle = useThrottle();
   const [isMounted, setIsMounted] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
-  const onContentClick = useCallback(
-    (heading: Heading) => {
-      if (postToolbar.mode === 'collapsed') {
-        dispatch(setIsExpanded(true));
-      }
-      if (postToolbar.mode === 'expanded') {
-        const postContent = document.querySelector('[data-post-content]');
-        const element = postContent?.querySelector(`[id="${heading.id}"]`);
-        if (element) {
-          scrollIntoElement(
-            element,
-            {
-              behavior: 'smooth',
-              block: 'start',
-            },
-            () => {
-              dispatch(setCurrentHeading(heading));
-              dispatch(setIsExpanded(false));
-            }
-          );
-        }
-      }
-    },
-    [dispatch, postToolbar.mode]
+  const hasHeadings = headings.length > 0;
+
+  const minLevel = useMemo(
+    () => (headings.length > 0 ? Math.min(...headings.map(h => h.level)) : 1),
+    [headings]
   );
 
   const onExpandButtonClick = useCallback(() => {
-    dispatch(setIsExpanded(postToolbar.mode !== 'expanded'));
-  }, [dispatch, postToolbar.mode]);
+    if (!hasHeadings) return;
+    setIsExpanded(prev => !prev);
+  }, [hasHeadings]);
 
   useEffect(() => {
     const handleScroll = () => {
       throttle(() => {
-        if (postToolbar.mode === 'expanded') return;
-
-        dispatch(setIsExpanded(false));
+        setIsExpanded(false);
       }, 100);
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [dispatch, postToolbar.mode, throttle]);
+  }, [throttle]);
 
   useEffect(() => setIsMounted(true), []);
 
-  return (
-    isMounted && (
-      <div
-        className={cn(
-          'fixed top-0 z-40 w-full flex flex-col bg-white/80 backdrop-blur-md',
-          'py-2 md:py-3 px-4 md:px-4',
-          'xl:ml-(--sidebar-width) block xl:hidden',
-          'transition-transform duration-300 ease-in-out',
-          className
-        )}
-      >
-        {!!postToolbar.breadcrumb && (
-          <div className='mx-8 text-xs text-gray-400 transition-discrete duration-300 ease-in-out truncate'>
-            {postToolbar.breadcrumb}
-          </div>
-        )}
+  if (!isMounted || isHeaderVisible) {
+    return null;
+  }
 
-        <div className='flex gap-2 md:gap-3 w-full items-start'>
+  return (
+    <div
+      className={cn(
+        'fixed top-0 z-40 w-full flex flex-col bg-white/80 backdrop-blur-md',
+        'py-2 md:py-3 px-4 md:px-4',
+        'xl:ml-(--sidebar-width) block xl:hidden',
+        'transition-transform duration-300 ease-in-out',
+        className
+      )}
+    >
+      <div className='flex gap-2 md:gap-3 w-full items-start'>
+        <button
+          onClick={() => {
+            dispatch(setIsVisible(true));
+          }}
+          className='xl:hidden shrink-0 p-2 -m-2 items-center justify-center'
+        >
+          <Menu className='w-6 h-6 text-gray-500' />
+        </button>
+
+        <Content
+          title={title}
+          headings={headings}
+          minLevel={minLevel}
+          currentHeadingId={currentHeadingId}
+          hasHeadings={hasHeadings}
+          isExpanded={isExpanded}
+          onClick={onHeadingClick}
+        />
+
+        {hasHeadings && (
           <button
-            onClick={() => {
-              dispatch(setIsVisible(true));
-            }}
-            className='xl:hidden shrink-0 p-2 -m-2 items-center justify-center'
+            onClick={onExpandButtonClick}
+            className='shrink-0 p-2 -m-2 items-center justify-center'
           >
-            <Menu className='w-6 h-6 text-gray-500' />
+            <ChevronDown
+              className={clsx(
+                'w-6 h-6 text-gray-500 transition-transform duration-300 ease-in-out',
+                isExpanded && '-rotate-180'
+              )}
+            />
           </button>
-          <Content postToolbar={postToolbar} onClick={onContentClick} />
-          <ExpandButton mode={postToolbar.mode} onClick={onExpandButtonClick} />
-        </div>
-      </div>
-    )
-  );
-}
-
-function Content({
-  postToolbar,
-  onClick,
-}: {
-  postToolbar: PostToolbarProps;
-  onClick: (heading: Heading) => void;
-}) {
-  return (
-    <div className='flex flex-1 min-w-0 max-h-60 overflow-auto scrollbar-hide'>
-      <div
-        className={clsx(
-          'flex flex-col w-full transition-opacity duration-300 ease-in-out',
-          postToolbar.mode === 'empty' ? 'opacity-0' : 'opacity-100'
-        )}
-      >
-        {postToolbar.mode === 'basic' && (
-          <div className='font-semibold h-6 truncate'>{postToolbar.title}</div>
-        )}
-        {(postToolbar.mode === 'collapsed' ||
-          postToolbar.mode === 'expanded') && (
-          <div className='flex flex-col'>
-            {postToolbar.headings.map(heading => (
-              <button
-                key={heading.id}
-                onClick={() => onClick(heading)}
-                className={clsx(
-                  'truncate text-left transition-discrete|opacity duration-300 ease-in',
-                  postToolbar.mode === 'expanded' ||
-                    postToolbar.title === heading.textContent
-                    ? 'h-6 opacity-100'
-                    : 'h-0 opacity-0',
-                  postToolbar.title === heading.textContent
-                    ? 'text-gray-900 font-semibold'
-                    : 'text-gray-400',
-                  postToolbar.mode === 'expanded' && 'my-1 md:my-2',
-                  'pl-(--padding-left)'
-                )}
-                style={{
-                  '--padding-left':
-                    postToolbar.mode === 'expanded'
-                      ? `${heading.level - 1}rem`
-                      : '0px',
-                }}
-              >
-                {heading.textContent}
-              </button>
-            ))}
-          </div>
         )}
       </div>
     </div>
   );
 }
 
-function ExpandButton({
-  mode,
+function Content({
+  title,
+  headings,
+  minLevel,
+  currentHeadingId,
+  hasHeadings,
+  isExpanded,
   onClick,
 }: {
-  mode: PostToolbarProps['mode'];
-  onClick: () => void;
+  title: string;
+  headings: Heading[];
+  minLevel: number;
+  currentHeadingId: string | null;
+  hasHeadings: boolean;
+  isExpanded: boolean;
+  onClick: (heading: Heading) => void;
 }) {
+  if (!hasHeadings || currentHeadingId === null) {
+    return (
+      <div className='flex flex-1 min-w-0 max-h-60 overflow-auto scrollbar-hide'>
+        <div className='flex flex-col w-full'>
+          <div className='font-semibold h-6 truncate'>{title}</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <button
-      onClick={onClick}
-      className='shrink-0 p-2 -m-2 items-center justify-center'
-    >
-      <ChevronDown
-        className={clsx(
-          'w-6 h-6 text-gray-500 transition-opacity|transform duration-300 ease-in-out',
-          mode === 'collapsed' || mode === 'expanded'
-            ? 'opacity-100'
-            : 'opacity-0',
-          mode === 'expanded' && '-rotate-180'
-        )}
-      />
-    </button>
+    <div className='flex flex-1 min-w-0 max-h-60 overflow-auto scrollbar-hide'>
+      <div className='flex flex-col w-full'>
+        <div className='flex flex-col'>
+          {headings.map(heading => (
+            <button
+              key={heading.id}
+              onClick={() => onClick(heading)}
+              className={clsx(
+                'truncate text-left transition-discrete|opacity duration-300 ease-in pl-(--indent)',
+                isExpanded || heading.id === currentHeadingId
+                  ? 'h-6 opacity-100'
+                  : 'h-0 opacity-0',
+                currentHeadingId === heading.id
+                  ? 'text-gray-900 font-semibold'
+                  : 'text-gray-400',
+                isExpanded && 'my-1 md:my-2'
+              )}
+              style={{
+                '--indent': `${(heading.level - minLevel) * 0.5}rem`,
+              }}
+            >
+              {heading.textContent}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }

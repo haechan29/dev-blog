@@ -23,7 +23,6 @@ import useBgmController from '@/features/post/hooks/useBgmController';
 import useRecordView from '@/features/post/hooks/useRecordView';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
-import { setHeadings, setTitle } from '@/lib/redux/post/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import { postKeys } from '@/queries/keys';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
@@ -110,11 +109,6 @@ export default function PostPageClient({
   useBgmController();
 
   useEffect(() => {
-    dispatch(setTitle(initialPost.title));
-    dispatch(setHeadings([]));
-  }, [dispatch, initialPost.title]);
-
-  useEffect(() => {
     dispatch(setIsVisible(false));
   }, [dispatch]);
 
@@ -131,7 +125,13 @@ export default function PostPageClient({
   return (
     <>
       <HomeToolbar isLoggedIn={isLoggedIn} className='max-xl:hidden' />
-      <PostToolbar className='xl:hidden' />
+      <PostToolbar
+        title={post.title}
+        headings={headings}
+        currentHeadingId={currentHeadingId}
+        onHeadingClick={handleHeadingClick}
+        className='xl:hidden'
+      />
 
       <PostSidebar authorId={post.userId} currentPostId={post.id} />
 
