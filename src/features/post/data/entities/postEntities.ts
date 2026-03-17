@@ -7,6 +7,7 @@ export interface PostEntity {
   tags: string[];
   content: string;
   content_json: object | null;
+  preview: string;
   created_at: string;
   updated_at: string | null;
   user_id: string;
@@ -28,6 +29,7 @@ export interface PostEntityFlat {
   tags: string[];
   content: string;
   content_json: object | null;
+  preview: string;
   created_at: string;
   updated_at: string | null;
   user_id: string;
