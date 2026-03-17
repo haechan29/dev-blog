@@ -32,9 +32,9 @@ export default function PostPreview({
   onDeleteSuccess?: () => void;
   onVisibilitySuccess?: () => void;
 }) {
-  const { id, title, plainText, tags } = post;
+  const { id, title, preview, tags } = post;
   const isScrollAnimationEnabled =
-    plainText.length >= MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION;
+    preview.length >= MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION;
 
   return (
     <div
@@ -124,7 +124,7 @@ export default function PostPreview({
                     '--extended-height': tags.length > 0 ? '9rem' : '7rem',
                   }}
                 >
-                  <div className='group-hover:hidden'>{plainText}</div>
+                  <div className='group-hover:hidden'>{preview}</div>
                   <div
                     className={clsx(
                       'text-transparent group-hover:text-gray-900 absolute inset-x-0 top-0',
@@ -132,15 +132,15 @@ export default function PostPreview({
                       'delay-0 group-hover:delay-(--scroll-delay) group-hover:translate-y-[calc(-100%+9rem)]'
                     )}
                     style={{
-                      '--scroll-duration': `${plainText.length / 50}s`,
+                      '--scroll-duration': `${preview.length / 50}s`,
                     }}
                   >
-                    {plainText}
+                    {preview}
                   </div>
                 </div>
               </div>
             ) : (
-              <div className='max-h-18 overflow-hidden'>{plainText}</div>
+              <div className='max-h-18 overflow-hidden'>{preview}</div>
             )}
           </div>
         </Link>

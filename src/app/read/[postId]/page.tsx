@@ -60,7 +60,7 @@ export async function generateMetadata({
     const post = await PostServerService.getPost(postId);
     const postProps = createProps(post);
 
-    const description = postProps.plainText.replace(/\n/g, ' ').slice(0, 160);
+    const description = postProps.preview;
     const url = `https://sharetext.app/read/${postId}`;
 
     return {

@@ -1,10 +1,6 @@
-import { extractHeadings } from '@/features/post/domain/lib/parse';
-import Heading from '@/features/post/domain/types/heading';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 
 export default class Post {
-  public readonly headings: Heading[];
-
   constructor(
     public readonly id: string,
     public readonly title: string,
@@ -12,6 +8,7 @@ export default class Post {
     public readonly updatedAt: string,
     public readonly content: string,
     public readonly contentJson: object | null,
+    public readonly preview: string,
     public readonly tags: string[],
     public readonly userId: string,
     public readonly authorName: string | null,
@@ -23,7 +20,5 @@ export default class Post {
     public readonly likeCount: number,
     public readonly viewCount: number,
     public readonly visibility: PostVisibility
-  ) {
-    this.headings = extractHeadings(content);
-  }
+  ) {}
 }

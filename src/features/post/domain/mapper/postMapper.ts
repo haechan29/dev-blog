@@ -9,6 +9,7 @@ export function toDomain(dto: PostDto): Post {
     dto.updatedAt,
     dto.content,
     dto.contentJson,
+    dto.preview,
     dto.tags,
     dto.userId,
     dto.authorName,

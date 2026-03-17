@@ -115,8 +115,8 @@ export default function PostPageClient({
 
   useEffect(() => {
     dispatch(setTitle(initialPost.title));
-    dispatch(setHeadings(initialPost.headings));
-  }, [dispatch, initialPost.headings, initialPost.title]);
+    dispatch(setHeadings([]));
+  }, [dispatch, initialPost.title]);
 
   useEffect(() => {
     dispatch(setIsVisible(false));

@@ -1,7 +1,5 @@
 import { formatDate } from '@/features/post/domain/lib/date';
-import { extractPlainText } from '@/features/post/domain/lib/parse';
 import Post from '@/features/post/domain/model/post';
-import Heading from '@/features/post/domain/types/heading';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import { toUserNickname } from '@/features/user/ui/userProps';
 import { JSONContent } from '@tiptap/core';
@@ -14,8 +12,7 @@ export interface PostProps {
   tags: string[];
   content: string;
   contentJson: JSONContent | null;
-  headings: Heading[];
-  plainText: string;
+  preview: string;
   userId: string;
   authorName: string;
   bio: string | null;
@@ -37,8 +34,7 @@ export function createProps(post: Post): PostProps {
     tags: post.tags,
     content: post.content,
     contentJson: post.contentJson,
-    headings: post.headings,
-    plainText: extractPlainText(post.content),
+    preview: post.preview,
     userId: post.userId,
     authorName: toUserNickname({ id: post.userId, nickname: post.authorName }),
     bio: post.bio,
