@@ -2,20 +2,18 @@
 
 import usePosts from '@/features/post/hooks/usePosts';
 import { PostProps } from '@/features/post/ui/postProps';
-import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
-import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo } from 'react';
-import { useDispatch } from 'react-redux';
 
 export default function PostSeriesNav({
   post: { userId, seriesId, seriesOrder, seriesTitle },
+  onOpenSidebar = () => {},
 }: {
   post: PostProps;
+  onOpenSidebar?: () => void;
 }) {
-  const dispatch = useDispatch<AppDispatch>();
   const { posts } = usePosts(userId);
 
   const next = useMemo(() => {
@@ -34,9 +32,7 @@ export default function PostSeriesNav({
     seriesOrder !== null && (
       <div className='mb-16'>
         <button
-          onClick={() => {
-            dispatch(setIsVisible(true));
-          }}
+          onClick={onOpenSidebar}
           className={clsx(
             'text-xs text-gray-400 mb-3',
             'max-xl:hover:text-blue-600 max-xl:cursor-pointer',

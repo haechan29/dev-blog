@@ -22,15 +22,12 @@ import useActiveHeading from '@/features/post/hooks/useActiveHeading';
 import useBgmController from '@/features/post/hooks/useBgmController';
 import useRecordView from '@/features/post/hooks/useRecordView';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
-import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
-import { AppDispatch } from '@/lib/redux/store';
 import { postKeys } from '@/queries/keys';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
-import { useDispatch } from 'react-redux';
 
 export default function PostPageClient({
   isLoggedIn,
@@ -49,8 +46,8 @@ export default function PostPageClient({
   initialPosts: PostProps[];
   initialCursor: string | null;
 }) {
-  const dispatch = useDispatch<AppDispatch>();
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
   const { ref, inView } = useInView();
 
   const {
@@ -110,10 +107,6 @@ export default function PostPageClient({
   useBgmController();
 
   useEffect(() => {
-    dispatch(setIsVisible(false));
-  }, [dispatch]);
-
-  useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
@@ -125,7 +118,11 @@ export default function PostPageClient({
 
   return (
     <>
-      <HomeToolbar isLoggedIn={isLoggedIn} className='max-xl:hidden' />
+      <HomeToolbar
+        isLoggedIn={isLoggedIn}
+        className='max-xl:hidden'
+        onCloseSidebar={() => setSidebarVisible(false)}
+      />
       <PostToolbar
         title={post.title}
         headings={headings}
@@ -133,9 +130,15 @@ export default function PostPageClient({
         onHeadingClick={handleHeadingClick}
         className='xl:hidden'
         isHeaderVisible={isHeaderVisible}
+        onOpenSidebar={() => setSidebarVisible(true)}
       />
 
-      <PostSidebar authorId={post.userId} currentPostId={post.id} />
+      <PostSidebar
+        authorId={post.userId}
+        currentPostId={post.id}
+        isVisible={sidebarVisible}
+        onClose={() => setSidebarVisible(false)}
+      />
 
       <div
         className={clsx(
@@ -150,6 +153,7 @@ export default function PostPageClient({
             userId={userId}
             post={post}
             onVisibilityChange={setIsHeaderVisible}
+            onOpenSidebar={() => setSidebarVisible(true)}
           />
           <div className='w-full h-px bg-gray-200 mb-10' />
           <PostVisibilityBanner
@@ -172,7 +176,10 @@ export default function PostPageClient({
 
           <div className='prose max-w-none mb-20'>{contentElement}</div>
           <LikeButton postId={post.id} likeCount={post.likeCount} />
-          <PostSeriesNav post={post} />
+          <PostSeriesNav
+            post={post}
+            onOpenSidebar={() => setSidebarVisible(true)}
+          />
           <AuthorProfile
             userId={post.userId}
             userName={post.authorName}

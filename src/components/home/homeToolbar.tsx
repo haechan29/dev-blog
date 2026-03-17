@@ -3,25 +3,22 @@
 import Logo from '@/components/logo';
 import ToolbarProfileIcon from '@/components/post/toolbarProfileIcon';
 import SearchCommand from '@/components/search/searchCommand';
-import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
-import { AppDispatch } from '@/lib/redux/store';
 import { cn } from '@/lib/utils';
 import clsx from 'clsx';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
-import { useDispatch } from 'react-redux';
 
 export default function HomeToolbar({
   isLoggedIn,
   initialQuery,
   className,
+  onCloseSidebar,
 }: {
   isLoggedIn: boolean;
   initialQuery?: string;
   className?: string;
+  onCloseSidebar?: () => void;
 }) {
-  const dispatch = useDispatch<AppDispatch>();
-
   return (
     <div
       className={cn(
@@ -30,7 +27,7 @@ export default function HomeToolbar({
         className
       )}
     >
-      <Logo onClick={() => dispatch(setIsVisible(false))} />
+      <Logo onClick={onCloseSidebar} />
 
       <div className='flex flex-1 min-w-0 justify-center'>
         <div className='max-md:hidden w-1/2'>

@@ -4,27 +4,25 @@ import PostSettingsDropdown from '@/components/post/postSettingsDropdown';
 import ProfileIcon from '@/components/user/profileIcon';
 import { PostProps } from '@/features/post/ui/postProps';
 import useRouterWithProgress from '@/hooks/useRouterWithProgress';
-import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
-import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { MoreVertical } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
 
 export default function PostHeader({
   userId,
   post,
   skipPasswordInput,
   onVisibilityChange,
+  onOpenSidebar,
 }: {
   userId?: string;
   post: PostProps;
   skipPasswordInput: boolean;
   onVisibilityChange?: (isVisible: boolean) => void;
+  onOpenSidebar?: () => void;
 }) {
   const router = useRouterWithProgress();
-  const dispatch = useDispatch<AppDispatch>();
   const { title, tags } = post;
   const headerRef = useRef<HTMLDivElement | null>(null);
 
@@ -51,9 +49,7 @@ export default function PostHeader({
       <div className='flex flex-col gap-2 items-start'>
         {post.seriesTitle && post.seriesOrder !== null && (
           <button
-            onClick={() => {
-              dispatch(setIsVisible(true));
-            }}
+            onClick={() => onOpenSidebar?.()}
             className={clsx(
               'text-sm text-gray-500  p-1 -m-1',
               'max-xl:hover:text-blue-600 max-xl:cursor-pointer',

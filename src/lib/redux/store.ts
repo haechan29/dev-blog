@@ -1,12 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import bgmControllerReducer from '@/lib/redux/bgmControllerSlice';
-import postSidebarReducer from '@/lib/redux/post/postSidebarSlice';
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
-      postSidebar: postSidebarReducer,
       bgmController: bgmControllerReducer,
     },
   });

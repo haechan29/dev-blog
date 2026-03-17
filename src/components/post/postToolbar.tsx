@@ -2,13 +2,10 @@
 
 import Heading from '@/features/post/domain/types/heading';
 import useThrottle from '@/hooks/useThrottle';
-import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
-import { AppDispatch } from '@/lib/redux/store';
 import { cn } from '@/lib/utils';
 import clsx from 'clsx';
 import { ChevronDown, Menu } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useDispatch } from 'react-redux';
 
 export default function PostToolbar({
   title = '',
@@ -17,6 +14,7 @@ export default function PostToolbar({
   onHeadingClick = () => {},
   className,
   isHeaderVisible = false,
+  onOpenSidebar = () => {},
 }: {
   title?: string;
   headings?: Heading[];
@@ -24,8 +22,8 @@ export default function PostToolbar({
   onHeadingClick?: (heading: Heading) => void;
   className?: string;
   isHeaderVisible?: boolean;
+  onOpenSidebar?: () => void;
 }) {
-  const dispatch = useDispatch<AppDispatch>();
   const throttle = useThrottle();
   const [isMounted, setIsMounted] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -71,9 +69,7 @@ export default function PostToolbar({
     >
       <div className='flex gap-2 md:gap-3 w-full items-start'>
         <button
-          onClick={() => {
-            dispatch(setIsVisible(true));
-          }}
+          onClick={onOpenSidebar}
           className='xl:hidden shrink-0 p-2 -m-2 items-center justify-center'
         >
           <Menu className='w-6 h-6 text-gray-500' />
