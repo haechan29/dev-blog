@@ -2,6 +2,7 @@ import BgmNode from '@/components/tiptap/nodes/bgm';
 import DialogueNode from '@/components/tiptap/nodes/dialogue';
 import ImageWithCaptionNode from '@/components/tiptap/nodes/imageWithCaption';
 import LinkCardNode from '@/components/tiptap/nodes/linkCard';
+import Heading from '@tiptap/extension-heading';
 import { Table } from '@tiptap/extension-table';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
@@ -9,7 +10,14 @@ import TableRow from '@tiptap/extension-table-row';
 import StarterKit from '@tiptap/starter-kit';
 
 export const rendererExtensions = [
-  StarterKit,
+  StarterKit.configure({
+    heading: false,
+  }),
+  Heading.extend({
+    renderText() {
+      return '';
+    },
+  }),
   Table,
   TableRow,
   TableHeader,

@@ -9,6 +9,7 @@ import * as SearchUsecase from '@/features/post/data/usecases/searchUsecase';
 import { rendererExtensions } from '@/features/post/domain/lib/extensions';
 import { PostStatCreationError } from '@/features/postStat/data/errors/postStatErrors';
 import * as PostStatQueries from '@/features/postStat/data/queries/postStatQueries';
+import { normalizeText } from '@/lib/text';
 import { getUserId } from '@/lib/user';
 import { generateText } from '@tiptap/core';
 import bcrypt from 'bcryptjs';
@@ -101,8 +102,9 @@ export async function POST(request: NextRequest) {
       ? null
       : await bcrypt.hash(password, 10);
 
-    const contentText = generateText(contentJson, rendererExtensions);
-    const preview = contentText.slice(0, 200);
+    const raw = generateText(contentJson, rendererExtensions);
+    const contentText = normalizeText(raw);
+    const preview = contentText.slice(0, 1000);
 
     const post = await PostQueries.createPost({
       title,

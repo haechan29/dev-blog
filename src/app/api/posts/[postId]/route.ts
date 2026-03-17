@@ -5,6 +5,7 @@ import * as DraftQueries from '@/features/draft/data/queries/draftQueries';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as PostUsecase from '@/features/post/data/usecases/postUsecase';
 import { rendererExtensions } from '@/features/post/domain/lib/extensions';
+import { normalizeText } from '@/lib/text';
 import { getUserId } from '@/lib/user';
 import { generateText } from '@tiptap/core';
 import bcrypt from 'bcryptjs';
@@ -79,10 +80,11 @@ export async function PATCH(
       }
     }
 
-    const contentText = contentJson
+    const raw = contentJson
       ? generateText(contentJson, rendererExtensions)
       : undefined;
-    const preview = contentText ? contentText.slice(0, 200) : undefined;
+    const contentText = raw ? normalizeText(raw) : undefined;
+    const preview = contentText ? contentText.slice(0, 1000) : undefined;
 
     const updated = await PostQueries.updatePost({
       postId,
