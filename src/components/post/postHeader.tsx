@@ -91,15 +91,18 @@ export default function PostHeader({
           <div className='text-gray-500'>{post.createdAt}</div>
         </div>
 
-        <PostSettingsDropdown
-          skipPasswordInput={skipPasswordInput}
-          userId={userId}
-          post={post}
-          showRawContent={true}
-          onDeleteSuccess={() => router.push('/')}
-        >
-          <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2 cursor-pointer' />
-        </PostSettingsDropdown>
+        {post.userId === userId ? (
+          <PostSettingsDropdown
+            skipPasswordInput={skipPasswordInput}
+            userId={userId}
+            post={post}
+            onDeleteSuccess={() => router.push('/')}
+          >
+            <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2 cursor-pointer' />
+          </PostSettingsDropdown>
+        ) : (
+          <div />
+        )}
       </div>
     </div>
   );

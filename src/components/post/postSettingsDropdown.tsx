@@ -8,51 +8,34 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import PostReader from '@/features/post/domain/model/postReader';
 import { PostProps } from '@/features/post/ui/postProps';
-import useDebounce from '@/hooks/useDebounce';
 import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { createRipple } from '@/lib/dom';
-import { setMode } from '@/lib/redux/post/postReaderSlice';
-import { AppDispatch, RootState } from '@/lib/redux/store';
-import { Code2, Edit2, FileText, Layers, Trash2 } from 'lucide-react';
-import { MouseEvent, ReactNode, useCallback, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { Edit2, Layers, Trash2 } from 'lucide-react';
+import { MouseEvent, ReactNode, useCallback, useState } from 'react';
 
 export default function PostSettingsDropdown({
   skipPasswordInput = false,
   userId,
   post,
-  showRawContent,
   onDeleteSuccess,
   children,
 }: {
   skipPasswordInput?: boolean;
   userId?: string;
   post: PostProps;
-  showRawContent: boolean;
   onDeleteSuccess?: () => void;
   children: ReactNode;
 }) {
-  const dispatch = useDispatch<AppDispatch>();
-  const debounce = useDebounce();
   const router = useRouterWithProgress();
 
-  const { mode } = useSelector((state: RootState) => state.postReader);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isSeriesDialogOpen, setIsSeriesDialogOpen] = useState(false);
-  const [debouncedMode, setDebouncedMode] =
-    useState<PostReader['mode']>('parsed');
 
   const handleAction = useCallback(
     (e: MouseEvent<HTMLElement>) => {
       const actionAttribute = e.currentTarget.getAttribute('data-action');
       switch (actionAttribute) {
-        case 'toggle-mode': {
-          const toggledMode = mode === 'parsed' ? 'raw' : 'parsed';
-          dispatch(setMode(toggledMode));
-          break;
-        }
         case 'series-settings': {
           if (!isSeriesDialogOpen) setIsSeriesDialogOpen(true);
           break;
@@ -67,18 +50,8 @@ export default function PostSettingsDropdown({
         }
       }
     },
-    [dispatch, isDeleteDialogOpen, isSeriesDialogOpen, mode, post.id, router]
+    [isDeleteDialogOpen, isSeriesDialogOpen, post.id, router]
   );
-
-  useEffect(() => {
-    debounce(() => {
-      setDebouncedMode(mode);
-    }, 300);
-  }, [mode, debounce]);
-
-  if (!showRawContent && post.userId !== userId) {
-    return null;
-  }
 
   return (
     <>
@@ -114,62 +87,34 @@ export default function PostSettingsDropdown({
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align='end'>
-          {showRawContent && (
+          <>
             <DropdownMenuItem
-              data-action='toggle-mode'
+              data-action='series-settings'
               onClick={handleAction}
               className='w-full flex items-center gap-2 cursor-pointer'
             >
-              {debouncedMode === 'parsed' ? (
-                <>
-                  <Code2 className='w-4 h-4 text-gray-500' />
-                  <div className='whitespace-nowrap text-gray-900'>
-                    원문 보기
-                  </div>
-                </>
-              ) : (
-                <>
-                  <FileText className='w-4 h-4 text-gray-500' />
-                  <div className='whitespace-nowrap text-gray-900'>
-                    일반 보기
-                  </div>
-                </>
-              )}
+              <Layers className='w-4 h-4 text-gray-500' />
+              <div className='whitespace-nowrap text-gray-900'>시리즈 설정</div>
             </DropdownMenuItem>
-          )}
 
-          {post.userId === userId && (
-            <>
-              <DropdownMenuItem
-                data-action='series-settings'
-                onClick={handleAction}
-                className='w-full flex items-center gap-2 cursor-pointer'
-              >
-                <Layers className='w-4 h-4 text-gray-500' />
-                <div className='whitespace-nowrap text-gray-900'>
-                  시리즈 설정
-                </div>
-              </DropdownMenuItem>
+            <DropdownMenuItem
+              data-action='edit'
+              onClick={handleAction}
+              className='w-full flex items-center gap-2 cursor-pointer'
+            >
+              <Edit2 className='w-4 h-4 text-gray-500' />
+              <div className='whitespace-nowrap text-gray-900'>수정</div>
+            </DropdownMenuItem>
 
-              <DropdownMenuItem
-                data-action='edit'
-                onClick={handleAction}
-                className='w-full flex items-center gap-2 cursor-pointer'
-              >
-                <Edit2 className='w-4 h-4 text-gray-500' />
-                <div className='whitespace-nowrap text-gray-900'>수정</div>
-              </DropdownMenuItem>
-
-              <DropdownMenuItem
-                data-action='delete'
-                onClick={handleAction}
-                className='w-full flex items-center gap-2 cursor-pointer'
-              >
-                <Trash2 className='w-4 h-4 text-red-400' />
-                <div className='whitespace-nowrap text-red-600'>삭제</div>
-              </DropdownMenuItem>
-            </>
-          )}
+            <DropdownMenuItem
+              data-action='delete'
+              onClick={handleAction}
+              className='w-full flex items-center gap-2 cursor-pointer'
+            >
+              <Trash2 className='w-4 h-4 text-red-400' />
+              <div className='whitespace-nowrap text-red-600'>삭제</div>
+            </DropdownMenuItem>
+          </>
         </DropdownMenuContent>
       </DropdownMenu>
     </>

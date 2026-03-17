@@ -62,15 +62,17 @@ export default function PostPreview({
               onSuccess={onVisibilitySuccess}
             />
           )}
-          <PostSettingsDropdown
-            skipPasswordInput={skipPasswordInput}
-            userId={userId}
-            post={post}
-            showRawContent={false}
-            onDeleteSuccess={onDeleteSuccess}
-          >
-            <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 hover:bg-gray-200 rounded-full p-2 -m-2 cursor-pointer' />
-          </PostSettingsDropdown>
+
+          {userId === post.userId && (
+            <PostSettingsDropdown
+              skipPasswordInput={skipPasswordInput}
+              userId={userId}
+              post={post}
+              onDeleteSuccess={onDeleteSuccess}
+            >
+              <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 hover:bg-gray-200 rounded-full p-2 -m-2 cursor-pointer' />
+            </PostSettingsDropdown>
+          )}
         </div>
       )}
 
