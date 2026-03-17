@@ -1,20 +1,12 @@
-import BgmNode from '@/components/tiptap/nodes/bgm';
-import DialogueNode from '@/components/tiptap/nodes/dialogue';
-import ImageWithCaptionNode from '@/components/tiptap/nodes/imageWithCaption';
-import LinkCardNode from '@/components/tiptap/nodes/linkCard';
 import BgmView from '@/components/tiptap/renderer/views/bgm';
 import CodeBlockView from '@/components/tiptap/renderer/views/codeBlock';
 import DialogueView from '@/components/tiptap/renderer/views/dialogue';
 import HorizontalRuleView from '@/components/tiptap/renderer/views/horizontalRule';
 import ImageWithCaptionView from '@/components/tiptap/renderer/views/imageWithCaption';
 import LinkCardView from '@/components/tiptap/renderer/views/linkCard';
+import { rendererExtensions } from '@/features/post/domain/lib/extensions';
 import Heading from '@/features/post/domain/types/heading';
 import { JSONContent } from '@tiptap/core';
-import { Table } from '@tiptap/extension-table';
-import TableCell from '@tiptap/extension-table-cell';
-import TableHeader from '@tiptap/extension-table-header';
-import TableRow from '@tiptap/extension-table-row';
-import StarterKit from '@tiptap/starter-kit';
 import { renderToReactElement } from '@tiptap/static-renderer/pm/react';
 import GithubSlugger from 'github-slugger';
 
@@ -25,17 +17,7 @@ export function renderContentElement(contentJson: JSONContent | null) {
   const headings: Heading[] = [];
 
   const contentElement = renderToReactElement({
-    extensions: [
-      StarterKit,
-      Table,
-      TableRow,
-      TableHeader,
-      TableCell,
-      LinkCardNode,
-      ImageWithCaptionNode,
-      DialogueNode,
-      BgmNode,
-    ],
+    extensions: rendererExtensions,
     content: contentJson,
     options: {
       nodeMapping: {

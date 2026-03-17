@@ -4,7 +4,9 @@ import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries'
 import * as DraftQueries from '@/features/draft/data/queries/draftQueries';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as PostUsecase from '@/features/post/data/usecases/postUsecase';
+import { rendererExtensions } from '@/features/post/domain/lib/extensions';
 import { getUserId } from '@/lib/user';
+import { generateText } from '@tiptap/core';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -78,6 +80,11 @@ export async function PATCH(
       }
     }
 
+    const contentText = contentJson
+      ? generateText(contentJson, rendererExtensions)
+      : undefined;
+    const preview = contentText ? contentText.slice(0, 200) : undefined;
+
     const updated = await PostQueries.updatePost({
       postId,
       title,
@@ -87,6 +94,8 @@ export async function PATCH(
       seriesId,
       seriesOrder,
       visibility,
+      preview,
+      contentText,
     });
 
     if (draftId) {

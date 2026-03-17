@@ -6,9 +6,11 @@ import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as FeedUsecase from '@/features/post/data/usecases/feedUsecase';
 import * as PostUsecase from '@/features/post/data/usecases/postUsecase';
 import * as SearchUsecase from '@/features/post/data/usecases/searchUsecase';
+import { rendererExtensions } from '@/features/post/domain/lib/extensions';
 import { PostStatCreationError } from '@/features/postStat/data/errors/postStatErrors';
 import * as PostStatQueries from '@/features/postStat/data/queries/postStatQueries';
 import { getUserId } from '@/lib/user';
+import { generateText } from '@tiptap/core';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -99,6 +101,9 @@ export async function POST(request: NextRequest) {
       ? null
       : await bcrypt.hash(password, 10);
 
+    const contentText = generateText(contentJson, rendererExtensions);
+    const preview = contentText.slice(0, 200);
+
     const post = await PostQueries.createPost({
       title,
       content,
@@ -107,8 +112,8 @@ export async function POST(request: NextRequest) {
       passwordHash,
       visibility,
       userId,
-      preview: '',
-      contentText: '',
+      preview,
+      contentText,
     });
 
     await PostStatQueries.createPostStat(post.id);
