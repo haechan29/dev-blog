@@ -5,7 +5,6 @@ import ProfileIcon from '@/components/user/profileIcon';
 import { PostProps } from '@/features/post/ui/postProps';
 import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
-import { setIsHeaderVisible } from '@/lib/redux/post/postToolbarSlice';
 import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { MoreVertical } from 'lucide-react';
@@ -17,10 +16,12 @@ export default function PostHeader({
   userId,
   post,
   skipPasswordInput,
+  onVisibilityChange,
 }: {
   userId?: string;
   post: PostProps;
   skipPasswordInput: boolean;
+  onVisibilityChange?: (isVisible: boolean) => void;
 }) {
   const router = useRouterWithProgress();
   const dispatch = useDispatch<AppDispatch>();
@@ -28,21 +29,25 @@ export default function PostHeader({
   const headerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    if (!headerRef.current || !onVisibilityChange) return;
+
     const headerObserver = new IntersectionObserver(
-      entries => dispatch(setIsHeaderVisible(entries[0].isIntersecting)),
+      entries => {
+        const isVisible = entries[0]?.isIntersecting ?? false;
+        onVisibilityChange(isVisible);
+      },
       {
         rootMargin: '0px 0px -50% 0px',
       }
     );
-    const header = document.querySelector('[data-post-header]');
-    if (header) {
-      headerObserver.observe(header);
-    }
+
+    headerObserver.observe(headerRef.current);
+
     return () => headerObserver.disconnect();
-  }, [dispatch, headerRef]);
+  }, [onVisibilityChange]);
 
   return (
-    <div data-post-header className='flex flex-col gap-6 mb-10'>
+    <div ref={headerRef} className='flex flex-col gap-6 mb-10'>
       <div className='flex flex-col gap-2 items-start'>
         {post.seriesTitle && post.seriesOrder !== null && (
           <button

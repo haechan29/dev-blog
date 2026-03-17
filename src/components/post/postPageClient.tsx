@@ -28,7 +28,7 @@ import { postKeys } from '@/queries/keys';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useDispatch } from 'react-redux';
 
@@ -50,6 +50,7 @@ export default function PostPageClient({
   initialCursor: string | null;
 }) {
   const dispatch = useDispatch<AppDispatch>();
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const { ref, inView } = useInView();
 
   const {
@@ -131,6 +132,7 @@ export default function PostPageClient({
         currentHeadingId={currentHeadingId}
         onHeadingClick={handleHeadingClick}
         className='xl:hidden'
+        isHeaderVisible={isHeaderVisible}
       />
 
       <PostSidebar authorId={post.userId} currentPostId={post.id} />
@@ -147,6 +149,7 @@ export default function PostPageClient({
             skipPasswordInput={isLoggedIn || isCreator}
             userId={userId}
             post={post}
+            onVisibilityChange={setIsHeaderVisible}
           />
           <div className='w-full h-px bg-gray-200 mb-10' />
           <PostVisibilityBanner

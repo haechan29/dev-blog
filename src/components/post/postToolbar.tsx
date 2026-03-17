@@ -3,12 +3,12 @@
 import Heading from '@/features/post/domain/types/heading';
 import useThrottle from '@/hooks/useThrottle';
 import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
-import { AppDispatch, RootState } from '@/lib/redux/store';
+import { AppDispatch } from '@/lib/redux/store';
 import { cn } from '@/lib/utils';
 import clsx from 'clsx';
 import { ChevronDown, Menu } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 export default function PostToolbar({
   title = '',
@@ -16,17 +16,16 @@ export default function PostToolbar({
   currentHeadingId = null,
   onHeadingClick = () => {},
   className,
+  isHeaderVisible = false,
 }: {
   title?: string;
   headings?: Heading[];
   currentHeadingId?: string | null;
   onHeadingClick?: (heading: Heading) => void;
   className?: string;
+  isHeaderVisible?: boolean;
 }) {
   const dispatch = useDispatch<AppDispatch>();
-  const isHeaderVisible = useSelector(
-    (state: RootState) => state.postToolbar.isHeaderVisible
-  );
   const throttle = useThrottle();
   const [isMounted, setIsMounted] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);

@@ -287,7 +287,7 @@ export default function WritePageClient({
         )}
       >
         <div className='max-w-[65ch] mx-auto'>
-          <div data-post-header className='flex flex-col gap-6 mb-10'>
+          <div className='flex flex-col gap-6 mb-10'>
             <textarea
               value={title}
               onChange={e => {
