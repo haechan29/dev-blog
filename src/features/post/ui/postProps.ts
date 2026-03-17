@@ -10,8 +10,7 @@ export interface PostProps {
   createdAt: string;
   updatedAt: string;
   tags: string[];
-  content: string;
-  contentJson: JSONContent | null;
+  contentJson: JSONContent;
   preview: string;
   userId: string;
   authorName: string;
@@ -32,7 +31,6 @@ export function createProps(post: Post): PostProps {
     createdAt: formatDate(post.createdAt),
     updatedAt: formatDate(post.updatedAt),
     tags: post.tags,
-    content: post.content,
     contentJson: post.contentJson,
     preview: post.preview,
     userId: post.userId,

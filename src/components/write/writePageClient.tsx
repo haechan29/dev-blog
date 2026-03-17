@@ -215,7 +215,6 @@ export default function WritePageClient({
       } else {
         const newPost = await PostClientService.createPost({
           title,
-          content: '',
           contentJson,
           tags,
           password: data.password,

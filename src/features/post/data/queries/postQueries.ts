@@ -13,7 +13,6 @@ import 'server-only';
 const POST_SELECT_FIELDS = `
   id,
   title,
-  content,
   content_json,
   preview,
   tags,
@@ -123,7 +122,6 @@ export async function searchPosts(
 
 export async function createPost({
   title,
-  content,
   contentJson,
   tags,
   passwordHash,
@@ -133,8 +131,7 @@ export async function createPost({
   contentText,
 }: {
   title: string;
-  content: string;
-  contentJson?: object;
+  contentJson: object;
   tags: string[];
   passwordHash: string | null;
   visibility: PostVisibility;
@@ -146,7 +143,6 @@ export async function createPost({
     .from('posts')
     .insert({
       title,
-      content,
       content_json: contentJson,
       preview,
       content_text: contentText,
@@ -168,7 +164,6 @@ export async function createPost({
 export async function updatePost({
   postId,
   title,
-  content,
   contentJson,
   tags,
   seriesId,
@@ -179,7 +174,6 @@ export async function updatePost({
 }: {
   postId: string;
   title?: string;
-  content?: string;
   contentJson?: JSONContent;
   tags?: string[];
   seriesId?: string | null;
@@ -191,7 +185,6 @@ export async function updatePost({
   const updates: Partial<PostEntity> & { content_text?: string } = {
     updated_at: new Date().toISOString(),
     ...(title !== undefined && { title }),
-    ...(content !== undefined && { content }),
     ...(contentJson !== undefined && { content_json: contentJson }),
     ...(tags !== undefined && { tags }),
     ...(seriesId !== undefined && { series_id: seriesId }),

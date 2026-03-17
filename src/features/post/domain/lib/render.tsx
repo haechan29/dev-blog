@@ -10,9 +10,7 @@ import { JSONContent } from '@tiptap/core';
 import { renderToReactElement } from '@tiptap/static-renderer/pm/react';
 import GithubSlugger from 'github-slugger';
 
-export function renderContentElement(contentJson: JSONContent | null) {
-  if (!contentJson) return { headings: [], element: null };
-
+export function renderContentElement(contentJson: JSONContent) {
   const slugger = new GithubSlugger();
   const headings: Heading[] = [];
 

@@ -19,7 +19,6 @@ export async function fetchFeedPosts({
       `
         id,
         title,
-        content,
         content_json,
         preview,
         tags,

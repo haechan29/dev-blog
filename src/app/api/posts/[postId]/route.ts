@@ -40,7 +40,6 @@ export async function PATCH(
     const { postId } = await params;
     const {
       title,
-      content,
       contentJson,
       tags,
       password,
@@ -88,7 +87,6 @@ export async function PATCH(
     const updated = await PostQueries.updatePost({
       postId,
       title,
-      content,
       contentJson,
       tags,
       seriesId,

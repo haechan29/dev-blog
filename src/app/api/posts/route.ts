@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { title, content, contentJson, password, tags, visibility, draftId } =
+    const { title, contentJson, password, tags, visibility, draftId } =
       await request.json();
 
     const session = await auth();
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     if (!title) {
       throw new ValidationError('제목을 찾을 수 없습니다');
     }
-    if (!content && !contentJson) {
+    if (!contentJson) {
       throw new ValidationError('내용을 찾을 수 없습니다');
     }
     if (!userId) {
@@ -106,7 +106,6 @@ export async function POST(request: NextRequest) {
 
     const post = await PostQueries.createPost({
       title,
-      content,
       contentJson,
       tags,
       passwordHash,
