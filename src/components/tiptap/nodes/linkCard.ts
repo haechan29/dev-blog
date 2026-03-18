@@ -1,6 +1,4 @@
 import { Node, mergeAttributes } from '@tiptap/core';
-import { ReactNodeViewRenderer } from '@tiptap/react';
-import LinkCardView from '@/components/tiptap/editor/views/linkCard';
 
 export interface LinkCardOptions {
   HTMLAttributes: Record<string, unknown>;
@@ -34,9 +32,18 @@ export default Node.create<LinkCardOptions>({
     return {
       href: {
         default: '',
+        parseHTML: element => element.getAttribute('data-href') ?? '',
+        renderHTML: attributes =>
+          attributes.href ? { 'data-href': attributes.href } : {},
       },
       variant: {
         default: 'vertical',
+        parseHTML: element => {
+          const v = element.getAttribute('data-variant');
+          return v === 'vertical' || v === 'horizontal' ? v : 'vertical';
+        },
+        renderHTML: attributes =>
+          attributes.variant ? { 'data-variant': attributes.variant } : {},
       },
     };
   },
@@ -54,14 +61,8 @@ export default Node.create<LinkCardOptions>({
       'div',
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
         'data-link-card': '',
-        'data-href': HTMLAttributes.href,
-        'data-variant': HTMLAttributes.variant,
       }),
     ];
-  },
-
-  addNodeView() {
-    return ReactNodeViewRenderer(LinkCardView);
   },
 
   addCommands() {
@@ -71,10 +72,7 @@ export default Node.create<LinkCardOptions>({
         ({ commands }) => {
           return commands.insertContent({
             type: this.name,
-            attrs: {
-              href: options.href,
-              variant: options.variant || 'vertical',
-            },
+            attrs: options,
           });
         },
     };

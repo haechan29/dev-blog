@@ -1,10 +1,13 @@
 import { auth } from '@/auth';
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries';
-import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as DraftQueries from '@/features/draft/data/queries/draftQueries';
+import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as PostUsecase from '@/features/post/data/usecases/postUsecase';
+import { rendererExtensions } from '@/features/post/domain/lib/extensions';
+import { normalizeText } from '@/lib/text';
 import { getUserId } from '@/lib/user';
+import { generateText } from '@tiptap/core';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -38,7 +41,6 @@ export async function PATCH(
     const { postId } = await params;
     const {
       title,
-      content,
       contentJson,
       tags,
       password,
@@ -78,15 +80,22 @@ export async function PATCH(
       }
     }
 
+    const raw = contentJson
+      ? generateText(contentJson, rendererExtensions)
+      : undefined;
+    const contentText = raw ? normalizeText(raw) : undefined;
+    const preview = contentText ? contentText.slice(0, 1000) : undefined;
+
     const updated = await PostQueries.updatePost({
       postId,
       title,
-      content,
       contentJson,
       tags,
       seriesId,
       seriesOrder,
       visibility,
+      preview,
+      contentText,
     });
 
     if (draftId) {

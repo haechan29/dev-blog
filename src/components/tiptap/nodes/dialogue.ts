@@ -1,6 +1,4 @@
 import { Node, mergeAttributes } from '@tiptap/core';
-import { ReactNodeViewRenderer } from '@tiptap/react';
-import DialogueView from '@/components/tiptap/editor/views/dialogue';
 
 export interface DialogueOptions {
   HTMLAttributes: Record<string, unknown>;
@@ -22,7 +20,7 @@ export default Node.create<DialogueOptions>({
 
   group: 'block',
 
-  content: 'inline*',
+  content: 'paragraph*',
 
   addOptions() {
     return {
@@ -34,9 +32,15 @@ export default Node.create<DialogueOptions>({
     return {
       speaker: {
         default: '',
+        parseHTML: element => element.getAttribute('data-speaker') ?? '',
+        renderHTML: attributes =>
+          attributes.speaker ? { 'data-speaker': attributes.speaker } : {},
       },
       avatar: {
         default: '',
+        parseHTML: element => element.getAttribute('data-avatar') ?? '',
+        renderHTML: attributes =>
+          attributes.avatar ? { 'data-avatar': attributes.avatar } : {},
       },
     };
   },
@@ -54,15 +58,9 @@ export default Node.create<DialogueOptions>({
       'div',
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
         'data-dialogue': '',
-        'data-speaker': HTMLAttributes.speaker,
-        'data-avatar': HTMLAttributes.avatar,
       }),
-      ['div', { class: 'dialogue-content' }, 0],
+      0,
     ];
-  },
-
-  addNodeView() {
-    return ReactNodeViewRenderer(DialogueView);
   },
 
   addCommands() {
@@ -73,7 +71,12 @@ export default Node.create<DialogueOptions>({
           return commands.insertContent({
             type: this.name,
             attrs: options,
-            content: [{ type: 'text', text: '대사를 입력하세요.' }],
+            content: [
+              {
+                type: 'paragraph',
+                content: [{ type: 'text', text: '대사를 입력하세요.' }],
+              },
+            ],
           });
         },
     };

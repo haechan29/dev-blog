@@ -1,6 +1,4 @@
 import { formatDate } from '@/features/post/domain/lib/date';
-import { extractPlainText } from '@/features/post/domain/lib/parse';
-import Heading from '@/features/post/domain/model/heading';
 import Post from '@/features/post/domain/model/post';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import { toUserNickname } from '@/features/user/ui/userProps';
@@ -12,10 +10,8 @@ export interface PostProps {
   createdAt: string;
   updatedAt: string;
   tags: string[];
-  content: string;
-  contentJson: JSONContent | null;
-  headings: Heading[];
-  plainText: string;
+  contentJson: JSONContent;
+  preview: string;
   userId: string;
   authorName: string;
   bio: string | null;
@@ -35,10 +31,8 @@ export function createProps(post: Post): PostProps {
     createdAt: formatDate(post.createdAt),
     updatedAt: formatDate(post.updatedAt),
     tags: post.tags,
-    content: post.content,
     contentJson: post.contentJson,
-    headings: post.headings,
-    plainText: extractPlainText(post.content),
+    preview: post.preview,
     userId: post.userId,
     authorName: toUserNickname({ id: post.userId, nickname: post.authorName }),
     bio: post.bio,

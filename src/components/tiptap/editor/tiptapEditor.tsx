@@ -5,14 +5,18 @@ import DialogueToolbar from '@/components/tiptap/editor/dialogueToolbar';
 import FloatingMenu from '@/components/tiptap/editor/floatingMenu';
 import LinkPasteMenu from '@/components/tiptap/editor/linkPasteMenu';
 import TableMenu from '@/components/tiptap/editor/tableMenu';
+import BgmView from '@/components/tiptap/editor/views/bgm';
 import CodeBlockView from '@/components/tiptap/editor/views/codeBlock';
+import DialogueView from '@/components/tiptap/editor/views/dialogue';
 import HorizontalRuleView from '@/components/tiptap/editor/views/horizontalRule';
+import ImageWithCaptionView from '@/components/tiptap/editor/views/imageWithCaption';
+import LinkCardView from '@/components/tiptap/editor/views/linkCard';
 import BgmNode from '@/components/tiptap/nodes/bgm';
 import DialogueNode from '@/components/tiptap/nodes/dialogue';
 import ImageWithCaptionNode from '@/components/tiptap/nodes/imageWithCaption';
 import LinkCardNode from '@/components/tiptap/nodes/linkCard';
-import { TocAnchor } from '@/components/write/tableOfContents';
 import { uploadImage } from '@/features/media/utils/uploadImage';
+import TocAnchor from '@/features/post/domain/types/tocAnchor';
 import { Blockquote } from '@tiptap/extension-blockquote';
 import CharacterCount from '@tiptap/extension-character-count';
 import CodeBlock from '@tiptap/extension-code-block';
@@ -108,10 +112,28 @@ const TiptapEditor = forwardRef<
           return ReactNodeViewRenderer(HorizontalRuleView);
         },
       }),
-      LinkCardNode,
-      ImageWithCaptionNode,
-      DialogueNode,
-      BgmNode,
+      LinkCardNode.extend({
+        addNodeView() {
+          return ReactNodeViewRenderer(LinkCardView);
+        },
+      }),
+      ImageWithCaptionNode.extend({
+        addNodeView() {
+          return ReactNodeViewRenderer(ImageWithCaptionView);
+        },
+      }),
+      DialogueNode.extend({
+        addNodeView() {
+          return ReactNodeViewRenderer(DialogueView);
+        },
+      }),
+      BgmNode.extend({
+        addNodeView() {
+          return ReactNodeViewRenderer(BgmView, {
+            className: 'flex justify-end',
+          });
+        },
+      }),
       FileHandler.configure({
         allowedMimeTypes: [
           'image/jpeg',

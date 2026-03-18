@@ -1,7 +1,6 @@
 import { auth } from '@/auth';
 import ForbiddenPostPage from '@/components/post/forbiddenPostPage';
 import PostPageClient from '@/components/post/postPageClient';
-import PostParsedContent from '@/components/post/postParsedContent';
 import * as CommentServerService from '@/features/comment/domain/service/commentServerService';
 import * as CreatorServerRepository from '@/features/creator/data/repository/creatorServerRepository';
 import { PostForbiddenError } from '@/features/post/data/errors/postErrors';
@@ -40,12 +39,6 @@ export default async function PostPage({
         initialComments={commentProps}
         initialPosts={postProps}
         initialCursor={nextCursor}
-        parsedContent={
-          <PostParsedContent
-            content={post.content}
-            contentJson={post.contentJson}
-          />
-        }
       />
     );
   } catch (error) {
@@ -67,7 +60,7 @@ export async function generateMetadata({
     const post = await PostServerService.getPost(postId);
     const postProps = createProps(post);
 
-    const description = postProps.plainText.replace(/\n/g, ' ').slice(0, 160);
+    const description = postProps.preview;
     const url = `https://sharetext.app/read/${postId}`;
 
     return {

@@ -5,8 +5,8 @@ export interface PostEntity {
   id: string;
   title: string;
   tags: string[];
-  content: string;
-  content_json: object | null;
+  content_json: object;
+  preview: string;
   created_at: string;
   updated_at: string | null;
   user_id: string;
@@ -26,8 +26,8 @@ export interface PostEntityFlat {
   id: string;
   title: string;
   tags: string[];
-  content: string;
-  content_json: object | null;
+  content_json: object;
+  preview: string;
   created_at: string;
   updated_at: string | null;
   user_id: string;

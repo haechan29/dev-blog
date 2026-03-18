@@ -4,25 +4,22 @@ import PostSidebarNav from '@/components/post/postSidebarNav';
 import Sidebar from '@/components/sidebar';
 import usePosts from '@/features/post/hooks/usePosts';
 import useScrollLock from '@/hooks/useScrollLock';
-import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
-import { AppDispatch, RootState } from '@/lib/redux/store';
 import { postKeys } from '@/queries/keys';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 
 export default function PostSidebar({
   authorId,
   currentPostId,
+  isVisible,
+  onClose,
 }: {
   authorId: string;
   currentPostId: string;
+  isVisible: boolean;
+  onClose: () => void;
 }) {
-  const dispatch = useDispatch<AppDispatch>();
   const queryClient = useQueryClient();
-  const isVisible = useSelector((state: RootState) => {
-    return state.postSidebar.isVisible;
-  });
 
   const { posts } = usePosts(authorId);
 
@@ -37,10 +34,7 @@ export default function PostSidebar({
   }, [posts, queryClient]);
 
   return (
-    <Sidebar
-      isVisible={isVisible}
-      onClose={() => dispatch(setIsVisible(false))}
-    >
+    <Sidebar isVisible={isVisible} onClose={onClose}>
       {posts && <PostSidebarNav currentPostId={currentPostId} posts={posts} />}
     </Sidebar>
   );

@@ -4,51 +4,52 @@ import PostSettingsDropdown from '@/components/post/postSettingsDropdown';
 import ProfileIcon from '@/components/user/profileIcon';
 import { PostProps } from '@/features/post/ui/postProps';
 import useRouterWithProgress from '@/hooks/useRouterWithProgress';
-import { setIsVisible } from '@/lib/redux/post/postSidebarSlice';
-import { setIsHeaderVisible } from '@/lib/redux/post/postToolbarSlice';
-import { AppDispatch } from '@/lib/redux/store';
 import clsx from 'clsx';
 import { MoreVertical } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
 
 export default function PostHeader({
   userId,
   post,
   skipPasswordInput,
+  onVisibilityChange,
+  onOpenSidebar,
 }: {
   userId?: string;
   post: PostProps;
   skipPasswordInput: boolean;
+  onVisibilityChange?: (isVisible: boolean) => void;
+  onOpenSidebar?: () => void;
 }) {
   const router = useRouterWithProgress();
-  const dispatch = useDispatch<AppDispatch>();
   const { title, tags } = post;
   const headerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    if (!headerRef.current || !onVisibilityChange) return;
+
     const headerObserver = new IntersectionObserver(
-      entries => dispatch(setIsHeaderVisible(entries[0].isIntersecting)),
+      entries => {
+        const isVisible = entries[0]?.isIntersecting ?? false;
+        onVisibilityChange(isVisible);
+      },
       {
         rootMargin: '0px 0px -50% 0px',
       }
     );
-    const header = document.querySelector('[data-post-header]');
-    if (header) {
-      headerObserver.observe(header);
-    }
+
+    headerObserver.observe(headerRef.current);
+
     return () => headerObserver.disconnect();
-  }, [dispatch, headerRef]);
+  }, [onVisibilityChange]);
 
   return (
-    <div data-post-header className='flex flex-col gap-6 mb-10'>
+    <div ref={headerRef} className='flex flex-col gap-6 mb-10'>
       <div className='flex flex-col gap-2 items-start'>
         {post.seriesTitle && post.seriesOrder !== null && (
           <button
-            onClick={() => {
-              dispatch(setIsVisible(true));
-            }}
+            onClick={() => onOpenSidebar?.()}
             className={clsx(
               'text-sm text-gray-500  p-1 -m-1',
               'max-xl:hover:text-blue-600 max-xl:cursor-pointer',
@@ -91,15 +92,18 @@ export default function PostHeader({
           <div className='text-gray-500'>{post.createdAt}</div>
         </div>
 
-        <PostSettingsDropdown
-          skipPasswordInput={skipPasswordInput}
-          userId={userId}
-          post={post}
-          showRawContent={true}
-          onDeleteSuccess={() => router.push('/')}
-        >
-          <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2 cursor-pointer' />
-        </PostSettingsDropdown>
+        {post.userId === userId ? (
+          <PostSettingsDropdown
+            skipPasswordInput={skipPasswordInput}
+            userId={userId}
+            post={post}
+            onDeleteSuccess={() => router.push('/')}
+          >
+            <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2 cursor-pointer' />
+          </PostSettingsDropdown>
+        ) : (
+          <div />
+        )}
       </div>
     </div>
   );

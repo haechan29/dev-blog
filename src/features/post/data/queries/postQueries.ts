@@ -13,8 +13,8 @@ import 'server-only';
 const POST_SELECT_FIELDS = `
   id,
   title,
-  content,
   content_json,
+  preview,
   tags,
   created_at,
   updated_at,
@@ -122,27 +122,30 @@ export async function searchPosts(
 
 export async function createPost({
   title,
-  content,
   contentJson,
   tags,
   passwordHash,
   visibility,
   userId,
+  preview,
+  contentText,
 }: {
   title: string;
-  content: string;
-  contentJson?: object;
+  contentJson: object;
   tags: string[];
   passwordHash: string | null;
   visibility: PostVisibility;
   userId: string;
+  preview: string;
+  contentText: string;
 }) {
   const { data, error } = await supabase
     .from('posts')
     .insert({
       title,
-      content,
       content_json: contentJson,
+      preview,
+      content_text: contentText,
       tags,
       password_hash: passwordHash,
       visibility,
@@ -161,31 +164,34 @@ export async function createPost({
 export async function updatePost({
   postId,
   title,
-  content,
   contentJson,
   tags,
   seriesId,
   seriesOrder,
   visibility,
+  preview,
+  contentText,
 }: {
   postId: string;
   title?: string;
-  content?: string;
   contentJson?: JSONContent;
   tags?: string[];
   seriesId?: string | null;
   seriesOrder?: number | null;
   visibility?: PostVisibility;
+  preview?: string;
+  contentText?: string;
 }) {
-  const updates: Partial<PostEntity> = {
+  const updates: Partial<PostEntity> & { content_text?: string } = {
     updated_at: new Date().toISOString(),
     ...(title !== undefined && { title }),
-    ...(content !== undefined && { content }),
     ...(contentJson !== undefined && { content_json: contentJson }),
     ...(tags !== undefined && { tags }),
     ...(seriesId !== undefined && { series_id: seriesId }),
     ...(seriesOrder !== undefined && { series_order: seriesOrder }),
     ...(visibility !== undefined && { visibility }),
+    ...(preview !== undefined && { preview }),
+    ...(contentText !== undefined && { content_text: contentText }),
   };
 
   const { data, error } = await supabase

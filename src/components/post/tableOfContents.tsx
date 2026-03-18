@@ -1,38 +1,26 @@
 'use client';
 
+import Heading from '@/features/post/domain/types/heading';
 import clsx from 'clsx';
 import { useMemo } from 'react';
 
-export interface TocAnchor {
-  id: string;
-  textContent: string;
-  level: number;
-  isActive: boolean;
-  isScrolledOver: boolean;
-  pos: number;
-  dom: HTMLElement;
-}
-
 export default function TableOfContents({
-  anchors,
+  headings,
+  currentHeadingId = null,
+  onItemClick,
   showPlaceholder = false,
 }: {
-  anchors: TocAnchor[];
+  headings: Heading[];
+  currentHeadingId?: string | null;
+  onItemClick?: (heading: Heading) => void;
   showPlaceholder?: boolean;
 }) {
   const minLevel = useMemo(
-    () => (anchors.length > 0 ? Math.min(...anchors.map(a => a.level)) : 1),
-    [anchors]
+    () => (headings.length > 0 ? Math.min(...headings.map(h => h.level)) : 1),
+    [headings]
   );
 
-  const handleClick = (anchor: TocAnchor) => {
-    anchor.dom.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    });
-  };
-
-  if (anchors.length === 0) {
+  if (headings.length === 0) {
     if (!showPlaceholder) return null;
     return (
       <div
@@ -56,19 +44,21 @@ export default function TableOfContents({
       )}
     >
       <ul className='space-y-2'>
-        {anchors.map(anchor => (
-          <li key={anchor.id}>
+        {headings.map(heading => (
+          <li key={heading.id}>
             <button
-              onClick={() => handleClick(anchor)}
+              onClick={() => onItemClick?.(heading)}
               style={{
-                '--indent': `${(anchor.level - minLevel) * 0.5}rem`,
+                '--indent': `${(heading.level - minLevel) * 0.5}rem`,
               }}
               className={clsx(
                 'w-full text-left text-sm hover:text-blue-500 truncate pl-(--indent)',
-                anchor.isActive ? 'text-blue-500' : 'text-gray-500'
+                currentHeadingId === heading.id
+                  ? 'text-blue-500'
+                  : 'text-gray-500'
               )}
             >
-              {anchor.textContent}
+              {heading.textContent}
             </button>
           </li>
         ))}

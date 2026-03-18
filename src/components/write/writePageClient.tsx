@@ -1,5 +1,6 @@
 'use client';
 
+import TableOfContents from '@/components/post/tableOfContents';
 import TiptapEditor, {
   TiptapEditorRef,
 } from '@/components/tiptap/editor/tiptapEditor';
@@ -7,7 +8,6 @@ import ProfileIcon from '@/components/user/profileIcon';
 import { DeleteDraftDialog } from '@/components/write/deleteDraftDialog';
 import DraftSidebar from '@/components/write/draftSidebar';
 import PublishDialog from '@/components/write/publishDialog';
-import TableOfContents, { TocAnchor } from '@/components/write/tableOfContents';
 import TagInput from '@/components/write/tagInput';
 import WriteToolbar from '@/components/write/writeToolbar';
 import { ApiError } from '@/errors/errors';
@@ -16,6 +16,7 @@ import useDrafts from '@/features/draft/hooks/useDrafts';
 import useSaveShortcut from '@/features/draft/hooks/useSaveShortcut';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
+import TocAnchor from '@/features/post/domain/types/tocAnchor';
 import useBgmController from '@/features/post/hooks/useBgmController';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
 import useUser from '@/features/user/domain/hooks/useUser';
@@ -214,7 +215,6 @@ export default function WritePageClient({
       } else {
         const newPost = await PostClientService.createPost({
           title,
-          content: '',
           contentJson,
           tags,
           password: data.password,
@@ -264,7 +264,18 @@ export default function WritePageClient({
       />
 
       <div className='fixed top-0 right-0 w-(--toc-width) mr-(--toc-margin) h-full max-xl:hidden'>
-        <TableOfContents anchors={anchors} showPlaceholder />
+        <TableOfContents
+          headings={anchors}
+          currentHeadingId={anchors.find(a => a.isActive)?.id ?? null}
+          onItemClick={heading => {
+            const anchor = anchors.find(a => a.id === heading.id);
+            anchor?.dom.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            });
+          }}
+          showPlaceholder
+        />
       </div>
 
       <div
@@ -275,7 +286,7 @@ export default function WritePageClient({
         )}
       >
         <div className='max-w-[65ch] mx-auto'>
-          <div data-post-header className='flex flex-col gap-6 mb-10'>
+          <div className='flex flex-col gap-6 mb-10'>
             <textarea
               value={title}
               onChange={e => {

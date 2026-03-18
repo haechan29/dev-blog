@@ -1,14 +1,17 @@
 import { auth } from '@/auth';
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries';
-import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as DraftQueries from '@/features/draft/data/queries/draftQueries';
+import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as FeedUsecase from '@/features/post/data/usecases/feedUsecase';
 import * as PostUsecase from '@/features/post/data/usecases/postUsecase';
 import * as SearchUsecase from '@/features/post/data/usecases/searchUsecase';
+import { rendererExtensions } from '@/features/post/domain/lib/extensions';
 import { PostStatCreationError } from '@/features/postStat/data/errors/postStatErrors';
 import * as PostStatQueries from '@/features/postStat/data/queries/postStatQueries';
+import { normalizeText } from '@/lib/text';
 import { getUserId } from '@/lib/user';
+import { generateText } from '@tiptap/core';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -73,15 +76,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const {
-      title,
-      content,
-      contentJson,
-      password,
-      tags,
-      visibility,
-      draftId,
-    } = await request.json();
+    const { title, contentJson, password, tags, visibility, draftId } =
+      await request.json();
 
     const session = await auth();
     const userId = await getUserId();
@@ -89,7 +85,7 @@ export async function POST(request: NextRequest) {
     if (!title) {
       throw new ValidationError('제목을 찾을 수 없습니다');
     }
-    if (!content && !contentJson) {
+    if (!contentJson) {
       throw new ValidationError('내용을 찾을 수 없습니다');
     }
     if (!userId) {
@@ -106,14 +102,19 @@ export async function POST(request: NextRequest) {
       ? null
       : await bcrypt.hash(password, 10);
 
+    const raw = generateText(contentJson, rendererExtensions);
+    const contentText = normalizeText(raw);
+    const preview = contentText.slice(0, 1000);
+
     const post = await PostQueries.createPost({
       title,
-      content,
       contentJson,
       tags,
       passwordHash,
       visibility,
       userId,
+      preview,
+      contentText,
     });
 
     await PostStatQueries.createPostStat(post.id);
