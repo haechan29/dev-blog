@@ -296,8 +296,6 @@ export default function WritePageClient({
             </div>
           </div>
 
-          <div className='w-full h-px bg-gray-200 mb-10' />
-
           <TiptapEditor
             ref={editorRef}
             initialContent={initial.contentJson}

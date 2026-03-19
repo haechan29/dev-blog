@@ -56,6 +56,7 @@ const TiptapEditor = forwardRef<
   }
 >(function TiptapEditor({ initialContent, className }, ref) {
   const [anchors, setAnchors] = useState<TocAnchor[]>([]);
+  const [isEditorToolbarVisible, setIsEditorToolbarVisible] = useState(false);
   const [isDialogueToolbarOpen, setIsDialogueToolbarOpen] = useState(false);
 
   const handleTocItemClick = (heading: Heading) => {
@@ -162,6 +163,9 @@ const TiptapEditor = forwardRef<
         class: clsx('prose max-w-none focus:outline-none', className),
       },
     },
+    onFocus: () => {
+      setIsEditorToolbarVisible(true);
+    },
   });
 
   useImperativeHandle(ref, () => ({
@@ -174,7 +178,11 @@ const TiptapEditor = forwardRef<
 
   return (
     <>
-      <EditorToolbar editor={editor} />
+      <EditorToolbar
+        editor={editor}
+        isVisible={isEditorToolbarVisible}
+        onClose={() => setIsEditorToolbarVisible(false)}
+      />
 
       <div className='mb-10 xl:mb-0'>
         <div className='block xl:hidden text-xl xl:text-2xl font-bold text-gray-900 mt-4 mb-2 leading-tight'>

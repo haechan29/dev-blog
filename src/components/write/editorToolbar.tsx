@@ -9,6 +9,7 @@ import { Editor, useEditorState } from '@tiptap/react';
 import clsx from 'clsx';
 import {
   Bold,
+  ChevronUp,
   Code,
   Heading1,
   Heading2,
@@ -28,7 +29,15 @@ import {
 } from 'lucide-react';
 import { useRef, useState } from 'react';
 
-export default function EditorToolbar({ editor }: { editor: Editor | null }) {
+export default function EditorToolbar({
+  editor,
+  isVisible,
+  onClose,
+}: {
+  editor: Editor | null;
+  isVisible: boolean;
+  onClose: () => void;
+}) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
@@ -201,53 +210,70 @@ export default function EditorToolbar({ editor }: { editor: Editor | null }) {
     }
   };
 
-  if (!editor) return null;
+  if (!editor || !isVisible) {
+    return (
+      <div className='sticky top-(--toolbar-height) z-40 w-full h-px mb-10 bg-gray-200' />
+    );
+  }
 
   return (
     <div
       className={clsx(
         'sticky top-(--toolbar-height) z-40 w-full mb-10',
-        'p-1 gap-1 border border-gray-200 rounded-lg bg-white/80 backdrop-blur-md'
+        'border-y border-gray-200 bg-white/80 backdrop-blur-md'
       )}
     >
-      <div className='w-full flex px-2 py-1 gap-1 overflow-x-auto scrollbar-hide border-gray-200'>
-        <EditorToolbarStyleDropdown
-          styles={textStyles}
-          onSelect={label => {
-            textStyles.find(style => style.label === label)?.action();
-          }}
-        />
+      <div className='w-full flex items-center gap-2 px-2 py-1'>
+        <div className='flex-1 min-w-0 flex items-center gap-1 overflow-x-auto scrollbar-hide'>
+          <EditorToolbarStyleDropdown
+            styles={textStyles}
+            onSelect={label => {
+              textStyles.find(style => style.label === label)?.action();
+            }}
+          />
 
-        <div className='w-px h-6 bg-gray-200 mx-1 shrink-0' />
+          <div className='w-px h-6 bg-gray-200 mx-1 shrink-0' />
 
-        {textItems.map(item => (
-          <Tooltip key={item.key} text={item.label} direction='top'>
-            <button
-              type='button'
-              onClick={item.onClick}
-              className={clsx(
-                'w-8 h-8 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer',
-                item.active && 'bg-gray-100'
-              )}
-            >
-              <item.icon className='w-4 h-4 text-gray-700' />
-            </button>
-          </Tooltip>
-        ))}
+          {textItems.map(item => (
+            <Tooltip key={item.key} text={item.label} direction='top'>
+              <button
+                type='button'
+                onClick={item.onClick}
+                className={clsx(
+                  'w-8 h-8 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer',
+                  item.active && 'bg-gray-100'
+                )}
+              >
+                <item.icon className='w-4 h-4 text-gray-700' />
+              </button>
+            </Tooltip>
+          ))}
 
-        <div className='w-px h-6 bg-gray-200 mx-1 shrink-0' />
+          <div className='w-px h-6 bg-gray-200 mx-1 shrink-0' />
 
-        {blockItems.map(item => (
-          <Tooltip key={item.key} text={item.label} direction='top'>
-            <button
-              type='button'
-              onClick={item.onClick}
-              className='w-8 h-8 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer'
-            >
-              <item.icon className='w-4 h-4 text-gray-700' />
-            </button>
-          </Tooltip>
-        ))}
+          {blockItems.map(item => (
+            <Tooltip key={item.key} text={item.label} direction='top'>
+              <button
+                type='button'
+                onClick={item.onClick}
+                className='w-8 h-8 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer'
+              >
+                <item.icon className='w-4 h-4 text-gray-700' />
+              </button>
+            </Tooltip>
+          ))}
+        </div>
+
+        <div className='shrink-0'>
+          <button
+            type='button'
+            onClick={onClose}
+            className='w-8 h-8 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer'
+            aria-label='에디터 툴바 접기'
+          >
+            <ChevronUp className='w-4 h-4 text-gray-500' />
+          </button>
+        </div>
       </div>
 
       <input
