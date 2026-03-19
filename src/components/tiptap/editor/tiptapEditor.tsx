@@ -1,5 +1,6 @@
 'use client';
 
+import TableOfContents from '@/components/post/tableOfContents';
 import BlockMenu from '@/components/tiptap/editor/blockMenu';
 import DialogueToolbar from '@/components/tiptap/editor/dialogueToolbar';
 import FloatingMenu from '@/components/tiptap/editor/floatingMenu';
@@ -15,7 +16,9 @@ import BgmNode from '@/components/tiptap/nodes/bgm';
 import DialogueNode from '@/components/tiptap/nodes/dialogue';
 import ImageWithCaptionNode from '@/components/tiptap/nodes/imageWithCaption';
 import LinkCardNode from '@/components/tiptap/nodes/linkCard';
+import EditorToolbar from '@/components/write/editorToolbar';
 import { uploadImage } from '@/features/media/utils/uploadImage';
+import Heading from '@/features/post/domain/types/heading';
 import TocAnchor from '@/features/post/domain/types/tocAnchor';
 import { Blockquote } from '@tiptap/extension-blockquote';
 import CharacterCount from '@tiptap/extension-character-count';
@@ -27,7 +30,7 @@ import Placeholder from '@tiptap/extension-placeholder';
 import { Table } from '@tiptap/extension-table';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
-import { TableOfContents } from '@tiptap/extension-table-of-contents';
+import { TableOfContents as TableOfContentsExtension } from '@tiptap/extension-table-of-contents';
 import TableRow from '@tiptap/extension-table-row';
 import {
   EditorContent,
@@ -49,11 +52,19 @@ const TiptapEditor = forwardRef<
   TiptapEditorRef,
   {
     initialContent?: JSONContent;
-    onAnchorsChange?: (anchors: TocAnchor[]) => void;
     className?: string;
   }
->(function TiptapEditor({ initialContent, onAnchorsChange, className }, ref) {
+>(function TiptapEditor({ initialContent, className }, ref) {
+  const [anchors, setAnchors] = useState<TocAnchor[]>([]);
   const [isDialogueToolbarOpen, setIsDialogueToolbarOpen] = useState(false);
+
+  const handleTocItemClick = (heading: Heading) => {
+    const anchor = anchors.find(a => a.id === heading.id);
+    anchor?.dom.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  };
 
   const editor = useEditor({
     extensions: [
@@ -80,12 +91,8 @@ const TiptapEditor = forwardRef<
       TableRow,
       TableHeader,
       TableCell,
-      TableOfContents.configure({
-        onUpdate: anchors => {
-          if (onAnchorsChange) {
-            onAnchorsChange(anchors as TocAnchor[]);
-          }
-        },
+      TableOfContentsExtension.configure({
+        onUpdate: setAnchors,
       }),
       Blockquote.extend({
         content: '(paragraph | imageWithCaption)*',
@@ -166,20 +173,35 @@ const TiptapEditor = forwardRef<
   }));
 
   return (
-    <div className='h-full flex flex-col'>
+    <>
+      <EditorToolbar editor={editor} />
+
+      <div className='mb-10 xl:mb-0'>
+        <div className='block xl:hidden text-xl xl:text-2xl font-bold text-gray-900 mt-4 mb-2 leading-tight'>
+          목차
+        </div>
+        <TableOfContents
+          headings={anchors}
+          currentHeadingId={anchors.find(a => a.isActive)?.id ?? null}
+          onItemClick={handleTocItemClick}
+          showPlaceholder
+        />
+      </div>
+
+      <div className='min-h-[30vh] relative'>
+        <EditorContent editor={editor} />
+      </div>
+
       <DialogueToolbar
         editor={editor}
         isOpen={isDialogueToolbarOpen}
         setIsOpen={setIsDialogueToolbarOpen}
       />
-      <div className='min-h-[30vh] relative'>
-        <EditorContent editor={editor} />
-      </div>
       <BlockMenu editor={editor} />
       <FloatingMenu editor={editor} />
       <LinkPasteMenu editor={editor} />
       <TableMenu editor={editor} />
-    </div>
+    </>
   );
 });
 

@@ -1,6 +1,5 @@
 'use client';
 
-import TableOfContents from '@/components/post/tableOfContents';
 import TiptapEditor, {
   TiptapEditorRef,
 } from '@/components/tiptap/editor/tiptapEditor';
@@ -16,7 +15,6 @@ import useDrafts from '@/features/draft/hooks/useDrafts';
 import useSaveShortcut from '@/features/draft/hooks/useSaveShortcut';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
-import TocAnchor from '@/features/post/domain/types/tocAnchor';
 import useBgmController from '@/features/post/hooks/useBgmController';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
 import useUser from '@/features/user/domain/hooks/useUser';
@@ -61,7 +59,6 @@ export default function WritePageClient({
   const [currentDraftId, setCurrentDraftId] = useState<string | null>(
     initial.currentDraftId
   );
-  const [anchors, setAnchors] = useState<TocAnchor[]>([]);
   const [isDraftSidebarVisible, setIsDraftSidebarVisible] = useState(false);
 
   const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
@@ -301,28 +298,9 @@ export default function WritePageClient({
 
           <div className='w-full h-px bg-gray-200 mb-10' />
 
-          <div className='mb-10 xl:mb-0'>
-            <div className='block xl:hidden text-xl xl:text-2xl font-bold text-gray-900 mt-4 mb-2 leading-tight'>
-              목차
-            </div>
-            <TableOfContents
-              headings={anchors}
-              currentHeadingId={anchors.find(a => a.isActive)?.id ?? null}
-              onItemClick={heading => {
-                const anchor = anchors.find(a => a.id === heading.id);
-                anchor?.dom.scrollIntoView({
-                  behavior: 'smooth',
-                  block: 'start',
-                });
-              }}
-              showPlaceholder
-            />
-          </div>
-
           <TiptapEditor
             ref={editorRef}
             initialContent={initial.contentJson}
-            onAnchorsChange={setAnchors}
             className='mb-20'
           />
 
