@@ -3,7 +3,6 @@
 import TableOfContents from '@/components/post/tableOfContents';
 import BlockMenu from '@/components/tiptap/editor/blockMenu';
 import DialogueToolbar from '@/components/tiptap/editor/dialogueToolbar';
-import FloatingMenu from '@/components/tiptap/editor/floatingMenu';
 import LinkPasteMenu from '@/components/tiptap/editor/linkPasteMenu';
 import TableMenu from '@/components/tiptap/editor/tableMenu';
 import BgmView from '@/components/tiptap/editor/views/bgm';
@@ -206,7 +205,6 @@ const TiptapEditor = forwardRef<
         setIsOpen={setIsDialogueToolbarOpen}
       />
       <BlockMenu editor={editor} />
-      <FloatingMenu editor={editor} />
       <LinkPasteMenu editor={editor} />
       <TableMenu editor={editor} />
     </>
