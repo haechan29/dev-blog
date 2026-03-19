@@ -394,7 +394,7 @@ body {
 .prose table,
 .prose figure,
 .prose hr {
-  @apply my-4;
+  @apply my-0 py-4;
 }
 
 .prose table {
