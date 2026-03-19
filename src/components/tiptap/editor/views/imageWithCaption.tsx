@@ -66,7 +66,7 @@ export default function ImageWithCaption({
   }, [status]);
 
   return (
-    <NodeViewWrapper className='flex flex-col items-center gap-4 my-5 lg:my-6 xl:my-7'>
+    <NodeViewWrapper className='not-prose flex flex-col items-center gap-4 my-5 lg:my-6 xl:my-7'>
       {isError || !src ? (
         <div className='flex items-center justify-center p-4 rounded-xl bg-gray-200 text-gray-700'>
           이미지를 불러올 수 없습니다

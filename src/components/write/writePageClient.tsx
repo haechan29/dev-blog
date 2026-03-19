@@ -263,21 +263,6 @@ export default function WritePageClient({
         onDeleteDraft={handleDraftDeleteClick}
       />
 
-      <div className='fixed top-0 right-0 w-(--toc-width) mr-(--toc-margin) h-full max-xl:hidden'>
-        <TableOfContents
-          headings={anchors}
-          currentHeadingId={anchors.find(a => a.isActive)?.id ?? null}
-          onItemClick={heading => {
-            const anchor = anchors.find(a => a.id === heading.id);
-            anchor?.dom.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-            });
-          }}
-          showPlaceholder
-        />
-      </div>
-
       <div
         className={clsx(
           'mt-(--toolbar-height) mb-12 px-6 md:px-12 xl:px-18',
@@ -315,6 +300,24 @@ export default function WritePageClient({
           </div>
 
           <div className='w-full h-px bg-gray-200 mb-10' />
+
+          <div className='mb-10 xl:mb-0'>
+            <div className='block xl:hidden text-xl xl:text-2xl font-bold text-gray-900 mt-4 mb-2 leading-tight'>
+              목차
+            </div>
+            <TableOfContents
+              headings={anchors}
+              currentHeadingId={anchors.find(a => a.isActive)?.id ?? null}
+              onItemClick={heading => {
+                const anchor = anchors.find(a => a.id === heading.id);
+                anchor?.dom.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'start',
+                });
+              }}
+              showPlaceholder
+            />
+          </div>
 
           <TiptapEditor
             ref={editorRef}
