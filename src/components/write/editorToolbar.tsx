@@ -27,7 +27,7 @@ import {
   Text,
   Underline,
 } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export default function EditorToolbar({
   editor,
@@ -40,7 +40,21 @@ export default function EditorToolbar({
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
+  const [showRightFade, setShowRightFade] = useState(false);
+
+  const updateRightFade = useCallback(() => {
+    const el = scrollAreaRef.current;
+    if (!el) {
+      setShowRightFade(false);
+      return;
+    }
+
+    const hasOverflow = el.scrollWidth > el.clientWidth + 1;
+    const hasMoreRight = el.scrollLeft + el.clientWidth < el.scrollWidth - 1;
+    setShowRightFade(hasOverflow && hasMoreRight);
+  }, []);
 
   const editorState = useEditorState({
     editor,
@@ -210,6 +224,31 @@ export default function EditorToolbar({
     }
   };
 
+  useEffect(() => {
+    if (!isVisible) return;
+
+    const el = scrollAreaRef.current;
+    if (!el) return;
+
+    updateRightFade();
+
+    const handleScroll = () => updateRightFade();
+    el.addEventListener('scroll', handleScroll, { passive: true });
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateRightFade();
+    });
+    resizeObserver.observe(el);
+
+    window.addEventListener('resize', updateRightFade);
+
+    return () => {
+      el.removeEventListener('scroll', handleScroll);
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', updateRightFade);
+    };
+  }, [isVisible, updateRightFade]);
+
   if (!editor || !isVisible) {
     return (
       <div className='sticky top-(--toolbar-height) z-40 w-full h-px mb-10 bg-gray-200' />
@@ -224,44 +263,57 @@ export default function EditorToolbar({
       )}
     >
       <div className='w-full flex items-center gap-2 px-2 py-1'>
-        <div className='flex-1 min-w-0 flex items-center gap-1 overflow-x-auto scrollbar-hide'>
-          <EditorToolbarStyleDropdown
-            styles={textStyles}
-            onSelect={label => {
-              textStyles.find(style => style.label === label)?.action();
-            }}
+        <div className='relative flex-1 min-w-0'>
+          <div
+            ref={scrollAreaRef}
+            className='flex items-center gap-1 overflow-x-auto scrollbar-hide'
+          >
+            <EditorToolbarStyleDropdown
+              styles={textStyles}
+              onSelect={label => {
+                textStyles.find(style => style.label === label)?.action();
+              }}
+            />
+
+            <div className='w-px h-6 bg-gray-200 mx-1 shrink-0' />
+
+            {textItems.map(item => (
+              <Tooltip key={item.key} text={item.label} direction='top'>
+                <button
+                  type='button'
+                  onClick={item.onClick}
+                  className={clsx(
+                    'w-8 h-8 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer',
+                    item.active && 'bg-gray-100'
+                  )}
+                >
+                  <item.icon className='w-4 h-4 text-gray-700' />
+                </button>
+              </Tooltip>
+            ))}
+
+            <div className='w-px h-6 bg-gray-200 mx-1 shrink-0' />
+
+            {blockItems.map(item => (
+              <Tooltip key={item.key} text={item.label} direction='top'>
+                <button
+                  type='button'
+                  onClick={item.onClick}
+                  className='w-8 h-8 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer'
+                >
+                  <item.icon className='w-4 h-4 text-gray-700' />
+                </button>
+              </Tooltip>
+            ))}
+          </div>
+
+          <div
+            className={clsx(
+              'pointer-events-none absolute right-0 top-0 h-full w-10',
+              'bg-linear-to-l from-white/85 to-transparent transition-opacity duration-150',
+              showRightFade ? 'opacity-100' : 'opacity-0'
+            )}
           />
-
-          <div className='w-px h-6 bg-gray-200 mx-1 shrink-0' />
-
-          {textItems.map(item => (
-            <Tooltip key={item.key} text={item.label} direction='top'>
-              <button
-                type='button'
-                onClick={item.onClick}
-                className={clsx(
-                  'w-8 h-8 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer',
-                  item.active && 'bg-gray-100'
-                )}
-              >
-                <item.icon className='w-4 h-4 text-gray-700' />
-              </button>
-            </Tooltip>
-          ))}
-
-          <div className='w-px h-6 bg-gray-200 mx-1 shrink-0' />
-
-          {blockItems.map(item => (
-            <Tooltip key={item.key} text={item.label} direction='top'>
-              <button
-                type='button'
-                onClick={item.onClick}
-                className='w-8 h-8 flex items-center justify-center shrink-0 p-2 rounded hover:bg-gray-100 cursor-pointer'
-              >
-                <item.icon className='w-4 h-4 text-gray-700' />
-              </button>
-            </Tooltip>
-          ))}
         </div>
 
         <div className='shrink-0'>
