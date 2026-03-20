@@ -242,6 +242,7 @@ export default function WritePageClient({
   return (
     <>
       <WriteToolbar
+        isEditMode={isEditMode}
         hasDrafts={(drafts?.length ?? 0) > 0}
         onOpenDraftSidebar={() => setIsDraftSidebarVisible(true)}
         onNext={handleNext}

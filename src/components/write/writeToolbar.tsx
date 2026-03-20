@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { Check, Loader2, Menu } from 'lucide-react';
 
 export default function WriteToolbar({
+  isEditMode,
   hasDrafts,
   onOpenDraftSidebar,
   onNext,
@@ -13,6 +14,7 @@ export default function WriteToolbar({
   isSavePending,
   saveJustSucceeded,
 }: {
+  isEditMode: boolean;
   hasDrafts: boolean;
   onOpenDraftSidebar: () => void;
   onNext: () => void;
@@ -76,6 +78,8 @@ export default function WriteToolbar({
       >
         {isPublishPending ? (
           <Loader2 size={16} className='animate-spin' />
+        ) : isEditMode ? (
+          '수정'
         ) : (
           '발행'
         )}
