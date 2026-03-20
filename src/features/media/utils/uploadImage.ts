@@ -15,16 +15,24 @@ export async function uploadImage(
 
   clearDropCursor();
 
-  for (const file of files) {
-    const id = nanoid();
-    const blobUrl = URL.createObjectURL(file);
+  const uploadItems = files.map(file => ({
+    file,
+    id: nanoid(),
+    blobUrl: URL.createObjectURL(file),
+  }));
 
-    editor
-      .chain()
-      .focus()
-      .setImageWithCaption({ src: blobUrl, id, status: 'loading' })
-      .run();
+  editor
+    .chain()
+    .focus()
+    .insertContent(
+      uploadItems.map(({ id, blobUrl }) => ({
+        type: 'imageWithCaption',
+        attrs: { src: blobUrl, id, status: 'loading' },
+      }))
+    )
+    .run();
 
+  for (const { file, id, blobUrl } of uploadItems) {
     try {
       const compressedFile =
         file.type === 'image/gif'
@@ -38,8 +46,6 @@ export async function uploadImage(
 
       const uploadedUrl =
         await MediaClientRepository.uploadPostImage(compressedFile);
-
-      URL.revokeObjectURL(blobUrl);
 
       updateNodeById(editor, 'imageWithCaption', id, {
         src: uploadedUrl,
@@ -57,6 +63,8 @@ export async function uploadImage(
           ? error.message
           : '이미지 업로드에 실패했습니다';
       toast.error(message);
+    } finally {
+      URL.revokeObjectURL(blobUrl);
     }
   }
 }

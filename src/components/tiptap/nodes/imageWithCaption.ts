@@ -4,20 +4,6 @@ export interface ImageWithCaptionOptions {
   HTMLAttributes: Record<string, unknown>;
 }
 
-declare module '@tiptap/core' {
-  interface Commands<ReturnType> {
-    imageWithCaption: {
-      setImageWithCaption: (options: {
-        src: string;
-        alt?: string;
-        size?: 'medium' | 'large';
-        id?: string;
-        status?: 'loading' | 'failed' | 'success';
-      }) => ReturnType;
-    };
-  }
-}
-
 export default Node.create<ImageWithCaptionOptions>({
   name: 'imageWithCaption',
 
@@ -93,18 +79,5 @@ export default Node.create<ImageWithCaptionOptions>({
       ['img', { src: HTMLAttributes.src, alt: HTMLAttributes.alt }],
       ['figcaption', {}, HTMLAttributes.alt || ''],
     ];
-  },
-
-  addCommands() {
-    return {
-      setImageWithCaption:
-        options =>
-        ({ commands }) => {
-          return commands.insertContent({
-            type: this.name,
-            attrs: options,
-          });
-        },
-    };
   },
 });

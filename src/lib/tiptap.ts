@@ -16,6 +16,7 @@ export function updateNodeById(
     }
   });
 
+  tr.setMeta('addToHistory', false);
   editor.view.dispatch(tr);
 }
 
