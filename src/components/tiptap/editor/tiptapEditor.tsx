@@ -148,8 +148,8 @@ const TiptapEditor = forwardRef<
           'image/gif',
           'image/webp',
         ],
-        onPaste: uploadImage,
-        onDrop: uploadImage,
+        onPaste: (editor, files) => uploadImage(editor, files),
+        onDrop: (editor, files, pos) => uploadImage(editor, files, pos),
       }),
       Placeholder.configure({
         placeholder: '여기에 글을 작성하세요',

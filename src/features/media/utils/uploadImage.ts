@@ -9,7 +9,8 @@ import toast from 'react-hot-toast';
 
 export async function uploadImage(
   editor: Editor,
-  files: File[]
+  files: File[],
+  pos?: number
 ): Promise<void> {
   if (files.length === 0) return;
 
@@ -21,16 +22,16 @@ export async function uploadImage(
     blobUrl: URL.createObjectURL(file),
   }));
 
-  editor
-    .chain()
-    .focus()
-    .insertContent(
-      uploadItems.map(({ id, blobUrl }) => ({
-        type: 'imageWithCaption',
-        attrs: { src: blobUrl, id, status: 'loading' },
-      }))
-    )
-    .run();
+  const content = uploadItems.map(({ id, blobUrl }) => ({
+    type: 'imageWithCaption',
+    attrs: { src: blobUrl, id, status: 'loading' },
+  }));
+
+  if (typeof pos === 'number') {
+    editor.chain().focus().insertContentAt(pos, content).run();
+  } else {
+    editor.chain().focus().insertContent(content).run();
+  }
 
   for (const { file, id, blobUrl } of uploadItems) {
     try {
