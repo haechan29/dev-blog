@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 function ErrorImage() {
   return (
-    <div className='flex items-center justify-center p-4 rounded-xl bg-gray-200 text-gray-700'>
+    <div className='flex items-center justify-center p-4 rounded-sm bg-gray-200 text-gray-700'>
       이미지를 불러올 수 없습니다
     </div>
   );
@@ -31,7 +31,7 @@ export default function ImageWithCaption({
   return (
     <figure
       data-image-with-caption
-      className='not-prose flex flex-col items-center gap-4 my-5 lg:my-6 xl:my-7'
+      className='flex flex-col items-center gap-1'
     >
       {isError || !src ? (
         <ErrorImage />

@@ -296,10 +296,6 @@ body {
   }
 }
 
-.prose {
-  @apply text-gray-900;
-}
-
 .prose h1 {
   @apply text-2xl;
 }
@@ -320,10 +316,6 @@ body {
 
 .prose a {
   @apply text-blue-600 hover:text-blue-800;
-}
-
-.prose img {
-  @apply rounded-lg;
 }
 
 .prose blockquote {
@@ -363,8 +355,16 @@ body {
 .prose p,
 .prose video,
 .prose iframe,
-.prose details {
+.prose details,
+.prose ul,
+.prose ol,
+.prose img,
+.prose figcaption {
   @apply my-0;
+}
+
+.prose figure {
+  @apply my-0 py-1;
 }
 
 .prose h1,
@@ -373,14 +373,9 @@ body {
 .prose h4,
 .prose h5,
 .prose h6,
-.prose img,
 .prose blockquote,
 .prose pre,
-.prose ul,
-.prose ol,
-.prose table,
-.prose figure,
-.prose hr {
+.prose table {
   @apply my-0 py-4;
 }
 

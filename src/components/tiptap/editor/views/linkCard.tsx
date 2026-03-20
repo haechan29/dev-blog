@@ -144,7 +144,7 @@ export default function LinkCard({
               height={1000}
               src={og.image}
               alt={og.title}
-              className='h-full w-full object-cover m-0! rounded-none!'
+              className='h-full w-full object-cover rounded-none'
             />
           </div>
           <div className='flex flex-col gap-1 p-4'>
@@ -193,7 +193,7 @@ export default function LinkCard({
             height={200}
             src={og.image}
             alt={og.title}
-            className='h-full w-full object-cover m-0! rounded-none!'
+            className='h-full w-full object-cover rounded-none'
           />
         </div>
         <div className='flex flex-col justify-center gap-1 p-4 flex-1 min-w-0'>

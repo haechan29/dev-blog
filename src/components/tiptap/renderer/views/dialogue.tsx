@@ -25,7 +25,7 @@ export default function Dialogue({
   const showImage = avatar && isValidImageSrc(avatar) && !isError;
 
   return (
-    <div className='not-prose my-4 flex gap-3'>
+    <div className='my-4 flex gap-3'>
       {showImage ? (
         <Image
           src={buildImageUrl(avatar, '120')}
@@ -35,7 +35,7 @@ export default function Dialogue({
           onError={() => setIsError(true)}
           className={clsx(
             ringColors[colorIndex],
-            'w-8 h-8 rounded-full! m-0! object-cover shrink-0 ring-2'
+            'w-8 h-8 rounded-full object-cover shrink-0 ring-2'
           )}
         />
       ) : (

@@ -24,7 +24,7 @@ export default function Dialogue({ node }: NodeViewProps) {
   }, [avatar]);
 
   return (
-    <NodeViewWrapper className='not-prose my-4 flex gap-3'>
+    <NodeViewWrapper className='my-4 flex gap-3'>
       {showImage ? (
         <Image
           src={buildImageUrl(avatar, '120')}
@@ -34,7 +34,7 @@ export default function Dialogue({ node }: NodeViewProps) {
           onError={() => setIsImageError(true)}
           className={clsx(
             ringColors[colorIndex],
-            'w-8 h-8 rounded-full! m-0! object-cover shrink-0 ring-2'
+            'w-8 h-8 rounded-full object-cover shrink-0 ring-2'
           )}
         />
       ) : (
