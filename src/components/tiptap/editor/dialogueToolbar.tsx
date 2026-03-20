@@ -192,7 +192,7 @@ export default function DialogueToolbar({
     };
   }, [editor, setIsOpen]);
 
-  if (!editor || !isOpen) return null;
+  if (!editor) return null;
 
   return (
     <>
@@ -209,7 +209,10 @@ export default function DialogueToolbar({
       />
 
       <div
-        className='fixed bottom-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-t border-gray-200'
+        className={clsx(
+          'fixed bottom-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-t border-gray-200',
+          !isOpen && 'hidden'
+        )}
         onMouseDown={e => e.preventDefault()}
         onTouchStart={e => e.preventDefault()}
       >
