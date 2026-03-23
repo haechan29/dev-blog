@@ -71,7 +71,6 @@ export default function DialogueToolbar({
               maxSizeMB: 1,
               initialQuality: 0.8,
               maxWidthOrHeight: 256,
-              useWebWorker: true,
             });
 
       const baseUrl =

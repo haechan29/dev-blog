@@ -14,15 +14,16 @@ export async function cropImage(
   updateNodeById(editor, 'imageWithCaption', nodeId, { status: 'loading' });
 
   try {
-    const compressedFile =
-      croppedFile.type === 'image/gif'
-        ? croppedFile
-        : await imageCompression(croppedFile, {
-            maxSizeMB: 1,
-            initialQuality: 0.8,
-            maxWidthOrHeight: 1920,
-            useWebWorker: true,
-          });
+    const shouldSkipCompression =
+      croppedFile.size < 1024 * 1024 || croppedFile.type === 'image/gif';
+
+    const compressedFile = shouldSkipCompression
+      ? croppedFile
+      : await imageCompression(croppedFile, {
+          maxSizeMB: 1,
+          initialQuality: 0.8,
+          maxWidthOrHeight: 1920,
+        });
 
     const uploadedUrl =
       await MediaClientRepository.uploadPostImage(compressedFile);

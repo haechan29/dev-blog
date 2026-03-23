@@ -47,7 +47,6 @@ export default function UserProfile({
         maxSizeMB: 1,
         initialQuality: 0.8,
         maxWidthOrHeight: 256,
-        useWebWorker: true,
       });
 
       updateImageMutation.mutate(compressedFile, {

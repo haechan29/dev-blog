@@ -35,15 +35,16 @@ export async function uploadImage(
 
   for (const { file, id, blobUrl } of uploadItems) {
     try {
-      const compressedFile =
-        file.type === 'image/gif'
-          ? file
-          : await imageCompression(file, {
-              maxSizeMB: 1,
-              initialQuality: 0.8,
-              maxWidthOrHeight: 1920,
-              useWebWorker: true,
-            });
+      const shouldSkipCompression =
+        file.size < 1024 * 1024 || file.type === 'image/gif';
+
+      const compressedFile = shouldSkipCompression
+        ? file
+        : await imageCompression(file, {
+            maxSizeMB: 1,
+            initialQuality: 0.8,
+            maxWidthOrHeight: 1920,
+          });
 
       const uploadedUrl =
         await MediaClientRepository.uploadPostImage(compressedFile);
