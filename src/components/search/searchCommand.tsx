@@ -39,9 +39,9 @@ export default function SearchCommand({
   const isTouch = useMediaQuery(TOUCH_QUERY);
 
   const { data: posts = [], isLoading } = useQuery({
-    queryKey: postKeys.search(debouncedQuery, 10),
+    queryKey: postKeys.search(debouncedQuery),
     queryFn: () =>
-      PostClientService.searchPosts(debouncedQuery, 10).then(result =>
+      PostClientService.searchPosts({ query: debouncedQuery }).then(result =>
         result.posts.map(createProps)
       ),
     enabled: debouncedQuery.length > 0,

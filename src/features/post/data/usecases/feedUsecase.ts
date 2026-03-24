@@ -6,12 +6,17 @@ import * as SubscriptionQueries from '@/features/subscription/data/queries/subsc
 
 const FEED_LIMIT = 5;
 
-export async function getFeedPosts(
-  cursor: string | null,
-  userId?: string,
-  excludeId?: string,
-  tag?: string
-) {
+export async function getFeedPosts({
+  cursor,
+  userId,
+  excludeId,
+  tag,
+}: {
+  cursor: string | null;
+  userId?: string;
+  excludeId?: string;
+  tag?: string;
+}) {
   if (!userId) {
     const fetchedPosts = await FeedQueries.fetchFeedPosts({
       limit: FEED_LIMIT + 1,

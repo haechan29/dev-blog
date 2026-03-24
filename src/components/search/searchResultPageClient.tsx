@@ -36,14 +36,13 @@ export default function SearchResultPageClient({
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: postKeys.search(query, 20, true),
+    queryKey: postKeys.search(query, true),
     queryFn: async ({ pageParam }) => {
-      const result = await PostClientService.searchPosts(
+      const result = await PostClientService.searchPosts({
         query,
-        20,
-        pageParam?.score,
-        pageParam?.id
-      );
+        cursorScore: pageParam?.score,
+        cursorId: pageParam?.id,
+      });
       return {
         posts: result.posts.map(createProps),
         nextCursor: result.nextCursor,

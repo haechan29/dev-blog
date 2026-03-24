@@ -1,37 +1,35 @@
 import { auth } from '@/auth';
-import SearchResultPageClient from '@/components/search/searchResultPageClient';
+import HomePageClient from '@/components/home/homePageClient';
 import * as PostServerService from '@/features/post/domain/service/postServerService';
 import { createProps } from '@/features/post/ui/postProps';
 import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 
-export default async function SearchResultPage({
-  searchParams,
+export default async function TagPage({
+  params,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  params: Promise<{ tag: string }>;
 }) {
   const session = await auth();
   const userId =
     session?.user?.user_id ?? (await cookies()).get('userId')?.value;
 
-  const { q } = await searchParams;
+  const { tag: encodedTag } = await params;
+  const tag = decodeURIComponent(encodedTag);
 
-  if (!q?.trim()) {
-    redirect('/search');
-  }
-
-  const { posts, nextCursor } = await PostServerService.searchPosts({
-    query: q,
+  const { posts, nextCursor } = await PostServerService.getFeedPosts({
+    cursor: null,
+    userId,
+    tag,
   });
   const postProps = posts.map(createProps);
 
   return (
-    <SearchResultPageClient
+    <HomePageClient
       isLoggedIn={!!session}
-      query={q}
       initialPosts={postProps}
       initialCursor={nextCursor}
       userId={userId}
+      tag={tag}
     />
   );
 }

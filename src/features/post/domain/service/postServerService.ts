@@ -3,16 +3,13 @@ import { toDomain } from '@/features/post/domain/mapper/postMapper';
 import Post from '@/features/post/domain/model/post';
 import 'server-only';
 
-export async function getFeedPosts(
-  cursor: string | null,
-  userId?: string,
-  excludeId?: string
-) {
-  const result = await PostServerRepository.getFeedPosts(
-    cursor,
-    userId,
-    excludeId
-  );
+export async function getFeedPosts(params: {
+  cursor: string | null;
+  userId?: string;
+  excludeId?: string;
+  tag?: string;
+}) {
+  const result = await PostServerRepository.getFeedPosts(params);
   return {
     posts: result.posts.map(toDomain),
     nextCursor: result.nextCursor,
@@ -29,18 +26,12 @@ export async function getPost(postId: string): Promise<Post> {
   return toDomain(dto);
 }
 
-export async function searchPosts(
-  query: string,
-  limit: number,
-  cursorScore?: number,
-  cursorId?: string
-) {
-  const result = await PostServerRepository.searchPosts(
-    query,
-    limit,
-    cursorScore,
-    cursorId
-  );
+export async function searchPosts(params: {
+  query: string;
+  cursorScore?: number;
+  cursorId?: string;
+}) {
+  const result = await PostServerRepository.searchPosts(params);
   return {
     posts: result.posts.map(toDomain),
     nextCursor: result.nextCursor,

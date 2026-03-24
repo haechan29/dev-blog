@@ -8,10 +8,15 @@ export async function getPost(postId: string): Promise<PostDto> {
   return response.data;
 }
 
-export async function getFeedPosts(
-  cursor: string | null,
-  excludeId?: string
-): Promise<{
+export async function getFeedPosts({
+  cursor,
+  excludeId,
+  tag,
+}: {
+  cursor: string | null;
+  excludeId?: string;
+  tag?: string;
+}): Promise<{
   posts: PostDto[];
   nextCursor: string | null;
 }> {
@@ -19,6 +24,7 @@ export async function getFeedPosts(
     type: 'feed',
     ...(cursor && { cursor }),
     ...(excludeId && { excludeId }),
+    ...(tag && { tag }),
   });
 
   const response = await api.get(`/api/posts?${params}`);
@@ -30,19 +36,21 @@ export async function getPostsByUserId(userId: string): Promise<PostDto[]> {
   return response.data;
 }
 
-export async function searchPosts(
-  query: string,
-  limit: number,
-  cursorScore?: number,
-  cursorId?: string
-): Promise<{
+export async function searchPosts({
+  query,
+  cursorScore,
+  cursorId,
+}: {
+  query: string;
+  cursorScore?: number;
+  cursorId?: string;
+}): Promise<{
   posts: PostDto[];
   nextCursor: { score: number; id: string } | null;
 }> {
   const params = new URLSearchParams({
     type: 'search',
     q: query,
-    limit: limit.toString(),
     ...(cursorScore !== undefined && { cursorScore: cursorScore.toString() }),
     ...(cursorId && { cursorId }),
   });

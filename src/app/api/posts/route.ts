@@ -25,18 +25,17 @@ export async function GET(request: NextRequest) {
       const cursor = searchParams.get('cursor');
       const excludeId = searchParams.get('excludeId') ?? undefined;
       const tag = searchParams.get('tag') ?? undefined;
-      const data = await FeedUsecase.getFeedPosts(
+      const data = await FeedUsecase.getFeedPosts({
         cursor,
         userId,
         excludeId,
-        tag
-      );
+        tag,
+      });
       return NextResponse.json({ data });
     }
 
     if (type === 'search') {
       const query = searchParams.get('q');
-      const limit = searchParams.get('limit');
       const cursorScore = searchParams.get('cursorScore');
       const cursorId = searchParams.get('cursorId');
 
@@ -44,16 +43,11 @@ export async function GET(request: NextRequest) {
         throw new ValidationError('검색어를 찾을 수 없습니다');
       }
 
-      if (!limit) {
-        throw new ValidationError('검색 갯수를 찾을 수 없습니다');
-      }
-
-      const data = await SearchUsecase.searchPosts(
+      const data = await SearchUsecase.searchPosts({
         query,
-        parseInt(limit),
-        cursorScore ? parseInt(cursorScore) : undefined,
-        cursorId ?? undefined
-      );
+        cursorScore: cursorScore ? parseInt(cursorScore) : undefined,
+        cursorId: cursorId ?? undefined,
+      });
 
       return NextResponse.json({ data });
     }

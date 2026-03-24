@@ -3,12 +3,13 @@ import * as PostUsecase from '@/features/post/data/usecases/postUsecase';
 import * as SearchUsecase from '@/features/post/data/usecases/searchUsecase';
 import 'server-only';
 
-export async function getFeedPosts(
-  cursor: string | null,
-  userId?: string,
-  excludeId?: string
-) {
-  return await FeedUsecase.getFeedPosts(cursor, userId, excludeId);
+export async function getFeedPosts(params: {
+  cursor: string | null;
+  userId?: string;
+  excludeId?: string;
+  tag?: string;
+}) {
+  return await FeedUsecase.getFeedPosts(params);
 }
 
 export async function getPostsByUserId(userId: string) {
@@ -19,11 +20,10 @@ export async function getPost(postId: string) {
   return await PostUsecase.getPost(postId);
 }
 
-export async function searchPosts(
-  query: string,
-  limit: number,
-  cursorScore?: number,
-  cursorId?: string
-) {
-  return await SearchUsecase.searchPosts(query, limit, cursorScore, cursorId);
+export async function searchPosts(params: {
+  query: string;
+  cursorScore?: number;
+  cursorId?: string;
+}) {
+  return await SearchUsecase.searchPosts(params);
 }
