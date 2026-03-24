@@ -9,13 +9,15 @@ const FEED_LIMIT = 5;
 export async function getFeedPosts(
   cursor: string | null,
   userId?: string,
-  excludeId?: string
+  excludeId?: string,
+  tag?: string
 ) {
   if (!userId) {
     const fetchedPosts = await FeedQueries.fetchFeedPosts({
       limit: FEED_LIMIT + 1,
       cursor,
       excludeIds: excludeId ? [excludeId] : [],
+      tag,
     });
 
     const isLastPage = fetchedPosts.length <= FEED_LIMIT;
@@ -46,6 +48,7 @@ export async function getFeedPosts(
     excludeIds: excludeId ? [...viewedPostIds, excludeId] : viewedPostIds,
     excludeUserId: userId,
     cursor,
+    tag,
   });
 
   const isLastPage = fetchedPosts.length <= FEED_LIMIT;

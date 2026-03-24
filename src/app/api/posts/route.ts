@@ -24,7 +24,13 @@ export async function GET(request: NextRequest) {
       const userId = await getUserId();
       const cursor = searchParams.get('cursor');
       const excludeId = searchParams.get('excludeId') ?? undefined;
-      const data = await FeedUsecase.getFeedPosts(cursor, userId, excludeId);
+      const tag = searchParams.get('tag') ?? undefined;
+      const data = await FeedUsecase.getFeedPosts(
+        cursor,
+        userId,
+        excludeId,
+        tag
+      );
       return NextResponse.json({ data });
     }
 

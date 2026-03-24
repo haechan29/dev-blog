@@ -7,11 +7,13 @@ export async function fetchFeedPosts({
   excludeIds = [],
   excludeUserId,
   cursor,
+  tag,
 }: {
   limit: number;
   excludeIds?: string[];
   excludeUserId?: string;
   cursor: string | null;
+  tag?: string;
 }) {
   let query = supabase
     .from('posts')
@@ -45,6 +47,10 @@ export async function fetchFeedPosts({
 
   if (cursor) {
     query = query.lt('post_stats.popularity', cursor);
+  }
+
+  if (tag) {
+    query = query.contains('tags', [tag]);
   }
 
   query = query
