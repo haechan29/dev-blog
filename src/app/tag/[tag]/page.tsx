@@ -25,7 +25,6 @@ export default async function TagPage({
 
   return (
     <HomePageClient
-      isLoggedIn={!!session}
       initialPosts={postProps}
       initialCursor={nextCursor}
       userId={userId}

@@ -25,23 +25,19 @@ function PostPreviewSkeleton() {
 
 export default function HomeLoading() {
   return (
-    <>
-      <div className='fixed top-0 z-40 w-full h-(--toolbar-height) bg-white/80 backdrop-blur-md' />
-
-      <div
-        className={clsx(
-          'mt-(--toolbar-height) mb-8 px-6 md:px-12 xl:px-18',
-          'xl:ml-(--sidebar-width)',
-          'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
-        )}
-      >
-        <div className='flex flex-col mt-8'>
-          <PostPreviewSkeleton />
-          <PostPreviewSkeleton />
-          <PostPreviewSkeleton />
-          <PostPreviewSkeleton />
-        </div>
+    <div
+      className={clsx(
+        'mt-(--toolbar-height) mb-8 px-6 md:px-12 xl:px-18',
+        'xl:ml-(--sidebar-width)',
+        'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
+      )}
+    >
+      <div className='flex flex-col mt-8'>
+        <PostPreviewSkeleton />
+        <PostPreviewSkeleton />
+        <PostPreviewSkeleton />
+        <PostPreviewSkeleton />
       </div>
-    </>
+    </div>
   );
 }

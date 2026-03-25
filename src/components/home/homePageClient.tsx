@@ -1,7 +1,5 @@
 'use client';
 
-import HomeSidebar from '@/components/home/homeSidebar';
-import HomeToolbar from '@/components/home/homeToolbar';
 import PostPreview from '@/components/post/postPreview';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
@@ -9,23 +7,20 @@ import { postKeys } from '@/queries/keys';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 
 export default function HomePageClient({
-  isLoggedIn,
   initialPosts,
   initialCursor,
   userId,
   tag,
 }: {
-  isLoggedIn: boolean;
   initialPosts: PostProps[];
   initialCursor: string | null;
   userId?: string;
   tag?: string;
 }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { ref, inView } = useInView();
 
   const {
@@ -62,46 +57,29 @@ export default function HomePageClient({
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
-    <>
-      <HomeToolbar
-        isLoggedIn={isLoggedIn}
-        initialQuery={tag ? `#${tag}` : undefined}
-        onSidebarOpenChange={setIsSidebarOpen}
-      />
-
-      {userId && (
-        <HomeSidebar
-          userId={userId}
-          isOpen={isSidebarOpen}
-          onClose={() => setIsSidebarOpen(false)}
-        />
+    <div
+      className={clsx(
+        'mt-(--toolbar-height) mb-8 px-6 md:px-12 xl:px-18',
+        'xl:ml-(--sidebar-width)',
+        'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
       )}
+    >
+      <div className='flex flex-col mt-8'>
+        {posts.map((post, index) => (
+          <div key={post.id} className='mb-8'>
+            <PostPreview post={post} userId={userId} />
+            {index !== posts.length - 1 && <div className='h-px bg-gray-200' />}
+          </div>
+        ))}
 
-      <div
-        className={clsx(
-          'mt-(--toolbar-height) mb-8 px-6 md:px-12 xl:px-18',
-          'xl:ml-(--sidebar-width)',
-          'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
+        <div ref={ref} />
+
+        {isFetchingNextPage && (
+          <div className='flex justify-center py-4'>
+            <Loader2 strokeWidth={3} className='animate-spin text-gray-400' />
+          </div>
         )}
-      >
-        <div className='flex flex-col mt-8'>
-          {posts.map((post, index) => (
-            <div key={post.id} className='mb-8'>
-              <PostPreview post={post} userId={userId} />
-              {index !== posts.length - 1 && (
-                <div className='h-px bg-gray-200' />
-              )}
-            </div>
-          ))}
-
-          <div ref={ref} />
-          {isFetchingNextPage && (
-            <div className='flex justify-center py-4'>
-              <Loader2 strokeWidth={3} className='animate-spin text-gray-400' />
-            </div>
-          )}
-        </div>
       </div>
-    </>
+    </div>
   );
 }

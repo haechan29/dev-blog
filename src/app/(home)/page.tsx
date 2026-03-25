@@ -17,7 +17,6 @@ export default async function HomePage() {
 
   return (
     <HomePageClient
-      isLoggedIn={!!session}
       initialPosts={postProps}
       initialCursor={nextCursor}
       userId={userId}
