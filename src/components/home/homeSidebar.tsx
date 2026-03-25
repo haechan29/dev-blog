@@ -11,6 +11,8 @@ import { Menu } from 'lucide-react';
 import Link from 'next/link';
 import SimpleBar from 'simplebar-react';
 
+const SKELETON_COUNT = 3;
+
 export default function HomeSidebar({
   userId,
   isOpen = false,
@@ -30,33 +32,50 @@ export default function HomeSidebar({
 
   useScrollLock({ isLocked: isOpen });
 
+  const isEmpty = (following?.length ?? 0) === 0;
+
   return (
-    !isLoading && (
-      <Sidebar isOpen={isOpen} onClose={onClose}>
-        <div className='xl:hidden pt-1.5'>
-          <div className='flex items-center gap-2 md:gap-3 py-2 md:py-3'>
-            <button
-              onClick={onClose}
-              className='shrink-0 p-2 -m-2 items-center justify-center'
-              aria-label='메뉴 닫기'
-            >
-              <Menu className='w-6 h-6 text-gray-500' />
-            </button>
-          </div>
+    <Sidebar isOpen={isOpen} onClose={onClose}>
+      <div className='xl:hidden pt-1.5'>
+        <div className='flex items-center gap-2 md:gap-3 py-2 md:py-3'>
+          <button
+            onClick={onClose}
+            className='shrink-0 p-2 -m-2 items-center justify-center'
+            aria-label='메뉴 닫기'
+          >
+            <Menu className='w-6 h-6 text-gray-500' />
+          </button>
         </div>
+      </div>
 
-        <div className='py-3 text-sm font-semibold text-gray-500'>구독</div>
+      <div className='py-3 text-sm font-semibold text-gray-500'>구독</div>
 
-        <SimpleBar className='h-full simplebar-hover'>
-          <div className='flex flex-col min-h-full'>
-            <div className='flex flex-col'>
-              {following?.length === 0 && (
-                <div className='py-3 px-3 text-sm text-gray-400'>
-                  구독한 사람이 없습니다
-                </div>
-              )}
-
-              {following?.map(user => (
+      <SimpleBar className='h-full simplebar-hover'>
+        <div className='flex flex-col min-h-full'>
+          <div className='flex flex-col'>
+            {isLoading ? (
+              <>
+                {Array.from({ length: SKELETON_COUNT }).map((_, idx) => (
+                  <div
+                    key={idx}
+                    className='flex items-center gap-2 py-2 px-3 rounded-sm animate-pulse'
+                  >
+                    <ProfileIcon
+                      nickname='skeleton'
+                      size='sm'
+                      profileImageUrl={null}
+                      skeleton
+                    />
+                    <div className='h-3 w-2/3 rounded bg-gray-200' />
+                  </div>
+                ))}
+              </>
+            ) : isEmpty ? (
+              <div className='p-3 text-sm text-gray-400'>
+                구독한 사람이 없습니다
+              </div>
+            ) : (
+              following?.map(user => (
                 <Link
                   key={user.id}
                   href={`/@${user.id}/posts`}
@@ -70,25 +89,25 @@ export default function HomeSidebar({
 
                   <div className='text-xs text-gray-900'>{user.nickname}</div>
                 </Link>
-              ))}
-            </div>
+              ))
+            )}
+          </div>
 
-            <div className='mt-auto py-4'>
-              <div className='flex gap-3 text-xs text-gray-500'>
-                <Link href='/privacy' className='hover:text-gray-700'>
-                  개인정보처리방침
-                </Link>
-                <Link href='/terms' className='hover:text-gray-700'>
-                  이용약관
-                </Link>
-              </div>
-              <div className='text-xs text-gray-400 mt-2'>
-                누구나 글을 쓰고 읽는 곳 © ShareText
-              </div>
+          <div className='mt-auto py-4'>
+            <div className='flex gap-3 text-xs text-gray-500'>
+              <Link href='/privacy' className='hover:text-gray-700'>
+                개인정보처리방침
+              </Link>
+              <Link href='/terms' className='hover:text-gray-700'>
+                이용약관
+              </Link>
+            </div>
+            <div className='text-xs text-gray-400 mt-2'>
+              누구나 글을 쓰고 읽는 곳 © ShareText
             </div>
           </div>
-        </SimpleBar>
-      </Sidebar>
-    )
+        </div>
+      </SimpleBar>
+    </Sidebar>
   );
 }
