@@ -4,10 +4,7 @@ import PostSidebarNav from '@/components/post/postSidebarNav';
 import Sidebar from '@/components/sidebar';
 import usePosts from '@/features/post/hooks/usePosts';
 import useScrollLock from '@/hooks/useScrollLock';
-import { postKeys } from '@/queries/keys';
-import { useQueryClient } from '@tanstack/react-query';
 import { Menu } from 'lucide-react';
-import { useEffect } from 'react';
 
 export default function PostSidebar({
   authorId,
@@ -20,19 +17,9 @@ export default function PostSidebar({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const queryClient = useQueryClient();
-
   const { posts } = usePosts(authorId);
 
   useScrollLock({ isLocked: isOpen });
-
-  useEffect(() => {
-    if (posts) {
-      posts.forEach(post => {
-        queryClient.setQueryData(postKeys.detail(post.id), post);
-      });
-    }
-  }, [posts, queryClient]);
 
   return (
     <Sidebar isOpen={isOpen} onClose={onClose}>
