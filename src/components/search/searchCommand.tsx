@@ -21,7 +21,7 @@ import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { postKeys, tagKeys } from '@/queries/keys';
 import { useQuery } from '@tanstack/react-query';
 import { Command as CommandPrimitive } from 'cmdk';
-import { ArrowUpRight, Loader2, Search } from 'lucide-react';
+import { ArrowUpRight, Hash, Loader2, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import SimpleBar from 'simplebar-react';
@@ -170,8 +170,14 @@ export default function SearchCommand({
                         }}
                         className='px-3 py-2 cursor-pointer'
                       >
-                        <div className='flex justify-between items-center w-full'>
-                          <span className='line-clamp-1'>{post.title}</span>
+                        <div className='flex justify-between items-center gap-2 w-full'>
+                          <div className='flex items-center gap-2 min-w-0 flex-1'>
+                            <Search
+                              className='w-4 h-4 shrink-0 text-gray-400'
+                              aria-hidden
+                            />
+                            <span className='line-clamp-1'>{post.title}</span>
+                          </div>
                           <ArrowUpRight className='w-4 h-4 shrink-0 text-gray-400' />
                         </div>
                       </CommandItem>
@@ -188,8 +194,14 @@ export default function SearchCommand({
                         }}
                         className='px-3 py-2 cursor-pointer'
                       >
-                        <div className='flex justify-between items-center w-full'>
-                          <span className='line-clamp-1'>#{tag}</span>
+                        <div className='flex justify-between items-center gap-2 w-full'>
+                          <div className='flex items-center gap-2 min-w-0 flex-1'>
+                            <Hash
+                              className='w-4 h-4 shrink-0 text-gray-400'
+                              aria-hidden
+                            />
+                            <span className='line-clamp-1'>{tag}</span>
+                          </div>
                           <ArrowUpRight className='w-4 h-4 shrink-0 text-gray-400' />
                         </div>
                       </CommandItem>

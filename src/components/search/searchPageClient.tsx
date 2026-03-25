@@ -9,7 +9,7 @@ import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { createRipple } from '@/lib/dom';
 import { postKeys, tagKeys } from '@/queries/keys';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowUpRight, ChevronLeft, Loader2, Search } from 'lucide-react';
+import { ArrowUpRight, ChevronLeft, Hash, Loader2, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -143,9 +143,15 @@ export default function SearchPageClient({
                     <li key={post.id}>
                       <Link
                         href={`/read/${post.id}`}
-                        className='flex justify-between items-center py-3'
+                        className='flex justify-between items-center gap-2 py-3'
                       >
-                        <span className='line-clamp-1'>{post.title}</span>
+                        <div className='flex items-center gap-2 min-w-0 flex-1'>
+                          <Search
+                            className='w-4 h-4 shrink-0 text-gray-400'
+                            aria-hidden
+                          />
+                          <span className='line-clamp-1'>{post.title}</span>
+                        </div>
                         <ArrowUpRight className='w-4 h-4 shrink-0 text-gray-400' />
                       </Link>
                     </li>
@@ -158,9 +164,15 @@ export default function SearchPageClient({
                     <li key={tag}>
                       <Link
                         href={`/tag/${encodeURIComponent(tag)}`}
-                        className='flex justify-between items-center py-3'
+                        className='flex justify-between items-center gap-2 py-3'
                       >
-                        <span className='line-clamp-1'>#{tag}</span>
+                        <div className='flex items-center gap-2 min-w-0 flex-1'>
+                          <Hash
+                            className='w-4 h-4 shrink-0 text-gray-400'
+                            aria-hidden
+                          />
+                          <span className='line-clamp-1'>{tag}</span>
+                        </div>
                         <ArrowUpRight className='w-4 h-4 shrink-0 text-gray-400' />
                       </Link>
                     </li>
