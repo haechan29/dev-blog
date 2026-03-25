@@ -26,6 +26,8 @@ export default function PostHeader({
   const { title, tags } = post;
   const headerRef = useRef<HTMLDivElement | null>(null);
 
+  const areTagsVisible = tags.length > 0;
+
   useEffect(() => {
     if (!headerRef.current || !onVisibilityChange) return;
 
@@ -62,15 +64,20 @@ export default function PostHeader({
         <div className='text-3xl font-bold line-clamp-2'>{title}</div>
       </div>
 
-      {tags.length > 0 && (
+      {areTagsVisible && (
         <div className='w-full flex overflow-x-auto scrollbar-hide gap-3'>
           {tags.map(tag => (
-            <div
+            <Link
               key={tag}
-              className='text-xs px-2 py-1 border border-gray-300 rounded-full whitespace-nowrap'
+              href={`/tag/${encodeURIComponent(tag)}`}
+              className={clsx(
+                'text-xs px-2 py-1 border border-gray-300 rounded-full whitespace-nowrap active:scale-[0.98]',
+                'text-gray-700 cursor-pointer transition-colors',
+                'hover:text-gray-900 hover:bg-gray-100/80'
+              )}
             >
               {tag}
-            </div>
+            </Link>
           ))}
         </div>
       )}

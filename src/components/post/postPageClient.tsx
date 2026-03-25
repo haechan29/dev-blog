@@ -56,12 +56,12 @@ export default function PostPageClient({
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: postKeys.list(initialPost.id),
+    queryKey: postKeys.list({ excludeId: initialPost.id }),
     queryFn: async ({ pageParam }) => {
-      const result = await PostClientService.getFeedPosts(
-        pageParam,
-        initialPost.id
-      );
+      const result = await PostClientService.getFeedPosts({
+        cursor: pageParam,
+        excludeId: initialPost.id,
+      });
       return {
         posts: result.posts.map(createProps),
         nextCursor: result.nextCursor,

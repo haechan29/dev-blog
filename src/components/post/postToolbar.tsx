@@ -139,7 +139,7 @@ function Content({
               key={heading.id}
               onClick={() => onClick(heading)}
               className={clsx(
-                'truncate text-left transition-discrete|opacity duration-300 ease-in pl-(--indent)',
+                'truncate text-left transition duration-300 ease-in pl-(--indent)',
                 isExpanded || heading.id === currentHeadingId
                   ? 'h-6 opacity-100'
                   : 'h-0 opacity-0',

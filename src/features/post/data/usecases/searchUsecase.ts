@@ -1,21 +1,26 @@
 import { toFlatDto } from '@/features/post/data/mapper/postMapper';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 
-export async function searchPosts(
-  query: string,
-  limit: number,
-  cursorScore?: number,
-  cursorId?: string
-) {
-  const fetchedPosts = await PostQueries.searchPosts(
-    query,
-    limit + 1,
-    cursorScore,
-    cursorId
-  );
+const SEARCH_LIMIT = 5;
 
-  const isLastPage = fetchedPosts.length <= limit;
-  const posts = fetchedPosts.slice(0, limit);
+export async function searchPosts({
+  query,
+  cursorScore,
+  cursorId,
+}: {
+  query: string;
+  cursorScore?: number;
+  cursorId?: string;
+}) {
+  const fetchedPosts = await PostQueries.searchPosts({
+    query,
+    limit: SEARCH_LIMIT + 1,
+    cursorScore,
+    cursorId,
+  });
+
+  const isLastPage = fetchedPosts.length <= SEARCH_LIMIT;
+  const posts = fetchedPosts.slice(0, SEARCH_LIMIT);
   const lastPost = posts.at(-1);
 
   const nextCursor =

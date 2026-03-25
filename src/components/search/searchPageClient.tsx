@@ -2,13 +2,14 @@
 
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import { createProps } from '@/features/post/ui/postProps';
+import * as TagClientRepository from '@/features/tag/data/repository/tagClientRepository';
 import useDebounce from '@/hooks/useDebounce';
 import useMediaQuery, { MD_QUERY, TOUCH_QUERY } from '@/hooks/useMediaQuery';
 import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { createRipple } from '@/lib/dom';
-import { postKeys } from '@/queries/keys';
+import { postKeys, tagKeys } from '@/queries/keys';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowUpRight, ChevronLeft, Loader2, Search } from 'lucide-react';
+import { ArrowUpRight, ChevronLeft, Hash, Loader2, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -25,14 +26,46 @@ export default function SearchPageClient({
   const [query, setQuery] = useState(initialQuery ?? '');
   const [debouncedQuery, setDebouncedQuery] = useState(query);
 
-  const { data: posts = [], isLoading } = useQuery({
-    queryKey: postKeys.search(debouncedQuery, 10),
+  const isTagSearch = debouncedQuery.startsWith('#');
+  const postQuery = isTagSearch ? '' : debouncedQuery.trim();
+  const tagQuery = isTagSearch ? debouncedQuery.slice(1).trim() : '';
+
+  const isPostSearchEnabled = !isTagSearch && postQuery.length > 0;
+  const isTagSearchEnabled = isTagSearch && tagQuery.length > 0;
+
+  const { data: posts = [], isLoading: isPostsLoading } = useQuery({
+    queryKey: postKeys.search(postQuery),
     queryFn: () =>
-      PostClientService.searchPosts(debouncedQuery, 10).then(result =>
+      PostClientService.searchPosts({ query: postQuery }).then(result =>
         result.posts.map(createProps)
       ),
-    enabled: debouncedQuery.length > 0,
+    enabled: isPostSearchEnabled,
   });
+
+  const { data: tags = [], isLoading: isTagsLoading } = useQuery({
+    queryKey: tagKeys.search(tagQuery),
+    queryFn: () => TagClientRepository.getTagNames({ query: tagQuery }),
+    enabled: isTagSearchEnabled,
+  });
+
+  const navigateFromSearchInput = () => {
+    const isTagSearch = query.startsWith('#');
+    const postQuery = isTagSearch ? '' : query.trim();
+    const tagQuery = isTagSearch ? query.slice(1).trim() : '';
+
+    if (postQuery) {
+      router.push(`/search/result?q=${encodeURIComponent(postQuery)}`);
+    } else if (tagQuery) {
+      router.push(`/tag/${encodeURIComponent(tagQuery)}`);
+    }
+  };
+
+  const isLoading =
+    (!isTagSearch && isPostsLoading) || (isTagSearch && isTagsLoading);
+  const isEmpty =
+    (!isTagSearch && posts.length === 0) || (isTagSearch && tags.length === 0);
+  const shouldShowDropdown = query.length > 0;
+  const isTagOnly = query === '#';
 
   useEffect(() => {
     if (isTouch === false && isLargerThanMd === true) {
@@ -68,10 +101,8 @@ export default function SearchPageClient({
               value={query}
               onChange={e => setQuery(e.target.value)}
               onKeyDown={e => {
-                if (e.key === 'Enter' && query.trim()) {
-                  router.push(
-                    `/search/result?q=${encodeURIComponent(query.trim())}`
-                  );
+                if (e.key === 'Enter') {
+                  navigateFromSearchInput();
                 }
               }}
               autoFocus
@@ -81,12 +112,7 @@ export default function SearchPageClient({
               className='p-2 -m-2 rounded-full'
               onClick={e => {
                 createRipple(e);
-
-                if (query.trim()) {
-                  router.push(
-                    `/search/result?q=${encodeURIComponent(query.trim())}`
-                  );
-                }
+                navigateFromSearchInput();
               }}
             >
               <Search className='w-5 h-5 shrink-0' />
@@ -95,28 +121,65 @@ export default function SearchPageClient({
         </div>
       </div>
 
-      {debouncedQuery.length > 0 && (
+      {shouldShowDropdown && (
         <div className='px-6 md:px-12 py-2'>
-          {isLoading ? (
-            <div className='py-8 flex justify-center'>
+          {isTagOnly ? (
+            <div className='flex justify-center py-4 text-gray-400'>
+              태그를 입력해주세요
+            </div>
+          ) : isLoading ? (
+            <div className='flex justify-center py-4'>
               <Loader2 className='w-6 h-6 animate-spin text-gray-400' />
             </div>
+          ) : isEmpty ? (
+            <div className='flex justify-center py-4 text-gray-400'>
+              검색 결과가 없습니다
+            </div>
           ) : (
-            posts.length > 0 && (
-              <ul>
-                {posts.map(post => (
-                  <li key={post.id}>
-                    <Link
-                      href={`/read/${post.id}`}
-                      className='flex justify-between items-center py-3'
-                    >
-                      <span className='line-clamp-1'>{post.title}</span>
-                      <ArrowUpRight className='w-4 h-4 shrink-0 text-gray-400' />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )
+            <>
+              {!isTagSearch && (
+                <ul>
+                  {posts.map(post => (
+                    <li key={post.id}>
+                      <Link
+                        href={`/read/${post.id}`}
+                        className='flex justify-between items-center gap-2 py-3'
+                      >
+                        <div className='flex items-center gap-2 min-w-0 flex-1'>
+                          <Search
+                            className='w-4 h-4 shrink-0 text-gray-400'
+                            aria-hidden
+                          />
+                          <span className='line-clamp-1'>{post.title}</span>
+                        </div>
+                        <ArrowUpRight className='w-4 h-4 shrink-0 text-gray-400' />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {isTagSearch && (
+                <ul>
+                  {tags.map(tag => (
+                    <li key={tag}>
+                      <Link
+                        href={`/tag/${encodeURIComponent(tag)}`}
+                        className='flex justify-between items-center gap-2 py-3'
+                      >
+                        <div className='flex items-center gap-2 min-w-0 flex-1'>
+                          <Hash
+                            className='w-4 h-4 shrink-0 text-gray-400'
+                            aria-hidden
+                          />
+                          <span className='line-clamp-1'>{tag}</span>
+                        </div>
+                        <ArrowUpRight className='w-4 h-4 shrink-0 text-gray-400' />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
           )}
         </div>
       )}

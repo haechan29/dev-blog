@@ -8,8 +8,12 @@ export async function getPost(postId: string): Promise<Post> {
   return toDomain(dto);
 }
 
-export async function getFeedPosts(cursor: string | null, excludeId?: string) {
-  const result = await PostClientRepository.getFeedPosts(cursor, excludeId);
+export async function getFeedPosts(params: {
+  cursor: string | null;
+  excludeId?: string;
+  tag?: string;
+}) {
+  const result = await PostClientRepository.getFeedPosts(params);
   return {
     posts: result.posts.map(toDomain),
     nextCursor: result.nextCursor,
@@ -21,18 +25,12 @@ export async function getPostsByUserId(userId: string) {
   return dtos.map(toDomain);
 }
 
-export async function searchPosts(
-  query: string,
-  limit: number,
-  cursorScore?: number,
-  cursorId?: string
-) {
-  const result = await PostClientRepository.searchPosts(
-    query,
-    limit,
-    cursorScore,
-    cursorId
-  );
+export async function searchPosts(params: {
+  query: string;
+  cursorScore?: number;
+  cursorId?: string;
+}) {
+  const result = await PostClientRepository.searchPosts(params);
   return {
     posts: result.posts.map(toDomain),
     nextCursor: result.nextCursor,

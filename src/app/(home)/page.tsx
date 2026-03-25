@@ -9,10 +9,10 @@ export default async function HomePage() {
   const userId =
     session?.user?.user_id ?? (await cookies()).get('userId')?.value;
 
-  const { posts, nextCursor } = await PostServerService.getFeedPosts(
-    null,
-    userId
-  );
+  const { posts, nextCursor } = await PostServerService.getFeedPosts({
+    cursor: null,
+    userId,
+  });
   const postProps = posts.map(createProps);
 
   return (

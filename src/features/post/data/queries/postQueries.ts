@@ -100,12 +100,17 @@ export async function fetchPostForAuth(postId: string) {
   return data as Pick<PostEntity, 'user_id' | 'password_hash'>;
 }
 
-export async function searchPosts(
-  query: string,
-  limit: number,
-  cursorScore?: number,
-  cursorId?: string
-) {
+export async function searchPosts({
+  query,
+  limit,
+  cursorScore,
+  cursorId,
+}: {
+  query: string;
+  limit: number;
+  cursorScore?: number;
+  cursorId?: string;
+}) {
   const { data, error } = await supabase.rpc('search_posts', {
     search_query: query,
     result_limit: limit,

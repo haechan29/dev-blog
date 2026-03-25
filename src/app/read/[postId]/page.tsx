@@ -24,7 +24,11 @@ export default async function PostPage({
     const [post, comments, { posts, nextCursor }, creator] = await Promise.all([
       PostServerService.getPost(postId).then(createProps),
       CommentServerService.getComments(postId, userId),
-      PostServerService.getFeedPosts(null, userId, postId),
+      PostServerService.getFeedPosts({
+        cursor: null,
+        userId,
+        excludeId: postId,
+      }),
       userId ? CreatorServerRepository.getCreatorByUserId(userId) : null,
     ]);
     const commentProps = comments.map(comment => comment.toProps());

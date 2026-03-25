@@ -17,11 +17,13 @@ export default function HomePageClient({
   initialPosts,
   initialCursor,
   userId,
+  tag,
 }: {
   isLoggedIn: boolean;
   initialPosts: PostProps[];
   initialCursor: string | null;
   userId?: string;
+  tag?: string;
 }) {
   const { ref, inView } = useInView();
 
@@ -31,9 +33,12 @@ export default function HomePageClient({
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: postKeys.list(),
+    queryKey: postKeys.list({ tag }),
     queryFn: async ({ pageParam }) => {
-      const result = await PostClientService.getFeedPosts(pageParam);
+      const result = await PostClientService.getFeedPosts({
+        cursor: pageParam,
+        tag,
+      });
       return {
         posts: result.posts.map(createProps),
         nextCursor: result.nextCursor,
@@ -57,7 +62,10 @@ export default function HomePageClient({
 
   return (
     <>
-      <HomeToolbar isLoggedIn={isLoggedIn} />
+      <HomeToolbar
+        isLoggedIn={isLoggedIn}
+        initialQuery={tag ? `#${tag}` : undefined}
+      />
 
       {userId && (
         <div className='max-xl:hidden'>
