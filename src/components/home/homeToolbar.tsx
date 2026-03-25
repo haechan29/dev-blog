@@ -5,19 +5,21 @@ import ToolbarProfileIcon from '@/components/post/toolbarProfileIcon';
 import SearchCommand from '@/components/search/searchCommand';
 import { cn } from '@/lib/utils';
 import clsx from 'clsx';
-import { Search } from 'lucide-react';
+import { Menu, Search } from 'lucide-react';
 import Link from 'next/link';
 
 export default function HomeToolbar({
   isLoggedIn,
   initialQuery,
   className,
-  onCloseSidebar,
+  canOpenSidebar = false,
+  onSidebarOpenChange,
 }: {
   isLoggedIn: boolean;
   initialQuery?: string;
   className?: string;
-  onCloseSidebar?: () => void;
+  canOpenSidebar?: boolean;
+  onSidebarOpenChange?: (isOpen: boolean) => void;
 }) {
   return (
     <div
@@ -27,7 +29,17 @@ export default function HomeToolbar({
         className
       )}
     >
-      <Logo onClick={onCloseSidebar} />
+      {canOpenSidebar && (
+        <button
+          onClick={() => onSidebarOpenChange?.(true)}
+          className='xl:hidden shrink-0 p-2 -m-2 items-center justify-center'
+          aria-label='메뉴 열기'
+        >
+          <Menu className='w-6 h-6 text-gray-500' />
+        </button>
+      )}
+
+      <Logo onClick={() => onSidebarOpenChange?.(false)} />
 
       <div className='flex flex-1 min-w-0 justify-center'>
         <div className='max-md:hidden w-1/2'>

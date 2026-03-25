@@ -102,7 +102,7 @@ export default function Sidebar({
           <button
             onClick={onClose}
             className='shrink-0 p-2 -m-2 items-center justify-center'
-            aria-label='메뉴 열기'
+            aria-label='메뉴 닫기'
           >
             <Menu className='w-6 h-6 text-gray-500' />
           </button>

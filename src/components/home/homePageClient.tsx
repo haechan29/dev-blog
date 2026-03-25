@@ -9,7 +9,7 @@ import { postKeys } from '@/queries/keys';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 
 export default function HomePageClient({
@@ -25,6 +25,7 @@ export default function HomePageClient({
   userId?: string;
   tag?: string;
 }) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { ref, inView } = useInView();
 
   const {
@@ -65,12 +66,16 @@ export default function HomePageClient({
       <HomeToolbar
         isLoggedIn={isLoggedIn}
         initialQuery={tag ? `#${tag}` : undefined}
+        canOpenSidebar={!!userId}
+        onSidebarOpenChange={setIsSidebarOpen}
       />
 
       {userId && (
-        <div className='max-xl:hidden'>
-          <HomeSidebar userId={userId} />
-        </div>
+        <HomeSidebar
+          userId={userId}
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+        />
       )}
 
       <div

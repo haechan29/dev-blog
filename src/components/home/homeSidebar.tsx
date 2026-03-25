@@ -4,12 +4,21 @@ import Sidebar from '@/components/sidebar';
 import ProfileIcon from '@/components/user/profileIcon';
 import * as SubscriptionClientRepository from '@/features/subscription/data/repository/subscriptionClientRepository';
 import { createProps } from '@/features/subscription/ui/followUserProps';
+import useScrollLock from '@/hooks/useScrollLock';
 import { subscriptionKeys } from '@/queries/keys';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import SimpleBar from 'simplebar-react';
 
-export default function HomeSidebar({ userId }: { userId: string }) {
+export default function HomeSidebar({
+  userId,
+  isOpen,
+  onClose,
+}: {
+  userId: string;
+  isOpen: boolean;
+  onClose: () => void;
+}) {
   const { data: following, isLoading } = useQuery({
     queryKey: subscriptionKeys.following(userId),
     queryFn: () =>
@@ -18,9 +27,11 @@ export default function HomeSidebar({ userId }: { userId: string }) {
       ),
   });
 
+  useScrollLock({ isLocked: isOpen });
+
   return (
     !isLoading && (
-      <Sidebar isVisible={true} onClose={() => {}}>
+      <Sidebar isVisible={isOpen} onClose={onClose}>
         <div className='py-3 text-sm font-semibold text-gray-500'>구독</div>
 
         <SimpleBar className='h-full simplebar-hover'>
