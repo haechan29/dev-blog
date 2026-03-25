@@ -38,6 +38,8 @@ export default function PostPreview({
     preview.length >= MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION;
   const [isHovered, setIsHovered] = useState(false);
 
+  const areTagsVisible = tags.length > 0;
+
   return (
     <div
       className='relative flex flex-col mb-8'
@@ -128,7 +130,7 @@ export default function PostPreview({
                       : 'h-18 line-clamp-3 duration-300 delay-0'
                   )}
                   style={{
-                    '--extended-height': tags.length > 0 ? '9rem' : '7rem',
+                    '--extended-height': areTagsVisible ? '9rem' : '7rem',
                   }}
                 >
                   <div className={clsx(isHovered && 'hidden')}>{preview}</div>
@@ -165,15 +167,20 @@ export default function PostPreview({
                 : 'delay-0 opacity-100')
           )}
         >
-          {tags.length > 0 && (
+          {areTagsVisible && (
             <div className='w-full flex overflow-x-auto scrollbar-hide gap-3'>
               {tags.map(tag => (
-                <div
+                <Link
                   key={tag}
-                  className='text-xs px-2 py-1 border border-gray-300 rounded-full whitespace-nowrap'
+                  href={`/tag/${encodeURIComponent(tag)}`}
+                  className={clsx(
+                    'text-xs px-2 py-1 border border-gray-300 rounded-full whitespace-nowrap active:scale-[0.98]',
+                    'text-gray-700 cursor-pointer transition-colors',
+                    'hover:text-gray-900 hover:bg-gray-100/80'
+                  )}
                 >
                   {tag}
-                </div>
+                </Link>
               ))}
             </div>
           )}
