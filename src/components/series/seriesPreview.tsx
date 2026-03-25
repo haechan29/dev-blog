@@ -8,7 +8,7 @@ export default function SeriesPreview({ series }: { series: SeriesProps }) {
       <div
         className={clsx(
           'absolute -inset-x-6 -inset-y-4 -z-50 rounded-xl bg-gray-100/50',
-          'transition-opacity|transform duration-300 ease-in-out',
+          'transition duration-300 ease-in-out',
           'scale-90 group-hover:scale-100 origin-center',
           'opacity-0 group-hover:opacity-100'
         )}

@@ -3,6 +3,7 @@
 import ProfileIcon from '@/components/user/profileIcon';
 import { PostProps } from '@/features/post/ui/postProps';
 import Link from 'next/link';
+import { useState } from 'react';
 
 import { LockIcon } from '@/components/lockIcon';
 import PostSettingsDropdown from '@/components/post/postSettingsDropdown';
@@ -35,10 +36,11 @@ export default function PostPreview({
   const { id, title, preview, tags } = post;
   const isScrollAnimationEnabled =
     preview.length >= MIN_TEXT_LENGTH_FOR_SCROLL_ANIMATION;
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div
-      className='relative flex flex-col group mb-8'
+      className='relative flex flex-col mb-8'
       style={{
         '--scale-delay': `${SCALE_ANIMATION_DELAY}s`,
         '--scroll-delay': `${SCROLL_ANIMATION_DELAY}s`,
@@ -47,9 +49,8 @@ export default function PostPreview({
       <div
         className={clsx(
           'absolute -inset-x-6 -inset-y-4 -z-50 rounded-xl bg-gray-100/50',
-          'transition-opacity|transform duration-300 ease-in-out',
-          'scale-90 group-hover:scale-100 origin-center',
-          'opacity-0 group-hover:opacity-100'
+          'transition duration-300 ease-in-out origin-center',
+          isHovered ? 'scale-100 opacity-100' : 'scale-90 opacity-0'
         )}
       />
 
@@ -76,10 +77,14 @@ export default function PostPreview({
         </div>
       )}
 
-      <div className='w-full flex flex-col gap-4'>
+      <div
+        onMouseLeave={() => setIsHovered(false)}
+        className='w-full flex flex-col gap-4'
+      >
         <Link
           href={`/read/${id}?from=feed`}
           className='w-full flex flex-col gap-4 text-gray-900'
+          onMouseEnter={() => setIsHovered(true)}
         >
           <div
             className={clsx(
@@ -117,21 +122,23 @@ export default function PostPreview({
               <div className='relative h-18'>
                 <div
                   className={clsx(
-                    'absolute inset-x-0 top-0',
-                    'h-18 line-clamp-3 group-hover:h-(--extended-height) group-hover:line-clamp-9999',
-                    'transition-discrete ease-in-out duration-300 group-hover:duration-(--scale-delay)',
-                    'delay-0 group-hover:delay-(--scale-delay)'
+                    'absolute inset-x-0 top-0 ease-in-out',
+                    isHovered
+                      ? 'h-(--extended-height) line-clamp-9999 duration-(--scale-delay) delay-(--scale-delay)'
+                      : 'h-18 line-clamp-3 duration-300 delay-0'
                   )}
                   style={{
                     '--extended-height': tags.length > 0 ? '9rem' : '7rem',
                   }}
                 >
-                  <div className='group-hover:hidden'>{preview}</div>
+                  <div className={clsx(isHovered && 'hidden')}>{preview}</div>
                   <div
                     className={clsx(
-                      'text-transparent group-hover:text-gray-900 absolute inset-x-0 top-0',
-                      'transition-transform ease-linear duration-[0] group-hover:duration-(--scroll-duration)',
-                      'delay-0 group-hover:delay-(--scroll-delay) group-hover:translate-y-[calc(-100%+9rem)]'
+                      'absolute inset-x-0 top-0',
+                      'transition-transform ease-linear',
+                      isHovered
+                        ? 'text-gray-900 duration-(--scroll-duration) delay-(--scroll-delay) translate-y-[calc(-100%+9rem)]'
+                        : 'text-transparent duration-[0] delay-0'
                     )}
                     style={{
                       '--scroll-duration': `${preview.length / 50}s`,
@@ -151,7 +158,11 @@ export default function PostPreview({
           className={clsx(
             'flex flex-col gap-4',
             isScrollAnimationEnabled &&
-              'transition-opacity duration-300 ease-in-out delay-0 group-hover:delay-(--scale-delay) group-hover:opacity-0'
+              'transition-opacity duration-300 ease-in-out',
+            isScrollAnimationEnabled &&
+              (isHovered
+                ? 'delay-(--scale-delay) opacity-0'
+                : 'delay-0 opacity-100')
           )}
         >
           {tags.length > 0 && (

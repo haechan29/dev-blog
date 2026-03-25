@@ -32,7 +32,7 @@ export default function LikeButton({
         onClick={handleClick}
         disabled={toggleLike.isPending}
         className={clsx(
-          'flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300',
+          'flex items-center gap-2 px-4 py-2 rounded-lg border transition duration-300',
           isLiked && isAnimating && 'scale-105',
           isLiked
             ? 'border-red-300 bg-red-50'
