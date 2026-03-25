@@ -19,7 +19,7 @@ import useBgmController from '@/features/post/hooks/useBgmController';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
 import useUser from '@/features/user/domain/hooks/useUser';
 import useRouterWithProgress from '@/hooks/useRouterWithProgress';
-import { draftKeys } from '@/queries/keys';
+import { draftKeys, postKeys } from '@/queries/keys';
 import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Heart } from 'lucide-react';
@@ -205,9 +205,11 @@ export default function WritePageClient({
           draftId: currentDraftId ?? undefined,
         });
         queryClient.invalidateQueries({
+          queryKey: postKeys.detail(post.id),
+        });
+        queryClient.invalidateQueries({
           queryKey: draftKeys.list(),
         });
-        setIsPublishDialogOpen(false);
         router.push(`/read/${post.id}`);
       } else {
         const newPost = await PostClientService.createPost({
@@ -222,7 +224,6 @@ export default function WritePageClient({
         queryClient.invalidateQueries({
           queryKey: draftKeys.list(),
         });
-        setIsPublishDialogOpen(false);
         router.push(`/read/${postProps.id}`);
       }
     } catch (error) {
@@ -235,6 +236,7 @@ export default function WritePageClient({
 
       toast.error(message);
     } finally {
+      setIsPublishDialogOpen(false);
       setIsPublishPending(false);
     }
   };
