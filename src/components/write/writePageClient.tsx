@@ -255,8 +255,8 @@ export default function WritePageClient({
       <DraftSidebar
         currentDraftId={currentDraftId}
         drafts={drafts}
-        isVisible={isDraftSidebarVisible}
-        setIsVisible={setIsDraftSidebarVisible}
+        isOpen={isDraftSidebarVisible}
+        onClose={() => setIsDraftSidebarVisible(false)}
         onSelectDraft={handleDraftSelect}
         onDeleteDraft={handleDraftDeleteClick}
       />

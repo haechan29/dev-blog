@@ -2,31 +2,28 @@
 
 import { cn } from '@/lib/utils';
 import clsx from 'clsx';
-import { Menu } from 'lucide-react';
-import { ReactNode, useCallback, useRef } from 'react';
+import { ReactNode, useRef } from 'react';
 
 export default function Sidebar({
-  isVisible,
-  onClose,
+  isOpen = false,
+  onClose = () => {},
   children,
-  className,
 }: {
-  isVisible: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
   children: ReactNode;
-  className?: string;
 }) {
   const startRef = useRef<[number, number] | null>(null);
   const scrollDirectionRef = useRef<'horizontal' | 'vertical' | null>(null);
 
-  const handleTouchStart = useCallback((e: React.TouchEvent<HTMLElement>) => {
+  const handleTouchStart = (e: React.TouchEvent<HTMLElement>) => {
     const sidebar = e.currentTarget;
     startRef.current = [e.touches[0].clientX, e.touches[0].clientY];
     sidebar.style.transition = 'none';
     scrollDirectionRef.current = null;
-  }, []);
+  };
 
-  const handleTouchMove = useCallback((e: React.TouchEvent<HTMLElement>) => {
+  const handleTouchMove = (e: React.TouchEvent<HTMLElement>) => {
     const sidebar = e.currentTarget;
 
     const start = startRef.current;
@@ -46,32 +43,29 @@ export default function Sidebar({
       const translateX = Math.min(currentX - start[0], 0);
       sidebar.style.transform = `translateX(${translateX}px)`;
     }
-  }, []);
+  };
 
-  const handleTouchEnd = useCallback(
-    (e: React.TouchEvent<HTMLElement>) => {
-      const sidebar = e.currentTarget;
+  const handleTouchEnd = (e: React.TouchEvent<HTMLElement>) => {
+    const sidebar = e.currentTarget;
 
-      const start = startRef.current;
-      if (start === null) return;
+    const start = startRef.current;
+    if (start === null) return;
 
-      if (scrollDirectionRef.current === 'horizontal') {
-        const currentX = e.changedTouches[0].clientX;
-        const translateX = Math.min(currentX - start[0], 0);
-        const threshold = -sidebar.getBoundingClientRect().width * 0.3;
+    if (scrollDirectionRef.current === 'horizontal') {
+      const currentX = e.changedTouches[0].clientX;
+      const translateX = Math.min(currentX - start[0], 0);
+      const threshold = -sidebar.getBoundingClientRect().width * 0.3;
 
-        if (translateX <= threshold) {
-          onClose();
-        }
+      if (translateX <= threshold) {
+        onClose();
       }
+    }
 
-      sidebar.style.transition = '';
-      sidebar.style.transform = '';
-      startRef.current = null;
-      scrollDirectionRef.current = null;
-    },
-    [onClose]
-  );
+    sidebar.style.transition = '';
+    sidebar.style.transform = '';
+    startRef.current = null;
+    scrollDirectionRef.current = null;
+  };
 
   return (
     <>
@@ -80,7 +74,7 @@ export default function Sidebar({
         className={clsx(
           'fixed inset-0 z-40 bg-black/70 xl:hidden',
           'transition-opacity duration-300 ease-in-out',
-          isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         )}
       />
 
@@ -94,20 +88,9 @@ export default function Sidebar({
           'flex flex-col bg-white',
           'pb-2 md:pb-3 px-4 md:px-6',
           'transition-transform duration-300 ease-in-out',
-          !isVisible && 'max-xl:-translate-x-full',
-          className
+          !isOpen && 'max-xl:-translate-x-full'
         )}
       >
-        <div className='xl:hidden flex items-center gap-2 md:gap-3 py-2 md:py-3'>
-          <button
-            onClick={onClose}
-            className='shrink-0 p-2 -m-2 items-center justify-center'
-            aria-label='메뉴 닫기'
-          >
-            <Menu className='w-6 h-6 text-gray-500' />
-          </button>
-        </div>
-
         {children}
       </div>
     </>

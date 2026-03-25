@@ -47,7 +47,7 @@ export default function PostPageClient({
   initialCursor: string | null;
 }) {
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
-  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { ref, inView } = useInView();
 
   const {
@@ -121,7 +121,7 @@ export default function PostPageClient({
       <HomeToolbar
         isLoggedIn={isLoggedIn}
         className='max-xl:hidden'
-        onCloseSidebar={() => setSidebarVisible(false)}
+        onSidebarOpenChange={setIsSidebarOpen}
       />
       <PostToolbar
         title={post.title}
@@ -130,14 +130,14 @@ export default function PostPageClient({
         onHeadingClick={handleHeadingClick}
         className='xl:hidden'
         isHeaderVisible={isHeaderVisible}
-        onOpenSidebar={() => setSidebarVisible(true)}
+        onOpenSidebar={() => setIsSidebarOpen(true)}
       />
 
       <PostSidebar
         authorId={post.userId}
         currentPostId={post.id}
-        isVisible={sidebarVisible}
-        onClose={() => setSidebarVisible(false)}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
 
       <div
@@ -153,7 +153,7 @@ export default function PostPageClient({
             userId={userId}
             post={post}
             onVisibilityChange={setIsHeaderVisible}
-            onOpenSidebar={() => setSidebarVisible(true)}
+            onOpenSidebar={() => setIsSidebarOpen(true)}
           />
           <div className='w-full h-px bg-gray-200 mb-10' />
           <PostVisibilityBanner
@@ -178,7 +178,7 @@ export default function PostPageClient({
           <LikeButton postId={post.id} likeCount={post.likeCount} />
           <PostSeriesNav
             post={post}
-            onOpenSidebar={() => setSidebarVisible(true)}
+            onOpenSidebar={() => setIsSidebarOpen(true)}
           />
           <AuthorProfile
             userId={post.userId}

@@ -7,17 +7,18 @@ import { createProps } from '@/features/subscription/ui/followUserProps';
 import useScrollLock from '@/hooks/useScrollLock';
 import { subscriptionKeys } from '@/queries/keys';
 import { useQuery } from '@tanstack/react-query';
+import { Menu } from 'lucide-react';
 import Link from 'next/link';
 import SimpleBar from 'simplebar-react';
 
 export default function HomeSidebar({
   userId,
-  isOpen,
-  onClose,
+  isOpen = false,
+  onClose = () => {},
 }: {
   userId: string;
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }) {
   const { data: following, isLoading } = useQuery({
     queryKey: subscriptionKeys.following(userId),
@@ -31,7 +32,19 @@ export default function HomeSidebar({
 
   return (
     !isLoading && (
-      <Sidebar isVisible={isOpen} onClose={onClose}>
+      <Sidebar isOpen={isOpen} onClose={onClose}>
+        <div className='xl:hidden pt-1.5'>
+          <div className='flex items-center gap-2 md:gap-3 py-2 md:py-3'>
+            <button
+              onClick={onClose}
+              className='shrink-0 p-2 -m-2 items-center justify-center'
+              aria-label='메뉴 닫기'
+            >
+              <Menu className='w-6 h-6 text-gray-500' />
+            </button>
+          </div>
+        </div>
+
         <div className='py-3 text-sm font-semibold text-gray-500'>구독</div>
 
         <SimpleBar className='h-full simplebar-hover'>

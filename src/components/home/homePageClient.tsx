@@ -66,7 +66,6 @@ export default function HomePageClient({
       <HomeToolbar
         isLoggedIn={isLoggedIn}
         initialQuery={tag ? `#${tag}` : undefined}
-        canOpenSidebar={!!userId}
         onSidebarOpenChange={setIsSidebarOpen}
       />
 

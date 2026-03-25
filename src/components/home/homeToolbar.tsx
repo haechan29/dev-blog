@@ -12,13 +12,11 @@ export default function HomeToolbar({
   isLoggedIn,
   initialQuery,
   className,
-  canOpenSidebar = false,
   onSidebarOpenChange,
 }: {
   isLoggedIn: boolean;
   initialQuery?: string;
   className?: string;
-  canOpenSidebar?: boolean;
   onSidebarOpenChange?: (isOpen: boolean) => void;
 }) {
   return (
@@ -29,15 +27,13 @@ export default function HomeToolbar({
         className
       )}
     >
-      {canOpenSidebar && (
-        <button
-          onClick={() => onSidebarOpenChange?.(true)}
-          className='xl:hidden shrink-0 p-2 -m-2 items-center justify-center'
-          aria-label='메뉴 열기'
-        >
-          <Menu className='w-6 h-6 text-gray-500' />
-        </button>
-      )}
+      <button
+        onClick={() => onSidebarOpenChange?.(true)}
+        className='xl:hidden shrink-0 p-2 -m-2 items-center justify-center'
+        aria-label='메뉴 열기'
+      >
+        <Menu className='w-6 h-6 text-gray-500' />
+      </button>
 
       <Logo onClick={() => onSidebarOpenChange?.(false)} />
 
