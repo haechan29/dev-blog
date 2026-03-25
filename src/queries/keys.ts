@@ -2,6 +2,10 @@ export const draftKeys = {
   list: () => ['drafts'] as const,
 };
 
+export const tagKeys = {
+  search: (query: string) => ['tags', 'search', { query }] as const,
+};
+
 export const postKeys = {
   list: (params?: { excludeId?: string; tag?: string }) => {
     const filters = {
