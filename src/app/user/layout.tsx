@@ -1,5 +1,6 @@
 import { auth } from '@/auth';
-import UserToolbar from '@/components/user/userToolbar';
+import HomeLayoutClient from '@/components/home/homeLayoutClient';
+import { cookies } from 'next/headers';
 import { ReactNode } from 'react';
 
 export default async function UserToolbarLayout({
@@ -8,11 +9,12 @@ export default async function UserToolbarLayout({
   children: ReactNode;
 }) {
   const session = await auth();
+  const userId =
+    session?.user?.user_id ?? (await cookies()).get('userId')?.value;
 
   return (
-    <>
-      <UserToolbar isLoggedIn={!!session} />
+    <HomeLayoutClient isLoggedIn={!!session} userId={userId}>
       {children}
-    </>
+    </HomeLayoutClient>
   );
 }

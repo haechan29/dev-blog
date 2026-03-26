@@ -1,5 +1,6 @@
 import { auth } from '@/auth';
-import UserToolbar from '@/components/user/userToolbar';
+import HomeLayoutClient from '@/components/home/homeLayoutClient';
+import { cookies } from 'next/headers';
 import { ReactNode } from 'react';
 
 export default async function SeriesLayout({
@@ -8,14 +9,12 @@ export default async function SeriesLayout({
   children: ReactNode;
 }) {
   const session = await auth();
+  const userId =
+    session?.user?.user_id ?? (await cookies()).get('userId')?.value;
 
   return (
-    <>
-      <UserToolbar isLoggedIn={!session} />
-
-      <div className='pt-(--toolbar-height) pb-20 px-6 md:px-12'>
-        {children}
-      </div>
-    </>
+    <HomeLayoutClient isLoggedIn={!!session} userId={userId}>
+      {children}
+    </HomeLayoutClient>
   );
 }
