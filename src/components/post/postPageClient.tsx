@@ -112,6 +112,10 @@ export default function PostPageClient({
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0 });
+  }, []);
+
   if (error instanceof PostForbiddenError) {
     return <ForbiddenPostPage isLoggedIn={isLoggedIn} />;
   }
