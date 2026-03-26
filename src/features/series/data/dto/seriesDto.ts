@@ -8,6 +8,7 @@ export interface SeriesDto {
   updatedAt: string;
   userId: string;
   authorName: string | null;
+  profileImageUrl: string | null;
   posts: Pick<
     PostDto,
     | 'id'

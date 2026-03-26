@@ -8,7 +8,7 @@ export interface SeriesEntity {
   user_id: string;
   created_at: string;
   updated_at: string;
-  users: Pick<UserEntity, 'nickname'>;
+  users: Pick<UserEntity, 'nickname' | 'profile_image_url'>;
   posts: Pick<
     PostEntity,
     | 'id'

@@ -11,6 +11,7 @@ export interface SeriesProps {
   updatedAt: string;
   userId: string;
   authorName: string;
+  profileImageUrl: string | null;
   posts: Pick<
     PostProps,
     | 'id'
@@ -37,6 +38,7 @@ export function createProps(series: Series): SeriesProps {
       id: series.userId,
       nickname: series.authorName,
     }),
+    profileImageUrl: series.profileImageUrl,
     posts: series.posts.map(post => {
       return {
         ...post,

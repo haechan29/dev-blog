@@ -4,21 +4,21 @@ import { toDto } from '@/features/series/data/mapper/seriesMapper';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
+const SERIES_SELECT_FIELDS = `
+  id, 
+  title, 
+  description, 
+  user_id, 
+  created_at, 
+  updated_at,
+  users:user_id(nickname, profile_image_url),
+  posts(id, title, created_at, series_id, series_order, visibility, post_stats(like_count, view_count))
+`;
+
 export async function fetchSeries(seriesId: string) {
   const { data, error } = await supabase
     .from('series')
-    .select(
-      `
-        id, 
-        title, 
-        description, 
-        user_id, 
-        created_at, 
-        updated_at,
-        users:user_id(nickname),
-        posts(id, title, created_at, series_id, series_order, visibility, post_stats(like_count, view_count))
-      `
-    )
+    .select(SERIES_SELECT_FIELDS)
     .eq('id', seriesId)
     .order('series_order', { referencedTable: 'posts', ascending: true })
     .maybeSingle();
@@ -37,18 +37,7 @@ export async function fetchSeries(seriesId: string) {
 export async function fetchSeriesByUserId(userId: string) {
   const { data, error } = await supabase
     .from('series')
-    .select(
-      `
-        id, 
-        title, 
-        description, 
-        user_id, 
-        created_at, 
-        updated_at,
-        users:user_id(nickname),
-        posts(id, title, created_at, series_id, series_order, visibility, post_stats(like_count, view_count))
-      `
-    )
+    .select(SERIES_SELECT_FIELDS)
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
 
@@ -105,18 +94,7 @@ export async function updateSeries({
     })
     .eq('id', seriesId)
     .eq('user_id', userId)
-    .select(
-      `
-        id, 
-        title, 
-        description, 
-        user_id, 
-        created_at, 
-        updated_at,
-        users:user_id(nickname),
-        posts(id, title, created_at, series_id, series_order, visibility, post_stats(like_count, view_count))
-      `
-    )
+    .select(SERIES_SELECT_FIELDS)
     .single();
 
   if (error) {

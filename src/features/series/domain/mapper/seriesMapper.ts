@@ -10,6 +10,7 @@ export function toDomain(dto: SeriesDto): Series {
     updatedAt: dto.updatedAt,
     userId: dto.userId,
     authorName: dto.authorName,
+    profileImageUrl: dto.profileImageUrl,
     posts: dto.posts,
     postCount: dto.postCount,
   };

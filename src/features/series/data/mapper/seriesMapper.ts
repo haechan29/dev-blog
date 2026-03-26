@@ -10,6 +10,7 @@ export function toDto(entity: SeriesEntity): SeriesDto {
     updatedAt: entity.updated_at,
     userId: entity.user_id,
     authorName: entity.users.nickname,
+    profileImageUrl: entity.users.profile_image_url,
     posts: entity.posts.map(post => ({
       id: post.id,
       title: post.title,

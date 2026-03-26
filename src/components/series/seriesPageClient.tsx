@@ -3,6 +3,7 @@
 import AddPostDialog from '@/components/series/addPostDialog';
 import SeriesPostList from '@/components/series/seriesPostList';
 import SeriesSettingsDropdown from '@/components/series/seriesSettingsDropdown';
+import ProfileIcon from '@/components/user/profileIcon';
 import useSeries from '@/features/series/domain/hooks/useSeries';
 import { SeriesProps } from '@/features/series/ui/seriesProps';
 import clsx from 'clsx';
@@ -49,6 +50,11 @@ export default function SeriesPageClient({
           )}
 
           <div className='flex items-center gap-2 text-sm'>
+            <ProfileIcon
+              nickname={series.authorName}
+              size='sm'
+              profileImageUrl={series.profileImageUrl}
+            />
             <Link
               href={`/@${series.userId}/posts`}
               className='text-gray-900 hover:underline'
