@@ -7,10 +7,12 @@ import { ReactNode, useState } from 'react';
 export default function HomeLayoutClient({
   isLoggedIn,
   userId,
+  tag,
   children,
 }: {
   isLoggedIn: boolean;
   userId?: string;
+  tag?: string;
   children: ReactNode;
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -19,6 +21,7 @@ export default function HomeLayoutClient({
     <>
       <HomeToolbar
         isLoggedIn={isLoggedIn}
+        initialQuery={tag ? `#${tag}` : undefined}
         onSidebarOpenChange={setIsSidebarOpen}
       />
 
