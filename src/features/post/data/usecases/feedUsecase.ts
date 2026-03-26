@@ -42,7 +42,6 @@ export async function getFeedPosts({
     InteractionQueries.fetchSkippedPosts(userId),
   ]);
 
-  const viewedPostIds = viewedPosts.map(v => v.post_id);
   const viewedSeriesIds = [
     ...new Set(viewedPosts.map(v => v.posts[0]?.series_id).filter(Boolean)),
   ];
@@ -50,7 +49,7 @@ export async function getFeedPosts({
 
   const fetchedPosts = await FeedQueries.fetchFeedPosts({
     limit: FEED_LIMIT + 1,
-    excludeIds: excludeId ? [...viewedPostIds, excludeId] : viewedPostIds,
+    excludeIds: excludeId ? [excludeId] : [],
     excludeUserId: userId,
     cursor,
     tag,
