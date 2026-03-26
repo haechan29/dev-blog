@@ -30,7 +30,7 @@ export default function ProfileIcon({
   isLoading?: boolean;
 }) {
   const sizeClass =
-    size === 'sm' ? 'w-6 h-6' : size === 'md' ? 'w-8 h-8' : 'w-14 h-14';
+    size === 'sm' ? 'w-6 h-6' : size === 'md' ? 'w-8 h-8' : 'w-12 h-12';
 
   if (skeleton) {
     return (
@@ -77,7 +77,7 @@ export default function ProfileIcon({
       <span
         className={clsx(
           'font-semibold text-white',
-          size === 'sm' ? 'text-xs' : size === 'md' ? 'text-sm' : 'text-2xl'
+          size === 'sm' ? 'text-xs' : size === 'md' ? 'text-sm' : 'text-xl'
         )}
       >
         {initial}

@@ -1,5 +1,6 @@
 'use client';
 
+import SubscribeButton from '@/components/post/subscribeButton';
 import UserBioDialog from '@/components/post/userBioDialog';
 import {
   DropdownMenu,
@@ -10,9 +11,12 @@ import {
 import ProfileIcon from '@/components/user/profileIcon';
 import { ApiError } from '@/errors/errors';
 import { SubscriptionDto } from '@/features/subscription/data/dto/subscriptionDto';
+import * as SubscriptionClientRepository from '@/features/subscription/data/repository/subscriptionClientRepository';
 import { useProfile } from '@/features/user/domain/hooks/useProfile';
 import { UserProps } from '@/features/user/ui/userProps';
 import { cn } from '@/lib/utils';
+import { subscriptionKeys } from '@/queries/keys';
+import { useQuery } from '@tanstack/react-query';
 import imageCompression from 'browser-image-compression';
 import { Edit2, ImageIcon, MoreVertical } from 'lucide-react';
 import { ReactNode, useLayoutEffect, useRef, useState } from 'react';
@@ -37,6 +41,14 @@ export default function UserProfile({
 
   const { user, updateBioMutation, updateImageMutation } =
     useProfile(initialUser);
+
+  const { data: subscriptionInfo } = useQuery({
+    queryKey: subscriptionKeys.info(initialUser.id),
+    queryFn: () =>
+      SubscriptionClientRepository.getSubscriptionInfo(initialUser.id),
+    enabled: currentUserId !== initialUser.id,
+    initialData,
+  });
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -140,6 +152,13 @@ export default function UserProfile({
             </div>
           )}
         </div>
+
+        {user.id !== currentUserId && (
+          <SubscribeButton
+            userId={user.id}
+            isSubscribed={subscriptionInfo?.isSubscribed ?? false}
+          />
+        )}
       </div>
 
       <input

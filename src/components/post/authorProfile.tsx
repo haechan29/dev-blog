@@ -26,7 +26,7 @@ export default function AuthorProfile({
   currentUserId?: string;
   className?: string;
 }) {
-  const { data } = useQuery({
+  const { data: subscriptionInfo } = useQuery({
     queryKey: subscriptionKeys.info(userId),
     queryFn: () => SubscriptionClientRepository.getSubscriptionInfo(userId),
     enabled: currentUserId !== userId,
@@ -63,7 +63,7 @@ export default function AuthorProfile({
       {userId !== currentUserId && (
         <SubscribeButton
           userId={userId}
-          isSubscribed={data?.isSubscribed ?? false}
+          isSubscribed={subscriptionInfo?.isSubscribed ?? false}
         />
       )}
     </div>
