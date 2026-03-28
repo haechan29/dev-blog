@@ -14,7 +14,11 @@ const NOTIFICATION_SELECT_FIELDS = `
   representative_comment_id, 
   milestone_value, 
   created_at, 
-  updated_at
+  updated_at,
+  post:post_id ( title ),
+  representative_user:representative_user_id ( nickname, profile_image_url ),
+  representative_comment:comments!representative_comment_id ( content ),
+  comment:comment_id ( content ),
 `;
 
 function applyQuotedLiteral(value: string) {

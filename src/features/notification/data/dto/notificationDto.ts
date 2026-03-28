@@ -13,9 +13,9 @@ export interface NotificationDto {
   milestoneValue: number | null;
   createdAt: string;
   updatedAt: string;
-}
-
-export interface NotificationListDto {
-  notifications: NotificationDto[];
-  nextCursor: { updatedAt: string; id: string } | null;
+  postTitle: string | null;
+  representativeUserNickname: string | null;
+  representativeUserProfileImageUrl: string | null;
+  commentContent: string | null;
+  representativeCommentContent: string | null;
 }

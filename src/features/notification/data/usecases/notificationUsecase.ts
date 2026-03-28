@@ -1,4 +1,3 @@
-import { NotificationListDto } from '@/features/notification/data/dto/notificationDto';
 import { toDto } from '@/features/notification/data/mapper/notificationMapper';
 import * as NotificationQueries from '@/features/notification/data/queries/notificationQueries';
 
@@ -12,16 +11,16 @@ export async function getNotifications({
   userId: string;
   cursorUpdatedAt: string | null;
   cursorId: string | null;
-}): Promise<NotificationListDto> {
-  const rows = await NotificationQueries.fetchNotifications({
+}) {
+  const entities = await NotificationQueries.fetchNotifications({
     userId,
     limit: NOTIFICATION_LIMIT + 1,
     cursorUpdatedAt: cursorUpdatedAt ?? undefined,
     cursorId: cursorId ?? undefined,
   });
 
-  const isLastPage = rows.length <= NOTIFICATION_LIMIT;
-  const notifications = rows.slice(0, NOTIFICATION_LIMIT);
+  const isLastPage = entities.length <= NOTIFICATION_LIMIT;
+  const notifications = entities.slice(0, NOTIFICATION_LIMIT);
   const last = notifications.at(-1);
 
   return {

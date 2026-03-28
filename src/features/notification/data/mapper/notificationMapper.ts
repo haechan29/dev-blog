@@ -15,5 +15,12 @@ export function toDto(entity: NotificationEntity): NotificationDto {
     milestoneValue: entity.milestone_value,
     createdAt: entity.created_at,
     updatedAt: entity.updated_at,
+    postTitle: entity.post?.title ?? null,
+    representativeUserNickname: entity.representative_user?.nickname ?? null,
+    representativeUserProfileImageUrl:
+      entity.representative_user?.profile_image_url ?? null,
+    commentContent: entity.comment?.content ?? null,
+    representativeCommentContent:
+      entity.representative_comment?.content ?? null,
   };
 }

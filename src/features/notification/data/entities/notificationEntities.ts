@@ -18,4 +18,11 @@ export interface NotificationEntity {
   milestone_value: number | null;
   created_at: string;
   updated_at: string;
+  post: { title: string } | null;
+  representative_user: {
+    nickname: string | null;
+    profile_image_url: string | null;
+  } | null;
+  representative_comment: { content: string } | null;
+  comment: { content: string } | null;
 }
