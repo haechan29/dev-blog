@@ -1,7 +1,7 @@
 import { CreatorPageClient } from '@/components/creator/creatorPageClient';
 import * as CreatorServerRepository from '@/features/creator/data/repository/creatorServerRepository';
 
-export default async function CreatorPage() {
+export default async function CreatorsPage() {
   const creators = await CreatorServerRepository.getCreators();
 
   return (
