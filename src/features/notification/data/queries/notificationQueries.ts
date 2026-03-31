@@ -58,3 +58,65 @@ export async function fetchNotifications({
 
   return data as unknown as NotificationEntity[];
 }
+
+export async function upsertUnreadCommentNotification({
+  postId,
+  authorId,
+  commentUserId,
+  representativeCommentId,
+}: {
+  postId: string;
+  authorId: string;
+  commentUserId: string;
+  representativeCommentId: number;
+}) {
+  if (authorId === commentUserId) {
+    return;
+  }
+
+  const { data: existing, error: selectError } = await supabase
+    .from('notifications')
+    .select('id, comment_count')
+    .eq('user_id', authorId)
+    .eq('type', 'comment')
+    .eq('post_id', postId)
+    .eq('is_read', false)
+    .maybeSingle();
+
+  if (selectError) {
+    throw new Error(selectError.message);
+  }
+
+  const now = new Date().toISOString();
+
+  if (existing) {
+    const nextCount = (existing.comment_count ?? 0) + 1;
+    const { error: updateError } = await supabase
+      .from('notifications')
+      .update({
+        comment_count: nextCount,
+        updated_at: now,
+      })
+      .eq('id', existing.id);
+
+    if (updateError) {
+      throw new Error(updateError.message);
+    }
+  } else {
+    const { error: insertError } = await supabase.from('notifications').insert({
+      user_id: authorId,
+      type: 'comment',
+      is_read: false,
+      post_id: postId,
+      comment_id: null,
+      comment_count: 1,
+      representative_user_id: commentUserId,
+      representative_comment_id: representativeCommentId,
+      milestone_value: null,
+    });
+
+    if (insertError) {
+      throw new Error(insertError.message);
+    }
+  }
+}

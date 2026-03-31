@@ -1,6 +1,8 @@
 import { auth } from '@/auth';
 import { ApiError, ValidationError } from '@/errors/errors';
 import * as CommentQueries from '@/features/comment/data/queries/commentQueries';
+import * as NotificationQueries from '@/features/notification/data/queries/notificationQueries';
+import * as PostQueries from '@/features/post/data/queries/postQueries';
 import { getUserId } from '@/lib/user';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
@@ -56,14 +58,28 @@ export async function POST(
 
     const passwordHash = session ? null : await bcrypt.hash(password, 10);
 
-    const data = await CommentQueries.createComments(
+    const comment = await CommentQueries.createComment(
       postId,
       content,
       passwordHash,
       userId
     );
 
-    return NextResponse.json({ data });
+    try {
+      const post = await PostQueries.fetchPostForAuth(postId);
+      if (post.user_id !== comment.userId) {
+        await NotificationQueries.upsertUnreadCommentNotification({
+          postId,
+          authorId: post.user_id,
+          commentUserId: comment.userId,
+          representativeCommentId: comment.id,
+        });
+      }
+    } catch (notificationError) {
+      console.error('댓글 알림 생성에 실패했습니다', notificationError);
+    }
+
+    return NextResponse.json({ data: comment });
   } catch (error) {
     console.error('댓글 생성 요청이 실패했습니다', error);
 

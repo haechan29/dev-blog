@@ -50,7 +50,7 @@ export async function fetchComments(
   return (data as CommentEntityFlat[]).map(flatToDto);
 }
 
-export async function createComments(
+export async function createComment(
   postId: string,
   content: string,
   passwordHash: string | null,
