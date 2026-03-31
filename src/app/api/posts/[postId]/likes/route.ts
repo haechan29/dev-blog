@@ -1,5 +1,5 @@
 import { ApiError, UnauthorizedError } from '@/errors/errors';
-import * as InteractionQueries from '@/features/post-interaction/data/queries/interactionQueries';
+import * as PostLikeQueries from '@/features/post-interaction/data/queries/postLikeQueries';
 import { getUserId } from '@/lib/user';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -15,7 +15,7 @@ export async function GET(
       return NextResponse.json({ data: false });
     }
 
-    const isLiked = await InteractionQueries.selectLike(userId, postId);
+    const isLiked = await PostLikeQueries.fetchPostLike(userId, postId);
 
     return NextResponse.json({ data: isLiked });
   } catch (error) {
@@ -44,7 +44,7 @@ export async function POST(
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 
-    await InteractionQueries.insertLike(userId, postId);
+    await PostLikeQueries.createPostLike(userId, postId);
 
     return NextResponse.json({ data: null });
   } catch (error) {
@@ -73,7 +73,7 @@ export async function DELETE(
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 
-    await InteractionQueries.deleteLike(userId, postId);
+    await PostLikeQueries.deletePostLike(userId, postId);
 
     return NextResponse.json({ data: null });
   } catch (error) {

@@ -1,4 +1,5 @@
-import * as InteractionQueries from '@/features/post-interaction/data/queries/interactionQueries';
+import * as PostSkipQueries from '@/features/post-interaction/data/queries/postSkipQueries';
+import * as PostViewQueries from '@/features/post-interaction/data/queries/postViewQueries';
 import 'server-only';
 
 export async function recordView(
@@ -8,10 +9,10 @@ export async function recordView(
   fromFeed: boolean = false
 ) {
   const results: Promise<void>[] = [];
-  results.push(InteractionQueries.insertView(userId, postId, readDuration));
+  results.push(PostViewQueries.createPostView(userId, postId, readDuration));
 
   if (fromFeed) {
-    results.push(InteractionQueries.decrementSkip(userId, postId));
+    results.push(PostSkipQueries.decrementPostSkip(userId, postId));
   }
 
   await Promise.all(results);
