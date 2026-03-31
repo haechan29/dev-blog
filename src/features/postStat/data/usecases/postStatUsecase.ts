@@ -24,14 +24,13 @@ export async function incrementPostStatViewWithReadTime({
   });
 }
 
-export async function incrementPostStatLikeCount(postId: string) {
-  const postStat = await PostStatQueries.fetchPostStatByPostId(postId);
-
-  if (!postStat) {
-    throw new ValidationError('게시글 통계를 찾을 수 없습니다');
-  }
-
-  const { like_count: prevLikeCount } = postStat;
+export async function incrementPostStatLikeCount({
+  postId,
+  prevLikeCount,
+}: {
+  postId: string;
+  prevLikeCount: number;
+}) {
   const newLikeCount = prevLikeCount + 1;
 
   await PostStatQueries.updatePostStat({ postId, likeCount: newLikeCount });

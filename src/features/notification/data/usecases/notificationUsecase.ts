@@ -1,6 +1,7 @@
 import { toDto } from '@/features/notification/data/mapper/notificationMapper';
 import * as MilestoneThresholdQueries from '@/features/notification/data/queries/milestoneThresholdQueries';
 import * as NotificationQueries from '@/features/notification/data/queries/notificationQueries';
+import * as PostQueries from '@/features/post/data/queries/postQueries';
 
 const NOTIFICATION_LIMIT = 10;
 
@@ -48,6 +49,36 @@ export async function insertPostViewMilestoneNotification({
   }
 
   await NotificationQueries.insertPostViewMilestoneNotification({
+    postId,
+    authorId,
+    milestoneValue,
+  });
+}
+
+export async function insertPostLikeMilestoneNotification({
+  postId,
+  userId,
+  milestoneValue,
+}: {
+  postId: string;
+  userId: string;
+  milestoneValue: number;
+}) {
+  const post = await PostQueries.fetchPostForAuth(postId);
+  const authorId = post.user_id;
+
+  if (authorId === userId) {
+    return;
+  }
+
+  const thresholds =
+    await MilestoneThresholdQueries.fetchMilestoneThresholds('post_like');
+
+  if (!thresholds.includes(milestoneValue)) {
+    return;
+  }
+
+  await NotificationQueries.insertPostLikeMilestoneNotification({
     postId,
     authorId,
     milestoneValue,
