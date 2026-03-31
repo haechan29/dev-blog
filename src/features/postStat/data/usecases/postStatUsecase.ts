@@ -2,19 +2,17 @@ import { ValidationError } from '@/errors/errors';
 import * as PostStatQueries from '@/features/postStat/data/queries/postStatQueries';
 import 'server-only';
 
-export async function incrementPostStatViewWithReadTime(
-  postId: string,
-  readDuration: number
-) {
-  const postStat = await PostStatQueries.fetchPostStatByPostId(postId);
-
-  if (!postStat) {
-    throw new ValidationError('게시글 통계를 찾을 수 없습니다');
-  }
-
-  const { view_count: prevViewCount, avg_read_time: prevAvgReadTime } =
-    postStat;
-
+export async function incrementPostStatViewWithReadTime({
+  postId,
+  prevViewCount,
+  prevAvgReadTime,
+  readDuration,
+}: {
+  postId: string;
+  prevViewCount: number;
+  prevAvgReadTime: number;
+  readDuration: number;
+}) {
   const newViewCount = prevViewCount + 1;
   const newAvgReadTime =
     (prevAvgReadTime * prevViewCount + readDuration) / newViewCount;
@@ -62,7 +60,10 @@ export async function incrementPostStatCommentCount(postId: string) {
   const { comment_count: prevCommentCount } = postStat;
   const newCommentCount = prevCommentCount + 1;
 
-  await PostStatQueries.updatePostStat({ postId, commentCount: newCommentCount });
+  await PostStatQueries.updatePostStat({
+    postId,
+    commentCount: newCommentCount,
+  });
 }
 
 export async function decrementPostStatCommentCount(postId: string) {
@@ -75,5 +76,8 @@ export async function decrementPostStatCommentCount(postId: string) {
   const { comment_count: prevCommentCount } = postStat;
   const newCommentCount = Math.max(0, prevCommentCount - 1);
 
-  await PostStatQueries.updatePostStat({ postId, commentCount: newCommentCount });
+  await PostStatQueries.updatePostStat({
+    postId,
+    commentCount: newCommentCount,
+  });
 }

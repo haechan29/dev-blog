@@ -1,4 +1,5 @@
 import { toDto } from '@/features/notification/data/mapper/notificationMapper';
+import * as MilestoneThresholdQueries from '@/features/notification/data/queries/milestoneThresholdQueries';
 import * as NotificationQueries from '@/features/notification/data/queries/notificationQueries';
 
 const NOTIFICATION_LIMIT = 10;
@@ -28,4 +29,27 @@ export async function getNotifications({
     nextCursor:
       isLastPage || !last ? null : { updatedAt: last.updated_at, id: last.id },
   };
+}
+
+export async function insertPostViewMilestoneNotification({
+  postId,
+  authorId,
+  milestoneValue,
+}: {
+  postId: string;
+  authorId: string;
+  milestoneValue: number;
+}) {
+  const thresholds =
+    await MilestoneThresholdQueries.fetchMilestoneThresholds('post_view');
+
+  if (!thresholds.includes(milestoneValue)) {
+    return;
+  }
+
+  await NotificationQueries.insertPostViewMilestoneNotification({
+    postId,
+    authorId,
+    milestoneValue,
+  });
 }

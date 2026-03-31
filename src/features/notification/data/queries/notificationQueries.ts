@@ -120,3 +120,29 @@ export async function upsertUnreadCommentNotification({
     }
   }
 }
+
+export async function insertPostViewMilestoneNotification({
+  postId,
+  authorId,
+  milestoneValue,
+}: {
+  postId: string;
+  authorId: string;
+  milestoneValue: number;
+}) {
+  const { error } = await supabase.from('notifications').insert({
+    user_id: authorId,
+    type: 'post_view_milestone',
+    is_read: false,
+    post_id: postId,
+    comment_id: null,
+    comment_count: null,
+    representative_user_id: null,
+    representative_comment_id: null,
+    milestone_value: milestoneValue,
+  });
+
+  if (error && error.code !== '23505') {
+    throw new Error(error.message);
+  }
+}
