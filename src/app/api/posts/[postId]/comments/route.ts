@@ -3,6 +3,7 @@ import { ApiError, ValidationError } from '@/errors/errors';
 import * as CommentQueries from '@/features/comment/data/queries/commentQueries';
 import * as NotificationQueries from '@/features/notification/data/queries/notificationQueries';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
+import * as PostStatUsecase from '@/features/postStat/data/usecases/postStatUsecase';
 import { getUserId } from '@/lib/user';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
@@ -64,6 +65,12 @@ export async function POST(
       passwordHash,
       userId
     );
+
+    try {
+      await PostStatUsecase.incrementPostStatCommentCount(postId);
+    } catch (error) {
+      console.error('게시글 통계 댓글 수 증가 요청이 실패했습니다', error);
+    }
 
     try {
       const post = await PostQueries.fetchPostForAuth(postId);

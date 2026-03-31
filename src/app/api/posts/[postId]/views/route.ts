@@ -1,5 +1,6 @@
 import { ApiError } from '@/errors/errors';
 import * as InteractionUsecase from '@/features/post-interaction/data/usecases/interactionUsecase';
+import * as PostStatUsecase from '@/features/postStat/data/usecases/postStatUsecase';
 import { getUserId } from '@/lib/user';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -17,7 +18,16 @@ export async function POST(
 
     const { readDuration, fromFeed } = await request.json();
 
-    await InteractionUsecase.recordView(userId, postId, readDuration, fromFeed);
+    InteractionUsecase.recordView(userId, postId, readDuration, fromFeed);
+
+    try {
+      await PostStatUsecase.incrementPostStatViewWithReadTime(
+        postId,
+        readDuration
+      );
+    } catch (error) {
+      console.error('게시글 통계 조회 수 증가 요청이 실패했습니다', error);
+    }
 
     return NextResponse.json({ data: null });
   } catch (error) {

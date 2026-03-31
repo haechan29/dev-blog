@@ -1,5 +1,6 @@
 import { ApiError, UnauthorizedError } from '@/errors/errors';
 import * as PostLikeQueries from '@/features/post-interaction/data/queries/postLikeQueries';
+import * as PostStatUsecase from '@/features/postStat/data/usecases/postStatUsecase';
 import { getUserId } from '@/lib/user';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -46,6 +47,12 @@ export async function POST(
 
     await PostLikeQueries.createPostLike(userId, postId);
 
+    try {
+      await PostStatUsecase.incrementPostStatLikeCount(postId);
+    } catch (error) {
+      console.error('게시글 통계 좋아요 수 증가 요청이 실패했습니다', error);
+    }
+
     return NextResponse.json({ data: null });
   } catch (error) {
     console.error('좋아요 요청이 실패했습니다', error);
@@ -74,6 +81,12 @@ export async function DELETE(
     }
 
     await PostLikeQueries.deletePostLike(userId, postId);
+
+    try {
+      await PostStatUsecase.decrementPostStatLikeCount(postId);
+    } catch (error) {
+      console.error('게시글 통계 좋아요 수 감소 요청이 실패했습니다', error);
+    }
 
     return NextResponse.json({ data: null });
   } catch (error) {
