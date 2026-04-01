@@ -59,6 +59,22 @@ export async function fetchNotifications({
   return data as unknown as NotificationEntity[];
 }
 
+export async function markAllUnreadNotificationsAsRead({
+  userId,
+}: {
+  userId: string;
+}) {
+  const { error } = await supabase
+    .from('notifications')
+    .update({ is_read: true })
+    .eq('user_id', userId)
+    .eq('is_read', false);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
 export async function upsertUnreadCommentNotification({
   postId,
   authorId,
