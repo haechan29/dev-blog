@@ -172,3 +172,29 @@ export async function insertPostLikeMilestoneNotification({
     throw new Error(error.message);
   }
 }
+
+export async function insertCommentLikeMilestoneNotification({
+  commentUserId,
+  commentId,
+  milestoneValue,
+}: {
+  commentUserId: string;
+  commentId: number;
+  milestoneValue: number;
+}) {
+  const { error } = await supabase.from('notifications').insert({
+    user_id: commentUserId,
+    type: 'comment_like_milestone',
+    is_read: false,
+    post_id: null,
+    comment_id: commentId,
+    comment_count: null,
+    representative_user_id: null,
+    representative_comment_id: null,
+    milestone_value: milestoneValue,
+  });
+
+  if (error && error.code !== '23505') {
+    throw new Error(error.message);
+  }
+}

@@ -84,3 +84,32 @@ export async function insertPostLikeMilestoneNotification({
     milestoneValue,
   });
 }
+
+export async function insertCommentLikeMilestoneNotification({
+  likeUserId,
+  commentUserId,
+  commentId,
+  milestoneValue,
+}: {
+  likeUserId: string;
+  commentUserId: string;
+  commentId: number;
+  milestoneValue: number;
+}) {
+  if (commentUserId === likeUserId) {
+    return;
+  }
+
+  const thresholds =
+    await MilestoneThresholdQueries.fetchMilestoneThresholds('comment_like');
+
+  if (!thresholds.includes(milestoneValue)) {
+    return;
+  }
+
+  await NotificationQueries.insertCommentLikeMilestoneNotification({
+    commentUserId,
+    commentId,
+    milestoneValue,
+  });
+}

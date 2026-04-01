@@ -2,5 +2,5 @@ import * as CommentQueries from '@/features/comment/data/queries/commentQueries'
 import 'server-only';
 
 export async function getComments(postId: string, userId?: string) {
-  return await CommentQueries.fetchComments(postId, userId);
+  return await CommentQueries.fetchComments({ postId, userId });
 }

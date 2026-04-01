@@ -1,4 +1,5 @@
-import { supabase } from '@/lib/supabase';
+import { ApiError, ValidationError } from '@/errors/errors';
+import * as CommentQueries from '@/features/comment/data/queries/commentQueries';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(
@@ -6,44 +7,37 @@ export async function POST(
   { params }: { params: Promise<{ postId: string; commentId: string }> }
 ) {
   try {
-    const { postId, commentId } = await params;
+    const { postId, commentId: commentIdParam } = await params;
 
-    const { data: currentData, error: fetchError } = await supabase
-      .from('comments')
-      .select('like_count')
-      .eq('post_id', postId)
-      .eq('id', commentId)
-      .maybeSingle();
-
-    if (fetchError) {
-      return NextResponse.json({ error: fetchError.message }, { status: 500 });
+    const commentIdNum = Number(commentIdParam);
+    if (!Number.isInteger(commentIdNum)) {
+      throw new ValidationError('유효하지 않은 댓글 ID입니다');
     }
 
-    if (!currentData) {
-      return NextResponse.json(
-        { error: `댓글이 존재하지 않습니다. commentId: ${commentId}` },
-        { status: 404 }
-      );
+    const { post_id: commentPostId, like_count: likeCount } =
+      await CommentQueries.fetchComment(commentIdNum);
+
+    if (commentPostId !== postId) {
+      throw new ValidationError('댓글이 속한 게시글이 일치하지 않습니다');
     }
 
-    const newLikeCount = currentData.like_count - 1;
+    const newLikeCount = Math.max(0, likeCount - 1);
 
-    const { data, error } = await supabase
-      .from('comments')
-      .update({ like_count: newLikeCount })
-      .eq('post_id', postId)
-      .eq('id', commentId)
-      .select()
-      .single();
+    const updated = await CommentQueries.updateComment({
+      commentId: commentIdNum,
+      likeCount: newLikeCount,
+    });
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ data: updated });
+  } catch (error) {
+    console.error('댓글 좋아요 수 감소 요청이 실패했습니다', error);
+
+    if (error instanceof ApiError) {
+      return error.toResponse();
     }
 
-    return NextResponse.json({ data });
-  } catch {
     return NextResponse.json(
-      { error: '댓글 좋아요 수 증가 요청이 실패했습니다.' },
+      { error: '댓글 좋아요 수 감소 요청이 실패했습니다.' },
       { status: 500 }
     );
   }

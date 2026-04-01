@@ -18,7 +18,11 @@ export async function GET(
     const { searchParams } = new URL(request.url);
     const timestamp = searchParams.get('timestamp') ?? undefined;
 
-    const data = await CommentQueries.fetchComments(postId, userId, timestamp);
+    const data = await CommentQueries.fetchComments({
+      postId,
+      userId,
+      timestamp,
+    });
     return NextResponse.json({ data });
   } catch (error) {
     console.error('댓글 조회 요청이 실패했습니다', error);
