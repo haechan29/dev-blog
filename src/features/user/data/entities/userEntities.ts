@@ -7,4 +7,5 @@ export interface UserEntity {
   registered_at: string | null;
   profile_image_url: string | null;
   bio: string | null;
+  subscriber_count: number;
 }

@@ -7,4 +7,5 @@ export interface UserResponseDto {
   registeredAt: string | null;
   profileImageUrl: string | null;
   bio: string | null;
+  subscriberCount: number;
 }

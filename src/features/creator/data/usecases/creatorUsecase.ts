@@ -11,7 +11,7 @@ export async function createCreatorWithUser({
   email: string;
   memo?: string;
 }) {
-  const userId = await UserQueries.createUserWithNickname(channelName);
+  const userId = await UserQueries.createUser(channelName);
 
   return CreatorQueries.createCreator({
     channelName,

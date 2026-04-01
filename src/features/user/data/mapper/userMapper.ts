@@ -11,5 +11,6 @@ export function toDto(user: UserEntity): UserResponseDto {
     registeredAt: user.registered_at,
     profileImageUrl: user.profile_image_url,
     bio: user.bio,
+    subscriberCount: user.subscriber_count,
   };
 }
