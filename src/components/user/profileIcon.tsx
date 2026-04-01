@@ -42,7 +42,7 @@ export default function ProfileIcon({
     return (
       <div
         className={clsx(
-          'shrink-0 rounded-full overflow-hidden relative',
+          'shrink-0 rounded-full overflow-hidden relative cursor-pointer',
           sizeClass
         )}
       >
@@ -69,7 +69,7 @@ export default function ProfileIcon({
   return (
     <div
       className={clsx(
-        'shrink-0 rounded-full flex items-center justify-center',
+        'shrink-0 rounded-full flex items-center justify-center cursor-pointer',
         sizeClass,
         baseColor
       )}
