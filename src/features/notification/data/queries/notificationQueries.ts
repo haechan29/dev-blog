@@ -198,3 +198,27 @@ export async function insertCommentLikeMilestoneNotification({
     throw new Error(error.message);
   }
 }
+
+export async function insertSubscriberMilestoneNotification({
+  followingUserId,
+  milestoneValue,
+}: {
+  followingUserId: string;
+  milestoneValue: number;
+}) {
+  const { error } = await supabase.from('notifications').insert({
+    user_id: followingUserId,
+    type: 'subscriber_milestone',
+    is_read: false,
+    post_id: null,
+    comment_id: null,
+    comment_count: null,
+    representative_user_id: null,
+    representative_comment_id: null,
+    milestone_value: milestoneValue,
+  });
+
+  if (error && error.code !== '23505') {
+    throw new Error(error.message);
+  }
+}

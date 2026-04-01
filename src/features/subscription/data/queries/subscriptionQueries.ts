@@ -79,12 +79,23 @@ export async function getFollowingIds(userId: string) {
   return data.map(s => s.following_id);
 }
 
-export async function createSubscription(followingId: string) {
-  const followerId = await getUserId();
-  if (!followerId) {
-    throw new UnauthorizedError('인증되지 않은 요청입니다');
+export async function countSubscribers(followingId: string) {
+  const { count, error } = await supabase
+    .from('subscriptions')
+    .select('*', { count: 'exact', head: true })
+    .eq('following_id', followingId);
+
+  if (error) {
+    throw new Error(error.message);
   }
 
+  return count ?? 0;
+}
+
+export async function createSubscription(
+  followingId: string,
+  followerId: string
+) {
   if (followerId === followingId) {
     throw new ValidationError('자기 자신을 구독할 수 없습니다');
   }

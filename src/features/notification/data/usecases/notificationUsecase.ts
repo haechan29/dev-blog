@@ -113,3 +113,29 @@ export async function insertCommentLikeMilestoneNotification({
     milestoneValue,
   });
 }
+
+export async function insertSubscriberMilestoneNotification({
+  followingUserId,
+  followerUserId,
+  milestoneValue,
+}: {
+  followingUserId: string;
+  followerUserId: string;
+  milestoneValue: number;
+}) {
+  if (followerUserId === followingUserId) {
+    return;
+  }
+
+  const thresholds =
+    await MilestoneThresholdQueries.fetchMilestoneThresholds('subscriber');
+
+  if (!thresholds.includes(milestoneValue)) {
+    return;
+  }
+
+  await NotificationQueries.insertSubscriberMilestoneNotification({
+    followingUserId,
+    milestoneValue,
+  });
+}
