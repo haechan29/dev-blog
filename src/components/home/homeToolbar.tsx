@@ -1,7 +1,7 @@
 'use client';
 
-import NotificationBellPopover from '@/components/home/notificationBellPopover';
 import Logo from '@/components/logo';
+import NotificationPopover from '@/components/notification/notificationPopover';
 import ToolbarProfileIcon from '@/components/post/toolbarProfileIcon';
 import SearchCommand from '@/components/search/searchCommand';
 import { cn } from '@/lib/utils';
@@ -64,7 +64,7 @@ export default function HomeToolbar({
         </Link>
 
         <div className='hidden sm:flex'>
-          <NotificationBellPopover />
+          <NotificationPopover />
         </div>
 
         <ToolbarProfileIcon isLoggedIn={isLoggedIn} />

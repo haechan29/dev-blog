@@ -1,15 +1,15 @@
 'use client';
 
 import BellIcon from '@/components/bellIcon';
+import Notification from '@/components/notification/notification';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import type { NotificationListCursor } from '@/features/notification/data/repository/notificationClientRepository';
 import * as NotificationClientRepository from '@/features/notification/data/repository/notificationClientRepository';
 import * as NotificationClientService from '@/features/notification/domain/service/notificationClientService';
-import { NotificationListItemUi } from '@/features/notification/ui/notificationListItemUiModel';
+import type { NotificationCursor } from '@/features/notification/domain/types/notificationCursor';
 import { notificationKeys } from '@/queries/keys';
 import {
   useInfiniteQuery,
@@ -17,47 +17,20 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
-import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import SimpleBar from 'simplebar-react';
 
 const UNREAD_COUNT_REFETCH_MS = 5 * 60 * 1000;
 
-function NotificationRow({ item }: { item: NotificationListItemUi }) {
-  const body = (
-    <div className='px-3 py-2.5 text-left'>
-      <p className='text-sm text-gray-900 leading-snug'>{item.primary}</p>
-      {item.secondary ? (
-        <p className='text-xs text-gray-500 mt-1 line-clamp-2 leading-snug'>
-          {item.secondary}
-        </p>
-      ) : null}
-    </div>
-  );
-
-  if (item.href) {
-    return (
-      <Link
-        href={item.href}
-        className='block border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors'
-      >
-        {body}
-      </Link>
-    );
-  }
-
-  return <div className='border-b border-gray-100 last:border-b-0'>{body}</div>;
-}
-
-export default function NotificationBellPopover() {
+export default function NotificationPopover() {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const { ref, inView } = useInView();
 
   const { data: unreadData } = useQuery({
     queryKey: notificationKeys.unreadCount(),
-    queryFn: () => NotificationClientRepository.fetchUnreadNotificationCount(),
+    queryFn: () => NotificationClientRepository.getUnreadNotificationCount(),
     refetchInterval: UNREAD_COUNT_REFETCH_MS,
   });
 
@@ -74,7 +47,7 @@ export default function NotificationBellPopover() {
   } = useInfiniteQuery({
     queryKey: notificationKeys.list(),
     queryFn: async ({ pageParam }) => {
-      const result = await NotificationClientService.getNotificationsPage({
+      const result = await NotificationClientService.getNotifications({
         cursor: pageParam,
       });
       if (pageParam === null) {
@@ -84,14 +57,14 @@ export default function NotificationBellPopover() {
       }
       return result;
     },
-    initialPageParam: null as NotificationListCursor | null,
+    initialPageParam: null as NotificationCursor | null,
     getNextPageParam: lastPage => lastPage.nextCursor,
     enabled: open,
     staleTime: 0,
   });
 
-  const items = useMemo(
-    () => data?.pages.flatMap(page => page.items) ?? [],
+  const notifications = useMemo(
+    () => data?.pages.flatMap(page => page.notifications) ?? [],
     [data]
   );
 
@@ -102,7 +75,7 @@ export default function NotificationBellPopover() {
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const showInitialSpinner = open && isLoading;
-  const isEmpty = !isLoading && !isFetching && items.length === 0;
+  const isEmpty = !isLoading && !isFetching && notifications.length === 0;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -144,8 +117,11 @@ export default function NotificationBellPopover() {
         ) : (
           <SimpleBar className='max-h-[min(70vh,320px)] simplebar-hover'>
             <div>
-              {items.map(item => (
-                <NotificationRow key={item.id} item={item} />
+              {notifications.map(notification => (
+                <Notification
+                  key={notification.id}
+                  notification={notification}
+                />
               ))}
               <div ref={ref} className='h-1' aria-hidden />
               {isFetchingNextPage ? (

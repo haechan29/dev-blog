@@ -204,10 +204,12 @@ export async function insertPostLikeMilestoneNotification({
 }
 
 export async function insertCommentLikeMilestoneNotification({
+  postId,
   commentUserId,
   commentId,
   milestoneValue,
 }: {
+  postId: string;
   commentUserId: string;
   commentId: number;
   milestoneValue: number;
@@ -216,7 +218,7 @@ export async function insertCommentLikeMilestoneNotification({
     user_id: commentUserId,
     type: 'comment_like_milestone',
     is_read: false,
-    post_id: null,
+    post_id: postId,
     comment_id: commentId,
     comment_count: null,
     representative_user_id: null,

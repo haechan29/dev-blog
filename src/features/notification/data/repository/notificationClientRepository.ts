@@ -2,14 +2,14 @@ import { NotificationDto } from '@/features/notification/data/dto/notificationDt
 import { NotificationCursor } from '@/features/notification/domain/types/notificationCursor';
 import { api } from '@/lib/api';
 
-export async function fetchUnreadNotificationCount(): Promise<{
+export async function getUnreadNotificationCount(): Promise<{
   unreadCount: number;
 }> {
   const response = await api.get('/api/notifications/unread-count');
   return response.data;
 }
 
-export async function fetchNotifications(
+export async function getNotifications(
   cursor: NotificationCursor | null
 ): Promise<{
   notifications: NotificationDto[];

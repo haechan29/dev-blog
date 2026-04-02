@@ -1,4 +1,4 @@
-import { NotificationType } from '@/features/notification/data/entities/notificationEntities';
+import { NotificationType } from '@/features/notification/domain/types/notificationType';
 
 export interface NotificationDto {
   id: string;

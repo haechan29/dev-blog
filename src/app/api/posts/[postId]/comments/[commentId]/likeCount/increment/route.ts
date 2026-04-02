@@ -41,6 +41,7 @@ export async function POST(
 
     try {
       await NotificationUsecase.insertCommentLikeMilestoneNotification({
+        postId,
         likeUserId: userId,
         commentUserId,
         commentId: commentIdNum,
