@@ -42,4 +42,5 @@ export const subscriptionKeys = {
 
 export const notificationKeys = {
   unreadCount: () => ['notifications', 'unread-count'] as const,
+  list: () => ['notifications', 'list'] as const,
 };

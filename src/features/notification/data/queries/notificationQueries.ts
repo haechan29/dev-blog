@@ -18,7 +18,7 @@ const NOTIFICATION_SELECT_FIELDS = `
   post:post_id ( title ),
   representative_user:representative_user_id ( nickname, profile_image_url ),
   representative_comment:comments!representative_comment_id ( content ),
-  comment:comment_id ( content ),
+  comment:comment_id ( content )
 `;
 
 function applyQuotedLiteral(value: string) {
@@ -59,11 +59,7 @@ export async function fetchNotifications({
   return data as unknown as NotificationEntity[];
 }
 
-export async function countUnreadNotifications({
-  userId,
-}: {
-  userId: string;
-}) {
+export async function countUnreadNotifications({ userId }: { userId: string }) {
   const { count, error } = await supabase
     .from('notifications')
     .select('*', { count: 'exact', head: true })
