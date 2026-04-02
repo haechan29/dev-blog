@@ -39,3 +39,7 @@ export const subscriptionKeys = {
   following: (userId: string) =>
     ['subscriptions', userId, 'following'] as const,
 };
+
+export const notificationKeys = {
+  unreadCount: () => ['notifications', 'unread-count'] as const,
+};

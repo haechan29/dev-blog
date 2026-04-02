@@ -9,10 +9,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import * as NotificationClientRepository from '@/features/notification/data/repository/notificationClientRepository';
 import { cn } from '@/lib/utils';
+import { notificationKeys } from '@/queries/keys';
+import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Menu, Search } from 'lucide-react';
 import Link from 'next/link';
+
+const UNREAD_COUNT_REFETCH_MS = 5 * 60 * 1000;
 
 export default function HomeToolbar({
   isLoggedIn,
@@ -25,6 +30,15 @@ export default function HomeToolbar({
   className?: string;
   onSidebarOpenChange?: (isOpen: boolean) => void;
 }) {
+  const { data } = useQuery({
+    queryKey: notificationKeys.unreadCount(),
+    queryFn: () => NotificationClientRepository.fetchUnreadNotificationCount(),
+    refetchInterval: UNREAD_COUNT_REFETCH_MS,
+  });
+
+  const unreadCount = data?.unreadCount ?? 0;
+  const showUnreadDot = unreadCount > 0;
+
   return (
     <div
       className={cn(
@@ -73,10 +87,16 @@ export default function HomeToolbar({
             <PopoverTrigger asChild>
               <button
                 type='button'
-                className='shrink-0 p-2 -m-2 cursor-pointer rounded-full hover:bg-gray-100'
-                aria-label='알림'
+                className='relative shrink-0 p-2 -m-2 cursor-pointer rounded-full hover:bg-gray-100'
+                aria-label={`알림, 읽지 않은 알림 ${unreadCount}개`}
               >
                 <BellIcon className='w-6 h-6' strokeWidth={1.5} />
+                {showUnreadDot ? (
+                  <span
+                    className='pointer-events-none absolute top-2.5 right-2.5 h-1.5 w-1.5 rounded-full bg-red-500 ring-2 ring-white'
+                    aria-hidden
+                  />
+                ) : null}
               </button>
             </PopoverTrigger>
             <PopoverContent
