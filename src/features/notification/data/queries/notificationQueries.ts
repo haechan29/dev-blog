@@ -59,6 +59,24 @@ export async function fetchNotifications({
   return data as unknown as NotificationEntity[];
 }
 
+export async function countUnreadNotifications({
+  userId,
+}: {
+  userId: string;
+}) {
+  const { count, error } = await supabase
+    .from('notifications')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('is_read', false);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return count ?? 0;
+}
+
 export async function markAllUnreadNotificationsAsRead({
   userId,
 }: {

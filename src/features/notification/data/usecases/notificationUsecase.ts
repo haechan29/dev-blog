@@ -5,6 +5,22 @@ import * as PostQueries from '@/features/post/data/queries/postQueries';
 
 const NOTIFICATION_LIMIT = 10;
 
+export async function getUnreadNotificationCount({
+  userId,
+}: {
+  userId?: string;
+}) {
+  if (!userId) {
+    return { unreadCount: 0 };
+  }
+
+  const unreadCount = await NotificationQueries.countUnreadNotifications({
+    userId,
+  });
+
+  return { unreadCount };
+}
+
 export async function getNotifications({
   userId,
   cursorUpdatedAt,
