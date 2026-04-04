@@ -8,7 +8,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { ApiError } from '@/errors/errors';
-import useComments from '@/features/comment/hooks/useComments';
+import * as CommentClientService from '@/features/comment/domain/service/commentClientService';
+import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import { postKeys } from '@/queries/keys';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
@@ -27,8 +30,30 @@ export default function DeleteCommentDialog({
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }) {
+  const queryClient = useQueryClient();
+
   const [password, setPassword] = useState('');
   const [isPasswordValid, setIsPasswordValid] = useState(true);
+
+  const deleteCommentMutation = useMutation({
+    mutationFn: ({
+      postId,
+      commentId,
+      password,
+    }: {
+      postId: string;
+      commentId: number;
+      password?: string;
+    }) => CommentClientService.deleteComment(postId, commentId, password),
+    onSuccess: (_, variables) => {
+      queryClient.setQueryData(
+        postKeys.comments(postId),
+        (old: CommentItemProps[]) => {
+          return old.filter(comment => comment.id !== variables.commentId);
+        }
+      );
+    },
+  });
 
   useEffect(() => {
     if (!isOpen) {
@@ -37,7 +62,6 @@ export default function DeleteCommentDialog({
     }
   }, [isOpen]);
 
-  const { deleteCommentMutation } = useComments({ postId });
   const deleteComment = useCallback(
     (params: { postId: string; commentId: number; password?: string }) => {
       deleteCommentMutation.mutate(params, {

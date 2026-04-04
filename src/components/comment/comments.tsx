@@ -5,12 +5,15 @@ import CommentPanel from '@/components/comment/commentPanel';
 import CommentPasswordDialog from '@/components/comment/commentPasswordDialog';
 import ProfileIcon from '@/components/user/profileIcon';
 import { ApiError } from '@/errors/errors';
-import useComments from '@/features/comment/hooks/useComments';
+import * as CommentClientService from '@/features/comment/domain/service/commentClientService';
+import { getComments } from '@/features/comment/domain/service/commentClientService';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
 import useMediaQuery, {
   DESKTOP_QUERY,
   TOUCH_QUERY,
 } from '@/hooks/useMediaQuery';
+import { postKeys } from '@/queries/keys';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
@@ -28,21 +31,43 @@ export default function Comments({
   postId: string;
   initialComments: CommentItemProps[];
 }) {
+  const queryClient = useQueryClient();
+
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const commentsPreviewRef = useRef<HTMLButtonElement | null>(null);
   const commentsListRef = useRef<HTMLDivElement | null>(null);
-  const { comments, createCommentMutation } = useComments({
-    postId,
-    initialComments,
-  });
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [content, setContent] = useState('');
   const [isInputVisible, setIsInputVisible] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  const [timestamp] = useState(() => new Date().toISOString());
 
   const isDesktop = useMediaQuery(DESKTOP_QUERY);
   const isTouch = useMediaQuery(TOUCH_QUERY);
   const showSheet = isDesktop && !isTouch;
+
+  const { data: comments } = useQuery({
+    queryKey: postKeys.comments(postId),
+    queryFn: async () => {
+      const comments = await getComments(postId, timestamp);
+      return comments.map(comment => comment.toProps());
+    },
+    initialData: initialComments,
+  });
+
+  const createCommentMutation = useMutation({
+    mutationFn: (params: {
+      postId: string;
+      content: string;
+      password?: string;
+    }) => CommentClientService.createComment(params),
+    onSuccess: newComment => {
+      queryClient.setQueryData(
+        postKeys.comments(postId),
+        (old: CommentItemProps[]) => [newComment.toProps(), ...old]
+      );
+    },
+  });
 
   const handleClickWrite = () => {
     setIsInputVisible(true);
