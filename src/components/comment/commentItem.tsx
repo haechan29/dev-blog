@@ -4,6 +4,7 @@ import CommentContentSection from '@/components/comment/commentContentSection';
 import CommentSettingsDropdown from '@/components/comment/commentSettingsDropdown';
 import ProfileIcon from '@/components/user/profileIcon';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import clsx from 'clsx';
 import { MoreVertical } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -21,8 +22,15 @@ export default function CommentItem({
 }) {
   const [isEditing, setIsEditing] = useState(false);
 
+  const isHighlighted = comment.id === highlightCommentId;
+
   return (
-    <div className='px-6 md:px-12 xl:px-4 my-4 flex space-x-2'>
+    <div
+      className={clsx(
+        'px-6 md:px-12 xl:px-4 py-4 flex space-x-2',
+        isHighlighted && 'bg-blue-50'
+      )}
+    >
       <ProfileIcon
         nickname={comment.authorName}
         size='sm'

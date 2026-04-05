@@ -51,7 +51,9 @@ export default function Comments({
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const commentsPreviewRef = useRef<HTMLButtonElement | null>(null);
   const commentsListRef = useRef<HTMLDivElement | null>(null);
-  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [isPanelOpen, setIsPanelOpen] = useState(
+    highlightCommentId !== undefined
+  );
   const [content, setContent] = useState('');
   const [isInputVisible, setIsInputVisible] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);

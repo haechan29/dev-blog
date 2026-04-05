@@ -7,8 +7,23 @@ const FALLBACK_POST_TITLE = '제목 없음';
 const FALLBACK_COMMENT_PREVIEW = '댓글 내용 없음';
 const COMMENT_PREVIEW_LIMIT = 120;
 
-function toPostUrl(postId: string | null) {
-  return postId ? `/read/${postId}` : null;
+function toPostUrl({
+  postId,
+  highlightCommentId,
+}: {
+  postId: string | null;
+  highlightCommentId?: number | null;
+}) {
+  if (!postId) {
+    return null;
+  }
+
+  const params = new URLSearchParams();
+  if (highlightCommentId != null) {
+    params.set('highlightCommentId', highlightCommentId.toString());
+  }
+  const qs = params.toString();
+  return qs ? `/read/${postId}?${qs}` : `/read/${postId}`;
 }
 
 function toPostTitle(title: string | null) {
@@ -56,7 +71,10 @@ export function toProps(dto: NotificationDto): NotificationProps {
       return {
         type: 'comment',
         ...baseFields(dto),
-        href: toPostUrl(dto.postId),
+        href: toPostUrl({
+          postId: dto.postId,
+          highlightCommentId: dto.representativeCommentId,
+        }),
         primary,
         secondary,
         representativeNickname: nickname,
@@ -68,7 +86,7 @@ export function toProps(dto: NotificationDto): NotificationProps {
       return {
         type: 'post_view_milestone',
         ...baseFields(dto),
-        href: toPostUrl(dto.postId),
+        href: toPostUrl({ postId: dto.postId }),
         primary: `조회수 ${value.toLocaleString()}회를 돌파했어요`,
         secondary: toPostTitle(dto.postTitle),
       };
@@ -78,7 +96,7 @@ export function toProps(dto: NotificationDto): NotificationProps {
       return {
         type: 'post_like_milestone',
         ...baseFields(dto),
-        href: toPostUrl(dto.postId),
+        href: toPostUrl({ postId: dto.postId }),
         primary: `좋아요를 ${value.toLocaleString()}개 받았어요`,
         secondary: toPostTitle(dto.postTitle),
       };
@@ -88,7 +106,10 @@ export function toProps(dto: NotificationDto): NotificationProps {
       return {
         type: 'comment_like_milestone',
         ...baseFields(dto),
-        href: toPostUrl(dto.postId),
+        href: toPostUrl({
+          postId: dto.postId,
+          highlightCommentId: dto.commentId,
+        }),
         primary: `내 댓글이 좋아요 ${value.toLocaleString()}개를 받았어요`,
         secondary: toCommentPreview(dto.commentContent),
       };
