@@ -11,14 +11,19 @@ import { cookies } from 'next/headers';
 
 export default async function PostPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ postId: string }>;
+  searchParams: Promise<{ highlightCommentId?: string }>;
 }) {
   const session = await auth();
   const userId =
     session?.user?.user_id ?? (await cookies()).get('userId')?.value;
 
   const { postId } = await params;
+  const { highlightCommentId: highlightRaw } = await searchParams;
+  const highlightCommentId =
+    highlightRaw !== undefined ? parseInt(highlightRaw) : undefined;
   const timestamp = new Date().toISOString();
 
   try {
@@ -28,6 +33,7 @@ export default async function PostPage({
         postId,
         userId,
         timestamp,
+        highlightCommentId,
       }).then(page => ({
         comments: page.comments.map(comment => comment.toProps()),
         nextCursor: page.nextCursor,
@@ -52,6 +58,7 @@ export default async function PostPage({
         initialCommentsPage={commentsPage}
         initialPostsPage={postsPage}
         initialTimestamp={timestamp}
+        highlightCommentId={highlightCommentId}
       />
     );
   } catch (error) {

@@ -27,11 +27,13 @@ export default function CommentContentSection({
   isLoggedIn,
   isEditing,
   setIsEditing,
+  highlightCommentId,
 }: {
   comment: CommentItemProps;
   isLoggedIn: boolean;
   isEditing: boolean;
   setIsEditing: (isEditing: boolean) => void;
+  highlightCommentId?: number;
 }) {
   const queryClient = useQueryClient();
 
@@ -59,7 +61,7 @@ export default function CommentContentSection({
     }) => CommentClientService.updateComment(params),
     onSuccess: updatedComment => {
       queryClient.setQueryData(
-        postKeys.comments(comment.postId),
+        postKeys.comments(comment.postId, highlightCommentId),
         (old: InfiniteData<CommentsPage> | undefined) => {
           if (!old) return old;
           return {
@@ -233,7 +235,10 @@ export default function CommentContentSection({
         )}
       </div>
 
-      <CommentLikeButton comment={comment} />
+      <CommentLikeButton
+        comment={comment}
+        highlightCommentId={highlightCommentId}
+      />
     </>
   );
 }

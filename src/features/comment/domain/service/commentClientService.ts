@@ -7,19 +7,22 @@ export async function getRankedComments({
   postId,
   timestamp,
   cursor,
+  highlightCommentId,
 }: {
   postId: string;
   timestamp: string;
-  cursor?: CommentCursor | null;
+  cursor: CommentCursor | null;
+  highlightCommentId?: number;
 }): Promise<{
   comments: Comment[];
   nextCursor: CommentCursor | null;
 }> {
-  const page = await CommentClientRepository.getRankedComments(
+  const page = await CommentClientRepository.getRankedComments({
     postId,
     timestamp,
-    cursor
-  );
+    cursor,
+    highlightCommentId,
+  });
   return {
     comments: page.comments.map(comment => toDomain(comment)),
     nextCursor: page.nextCursor,

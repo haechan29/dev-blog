@@ -26,12 +26,14 @@ export default function DeleteCommentDialog({
   isLoggedIn,
   postId,
   commentId,
+  highlightCommentId,
   isOpen,
   setIsOpen,
 }: {
   isLoggedIn: boolean;
   postId: string;
   commentId: number;
+  highlightCommentId?: number;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }) {
@@ -52,7 +54,7 @@ export default function DeleteCommentDialog({
     }) => CommentClientService.deleteComment(postId, commentId, password),
     onSuccess: (_, variables) => {
       queryClient.setQueryData(
-        postKeys.comments(postId),
+        postKeys.comments(postId, highlightCommentId),
         (old: InfiniteData<CommentsPage> | undefined) => {
           if (!old) return old;
           return {

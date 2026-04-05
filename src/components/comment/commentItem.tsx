@@ -12,10 +12,12 @@ export default function CommentItem({
   isLoggedIn,
   userId,
   comment,
+  highlightCommentId,
 }: {
   isLoggedIn: boolean;
   userId?: string;
   comment: CommentItemProps;
+  highlightCommentId?: number;
 }) {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -49,6 +51,7 @@ export default function CommentItem({
             <CommentSettingsDropdown
               isLoggedIn={isLoggedIn}
               comment={comment}
+              highlightCommentId={highlightCommentId}
               onEdit={() => setIsEditing(prev => !prev)}
             >
               <MoreVertical className='w-8 h-8 text-gray-400 hover:text-gray-500 rounded-full p-2 -m-2' />
@@ -61,6 +64,7 @@ export default function CommentItem({
           isLoggedIn={isLoggedIn}
           isEditing={isEditing}
           setIsEditing={setIsEditing}
+          highlightCommentId={highlightCommentId}
         />
       </div>
     </div>

@@ -36,6 +36,7 @@ export default function Comments({
   initialCommentsPage,
   initialTimestamp,
   commentCount,
+  highlightCommentId,
 }: {
   isLoggedIn: boolean;
   userId?: string;
@@ -43,6 +44,7 @@ export default function Comments({
   initialCommentsPage: CommentsPage;
   initialTimestamp: string;
   commentCount: number;
+  highlightCommentId?: number;
 }) {
   const queryClient = useQueryClient();
 
@@ -66,12 +68,13 @@ export default function Comments({
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: postKeys.comments(postId),
+    queryKey: postKeys.comments(postId, highlightCommentId),
     queryFn: async ({ pageParam }) => {
       const page = await CommentClientService.getRankedComments({
         postId,
         timestamp: initialTimestamp,
         cursor: pageParam,
+        highlightCommentId,
       });
       return {
         comments: page.comments.map(comment => comment.toProps()),
@@ -103,7 +106,7 @@ export default function Comments({
     }) => CommentClientService.createComment(params),
     onSuccess: newComment => {
       queryClient.setQueryData(
-        postKeys.comments(postId),
+        postKeys.comments(postId, highlightCommentId),
         (old: InfiniteData<CommentsPage> | undefined) => {
           if (!old) return old;
           const newProps = newComment.toProps();
@@ -229,6 +232,7 @@ export default function Comments({
                         isLoggedIn={isLoggedIn}
                         userId={userId}
                         comment={comment}
+                        highlightCommentId={highlightCommentId}
                       />
                       {idx !== comments.length - 1 && (
                         <div className='w-full h-px bg-gray-200' />

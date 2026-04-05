@@ -38,6 +38,7 @@ export default function PostPageClient({
   initialCommentsPage,
   initialPostsPage,
   initialTimestamp,
+  highlightCommentId,
 }: {
   isLoggedIn: boolean;
   isCreator: boolean;
@@ -46,6 +47,7 @@ export default function PostPageClient({
   initialCommentsPage: CommentsPage;
   initialPostsPage: PostsPage;
   initialTimestamp: string;
+  highlightCommentId?: number;
 }) {
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -200,6 +202,7 @@ export default function PostPageClient({
             initialCommentsPage={initialCommentsPage}
             initialTimestamp={initialTimestamp}
             commentCount={post.commentCount}
+            highlightCommentId={highlightCommentId}
           />
           <div className='flex flex-col'>
             {recommendedPosts.map(post => (

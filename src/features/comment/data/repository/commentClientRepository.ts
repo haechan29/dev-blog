@@ -2,18 +2,26 @@ import { CommentResponseDto } from '@/features/comment/data/dto/commentResponseD
 import { CommentCursor } from '@/features/comment/domain/types/page';
 import { api } from '@/lib/api';
 
-export async function getRankedComments(
-  postId: string,
-  timestamp: string,
-  cursor?: CommentCursor | null
-): Promise<{
+export async function getRankedComments({
+  postId,
+  timestamp,
+  cursor,
+  highlightCommentId,
+}: {
+  postId: string;
+  timestamp: string;
+  cursor: CommentCursor | null;
+  highlightCommentId?: number;
+}): Promise<{
   comments: CommentResponseDto[];
   nextCursor: CommentCursor | null;
 }> {
   const params = new URLSearchParams({ timestamp });
-  if (cursor) {
+  if (!!cursor) {
     params.set('cursorScore', String(cursor.score));
     params.set('cursorId', cursor.id);
+  } else if (highlightCommentId !== undefined) {
+    params.set('highlightCommentId', String(highlightCommentId));
   }
 
   const response = await api.get(
