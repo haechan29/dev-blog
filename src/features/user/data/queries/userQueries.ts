@@ -1,5 +1,3 @@
-import { auth } from '@/auth';
-import { UnauthorizedError } from '@/errors/errors';
 import { UserEntity } from '@/features/user/data/entities/userEntities';
 import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
 import { toDto } from '@/features/user/data/mapper/userMapper';
@@ -11,14 +9,15 @@ export async function fetchUser(userId: string) {
     .from('users')
     .select(
       `
-        id, 
-        nickname, 
-        created_at, 
-        updated_at, 
-        deleted_at, 
+        id,
+        nickname,
+        created_at,
+        updated_at,
+        deleted_at,
         registered_at,
         profile_image_url,
-        bio
+        bio,
+        subscriber_count
       `
     )
     .eq('id', userId)
@@ -31,21 +30,7 @@ export async function fetchUser(userId: string) {
   return data ? toDto(data as unknown as UserEntity) : null;
 }
 
-export async function createUser() {
-  const { data, error } = await supabase
-    .from('users')
-    .insert({ nickname: null, auth_user_id: null })
-    .select('id')
-    .single();
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data.id as string;
-}
-
-export async function createUserWithNickname(nickname: string) {
+export async function createUser(nickname: string | null = null) {
   const { data, error } = await supabase
     .from('users')
     .insert({ nickname, auth_user_id: null })
@@ -61,66 +46,47 @@ export async function createUserWithNickname(nickname: string) {
 
 export async function updateUser({
   userId,
-  authUserId,
+  userIdFromSession,
   nickname,
+  subscriberCount,
+  registeredAt,
+  deletedAt,
 }: {
   userId: string;
-  authUserId: string;
-  nickname: string;
+  userIdFromSession?: string;
+  nickname?: string | null;
+  subscriberCount?: number;
+  registeredAt?: string | null;
+  deletedAt?: string | null;
 }) {
   const { error } = await supabase
     .from('users')
     .update({
-      nickname,
-      deleted_at: null,
-      auth_user_id: authUserId,
-      registered_at: new Date().toISOString(),
+      ...(nickname !== undefined && { nickname }),
+      ...(userIdFromSession !== undefined && {
+        auth_user_id: userIdFromSession,
+      }),
+      ...(subscriberCount !== undefined && {
+        subscriber_count: subscriberCount,
+      }),
+      ...(registeredAt !== undefined && { registered_at: registeredAt }),
+      ...(deletedAt !== undefined && { deleted_at: deletedAt }),
     })
     .eq('id', userId);
 
   if (error) {
-    if (error.code === '23505') {
+    if (!!nickname && error.code === '23505') {
       throw new DuplicateNicknameError(nickname);
     }
     throw new Error(error.message);
   }
 }
 
-export async function deleteUser() {
-  const session = await auth();
-  if (!session) {
-    throw new UnauthorizedError('인증되지 않은 요청입니다');
-  }
-
-  const userId = session.user?.user_id;
-  if (!userId) {
-    throw new UnauthorizedError('인증되지 않은 요청입니다');
-  }
-
-  const { error } = await supabase
-    .from('users')
-    .update({
-      deleted_at: new Date().toISOString(),
-      nickname: null,
-    })
-    .eq('id', userId);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-}
-
-export async function hardDeleteAuthUser() {
-  const session = await auth();
-  const authUserId = session?.user?.id;
-  if (!authUserId) {
-    throw new UnauthorizedError('인증되지 않은 요청입니다');
-  }
-
+export async function deleteUserFromAuth(userIdFromSession: string) {
   const { error } = await supabaseNextAuth
     .from('users')
     .delete()
-    .eq('id', authUserId);
+    .eq('id', userIdFromSession);
 
   if (error) {
     throw new Error(error.message);

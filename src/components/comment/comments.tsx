@@ -5,37 +5,55 @@ import CommentPanel from '@/components/comment/commentPanel';
 import CommentPasswordDialog from '@/components/comment/commentPasswordDialog';
 import ProfileIcon from '@/components/user/profileIcon';
 import { ApiError } from '@/errors/errors';
-import useComments from '@/features/comment/hooks/useComments';
-import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import * as CommentClientService from '@/features/comment/domain/service/commentClientService';
+import {
+  CommentCursor,
+  CommentsPage,
+} from '@/features/comment/domain/types/page';
+import { PostProps } from '@/features/post/ui/postProps';
 import useMediaQuery, {
   DESKTOP_QUERY,
   TOUCH_QUERY,
 } from '@/hooks/useMediaQuery';
+import { postKeys } from '@/queries/keys';
+import {
+  InfiniteData,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useInView } from 'react-intersection-observer';
 import SimpleBar from 'simplebar-react';
 
 export default function Comments({
   isLoggedIn,
   userId,
   postId,
-  initialComments,
+  initialCommentsPage,
+  initialTimestamp,
+  commentCount,
+  highlightCommentId,
 }: {
   isLoggedIn: boolean;
   userId?: string;
   postId: string;
-  initialComments: CommentItemProps[];
+  initialCommentsPage: CommentsPage;
+  initialTimestamp: string;
+  commentCount: number;
+  highlightCommentId?: number;
 }) {
+  const queryClient = useQueryClient();
+
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const commentsPreviewRef = useRef<HTMLButtonElement | null>(null);
   const commentsListRef = useRef<HTMLDivElement | null>(null);
-  const { comments, createCommentMutation } = useComments({
-    postId,
-    initialComments,
-  });
-  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [isPanelOpen, setIsPanelOpen] = useState(
+    highlightCommentId !== undefined
+  );
   const [content, setContent] = useState('');
   const [isInputVisible, setIsInputVisible] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
@@ -43,6 +61,90 @@ export default function Comments({
   const isDesktop = useMediaQuery(DESKTOP_QUERY);
   const isTouch = useMediaQuery(TOUCH_QUERY);
   const showSheet = isDesktop && !isTouch;
+
+  const { ref: loadMoreRef, inView } = useInView();
+
+  const {
+    data: { pages },
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: postKeys.comments(postId, highlightCommentId),
+    queryFn: async ({ pageParam }) => {
+      const page = await CommentClientService.getRankedComments({
+        postId,
+        timestamp: initialTimestamp,
+        cursor: pageParam,
+        highlightCommentId,
+      });
+      return {
+        comments: page.comments.map(comment => comment.toProps()),
+        nextCursor: page.nextCursor,
+      };
+    },
+    initialPageParam: null as CommentCursor | null,
+    getNextPageParam: lastPage => lastPage.nextCursor,
+    initialData: {
+      pages: [initialCommentsPage],
+      pageParams: [null],
+    },
+  });
+
+  const comments = useMemo(() => {
+    const flat = pages.flatMap(page => page.comments);
+    if (highlightCommentId == null) return flat;
+    const seen = new Set<number>();
+    return flat.filter(c => {
+      if (seen.has(c.id)) return false;
+      seen.add(c.id);
+      return true;
+    });
+  }, [pages, highlightCommentId]);
+
+  const representativeComment = comments.length === 0 ? null : comments[0];
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const createCommentMutation = useMutation({
+    mutationFn: (params: {
+      postId: string;
+      content: string;
+      password?: string;
+    }) => CommentClientService.createComment(params),
+    onSuccess: newComment => {
+      queryClient.setQueryData(
+        postKeys.comments(postId, highlightCommentId),
+        (old: InfiniteData<CommentsPage> | undefined) => {
+          if (!old) return old;
+          const newProps = newComment.toProps();
+          return {
+            ...old,
+            pages: old.pages.map((page, i) =>
+              i === 0
+                ? { ...page, comments: [newProps, ...page.comments] }
+                : page
+            ),
+          };
+        }
+      );
+
+      queryClient.setQueryData(
+        postKeys.detail(postId),
+        (old: PostProps | undefined) => {
+          if (!old) return old;
+          return {
+            ...old,
+            commentCount: old.commentCount + 1,
+          };
+        }
+      );
+    },
+  });
 
   const handleClickWrite = () => {
     setIsInputVisible(true);
@@ -82,8 +184,6 @@ export default function Comments({
     [content, createCommentMutation, isLoggedIn, isPasswordDialogOpen, postId]
   );
 
-  if (!comments) return null;
-
   return (
     <>
       <button
@@ -94,22 +194,22 @@ export default function Comments({
         className='w-full p-4 mb-12 bg-gray-50 rounded-lg text-left cursor-pointer hover:bg-gray-100'
       >
         <div className='mb-2 text-sm font-medium text-gray-700'>
-          {`댓글 ${comments.length}개`}
+          {`댓글 ${commentCount}개`}
         </div>
-        {comments.length === 0 ? (
-          <div className='text-sm text-gray-500'>
-            첫 번째 댓글을 작성해보세요
-          </div>
-        ) : (
+        {representativeComment ? (
           <div className='flex gap-3'>
             <ProfileIcon
-              nickname={comments[0].authorName}
+              nickname={representativeComment.authorName}
               size='sm'
-              profileImageUrl={comments[0].profileImageUrl}
+              profileImageUrl={representativeComment.profileImageUrl}
             />
             <div className='flex-1 min-w-0 text-sm text-gray-600 line-clamp-3'>
-              {comments[0].content}
+              {representativeComment.content}
             </div>
+          </div>
+        ) : (
+          <div className='text-sm text-gray-500'>
+            첫 번째 댓글을 작성해보세요
           </div>
         )}
       </button>
@@ -118,7 +218,7 @@ export default function Comments({
         open={isPanelOpen}
         onOpenChange={setIsPanelOpen}
         showSheet={showSheet}
-        title={`댓글 ${comments.length}개`}
+        title={`댓글 ${commentCount}개`}
         onClickWrite={handleClickWrite}
         onInteractOutside={e => {
           if (commentsPreviewRef.current?.contains(e.target as Node)) {
@@ -128,7 +228,7 @@ export default function Comments({
       >
         <>
           <div className='flex-1 min-h-0 overflow-hidden'>
-            {comments.length === 0 ? (
+            {commentCount === 0 ? (
               <div className='h-full flex items-center justify-center bg-gray-50 text-gray-500 text-sm'>
                 아직 댓글이 없습니다
               </div>
@@ -144,12 +244,22 @@ export default function Comments({
                         isLoggedIn={isLoggedIn}
                         userId={userId}
                         comment={comment}
+                        highlightCommentId={highlightCommentId}
                       />
                       {idx !== comments.length - 1 && (
                         <div className='w-full h-px bg-gray-200' />
                       )}
                     </div>
                   ))}
+                  <div ref={loadMoreRef} className='h-px shrink-0' />
+                  {isFetchingNextPage && (
+                    <div className='flex justify-center py-4'>
+                      <Loader2
+                        strokeWidth={3}
+                        className='animate-spin text-gray-400'
+                      />
+                    </div>
+                  )}
                 </div>
               </SimpleBar>
             )}

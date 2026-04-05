@@ -21,11 +21,7 @@ export default function SubscribeButton({
     onSuccess: () => {
       queryClient.setQueryData<SubscriptionDto>(
         subscriptionKeys.info(userId),
-        prev =>
-          prev && {
-            isSubscribed: true,
-            subscriberCount: prev.subscriberCount + 1,
-          }
+        prev => (prev ? { ...prev, isSubscribed: true } : prev)
       );
     },
   });
@@ -35,11 +31,7 @@ export default function SubscribeButton({
     onSuccess: () => {
       queryClient.setQueryData<SubscriptionDto>(
         subscriptionKeys.info(userId),
-        prev =>
-          prev && {
-            isSubscribed: false,
-            subscriberCount: prev.subscriberCount - 1,
-          }
+        prev => (prev ? { ...prev, isSubscribed: false } : prev)
       );
     },
   });

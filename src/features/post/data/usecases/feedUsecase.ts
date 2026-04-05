@@ -1,4 +1,5 @@
-import * as InteractionQueries from '@/features/post-interaction/data/queries/interactionQueries';
+import * as PostSkipQueries from '@/features/post-interaction/data/queries/postSkipQueries';
+import * as PostViewQueries from '@/features/post-interaction/data/queries/postViewQueries';
 import { FeedPostEntity } from '@/features/post/data/entities/feedPostEntities';
 import { toDto } from '@/features/post/data/mapper/feedMapper';
 import * as FeedQueries from '@/features/post/data/queries/feedQueries';
@@ -38,8 +39,8 @@ export async function getFeedPosts({
 
   const [followingIds, viewedPosts, skippedPosts] = await Promise.all([
     SubscriptionQueries.getFollowingIds(userId),
-    InteractionQueries.fetchViewedPosts(userId),
-    InteractionQueries.fetchSkippedPosts(userId),
+    PostViewQueries.fetchViewedPosts(userId),
+    PostSkipQueries.fetchSkippedPosts(userId),
   ]);
 
   const viewedSeriesIds = [
@@ -69,7 +70,7 @@ export async function getFeedPosts({
   scoredPosts.sort((a, b) => b.score - a.score);
 
   const postIds = scoredPosts.map(p => p.id);
-  await InteractionQueries.incrementSkips(userId, postIds);
+  await PostSkipQueries.incrementPostSkips(userId, postIds);
 
   return {
     posts: scoredPosts.map(p => toDto(p)),

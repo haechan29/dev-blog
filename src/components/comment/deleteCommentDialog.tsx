@@ -8,7 +8,15 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { ApiError } from '@/errors/errors';
-import useComments from '@/features/comment/hooks/useComments';
+import * as CommentClientService from '@/features/comment/domain/service/commentClientService';
+import { CommentsPage } from '@/features/comment/domain/types/page';
+import { PostProps } from '@/features/post/ui/postProps';
+import { postKeys } from '@/queries/keys';
+import {
+  InfiniteData,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
@@ -18,17 +26,59 @@ export default function DeleteCommentDialog({
   isLoggedIn,
   postId,
   commentId,
+  highlightCommentId,
   isOpen,
   setIsOpen,
 }: {
   isLoggedIn: boolean;
   postId: string;
   commentId: number;
+  highlightCommentId?: number;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }) {
+  const queryClient = useQueryClient();
+
   const [password, setPassword] = useState('');
   const [isPasswordValid, setIsPasswordValid] = useState(true);
+
+  const deleteCommentMutation = useMutation({
+    mutationFn: ({
+      postId,
+      commentId,
+      password,
+    }: {
+      postId: string;
+      commentId: number;
+      password?: string;
+    }) => CommentClientService.deleteComment(postId, commentId, password),
+    onSuccess: (_, variables) => {
+      queryClient.setQueryData(
+        postKeys.comments(postId, highlightCommentId),
+        (old: InfiniteData<CommentsPage> | undefined) => {
+          if (!old) return old;
+          return {
+            ...old,
+            pages: old.pages.map(page => ({
+              ...page,
+              comments: page.comments.filter(c => c.id !== variables.commentId),
+            })),
+          };
+        }
+      );
+
+      queryClient.setQueryData(
+        postKeys.detail(postId),
+        (old: PostProps | undefined) => {
+          if (!old) return old;
+          return {
+            ...old,
+            commentCount: Math.max(0, old.commentCount - 1),
+          };
+        }
+      );
+    },
+  });
 
   useEffect(() => {
     if (!isOpen) {
@@ -37,7 +87,6 @@ export default function DeleteCommentDialog({
     }
   }, [isOpen]);
 
-  const { deleteCommentMutation } = useComments({ postId });
   const deleteComment = useCallback(
     (params: { postId: string; commentId: number; password?: string }) => {
       deleteCommentMutation.mutate(params, {

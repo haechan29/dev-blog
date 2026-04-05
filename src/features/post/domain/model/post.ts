@@ -18,6 +18,7 @@ export default class Post {
     public readonly seriesTitle: string | null,
     public readonly likeCount: number,
     public readonly viewCount: number,
+    public readonly commentCount: number,
     public readonly visibility: PostVisibility
   ) {}
 }

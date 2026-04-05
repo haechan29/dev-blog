@@ -21,7 +21,10 @@ export default async function UserLayout({
     UserServerService.fetchUserById(userId).then(user =>
       user ? createProps(user) : null
     ),
-    SubscriptionServerRepository.getSubscriptionInfo(userId),
+    SubscriptionServerRepository.getSubscriptionInfo({
+      followerUserId: currentUserId,
+      followingUserId: userId,
+    }),
   ]);
 
   if (!user || !!user.deletedAt) {

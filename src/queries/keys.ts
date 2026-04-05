@@ -19,7 +19,8 @@ export const postKeys = {
   detail: (id: string) => ['posts', id] as const,
   search: (query: string, infinite = false) =>
     ['posts', 'search', { query, infinite }] as const,
-  comments: (postId: string) => ['posts', postId, 'comments'] as const,
+  comments: (postId: string, highlightCommentId: number | null = null) =>
+    ['posts', postId, 'comments', { highlightCommentId }] as const,
   like: (postId: string) => ['posts', postId, 'like'] as const,
 };
 
@@ -38,4 +39,9 @@ export const subscriptionKeys = {
     ['subscriptions', userId, 'followers'] as const,
   following: (userId: string) =>
     ['subscriptions', userId, 'following'] as const,
+};
+
+export const notificationKeys = {
+  unreadCount: () => ['notifications', 'unread-count'] as const,
+  list: () => ['notifications', 'list'] as const,
 };

@@ -1,5 +1,8 @@
-import { ApiError, UnauthorizedError } from '@/errors/errors';
-import * as InteractionQueries from '@/features/post-interaction/data/queries/interactionQueries';
+import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
+import * as NotificationUsecase from '@/features/notification/data/usecases/notificationUsecase';
+import * as PostLikeQueries from '@/features/post-interaction/data/queries/postLikeQueries';
+import * as PostStatQueries from '@/features/postStat/data/queries/postStatQueries';
+import * as PostStatUsecase from '@/features/postStat/data/usecases/postStatUsecase';
 import { getUserId } from '@/lib/user';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -15,7 +18,7 @@ export async function GET(
       return NextResponse.json({ data: false });
     }
 
-    const isLiked = await InteractionQueries.selectLike(userId, postId);
+    const isLiked = await PostLikeQueries.fetchPostLike(userId, postId);
 
     return NextResponse.json({ data: isLiked });
   } catch (error) {
@@ -44,7 +47,34 @@ export async function POST(
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 
-    await InteractionQueries.insertLike(userId, postId);
+    await PostLikeQueries.createPostLike(userId, postId);
+
+    try {
+      const postStat = await PostStatQueries.fetchPostStatByPostId(postId);
+
+      if (!postStat) {
+        throw new ValidationError('게시글 통계를 찾을 수 없습니다');
+      }
+
+      const { like_count: prevLikeCount } = postStat;
+
+      await Promise.all([
+        PostStatUsecase.incrementPostStatLikeCount({
+          postId,
+          prevLikeCount,
+        }),
+        NotificationUsecase.insertPostLikeMilestoneNotification({
+          postId,
+          userId,
+          milestoneValue: prevLikeCount + 1,
+        }),
+      ]);
+    } catch (error) {
+      console.error(
+        '게시글 통계 좋아요 수 증가 / 알림 생성 요청이 실패했습니다',
+        error
+      );
+    }
 
     return NextResponse.json({ data: null });
   } catch (error) {
@@ -73,7 +103,13 @@ export async function DELETE(
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 
-    await InteractionQueries.deleteLike(userId, postId);
+    await PostLikeQueries.deletePostLike(userId, postId);
+
+    try {
+      await PostStatUsecase.decrementPostStatLikeCount(postId);
+    } catch (error) {
+      console.error('게시글 통계 좋아요 수 감소 요청이 실패했습니다', error);
+    }
 
     return NextResponse.json({ data: null });
   } catch (error) {

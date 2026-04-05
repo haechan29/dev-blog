@@ -1,6 +1,7 @@
 import { auth } from '@/auth';
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as UserQueries from '@/features/user/data/queries/userQueries';
+import * as UserUsecase from '@/features/user/data/usecases/userUsecase';
 import { getUserId } from '@/lib/user';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
@@ -10,7 +11,9 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('id') ?? (await getUserId());
+
     const data = userId ? await UserQueries.fetchUser(userId) : null;
+
     return NextResponse.json({ data });
   } catch (error) {
     console.error('유저 조회에 실패했습니다', error);
@@ -29,9 +32,9 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const userId = (await cookies()).get('userId')?.value;
-    const authUserId = (await auth())?.user?.id;
+    const userIdFromSession = (await auth())?.user?.id;
 
-    if (!userId || !authUserId) {
+    if (!userId || !userIdFromSession) {
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 
@@ -45,7 +48,15 @@ export async function PATCH(request: NextRequest) {
       throw new ValidationError('닉네임은 1-50자여야 합니다');
     }
 
-    await UserQueries.updateUser({ userId, authUserId, nickname });
+    const now = new Date().toISOString();
+
+    await UserQueries.updateUser({
+      userId,
+      userIdFromSession,
+      nickname,
+      registeredAt: now,
+      deletedAt: null,
+    });
 
     return NextResponse.json({ data: null });
   } catch (error) {
@@ -65,15 +76,15 @@ export async function PATCH(request: NextRequest) {
 export async function DELETE() {
   try {
     const session = await auth();
-    const userId = session?.user?.user_id;
+    const userIdFromSession = session?.user?.user_id;
 
-    if (!userId) {
+    if (!userIdFromSession) {
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 
     await Promise.all([
-      UserQueries.deleteUser(),
-      UserQueries.hardDeleteAuthUser(),
+      UserUsecase.softDeleteUser(userIdFromSession),
+      UserQueries.deleteUserFromAuth(userIdFromSession),
     ]);
 
     return NextResponse.json({ data: null });

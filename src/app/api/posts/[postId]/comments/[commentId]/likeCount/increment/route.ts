@@ -1,4 +1,7 @@
-import { supabase } from '@/lib/supabase';
+import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
+import * as CommentQueries from '@/features/comment/data/queries/commentQueries';
+import * as NotificationUsecase from '@/features/notification/data/usecases/notificationUsecase';
+import { getUserId } from '@/lib/user';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(
@@ -6,42 +9,56 @@ export async function POST(
   { params }: { params: Promise<{ postId: string; commentId: string }> }
 ) {
   try {
-    const { postId, commentId } = await params;
+    const userId = await getUserId();
 
-    const { data: currentData, error: fetchError } = await supabase
-      .from('comments')
-      .select('like_count')
-      .eq('post_id', postId)
-      .eq('id', commentId)
-      .maybeSingle();
-
-    if (fetchError) {
-      return NextResponse.json({ error: fetchError.message }, { status: 500 });
+    if (!userId) {
+      throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 
-    if (!currentData) {
-      return NextResponse.json(
-        { error: `댓글이 존재하지 않습니다. commentId: ${commentId}` },
-        { status: 404 }
-      );
+    const { postId, commentId: commentIdParam } = await params;
+
+    const commentIdNum = Number(commentIdParam);
+    if (!Number.isInteger(commentIdNum)) {
+      throw new ValidationError('유효하지 않은 댓글 ID입니다');
     }
 
-    const newLikeCount = currentData.like_count + 1;
+    const {
+      post_id: commentPostId,
+      user_id: commentUserId,
+      like_count: likeCount,
+    } = await CommentQueries.fetchComment(commentIdNum);
 
-    const { data, error } = await supabase
-      .from('comments')
-      .update({ like_count: newLikeCount })
-      .eq('post_id', postId)
-      .eq('id', commentId)
-      .select()
-      .single();
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (commentPostId !== postId) {
+      throw new ValidationError('댓글이 속한 게시글이 일치하지 않습니다');
     }
 
-    return NextResponse.json({ data });
-  } catch {
+    const newLikeCount = likeCount + 1;
+
+    const updated = await CommentQueries.updateComment({
+      commentId: commentIdNum,
+      likeCount: newLikeCount,
+    });
+
+    try {
+      await NotificationUsecase.insertCommentLikeMilestoneNotification({
+        postId,
+        likeUserId: userId,
+        commentUserId,
+        commentId: commentIdNum,
+        milestoneValue: newLikeCount,
+      });
+    } catch (error) {
+      console.error('댓글 좋아요 마일스톤 알림 생성에 실패했습니다', error);
+    }
+
+    return NextResponse.json({ data: updated });
+  } catch (error) {
+    console.error('댓글 좋아요 수 증가 요청이 실패했습니다', error);
+
+    if (error instanceof ApiError) {
+      return error.toResponse();
+    }
+
     return NextResponse.json(
       { error: '댓글 좋아요 수 증가 요청이 실패했습니다.' },
       { status: 500 }

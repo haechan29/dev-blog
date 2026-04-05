@@ -11,28 +11,43 @@ import { cookies } from 'next/headers';
 
 export default async function PostPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ postId: string }>;
+  searchParams: Promise<{ highlightCommentId?: string }>;
 }) {
   const session = await auth();
   const userId =
     session?.user?.user_id ?? (await cookies()).get('userId')?.value;
 
   const { postId } = await params;
+  const { highlightCommentId: highlightRaw } = await searchParams;
+  const highlightCommentId =
+    highlightRaw !== undefined ? parseInt(highlightRaw) : undefined;
+  const timestamp = new Date().toISOString();
 
   try {
-    const [post, comments, { posts, nextCursor }, creator] = await Promise.all([
+    const [post, commentsPage, postsPage, creator] = await Promise.all([
       PostServerService.getPost(postId).then(createProps),
-      CommentServerService.getComments(postId, userId),
+      CommentServerService.getRankedComments({
+        postId,
+        userId,
+        timestamp,
+        highlightCommentId,
+      }).then(page => ({
+        comments: page.comments.map(comment => comment.toProps()),
+        nextCursor: page.nextCursor,
+      })),
       PostServerService.getFeedPosts({
         cursor: null,
         userId,
         excludeId: postId,
-      }),
+      }).then(page => ({
+        posts: page.posts.map(createProps),
+        nextCursor: page.nextCursor,
+      })),
       userId ? CreatorServerRepository.getCreatorByUserId(userId) : null,
     ]);
-    const commentProps = comments.map(comment => comment.toProps());
-    const postProps = posts.map(createProps);
 
     return (
       <PostPageClient
@@ -40,9 +55,10 @@ export default async function PostPage({
         isCreator={!!creator}
         userId={userId}
         initialPost={post}
-        initialComments={commentProps}
-        initialPosts={postProps}
-        initialCursor={nextCursor}
+        initialCommentsPage={commentsPage}
+        initialPostsPage={postsPage}
+        initialTimestamp={timestamp}
+        highlightCommentId={highlightCommentId}
       />
     );
   } catch (error) {

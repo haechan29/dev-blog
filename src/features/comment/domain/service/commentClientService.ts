@@ -1,13 +1,32 @@
 import * as CommentClientRepository from '@/features/comment/data/repository/commentClientRepository';
 import { toDomain } from '@/features/comment/domain/mapper/commentMapper';
 import { Comment } from '@/features/comment/domain/model/comment';
+import { CommentCursor } from '@/features/comment/domain/types/page';
 
-export async function getComments(
-  postId: string,
-  timestamp: string
-): Promise<Comment[]> {
-  const comments = await CommentClientRepository.getComments(postId, timestamp);
-  return comments.map(comment => toDomain(comment));
+export async function getRankedComments({
+  postId,
+  timestamp,
+  cursor,
+  highlightCommentId,
+}: {
+  postId: string;
+  timestamp: string;
+  cursor: CommentCursor | null;
+  highlightCommentId?: number;
+}): Promise<{
+  comments: Comment[];
+  nextCursor: CommentCursor | null;
+}> {
+  const page = await CommentClientRepository.getRankedComments({
+    postId,
+    timestamp,
+    cursor,
+    highlightCommentId,
+  });
+  return {
+    comments: page.comments.map(comment => toDomain(comment)),
+    nextCursor: page.nextCursor,
+  };
 }
 
 export async function createComment(params: {

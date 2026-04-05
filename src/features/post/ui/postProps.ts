@@ -21,6 +21,7 @@ export interface PostProps {
   seriesTitle: string | null;
   likeCount: number;
   viewCount: string | null;
+  commentCount: number;
   visibility: PostVisibility;
 }
 
@@ -42,6 +43,7 @@ export function createProps(post: Post): PostProps {
     seriesTitle: post.seriesTitle,
     likeCount: post.likeCount,
     viewCount: formatViewCount(post.viewCount),
+    commentCount: post.commentCount,
     visibility: post.visibility,
   };
 }

@@ -2,8 +2,15 @@
 
 import CommentLikeButton from '@/components/comment/commentLikeButton';
 import { ApiError } from '@/errors/errors';
-import useComments from '@/features/comment/hooks/useComments';
+import * as CommentClientService from '@/features/comment/domain/service/commentClientService';
+import { CommentsPage } from '@/features/comment/domain/types/page';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import { postKeys } from '@/queries/keys';
+import {
+  InfiniteData,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
 import {
@@ -20,19 +27,22 @@ export default function CommentContentSection({
   isLoggedIn,
   isEditing,
   setIsEditing,
+  highlightCommentId,
 }: {
   comment: CommentItemProps;
   isLoggedIn: boolean;
   isEditing: boolean;
   setIsEditing: (isEditing: boolean) => void;
+  highlightCommentId?: number;
 }) {
+  const queryClient = useQueryClient();
+
   const contentRef = useRef<HTMLDivElement>(null);
   const restLinesRef = useRef<HTMLDivElement>(null);
   const [password, setPassword] = useState('');
   const [content, setContent] = useState(comment.content);
   const [isPasswordValid, setIsPasswordValid] = useState(true);
   const [isContentValid, setIsContentValid] = useState(true);
-  const { updateCommentMutation } = useComments({ postId: comment.postId });
 
   const [splitIndex, setSplitIndex] = useState<number | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -41,6 +51,32 @@ export default function CommentContentSection({
   const [firstTwoLines, restLines] = splitIndex
     ? [comment.content.slice(0, splitIndex), comment.content.slice(splitIndex)]
     : [comment.content, ''];
+
+  const updateCommentMutation = useMutation({
+    mutationFn: (params: {
+      postId: string;
+      commentId: number;
+      content: string;
+      password?: string;
+    }) => CommentClientService.updateComment(params),
+    onSuccess: updatedComment => {
+      queryClient.setQueryData(
+        postKeys.comments(comment.postId, highlightCommentId),
+        (old: InfiniteData<CommentsPage> | undefined) => {
+          if (!old) return old;
+          return {
+            ...old,
+            pages: old.pages.map(page => ({
+              ...page,
+              comments: page.comments.map(c =>
+                c.id === updatedComment.id ? updatedComment.toProps() : c
+              ),
+            })),
+          };
+        }
+      );
+    },
+  });
 
   useEffect(() => {
     if (!isEditing) {
@@ -199,7 +235,10 @@ export default function CommentContentSection({
         )}
       </div>
 
-      <CommentLikeButton comment={comment} />
+      <CommentLikeButton
+        comment={comment}
+        highlightCommentId={highlightCommentId}
+      />
     </>
   );
 }

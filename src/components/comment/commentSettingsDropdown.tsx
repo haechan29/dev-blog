@@ -15,11 +15,13 @@ import { useState } from 'react';
 export default function CommentSettingsDropdown({
   isLoggedIn,
   comment: { postId, id: commentId },
+  highlightCommentId,
   onEdit,
   children,
 }: {
   isLoggedIn: boolean;
   comment: CommentItemProps;
+  highlightCommentId?: number;
   onEdit: () => void;
   children: React.ReactNode;
 }) {
@@ -31,6 +33,7 @@ export default function CommentSettingsDropdown({
         isLoggedIn={isLoggedIn}
         postId={postId}
         commentId={commentId}
+        highlightCommentId={highlightCommentId}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
       />

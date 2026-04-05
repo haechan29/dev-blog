@@ -12,12 +12,13 @@ import PostSidebar from '@/components/post/postSidebar';
 import PostToolbar from '@/components/post/postToolbar';
 import PostVisibilityBanner from '@/components/post/postVisibilityBanner';
 import TableOfContents from '@/components/post/tableOfContents';
-import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import { CommentsPage } from '@/features/comment/domain/types/page';
 import { PostForbiddenError } from '@/features/post/data/errors/postErrors';
 import { renderContentElement } from '@/features/post/domain/lib/render';
 import { getToolbarHeightPx } from '@/features/post/domain/lib/toolbarHeight';
 import * as PostClientService from '@/features/post/domain/service/postClientService';
 import Heading from '@/features/post/domain/types/heading';
+import { PostsPage } from '@/features/post/domain/types/page';
 import useActiveHeading from '@/features/post/hooks/useActiveHeading';
 import useBgmController from '@/features/post/hooks/useBgmController';
 import useRecordView from '@/features/post/hooks/useRecordView';
@@ -34,17 +35,19 @@ export default function PostPageClient({
   isCreator,
   userId,
   initialPost,
-  initialComments,
-  initialPosts,
-  initialCursor,
+  initialCommentsPage,
+  initialPostsPage,
+  initialTimestamp,
+  highlightCommentId,
 }: {
   isLoggedIn: boolean;
   isCreator: boolean;
   userId?: string;
   initialPost: PostProps;
-  initialComments: CommentItemProps[];
-  initialPosts: PostProps[];
-  initialCursor: string | null;
+  initialCommentsPage: CommentsPage;
+  initialPostsPage: PostsPage;
+  initialTimestamp: string;
+  highlightCommentId?: number;
 }) {
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -58,19 +61,19 @@ export default function PostPageClient({
   } = useInfiniteQuery({
     queryKey: postKeys.list({ excludeId: initialPost.id }),
     queryFn: async ({ pageParam }) => {
-      const result = await PostClientService.getFeedPosts({
+      const page = await PostClientService.getFeedPosts({
         cursor: pageParam,
         excludeId: initialPost.id,
       });
       return {
-        posts: result.posts.map(createProps),
-        nextCursor: result.nextCursor,
+        posts: page.posts.map(createProps),
+        nextCursor: page.nextCursor,
       };
     },
     initialPageParam: null as string | null,
     getNextPageParam: lastPage => lastPage.nextCursor,
     initialData: {
-      pages: [{ posts: initialPosts, nextCursor: initialCursor }],
+      pages: [initialPostsPage],
       pageParams: [null],
     },
   });
@@ -196,7 +199,10 @@ export default function PostPageClient({
             isLoggedIn={isLoggedIn}
             userId={userId}
             postId={post.id}
-            initialComments={initialComments}
+            initialCommentsPage={initialCommentsPage}
+            initialTimestamp={initialTimestamp}
+            commentCount={post.commentCount}
+            highlightCommentId={highlightCommentId}
           />
           <div className='flex flex-col'>
             {recommendedPosts.map(post => (

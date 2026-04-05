@@ -24,6 +24,7 @@ export function toDto(post: PostEntity): PostDto {
     seriesTitle: post.series?.title ?? null,
     likeCount: post.post_stats?.like_count ?? 0,
     viewCount: post.post_stats?.view_count ?? 0,
+    commentCount: post.post_stats?.comment_count ?? 0,
     visibility: post.visibility,
   };
 }
@@ -48,6 +49,7 @@ export function toFlatDto(post: PostEntityFlat): PostDto {
     seriesTitle: post.series_title,
     likeCount: post.like_count ?? 0,
     viewCount: post.view_count ?? 0,
+    commentCount: post.comment_count ?? 0,
     visibility: post.visibility,
   };
 }

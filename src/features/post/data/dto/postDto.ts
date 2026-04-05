@@ -19,5 +19,6 @@ export interface PostDto {
   seriesTitle: string | null;
   likeCount: number;
   viewCount: number;
+  commentCount: number;
   visibility: PostVisibility;
 }

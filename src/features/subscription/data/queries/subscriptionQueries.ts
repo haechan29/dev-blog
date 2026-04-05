@@ -4,38 +4,29 @@ import { supabase } from '@/lib/supabase';
 import { getUserId } from '@/lib/user';
 import 'server-only';
 
-export async function getSubscriptionInfo(followingId: string) {
-  const followerId = await getUserId();
-
-  let isSubscribed = false;
-  if (followerId) {
-    const { data, error } = await supabase
-      .from('subscriptions')
-      .select('follower_id')
-      .eq('follower_id', followerId)
-      .eq('following_id', followingId)
-      .maybeSingle();
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    isSubscribed = data !== null;
+export async function getSubscriptionInfo({
+  followerUserId,
+  followingUserId,
+}: {
+  followerUserId?: string;
+  followingUserId: string;
+}) {
+  if (!followerUserId) {
+    return { isSubscribed: false };
   }
 
-  const { count, error } = await supabase
+  const { data, error } = await supabase
     .from('subscriptions')
-    .select('*', { count: 'exact', head: true })
-    .eq('following_id', followingId);
+    .select('follower_id')
+    .eq('follower_id', followerUserId)
+    .eq('following_id', followingUserId)
+    .maybeSingle();
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return {
-    isSubscribed,
-    subscriberCount: count ?? 0,
-  };
+  return { isSubscribed: data !== null };
 }
 
 export async function getFollowers(userId: string) {
@@ -79,12 +70,10 @@ export async function getFollowingIds(userId: string) {
   return data.map(s => s.following_id);
 }
 
-export async function createSubscription(followingId: string) {
-  const followerId = await getUserId();
-  if (!followerId) {
-    throw new UnauthorizedError('인증되지 않은 요청입니다');
-  }
-
+export async function createSubscription(
+  followingId: string,
+  followerId: string
+) {
   if (followerId === followingId) {
     throw new ValidationError('자기 자신을 구독할 수 없습니다');
   }
@@ -114,13 +103,16 @@ export async function deleteSubscription(followingId: string) {
     throw new ValidationError('자기 자신을 구독취소할 수 없습니다');
   }
 
-  const { error } = await supabase
+  const { data: deleted, error } = await supabase
     .from('subscriptions')
     .delete()
     .eq('follower_id', followerId)
-    .eq('following_id', followingId);
+    .eq('following_id', followingId)
+    .select('follower_id');
 
   if (error) {
     throw new Error(error.message);
   }
+
+  return deleted;
 }

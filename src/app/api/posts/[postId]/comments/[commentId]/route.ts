@@ -1,13 +1,14 @@
 import { auth } from '@/auth';
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as CommentQueries from '@/features/comment/data/queries/commentQueries';
+import * as PostStatUsecase from '@/features/postStat/data/usecases/postStatUsecase';
 import { getUserId } from '@/lib/user';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ commentId: number }> }
+  { params }: { params: Promise<{ postId: string; commentId: number }> }
 ) {
   try {
     const { commentId } = await params;
@@ -28,7 +29,7 @@ export async function PATCH(
       throw new ValidationError('비밀번호를 찾을 수 없습니다');
     }
 
-    const comment = await CommentQueries.fetchComment(commentId);
+    const comment = await CommentQueries.fetchCommentForAuth(commentId);
 
     if (userId !== comment.user_id) {
       throw new UnauthorizedError('인증되지 않은 요청입니다');
@@ -44,7 +45,7 @@ export async function PATCH(
       }
     }
 
-    const updated = await CommentQueries.updateComment(commentId, content);
+    const updated = await CommentQueries.updateComment({ commentId, content });
 
     return NextResponse.json({ data: updated });
   } catch (error) {
@@ -63,10 +64,10 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ commentId: number }> }
+  { params }: { params: Promise<{ postId: string; commentId: number }> }
 ) {
   try {
-    const { commentId } = await params;
+    const { postId, commentId } = await params;
     const password = request.headers.get('X-Comment-Password');
     const session = await auth();
     const userId = await getUserId();
@@ -79,7 +80,7 @@ export async function DELETE(
       throw new ValidationError('비밀번호를 찾을 수 없습니다');
     }
 
-    const comment = await CommentQueries.fetchComment(commentId);
+    const comment = await CommentQueries.fetchCommentForAuth(commentId);
 
     if (userId !== comment.user_id) {
       throw new UnauthorizedError('인증되지 않은 요청입니다');
@@ -97,6 +98,12 @@ export async function DELETE(
     }
 
     await CommentQueries.deleteComment(commentId);
+
+    try {
+      await PostStatUsecase.decrementPostStatCommentCount(postId);
+    } catch (error) {
+      console.error('게시글 통계 댓글 수 감소 요청이 실패했습니다', error);
+    }
 
     return NextResponse.json({ data: null });
   } catch (error) {
