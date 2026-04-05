@@ -6,30 +6,39 @@ import CommentPasswordDialog from '@/components/comment/commentPasswordDialog';
 import ProfileIcon from '@/components/user/profileIcon';
 import { ApiError } from '@/errors/errors';
 import * as CommentClientService from '@/features/comment/domain/service/commentClientService';
-import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import {
+  CommentCursor,
+  CommentsPage,
+} from '@/features/comment/domain/types/page';
 import useMediaQuery, {
   DESKTOP_QUERY,
   TOUCH_QUERY,
 } from '@/hooks/useMediaQuery';
 import { postKeys } from '@/queries/keys';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  InfiniteData,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useInView } from 'react-intersection-observer';
 import SimpleBar from 'simplebar-react';
 
 export default function Comments({
   isLoggedIn,
   userId,
   postId,
-  initialComments,
+  initialCommentsPage,
   initialTimestamp,
 }: {
   isLoggedIn: boolean;
   userId?: string;
   postId: string;
-  initialComments: CommentItemProps[];
+  initialCommentsPage: CommentsPage;
   initialTimestamp: string;
 }) {
   const queryClient = useQueryClient();
@@ -46,17 +55,41 @@ export default function Comments({
   const isTouch = useMediaQuery(TOUCH_QUERY);
   const showSheet = isDesktop && !isTouch;
 
-  const { data: comments } = useQuery({
+  const { ref: loadMoreRef, inView } = useInView();
+
+  const {
+    data: { pages },
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: postKeys.comments(postId),
-    queryFn: async () => {
-      const { comments } = await CommentClientService.getRankedComments({
+    queryFn: async ({ pageParam }) => {
+      const page = await CommentClientService.getRankedComments({
         postId,
         timestamp: initialTimestamp,
+        cursor: pageParam,
       });
-      return comments.map(comment => comment.toProps());
+      return {
+        comments: page.comments.map(comment => comment.toProps()),
+        nextCursor: page.nextCursor,
+      };
     },
-    initialData: initialComments,
+    initialPageParam: null as CommentCursor | null,
+    getNextPageParam: lastPage => lastPage.nextCursor,
+    initialData: {
+      pages: [initialCommentsPage],
+      pageParams: [null],
+    },
   });
+
+  const comments = useMemo(() => pages.flatMap(page => page.comments), [pages]);
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const createCommentMutation = useMutation({
     mutationFn: (params: {
@@ -67,7 +100,18 @@ export default function Comments({
     onSuccess: newComment => {
       queryClient.setQueryData(
         postKeys.comments(postId),
-        (old: CommentItemProps[]) => [newComment.toProps(), ...old]
+        (old: InfiniteData<CommentsPage> | undefined) => {
+          if (!old) return old;
+          const newProps = newComment.toProps();
+          return {
+            ...old,
+            pages: old.pages.map((page, i) =>
+              i === 0
+                ? { ...page, comments: [newProps, ...page.comments] }
+                : page
+            ),
+          };
+        }
       );
     },
   });
@@ -109,8 +153,6 @@ export default function Comments({
     },
     [content, createCommentMutation, isLoggedIn, isPasswordDialogOpen, postId]
   );
-
-  if (!comments) return null;
 
   return (
     <>
@@ -178,6 +220,15 @@ export default function Comments({
                       )}
                     </div>
                   ))}
+                  <div ref={loadMoreRef} className='h-px shrink-0' />
+                  {isFetchingNextPage && (
+                    <div className='flex justify-center py-4'>
+                      <Loader2
+                        strokeWidth={3}
+                        className='animate-spin text-gray-400'
+                      />
+                    </div>
+                  )}
                 </div>
               </SimpleBar>
             )}

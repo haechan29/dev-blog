@@ -1,5 +1,5 @@
 import { CommentResponseDto } from '@/features/comment/data/dto/commentResponseDto';
-import { CommentCursor } from '@/features/comment/data/types/commentCursor';
+import { CommentCursor } from '@/features/comment/domain/types/page';
 import { api } from '@/lib/api';
 
 export async function getRankedComments(

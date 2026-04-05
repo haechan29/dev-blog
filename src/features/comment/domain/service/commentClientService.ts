@@ -1,7 +1,7 @@
 import * as CommentClientRepository from '@/features/comment/data/repository/commentClientRepository';
-import { CommentCursor } from '@/features/comment/data/types/commentCursor';
 import { toDomain } from '@/features/comment/domain/mapper/commentMapper';
 import { Comment } from '@/features/comment/domain/model/comment';
+import { CommentCursor } from '@/features/comment/domain/types/page';
 
 export async function getRankedComments({
   postId,

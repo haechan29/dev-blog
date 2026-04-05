@@ -1,7 +1,7 @@
 import { CommentResponseDto } from '@/features/comment/data/dto/commentResponseDto';
 import { toDto } from '@/features/comment/data/mapper/rankedCommentMapper';
 import * as RankedCommentQueries from '@/features/comment/data/queries/rankedCommentQueries';
-import { CommentCursor } from '@/features/comment/data/types/commentCursor';
+import { CommentCursor } from '@/features/comment/domain/types/page';
 import 'server-only';
 
 const COMMENT_LIMIT = 5;

@@ -1,6 +1,6 @@
 import { CommentResponseDto } from '@/features/comment/data/dto/commentResponseDto';
-import { CommentCursor } from '@/features/comment/data/types/commentCursor';
 import * as RankedCommentUsecase from '@/features/comment/data/usecases/rankedCommentUsecase';
+import { CommentCursor } from '@/features/comment/domain/types/page';
 import 'server-only';
 
 export async function getRankedComments({

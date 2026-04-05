@@ -3,9 +3,14 @@
 import CommentLikeButton from '@/components/comment/commentLikeButton';
 import { ApiError } from '@/errors/errors';
 import * as CommentClientService from '@/features/comment/domain/service/commentClientService';
+import { CommentsPage } from '@/features/comment/domain/types/page';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
 import { postKeys } from '@/queries/keys';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  InfiniteData,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
 import {
@@ -55,12 +60,17 @@ export default function CommentContentSection({
     onSuccess: updatedComment => {
       queryClient.setQueryData(
         postKeys.comments(comment.postId),
-        (old: CommentItemProps[]) => {
-          return old.map(comment =>
-            comment.id === updatedComment.id
-              ? updatedComment.toProps()
-              : comment
-          );
+        (old: InfiniteData<CommentsPage> | undefined) => {
+          if (!old) return old;
+          return {
+            ...old,
+            pages: old.pages.map(page => ({
+              ...page,
+              comments: page.comments.map(c =>
+                c.id === updatedComment.id ? updatedComment.toProps() : c
+              ),
+            })),
+          };
         }
       );
     },

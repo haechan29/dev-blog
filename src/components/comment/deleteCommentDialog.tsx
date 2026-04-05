@@ -9,9 +9,13 @@ import {
 } from '@/components/ui/dialog';
 import { ApiError } from '@/errors/errors';
 import * as CommentClientService from '@/features/comment/domain/service/commentClientService';
-import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import { CommentsPage } from '@/features/comment/domain/types/page';
 import { postKeys } from '@/queries/keys';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  InfiniteData,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
@@ -48,8 +52,15 @@ export default function DeleteCommentDialog({
     onSuccess: (_, variables) => {
       queryClient.setQueryData(
         postKeys.comments(postId),
-        (old: CommentItemProps[]) => {
-          return old.filter(comment => comment.id !== variables.commentId);
+        (old: InfiniteData<CommentsPage> | undefined) => {
+          if (!old) return old;
+          return {
+            ...old,
+            pages: old.pages.map(page => ({
+              ...page,
+              comments: page.comments.filter(c => c.id !== variables.commentId),
+            })),
+          };
         }
       );
     },

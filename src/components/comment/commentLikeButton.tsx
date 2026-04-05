@@ -1,11 +1,16 @@
 'use client';
 
 import * as CommentClientService from '@/features/comment/domain/service/commentClientService';
+import { CommentsPage } from '@/features/comment/domain/types/page';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import useThrottle from '@/hooks/useThrottle';
 import { postKeys } from '@/queries/keys';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  InfiniteData,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Heart } from 'lucide-react';
 import { useCallback } from 'react';
@@ -35,15 +40,20 @@ export default function CommentLikeButton({
 
       queryClient.setQueryData(
         postKeys.comments(comment.postId),
-        (prev: CommentItemProps[] | undefined) =>
-          prev?.map(item =>
-            item.id === comment.id
-              ? {
-                  ...item,
-                  likeCount: item.likeCount + 1,
-                }
-              : item
-          ) ?? prev
+        (prev: InfiniteData<CommentsPage> | undefined) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            pages: prev.pages.map(page => ({
+              ...page,
+              comments: page.comments.map(item =>
+                item.id === comment.id
+                  ? { ...item, likeCount: item.likeCount + 1 }
+                  : item
+              ),
+            })),
+          };
+        }
       );
 
       return { previousComments };
@@ -71,15 +81,20 @@ export default function CommentLikeButton({
 
       queryClient.setQueryData(
         postKeys.comments(comment.postId),
-        (prev: CommentItemProps[] | undefined) =>
-          prev?.map(item =>
-            item.id === comment.id
-              ? {
-                  ...item,
-                  likeCount: item.likeCount - 1,
-                }
-              : item
-          ) ?? prev
+        (prev: InfiniteData<CommentsPage> | undefined) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            pages: prev.pages.map(page => ({
+              ...page,
+              comments: page.comments.map(item =>
+                item.id === comment.id
+                  ? { ...item, likeCount: item.likeCount - 1 }
+                  : item
+              ),
+            })),
+          };
+        }
       );
 
       return { previousComments };
