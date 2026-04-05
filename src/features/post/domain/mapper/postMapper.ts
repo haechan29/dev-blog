@@ -19,6 +19,7 @@ export function toDomain(dto: PostDto): Post {
     dto.seriesTitle,
     dto.likeCount,
     dto.viewCount,
+    dto.commentCount,
     dto.visibility
   );
 }

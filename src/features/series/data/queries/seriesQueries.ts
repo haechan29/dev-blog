@@ -12,7 +12,7 @@ const SERIES_SELECT_FIELDS = `
   created_at, 
   updated_at,
   users:user_id(nickname, profile_image_url),
-  posts(id, title, created_at, series_id, series_order, visibility, post_stats(like_count, view_count))
+  posts(id, title, created_at, series_id, series_order, visibility, post_stats(like_count, view_count, comment_count))
 `;
 
 export async function fetchSeries(seriesId: string) {

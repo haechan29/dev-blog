@@ -10,6 +10,7 @@ import {
   CommentCursor,
   CommentsPage,
 } from '@/features/comment/domain/types/page';
+import { PostProps } from '@/features/post/ui/postProps';
 import useMediaQuery, {
   DESKTOP_QUERY,
   TOUCH_QUERY,
@@ -23,7 +24,7 @@ import {
 } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useInView } from 'react-intersection-observer';
 import SimpleBar from 'simplebar-react';
@@ -34,12 +35,14 @@ export default function Comments({
   postId,
   initialCommentsPage,
   initialTimestamp,
+  commentCount,
 }: {
   isLoggedIn: boolean;
   userId?: string;
   postId: string;
   initialCommentsPage: CommentsPage;
   initialTimestamp: string;
+  commentCount: number;
 }) {
   const queryClient = useQueryClient();
 
@@ -83,7 +86,8 @@ export default function Comments({
     },
   });
 
-  const comments = useMemo(() => pages.flatMap(page => page.comments), [pages]);
+  const comments = pages.flatMap(page => page.comments);
+  const representativeComment = comments.length === 0 ? null : comments[0];
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
@@ -110,6 +114,17 @@ export default function Comments({
                 ? { ...page, comments: [newProps, ...page.comments] }
                 : page
             ),
+          };
+        }
+      );
+
+      queryClient.setQueryData(
+        postKeys.detail(postId),
+        (old: PostProps | undefined) => {
+          if (!old) return old;
+          return {
+            ...old,
+            commentCount: old.commentCount + 1,
           };
         }
       );
@@ -164,22 +179,22 @@ export default function Comments({
         className='w-full p-4 mb-12 bg-gray-50 rounded-lg text-left cursor-pointer hover:bg-gray-100'
       >
         <div className='mb-2 text-sm font-medium text-gray-700'>
-          {`댓글 ${comments.length}개`}
+          {`댓글 ${commentCount}개`}
         </div>
-        {comments.length === 0 ? (
-          <div className='text-sm text-gray-500'>
-            첫 번째 댓글을 작성해보세요
-          </div>
-        ) : (
+        {representativeComment ? (
           <div className='flex gap-3'>
             <ProfileIcon
-              nickname={comments[0].authorName}
+              nickname={representativeComment.authorName}
               size='sm'
-              profileImageUrl={comments[0].profileImageUrl}
+              profileImageUrl={representativeComment.profileImageUrl}
             />
             <div className='flex-1 min-w-0 text-sm text-gray-600 line-clamp-3'>
-              {comments[0].content}
+              {representativeComment.content}
             </div>
+          </div>
+        ) : (
+          <div className='text-sm text-gray-500'>
+            첫 번째 댓글을 작성해보세요
           </div>
         )}
       </button>
@@ -188,7 +203,7 @@ export default function Comments({
         open={isPanelOpen}
         onOpenChange={setIsPanelOpen}
         showSheet={showSheet}
-        title={`댓글 ${comments.length}개`}
+        title={`댓글 ${commentCount}개`}
         onClickWrite={handleClickWrite}
         onInteractOutside={e => {
           if (commentsPreviewRef.current?.contains(e.target as Node)) {
@@ -198,7 +213,7 @@ export default function Comments({
       >
         <>
           <div className='flex-1 min-h-0 overflow-hidden'>
-            {comments.length === 0 ? (
+            {commentCount === 0 ? (
               <div className='h-full flex items-center justify-center bg-gray-50 text-gray-500 text-sm'>
                 아직 댓글이 없습니다
               </div>

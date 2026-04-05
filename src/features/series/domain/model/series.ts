@@ -18,6 +18,7 @@ export interface Series {
     | 'seriesOrder'
     | 'likeCount'
     | 'viewCount'
+    | 'commentCount'
     | 'visibility'
   >[];
   postCount: number;

@@ -199,6 +199,7 @@ export default function PostPageClient({
             postId={post.id}
             initialCommentsPage={initialCommentsPage}
             initialTimestamp={initialTimestamp}
+            commentCount={post.commentCount}
           />
           <div className='flex flex-col'>
             {recommendedPosts.map(post => (

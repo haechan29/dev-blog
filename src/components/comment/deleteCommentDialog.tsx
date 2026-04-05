@@ -10,6 +10,7 @@ import {
 import { ApiError } from '@/errors/errors';
 import * as CommentClientService from '@/features/comment/domain/service/commentClientService';
 import { CommentsPage } from '@/features/comment/domain/types/page';
+import { PostProps } from '@/features/post/ui/postProps';
 import { postKeys } from '@/queries/keys';
 import {
   InfiniteData,
@@ -60,6 +61,17 @@ export default function DeleteCommentDialog({
               ...page,
               comments: page.comments.filter(c => c.id !== variables.commentId),
             })),
+          };
+        }
+      );
+
+      queryClient.setQueryData(
+        postKeys.detail(postId),
+        (old: PostProps | undefined) => {
+          if (!old) return old;
+          return {
+            ...old,
+            commentCount: Math.max(0, old.commentCount - 1),
           };
         }
       );

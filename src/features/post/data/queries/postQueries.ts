@@ -24,7 +24,7 @@ const POST_SELECT_FIELDS = `
   visibility,
   users:user_id(nickname, deleted_at, registered_at, bio, profile_image_url),
   series:series_id(title),
-  post_stats(like_count, view_count)
+  post_stats(like_count, view_count, comment_count)
 `;
 
 export async function fetchPostsByUserId(
