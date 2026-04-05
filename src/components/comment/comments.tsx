@@ -24,7 +24,7 @@ import {
 } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useInView } from 'react-intersection-observer';
 import SimpleBar from 'simplebar-react';
@@ -89,7 +89,17 @@ export default function Comments({
     },
   });
 
-  const comments = pages.flatMap(page => page.comments);
+  const comments = useMemo(() => {
+    const flat = pages.flatMap(page => page.comments);
+    if (highlightCommentId == null) return flat;
+    const seen = new Set<number>();
+    return flat.filter(c => {
+      if (seen.has(c.id)) return false;
+      seen.add(c.id);
+      return true;
+    });
+  }, [pages, highlightCommentId]);
+
   const representativeComment = comments.length === 0 ? null : comments[0];
 
   useEffect(() => {
