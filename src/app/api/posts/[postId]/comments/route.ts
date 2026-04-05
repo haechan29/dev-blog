@@ -1,6 +1,7 @@
 import { auth } from '@/auth';
 import { ApiError, ValidationError } from '@/errors/errors';
 import * as CommentQueries from '@/features/comment/data/queries/commentQueries';
+import * as RankedCommentQueries from '@/features/comment/data/queries/rankedCommentQueries';
 import * as NotificationQueries from '@/features/notification/data/queries/notificationQueries';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as PostStatUsecase from '@/features/postStat/data/usecases/postStatUsecase';
@@ -18,7 +19,7 @@ export async function GET(
     const { searchParams } = new URL(request.url);
     const timestamp = searchParams.get('timestamp') ?? undefined;
 
-    const data = await CommentQueries.fetchComments({
+    const data = await RankedCommentQueries.fetchRankedComments({
       postId,
       userId,
       timestamp,

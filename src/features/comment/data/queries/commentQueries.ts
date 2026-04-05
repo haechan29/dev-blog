@@ -1,9 +1,6 @@
 import { NotFoundError } from '@/errors/errors';
-import {
-  CommentEntity,
-  CommentEntityFlat,
-} from '@/features/comment/data/entities/commentEntities';
-import { flatToDto, toDto } from '@/features/comment/data/mapper/commentMapper';
+import { CommentEntity } from '@/features/comment/data/entities/commentEntities';
+import { toDto } from '@/features/comment/data/mapper/commentMapper';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
@@ -54,35 +51,6 @@ export async function fetchCommentForAuth(commentId: number) {
   }
 
   return data as Pick<CommentEntity, 'user_id' | 'password_hash'>;
-}
-
-export async function fetchComments({
-  postId,
-  userId,
-  timestamp,
-  cursorScore,
-  cursorId,
-}: {
-  postId: string;
-  userId?: string;
-  timestamp?: string;
-  cursorScore?: number;
-  cursorId?: number;
-}) {
-  const { data, error } = await supabase.rpc('get_ranked_comments', {
-    p_post_id: postId,
-    p_user_id: userId ?? null,
-    p_timestamp: timestamp ?? new Date().toISOString(),
-    p_cursor_score: cursorScore ?? null,
-    p_cursor_id: cursorId ?? null,
-    p_limit: COMMENT_LIMIT,
-  });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return (data as CommentEntityFlat[]).map(flatToDto);
 }
 
 export async function createComment(

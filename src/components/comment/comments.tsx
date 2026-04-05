@@ -6,7 +6,7 @@ import CommentPasswordDialog from '@/components/comment/commentPasswordDialog';
 import ProfileIcon from '@/components/user/profileIcon';
 import { ApiError } from '@/errors/errors';
 import * as CommentClientService from '@/features/comment/domain/service/commentClientService';
-import { getComments } from '@/features/comment/domain/service/commentClientService';
+import { getRankedComments } from '@/features/comment/domain/service/commentClientService';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
 import useMediaQuery, {
   DESKTOP_QUERY,
@@ -49,7 +49,7 @@ export default function Comments({
   const { data: comments } = useQuery({
     queryKey: postKeys.comments(postId),
     queryFn: async () => {
-      const comments = await getComments(postId, timestamp);
+      const comments = await getRankedComments(postId, timestamp);
       return comments.map(comment => comment.toProps());
     },
     initialData: initialComments,

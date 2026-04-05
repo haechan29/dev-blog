@@ -8,7 +8,10 @@ export interface CommentEntity {
   updated_at: string;
   like_count: number;
   user_id: string;
-  users: Pick<UserEntity, 'nickname' | 'deleted_at' | 'registered_at' | 'profile_image_url'>;
+  users: Pick<
+    UserEntity,
+    'nickname' | 'deleted_at' | 'registered_at' | 'profile_image_url'
+  >;
   password_hash?: string | null;
 }
 

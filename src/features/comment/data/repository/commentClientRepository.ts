@@ -1,7 +1,7 @@
 import { CommentResponseDto } from '@/features/comment/data/dto/commentResponseDto';
 import { api } from '@/lib/api';
 
-export async function getComments(
+export async function getRankedComments(
   postId: string,
   timestamp: string
 ): Promise<CommentResponseDto[]> {

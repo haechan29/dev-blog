@@ -23,7 +23,7 @@ export default async function PostPage({
   try {
     const [post, comments, { posts, nextCursor }, creator] = await Promise.all([
       PostServerService.getPost(postId).then(createProps),
-      CommentServerService.getComments(postId, userId),
+      CommentServerService.getRankedComments(postId, userId),
       PostServerService.getFeedPosts({
         cursor: null,
         userId,

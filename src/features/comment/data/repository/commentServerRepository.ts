@@ -1,6 +1,6 @@
-import * as CommentQueries from '@/features/comment/data/queries/commentQueries';
+import * as RankedCommentQueries from '@/features/comment/data/queries/rankedCommentQueries';
 import 'server-only';
 
-export async function getComments(postId: string, userId?: string) {
-  return await CommentQueries.fetchComments({ postId, userId });
+export async function getRankedComments(postId: string, userId?: string) {
+  return await RankedCommentQueries.fetchRankedComments({ postId, userId });
 }

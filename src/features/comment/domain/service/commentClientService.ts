@@ -2,11 +2,14 @@ import * as CommentClientRepository from '@/features/comment/data/repository/com
 import { toDomain } from '@/features/comment/domain/mapper/commentMapper';
 import { Comment } from '@/features/comment/domain/model/comment';
 
-export async function getComments(
+export async function getRankedComments(
   postId: string,
   timestamp: string
 ): Promise<Comment[]> {
-  const comments = await CommentClientRepository.getComments(postId, timestamp);
+  const comments = await CommentClientRepository.getRankedComments(
+    postId,
+    timestamp
+  );
   return comments.map(comment => toDomain(comment));
 }
 
