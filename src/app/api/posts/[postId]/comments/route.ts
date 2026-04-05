@@ -20,16 +20,20 @@ export async function GET(
     const timestamp = searchParams.get('timestamp') ?? undefined;
     const cursorScoreRaw = searchParams.get('cursorScore');
     const cursorIdRaw = searchParams.get('cursorId');
+    const highlightCommentIdRaw = searchParams.get('highlightCommentId');
 
     const data = await RankedCommentUsecase.getRankedComments({
       postId,
       userId,
       timestamp,
-      ...(cursorScoreRaw != null &&
-        cursorIdRaw != null && {
+      ...(cursorScoreRaw !== null &&
+        cursorIdRaw !== null && {
           cursorScore: parseInt(cursorScoreRaw),
           cursorId: parseInt(cursorIdRaw),
         }),
+      ...(highlightCommentIdRaw !== null && {
+        highlightCommentId: parseInt(highlightCommentIdRaw),
+      }),
     });
     return NextResponse.json({ data });
   } catch (error) {
