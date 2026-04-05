@@ -1,7 +1,7 @@
 import { auth } from '@/auth';
 import { ApiError, ValidationError } from '@/errors/errors';
 import * as CommentQueries from '@/features/comment/data/queries/commentQueries';
-import * as RankedCommentQueries from '@/features/comment/data/queries/rankedCommentQueries';
+import * as RankedCommentUsecase from '@/features/comment/data/usecases/rankedCommentUsecase';
 import * as NotificationQueries from '@/features/notification/data/queries/notificationQueries';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as PostStatUsecase from '@/features/postStat/data/usecases/postStatUsecase';
@@ -18,11 +18,18 @@ export async function GET(
     const userId = await getUserId();
     const { searchParams } = new URL(request.url);
     const timestamp = searchParams.get('timestamp') ?? undefined;
+    const cursorScoreRaw = searchParams.get('cursorScore');
+    const cursorIdRaw = searchParams.get('cursorId');
 
-    const data = await RankedCommentQueries.fetchRankedComments({
+    const data = await RankedCommentUsecase.getRankedComments({
       postId,
       userId,
       timestamp,
+      ...(cursorScoreRaw != null &&
+        cursorIdRaw != null && {
+          cursorScore: parseInt(cursorScoreRaw),
+          cursorId: parseInt(cursorIdRaw),
+        }),
     });
     return NextResponse.json({ data });
   } catch (error) {

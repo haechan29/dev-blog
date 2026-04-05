@@ -1,20 +1,19 @@
 import { RankedCommentEntity } from '@/features/comment/data/entities/rankedCommentEntities';
-import { toDto } from '@/features/comment/data/mapper/rankedCommentMapper';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
-
-const COMMENT_LIMIT = 5;
 
 export async function fetchRankedComments({
   postId,
   userId,
   timestamp,
+  limit,
   cursorScore,
   cursorId,
 }: {
   postId: string;
   userId?: string;
   timestamp?: string;
+  limit: number;
   cursorScore?: number;
   cursorId?: number;
 }) {
@@ -24,12 +23,12 @@ export async function fetchRankedComments({
     p_timestamp: timestamp ?? new Date().toISOString(),
     p_cursor_score: cursorScore ?? null,
     p_cursor_id: cursorId ?? null,
-    p_limit: COMMENT_LIMIT,
+    p_limit: limit,
   });
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return (data as RankedCommentEntity[]).map(toDto);
+  return data as RankedCommentEntity[];
 }

@@ -4,8 +4,6 @@ import { toDto } from '@/features/comment/data/mapper/commentMapper';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
-const COMMENT_LIMIT = 5;
-
 const COMMENT_SELECT = `
   id,
   post_id,

@@ -1,12 +1,23 @@
 import { CommentResponseDto } from '@/features/comment/data/dto/commentResponseDto';
+import { CommentCursor } from '@/features/comment/data/types/commentCursor';
 import { api } from '@/lib/api';
 
 export async function getRankedComments(
   postId: string,
-  timestamp: string
-): Promise<CommentResponseDto[]> {
+  timestamp: string,
+  cursor?: CommentCursor | null
+): Promise<{
+  comments: CommentResponseDto[];
+  nextCursor: CommentCursor | null;
+}> {
+  const params = new URLSearchParams({ timestamp });
+  if (cursor) {
+    params.set('cursorScore', String(cursor.score));
+    params.set('cursorId', cursor.id);
+  }
+
   const response = await api.get(
-    `/api/posts/${postId}/comments?timestamp=${timestamp}`
+    `/api/posts/${postId}/comments?${params.toString()}`
   );
   return response.data;
 }

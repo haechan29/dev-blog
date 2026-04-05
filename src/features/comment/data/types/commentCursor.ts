@@ -1,4 +1,4 @@
-interface CommentCursor {
+export interface CommentCursor {
   score: number;
   id: string;
 }

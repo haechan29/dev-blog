@@ -19,11 +19,12 @@ export default async function PostPage({
     session?.user?.user_id ?? (await cookies()).get('userId')?.value;
 
   const { postId } = await params;
+  const timestamp = new Date().toISOString();
 
   try {
-    const [post, comments, { posts, nextCursor }, creator] = await Promise.all([
+    const [post, commentPage, feedPage, creator] = await Promise.all([
       PostServerService.getPost(postId).then(createProps),
-      CommentServerService.getRankedComments(postId, userId),
+      CommentServerService.getRankedComments({ postId, userId, timestamp }),
       PostServerService.getFeedPosts({
         cursor: null,
         userId,
@@ -31,8 +32,8 @@ export default async function PostPage({
       }),
       userId ? CreatorServerRepository.getCreatorByUserId(userId) : null,
     ]);
-    const commentProps = comments.map(comment => comment.toProps());
-    const postProps = posts.map(createProps);
+    const commentProps = commentPage.comments.map(comment => comment.toProps());
+    const postProps = feedPage.posts.map(createProps);
 
     return (
       <PostPageClient
@@ -41,8 +42,9 @@ export default async function PostPage({
         userId={userId}
         initialPost={post}
         initialComments={commentProps}
+        initialTimestamp={timestamp}
         initialPosts={postProps}
-        initialCursor={nextCursor}
+        initialCursor={feedPage.nextCursor}
       />
     );
   } catch (error) {

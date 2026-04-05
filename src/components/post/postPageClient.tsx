@@ -35,6 +35,7 @@ export default function PostPageClient({
   userId,
   initialPost,
   initialComments,
+  initialTimestamp,
   initialPosts,
   initialCursor,
 }: {
@@ -43,6 +44,7 @@ export default function PostPageClient({
   userId?: string;
   initialPost: PostProps;
   initialComments: CommentItemProps[];
+  initialTimestamp: string;
   initialPosts: PostProps[];
   initialCursor: string | null;
 }) {
@@ -197,6 +199,7 @@ export default function PostPageClient({
             userId={userId}
             postId={post.id}
             initialComments={initialComments}
+            initialTimestamp={initialTimestamp}
           />
           <div className='flex flex-col'>
             {recommendedPosts.map(post => (

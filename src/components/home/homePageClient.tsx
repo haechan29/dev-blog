@@ -31,13 +31,13 @@ export default function HomePageClient({
   } = useInfiniteQuery({
     queryKey: postKeys.list({ tag }),
     queryFn: async ({ pageParam }) => {
-      const result = await PostClientService.getFeedPosts({
+      const page = await PostClientService.getFeedPosts({
         cursor: pageParam,
         tag,
       });
       return {
-        posts: result.posts.map(createProps),
-        nextCursor: result.nextCursor,
+        posts: page.posts.map(createProps),
+        nextCursor: page.nextCursor,
       };
     },
     initialPageParam: null as string | null,

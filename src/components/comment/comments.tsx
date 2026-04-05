@@ -6,7 +6,6 @@ import CommentPasswordDialog from '@/components/comment/commentPasswordDialog';
 import ProfileIcon from '@/components/user/profileIcon';
 import { ApiError } from '@/errors/errors';
 import * as CommentClientService from '@/features/comment/domain/service/commentClientService';
-import { getRankedComments } from '@/features/comment/domain/service/commentClientService';
 import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
 import useMediaQuery, {
   DESKTOP_QUERY,
@@ -25,11 +24,13 @@ export default function Comments({
   userId,
   postId,
   initialComments,
+  initialTimestamp,
 }: {
   isLoggedIn: boolean;
   userId?: string;
   postId: string;
   initialComments: CommentItemProps[];
+  initialTimestamp: string;
 }) {
   const queryClient = useQueryClient();
 
@@ -40,7 +41,6 @@ export default function Comments({
   const [content, setContent] = useState('');
   const [isInputVisible, setIsInputVisible] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
-  const [timestamp] = useState(() => new Date().toISOString());
 
   const isDesktop = useMediaQuery(DESKTOP_QUERY);
   const isTouch = useMediaQuery(TOUCH_QUERY);
@@ -49,7 +49,10 @@ export default function Comments({
   const { data: comments } = useQuery({
     queryKey: postKeys.comments(postId),
     queryFn: async () => {
-      const comments = await getRankedComments(postId, timestamp);
+      const { comments } = await CommentClientService.getRankedComments({
+        postId,
+        timestamp: initialTimestamp,
+      });
       return comments.map(comment => comment.toProps());
     },
     initialData: initialComments,
