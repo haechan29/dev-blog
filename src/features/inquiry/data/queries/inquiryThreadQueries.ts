@@ -49,3 +49,32 @@ export async function fetchInquiryThreads({
 
   return data as unknown as InquiryThreadEntity[];
 }
+
+export async function createInquiryThread({
+  userId,
+  content,
+  images,
+  lastMessagePreview,
+}: {
+  userId: string;
+  content: string;
+  images: string[];
+  lastMessagePreview: string;
+}) {
+  const { data, error } = await supabase.rpc('create_inquiry', {
+    p_user_id: userId,
+    p_content: content,
+    p_images: images,
+    p_last_message_preview: lastMessagePreview,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (data == null || typeof data !== 'string') {
+    throw new Error('문의 스레드 생성 응답이 올바르지 않습니다');
+  }
+
+  return data;
+}
