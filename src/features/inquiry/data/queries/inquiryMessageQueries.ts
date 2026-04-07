@@ -27,3 +27,35 @@ export async function fetchInquiryMessagesByThreadId(threadId: string) {
 
   return (data ?? []) as unknown as InquiryMessageEntity[];
 }
+
+export async function createInquiryMessage({
+  threadId,
+  userId,
+  content,
+  images,
+  lastMessagePreview,
+}: {
+  threadId: string;
+  userId: string;
+  content: string;
+  images: string[];
+  lastMessagePreview: string;
+}) {
+  const { data, error } = await supabase.rpc('create_inquiry_message', {
+    p_thread_id: threadId,
+    p_user_id: userId,
+    p_content: content,
+    p_images: images,
+    p_last_message_preview: lastMessagePreview,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (data == null || typeof data !== 'string') {
+    throw new Error('문의 메시지 생성 응답이 올바르지 않습니다');
+  }
+
+  return data;
+}

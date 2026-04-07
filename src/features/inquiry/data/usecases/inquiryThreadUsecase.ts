@@ -4,14 +4,16 @@ import {
   UnauthorizedError,
   ValidationError,
 } from '@/errors/errors';
+import {
+  INQUIRY_MAX_IMAGES,
+  LAST_MESSAGE_PREVIEW_MAX,
+} from '@/features/inquiry/constants/inquiry';
 import { InquiryThreadsPage } from '@/features/inquiry/data/dto/inquiryThreadDto';
 import * as InquiryThreadMapper from '@/features/inquiry/data/mapper/inquiryThreadMapper';
 import * as InquiryThreadQueries from '@/features/inquiry/data/queries/inquiryThreadQueries';
 import 'server-only';
 
 const INQUIRY_THREAD_LIMIT = 5;
-const INQUIRY_MAX_IMAGES = 5;
-const LAST_MESSAGE_PREVIEW_MAX = 120;
 
 export async function getMyInquiryThreads({
   userId,
