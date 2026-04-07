@@ -8,6 +8,7 @@ import {
   INQUIRY_MAX_IMAGES,
   MESSAGE_PREVIEW_MAX,
 } from '@/features/inquiry/constants/inquiry';
+import { DELETED_MESSAGE_CONTENT } from '@/features/inquiry/constants/inquiryMessage';
 import * as InquiryMessageMapper from '@/features/inquiry/data/mapper/inquiryMessageMapper';
 import * as InquiryMessageQueries from '@/features/inquiry/data/queries/inquiryMessageQueries';
 import * as InquiryThreadQueries from '@/features/inquiry/data/queries/inquiryThreadQueries';
@@ -91,4 +92,46 @@ export async function getMyInquiryMessagesByThreadId({
   return {
     messages: messages.map(m => InquiryMessageMapper.toDto(m, urlById)),
   };
+}
+
+export async function deleteMyInquiryMessage({
+  userId,
+  threadId,
+  messageId,
+}: {
+  userId?: string;
+  threadId: string;
+  messageId: string;
+}): Promise<void> {
+  if (!userId) {
+    throw new UnauthorizedError('인증되지 않은 요청입니다');
+  }
+
+  const thread = await InquiryThreadQueries.fetchInquiryThreadForAuth(threadId);
+  if (!thread || thread.is_deleted) {
+    throw new NotFoundError('문의를 찾을 수 없습니다');
+  }
+  if (thread.user_id !== userId) {
+    throw new ForbiddenError('이 문의에 접근할 수 없습니다');
+  }
+
+  const message = await InquiryMessageQueries.fetchInquiryMessageForAuth(
+    threadId,
+    messageId
+  );
+  if (!message) {
+    throw new NotFoundError('문의를 찾을 수 없습니다');
+  }
+  if (message.is_deleted) {
+    return;
+  }
+  if (message.sender_type !== 'USER' || message.sender_id !== userId) {
+    throw new ForbiddenError('이 문의에 접근할 수 없습니다');
+  }
+
+  await InquiryMessageQueries.deleteInquiryMessage({
+    threadId,
+    messageId,
+    deletedPreview: DELETED_MESSAGE_CONTENT,
+  });
 }

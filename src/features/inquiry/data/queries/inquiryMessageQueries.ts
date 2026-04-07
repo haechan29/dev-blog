@@ -13,6 +13,27 @@ const INQUIRY_MESSAGE_SELECT_FIELDS = `
   created_at
 `;
 
+export async function fetchInquiryMessageForAuth(
+  threadId: string,
+  messageId: string
+) {
+  const { data, error } = await supabase
+    .from('inquiry_messages')
+    .select('id, thread_id, sender_id, sender_type, is_deleted')
+    .eq('thread_id', threadId)
+    .eq('id', messageId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data as unknown as Pick<
+    InquiryMessageEntity,
+    'id' | 'thread_id' | 'sender_id' | 'sender_type' | 'is_deleted'
+  > | null;
+}
+
 export async function fetchInquiryMessagesByThreadId(threadId: string) {
   const { data, error } = await supabase
     .from('inquiry_messages')
@@ -58,4 +79,24 @@ export async function createInquiryMessage({
   }
 
   return data;
+}
+
+export async function deleteInquiryMessage({
+  threadId,
+  messageId,
+  deletedPreview,
+}: {
+  threadId: string;
+  messageId: string;
+  deletedPreview: string;
+}) {
+  const { error } = await supabase.rpc('delete_inquiry_message', {
+    p_thread_id: threadId,
+    p_message_id: messageId,
+    p_deleted_preview: deletedPreview,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
 }
