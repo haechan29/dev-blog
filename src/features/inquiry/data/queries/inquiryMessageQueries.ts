@@ -49,6 +49,17 @@ export async function fetchInquiryMessagesByThreadId(threadId: string) {
   return (data ?? []) as unknown as InquiryMessageEntity[];
 }
 
+export async function resetInquiryThreadUserUnreadCount(threadId: string) {
+  const { error } = await supabase
+    .from('inquiry_threads')
+    .update({ user_unread_count: 0 })
+    .eq('id', threadId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
 export async function createInquiryMessage({
   threadId,
   userId,

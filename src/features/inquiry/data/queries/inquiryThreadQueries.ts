@@ -10,6 +10,8 @@ const INQUIRY_THREAD_SELECT_FIELDS = `
   first_message_id,
   last_message_preview,
   last_message_id,
+  user_unread_count,
+  admin_unread_count,
   created_at,
   updated_at,
   is_deleted

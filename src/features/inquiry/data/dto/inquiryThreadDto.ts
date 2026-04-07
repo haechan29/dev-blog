@@ -8,6 +8,8 @@ export interface InquiryThreadDto {
   firstMessageId: string | null;
   lastMessagePreview: string | null;
   lastMessageId: string | null;
+  userUnreadCount: number;
+  adminUnreadCount: number;
   createdAt: string;
   updatedAt: string;
 }

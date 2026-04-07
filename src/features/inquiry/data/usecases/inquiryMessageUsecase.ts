@@ -82,6 +82,12 @@ export async function getMyInquiryMessagesByThreadId({
   const messages =
     await InquiryMessageQueries.fetchInquiryMessagesByThreadId(threadId);
 
+  try {
+    await InquiryMessageQueries.resetInquiryThreadUserUnreadCount(threadId);
+  } catch (error) {
+    console.error('문의 읽음 처리에 실패했습니다', error);
+  }
+
   const imageIds = [
     ...new Set(
       messages.filter(m => !m.is_deleted).flatMap(m => m.images ?? [])
