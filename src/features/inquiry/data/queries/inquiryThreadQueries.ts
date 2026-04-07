@@ -15,6 +15,21 @@ function applyQuotedLiteral(value: string) {
   return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '""')}"`;
 }
 
+export async function fetchInquiryThreadForAuth(threadId: string) {
+  const { data, error } = await supabase
+    .from('inquiry_threads')
+    .select('id, user_id')
+    .eq('id', threadId)
+    .eq('is_deleted', false)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data as unknown as Pick<InquiryThreadEntity, 'id' | 'user_id'> | null;
+}
+
 export async function fetchInquiryThreads({
   userId,
   limit,

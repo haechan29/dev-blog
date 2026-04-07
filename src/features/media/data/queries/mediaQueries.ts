@@ -1,6 +1,30 @@
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
+export async function fetchMediaUrlsByIds(ids: string[]) {
+  if (ids.length === 0) {
+    return new Map<string, string>();
+  }
+
+  const { data, error } = await supabase
+    .from('media')
+    .select('id, url')
+    .in('id', ids);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const map = new Map<string, string>();
+  for (const { id, url } of data ?? []) {
+    if (id != null && url != null) {
+      map.set(id, url);
+    }
+  }
+
+  return map;
+}
+
 export async function getUsageSince(
   userId: string,
   since: Date
