@@ -8,7 +8,8 @@ const INQUIRY_THREAD_SELECT_FIELDS = `
   status,
   last_message_preview,
   created_at,
-  updated_at
+  updated_at,
+  is_deleted
 `;
 
 function applyQuotedLiteral(value: string) {
@@ -18,16 +19,18 @@ function applyQuotedLiteral(value: string) {
 export async function fetchInquiryThreadForAuth(threadId: string) {
   const { data, error } = await supabase
     .from('inquiry_threads')
-    .select('id, user_id')
+    .select('id, user_id, is_deleted')
     .eq('id', threadId)
-    .eq('is_deleted', false)
     .maybeSingle();
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return data as unknown as Pick<InquiryThreadEntity, 'id' | 'user_id'> | null;
+  return data as unknown as Pick<
+    InquiryThreadEntity,
+    'id' | 'user_id' | 'is_deleted'
+  > | null;
 }
 
 export async function fetchInquiryThreads({
@@ -92,4 +95,26 @@ export async function createInquiryThread({
   }
 
   return data;
+}
+
+export async function softDeleteInquiryThread({
+  threadId,
+  userId,
+}: {
+  threadId: string;
+  userId: string;
+}) {
+  const { error } = await supabase
+    .from('inquiry_threads')
+    .update({
+      is_deleted: true,
+      deleted_at: new Date().toISOString(),
+    })
+    .eq('id', threadId)
+    .eq('user_id', userId)
+    .eq('is_deleted', false);
+
+  if (error) {
+    throw new Error(error.message);
+  }
 }

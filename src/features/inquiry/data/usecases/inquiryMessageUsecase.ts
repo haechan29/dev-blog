@@ -21,7 +21,7 @@ export async function getMyInquiryMessagesByThreadId({
   }
 
   const thread = await InquiryThreadQueries.fetchInquiryThreadForAuth(threadId);
-  if (!thread) {
+  if (!thread || thread.is_deleted) {
     throw new NotFoundError('문의를 찾을 수 없습니다');
   }
   if (thread.user_id !== userId) {

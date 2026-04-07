@@ -1,4 +1,9 @@
-import { ValidationError } from '@/errors/errors';
+import {
+  ForbiddenError,
+  NotFoundError,
+  UnauthorizedError,
+  ValidationError,
+} from '@/errors/errors';
 import { InquiryThreadsPage } from '@/features/inquiry/data/dto/inquiryThreadDto';
 import * as InquiryThreadMapper from '@/features/inquiry/data/mapper/inquiryThreadMapper';
 import * as InquiryThreadQueries from '@/features/inquiry/data/queries/inquiryThreadQueries';
@@ -67,4 +72,32 @@ export async function createMyInquiryThread({
   });
 
   return { threadId };
+}
+
+export async function deleteMyInquiryThread({
+  userId,
+  threadId,
+}: {
+  userId?: string;
+  threadId: string;
+}): Promise<void> {
+  if (!userId) {
+    throw new UnauthorizedError('인증되지 않은 요청입니다');
+  }
+
+  const row = await InquiryThreadQueries.fetchInquiryThreadForAuth(threadId);
+  if (!row) {
+    throw new NotFoundError('문의를 찾을 수 없습니다');
+  }
+  if (row.user_id !== userId) {
+    throw new ForbiddenError('이 문의에 접근할 수 없습니다');
+  }
+  if (row.is_deleted) {
+    return;
+  }
+
+  await InquiryThreadQueries.softDeleteInquiryThread({
+    threadId,
+    userId,
+  });
 }
