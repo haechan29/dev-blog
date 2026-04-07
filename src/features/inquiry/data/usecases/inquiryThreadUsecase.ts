@@ -6,7 +6,7 @@ import {
 } from '@/errors/errors';
 import {
   INQUIRY_MAX_IMAGES,
-  LAST_MESSAGE_PREVIEW_MAX,
+  MESSAGE_PREVIEW_MAX,
 } from '@/features/inquiry/constants/inquiry';
 import { InquiryThreadsPage } from '@/features/inquiry/data/dto/inquiryThreadDto';
 import * as InquiryThreadMapper from '@/features/inquiry/data/mapper/inquiryThreadMapper';
@@ -70,7 +70,7 @@ export async function createMyInquiryThread({
     userId,
     content,
     images,
-    lastMessagePreview: content.slice(0, LAST_MESSAGE_PREVIEW_MAX),
+    messagePreview: content.slice(0, MESSAGE_PREVIEW_MAX),
   });
 
   return { threadId };

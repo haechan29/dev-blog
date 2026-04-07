@@ -6,7 +6,7 @@ import {
 } from '@/errors/errors';
 import {
   INQUIRY_MAX_IMAGES,
-  LAST_MESSAGE_PREVIEW_MAX,
+  MESSAGE_PREVIEW_MAX,
 } from '@/features/inquiry/constants/inquiry';
 import * as InquiryMessageMapper from '@/features/inquiry/data/mapper/inquiryMessageMapper';
 import * as InquiryMessageQueries from '@/features/inquiry/data/queries/inquiryMessageQueries';
@@ -53,7 +53,7 @@ export async function createMyInquiryMessage({
     userId,
     content,
     images,
-    lastMessagePreview: content.slice(0, LAST_MESSAGE_PREVIEW_MAX),
+    lastMessagePreview: content.slice(0, MESSAGE_PREVIEW_MAX),
   });
 
   return { messageId };

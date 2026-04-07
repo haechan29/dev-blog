@@ -4,7 +4,10 @@ import { InquiryCursor } from '@/features/inquiry/domain/types/page';
 export interface InquiryThreadDto {
   id: string;
   status: InquiryThreadStatus;
+  firstMessagePreview: string | null;
+  firstMessageId: string | null;
   lastMessagePreview: string | null;
+  lastMessageId: string | null;
   createdAt: string;
   updatedAt: string;
 }

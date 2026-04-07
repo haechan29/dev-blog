@@ -6,7 +6,10 @@ const INQUIRY_THREAD_SELECT_FIELDS = `
   id,
   user_id,
   status,
+  first_message_preview,
+  first_message_id,
   last_message_preview,
+  last_message_id,
   created_at,
   updated_at,
   is_deleted
@@ -72,18 +75,18 @@ export async function createInquiryThread({
   userId,
   content,
   images,
-  lastMessagePreview,
+  messagePreview,
 }: {
   userId: string;
   content: string;
   images: string[];
-  lastMessagePreview: string;
+  messagePreview: string;
 }) {
   const { data, error } = await supabase.rpc('create_inquiry', {
     p_user_id: userId,
     p_content: content,
     p_images: images,
-    p_last_message_preview: lastMessagePreview,
+    p_message_preview: messagePreview,
   });
 
   if (error) {

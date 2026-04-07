@@ -16,7 +16,10 @@ export function toDto(entity: InquiryThreadEntity): InquiryThreadDto {
   return {
     id: entity.id,
     status: toStatus(entity.status),
+    firstMessagePreview: entity.first_message_preview,
+    firstMessageId: entity.first_message_id,
     lastMessagePreview: entity.last_message_preview,
+    lastMessageId: entity.last_message_id,
     createdAt: entity.created_at,
     updatedAt: entity.updated_at,
   };
