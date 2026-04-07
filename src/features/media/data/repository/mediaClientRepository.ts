@@ -8,6 +8,16 @@ export async function uploadPostImage(file: File): Promise<string> {
   return response.data;
 }
 
+export async function uploadInquiryImage(
+  file: File
+): Promise<{ id: string; url: string }> {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await api.post('/api/media/inquiry', formData);
+  return response.data;
+}
+
 export async function uploadAvatarImage(file: File): Promise<string> {
   const formData = new FormData();
   formData.append('file', file);

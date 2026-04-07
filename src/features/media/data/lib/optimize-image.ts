@@ -31,6 +31,15 @@ export async function optimizePostImage(inputBuffer: Buffer): Promise<{
   return { small, medium, original };
 }
 
+export async function optimizeInquiryImage(inputBuffer: Buffer): Promise<Buffer> {
+  const baseOptions = {
+    quality: 80,
+    effort: 4,
+  };
+
+  return sharp(inputBuffer).rotate().webp(baseOptions).toBuffer();
+}
+
 export async function optimizeProfileImage(inputBuffer: Buffer) {
   return await sharp(inputBuffer)
     .rotate()

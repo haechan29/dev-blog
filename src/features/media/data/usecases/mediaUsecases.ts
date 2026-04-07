@@ -1,4 +1,5 @@
 import {
+  optimizeInquiryImage,
   optimizePostImage,
   optimizeProfileImage,
 } from '@/features/media/data/lib/optimize-image';
@@ -52,6 +53,38 @@ export async function uploadPostImage({
   });
 
   return `${process.env.R2_PUBLIC_URL!}/${baseId}`;
+}
+
+export async function uploadInquiryImage({
+  file,
+  userId,
+}: {
+  file: File;
+  userId: string;
+}): Promise<{ id: string; url: string }> {
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const optimized = await optimizeInquiryImage(buffer);
+
+  await checkQuota(userId, optimized.length);
+
+  const baseId = nanoid();
+  const key = `${baseId}-original.webp`;
+  const url = `${process.env.R2_PUBLIC_URL!}/${key}`;
+
+  await uploadToR2({
+    key,
+    body: optimized,
+    contentType: 'image/webp',
+  });
+
+  const id = await MediaQueries.createMedia({
+    url,
+    sizeBytes: optimized.length,
+    userId,
+    type: 'image',
+  });
+
+  return { id, url };
 }
 
 export async function uploadAvatarImage({
