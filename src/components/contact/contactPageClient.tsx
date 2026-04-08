@@ -5,6 +5,7 @@ import type { InquiryThreadStatus } from '@/features/inquiry/domain/types/inquir
 import { formatDate } from '@/features/post/domain/lib/date';
 import clsx from 'clsx';
 import { Archive, CircleCheck, Clock, MessageSquarePlus } from 'lucide-react';
+import Link from 'next/link';
 
 const MOCK_THREADS: InquiryThreadDto[] = [
   {
@@ -101,7 +102,10 @@ export default function ContactPageClient() {
             <div className='flex flex-col'>
               {MOCK_THREADS.map((thread, index) => (
                 <div key={thread.id} className='mb-8'>
-                  <div className='flex gap-3'>
+                  <Link
+                    href={`/contact/${thread.id}`}
+                    className='flex gap-3 rounded-lg -mx-1 px-1 py-1 -my-1 hover:bg-gray-50 transition-colors text-left'
+                  >
                     {/* 왼쪽 상태 아이콘 + 새 답변 dot */}
                     <div className='relative shrink-0 pt-0.5'>
                       {statusIcon(thread.status)}
@@ -124,7 +128,7 @@ export default function ContactPageClient() {
                         {secondLineText(thread)}
                       </p>
                     </div>
-                  </div>
+                  </Link>
                   {index !== MOCK_THREADS.length - 1 && (
                     <div className='mt-8 h-px bg-gray-200' />
                   )}
