@@ -4,7 +4,7 @@ import type { InquiryMessageDto } from '@/features/inquiry/data/dto/inquiryMessa
 import clsx from 'clsx';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import { useMemo } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const MOCK_MESSAGES_BY_THREAD: Record<string, InquiryMessageDto[]> = {
   'mock-thread-1': [
@@ -135,82 +135,171 @@ function showTimeForMessage(
   return !isSameTimeGroup(messages[index], next);
 }
 
+/** 고정 툴바 높이와 맞춤: border-t + py-4(상·하) + textarea max-h-52 */
+const INQUIRY_COMPOSER_BOTTOM_PADDING = 'pb-[calc(1px+2rem+13rem)]';
+
+const inquiryThreadShellLayout = clsx(
+  'px-6 md:px-12 xl:px-18',
+  'xl:ml-(--sidebar-width)',
+  'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
+);
+
 export default function InquiryThreadPageClient({
   inquiryThreadId,
 }: {
   inquiryThreadId: string;
 }) {
-  const messages = useMemo(() => {
+  const [messages, setMessages] = useState<InquiryMessageDto[]>([]);
+  const [draft, setDraft] = useState('');
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  useEffect(() => {
     const raw = MOCK_MESSAGES_BY_THREAD[inquiryThreadId] ?? [];
-    return [...raw].sort(
-      (a, b) =>
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    setMessages(
+      [...raw].sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      )
     );
+    setDraft('');
   }, [inquiryThreadId]);
 
+  const sendMessage = useCallback(() => {
+    const text = draft.trim();
+    if (text === '') return;
+
+    const next: InquiryMessageDto = {
+      id: `local-${Date.now()}`,
+      senderType: 'USER',
+      createdAt: new Date().toISOString(),
+      content: text,
+      imageUrls: [],
+    };
+    setMessages(prev => [...prev, next]);
+    setDraft('');
+    requestAnimationFrame(() => {
+      const el = textareaRef.current;
+      if (el) {
+        el.style.height = 'auto';
+      }
+    });
+  }, [draft]);
+
   return (
-    <div
-      className={clsx(
-        'mt-(--toolbar-height) mb-8 px-6 md:px-12 xl:px-18',
-        'xl:ml-(--sidebar-width)',
-        'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
-      )}
-    >
-      <div className='flex flex-col pt-8 pb-20 max-w-2xl mx-auto w-full'>
-        <div className='mb-6'>
-          <Link
-            href='/contact'
-            className='inline-flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors'
-          >
-            <ChevronLeft className='w-4 h-4' aria-hidden />
-            문의 목록으로
-          </Link>
+    <>
+      <div
+        className={clsx('mt-(--toolbar-height) mb-8', inquiryThreadShellLayout)}
+      >
+        <div
+          className={clsx(
+            'flex flex-col pt-8 max-w-2xl mx-auto w-full',
+            INQUIRY_COMPOSER_BOTTOM_PADDING
+          )}
+        >
+          <div className='mb-6'>
+            <Link
+              href='/contact'
+              className='inline-flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors'
+            >
+              <ChevronLeft className='w-4 h-4' aria-hidden />
+              문의 목록으로
+            </Link>
+          </div>
+
+          <h1 className='text-lg font-semibold text-gray-900 mb-6'>
+            문의 상세
+          </h1>
+
+          {messages.length === 0 ? (
+            <p className='text-center py-16 text-gray-500'>
+              메시지가 없거나 찾을 수 없는 문의입니다.
+            </p>
+          ) : (
+            <ul className='flex flex-col gap-3 list-none p-0 m-0' role='list'>
+              {messages.map((msg, index) => {
+                const showDate =
+                  index === 0 ||
+                  localDateKey(msg.createdAt) !==
+                    localDateKey(messages[index - 1].createdAt);
+                const showTime = showTimeForMessage(messages, index);
+                const isUser = msg.senderType === 'USER';
+
+                return (
+                  <li key={msg.id} className='w-full'>
+                    {showDate && (
+                      <div
+                        className={clsx(
+                          'flex justify-center my-5',
+                          index === 0 && 'mt-0'
+                        )}
+                      >
+                        <span className='text-[11px] font-medium text-gray-400 tracking-wide'>
+                          {formatDateDivider(msg.createdAt)}
+                        </span>
+                      </div>
+                    )}
+
+                    <MessageRow
+                      content={msg.content}
+                      showTime={showTime}
+                      timeLabel={formatTimeHm(msg.createdAt)}
+                      isUser={isUser}
+                    />
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </div>
-
-        <h1 className='text-lg font-semibold text-gray-900 mb-6'>문의 상세</h1>
-
-        {messages.length === 0 ? (
-          <p className='text-center py-16 text-gray-500'>
-            메시지가 없거나 찾을 수 없는 문의입니다.
-          </p>
-        ) : (
-          <ul className='flex flex-col gap-3 list-none p-0 m-0' role='list'>
-            {messages.map((msg, index) => {
-              const showDate =
-                index === 0 ||
-                localDateKey(msg.createdAt) !==
-                  localDateKey(messages[index - 1].createdAt);
-              const showTime = showTimeForMessage(messages, index);
-              const isUser = msg.senderType === 'USER';
-
-              return (
-                <li key={msg.id} className='w-full'>
-                  {showDate && (
-                    <div
-                      className={clsx(
-                        'flex justify-center my-5',
-                        index === 0 && 'mt-0'
-                      )}
-                    >
-                      <span className='text-[11px] font-medium text-gray-400 tracking-wide'>
-                        {formatDateDivider(msg.createdAt)}
-                      </span>
-                    </div>
-                  )}
-
-                  <MessageRow
-                    content={msg.content}
-                    showTime={showTime}
-                    timeLabel={formatTimeHm(msg.createdAt)}
-                    isUser={isUser}
-                  />
-                </li>
-              );
-            })}
-          </ul>
-        )}
       </div>
-    </div>
+
+      <div className='fixed inset-x-0 bottom-0 z-100 border-t border-gray-200 bg-white'>
+        <div className={inquiryThreadShellLayout}>
+          <div className='max-w-2xl mx-auto w-full'>
+            <div className='flex gap-3 items-end py-4'>
+              <textarea
+                ref={textareaRef}
+                value={draft}
+                onChange={e => setDraft(e.target.value)}
+                onInput={e => {
+                  const target = e.target as HTMLTextAreaElement;
+                  target.style.height = 'auto';
+                  target.style.height = `${target.scrollHeight}px`;
+                }}
+                onKeyDown={e => {
+                  if (e.key !== 'Enter' || e.shiftKey) return;
+                  e.preventDefault();
+                  sendMessage();
+                }}
+                placeholder='메시지를 입력하세요'
+                rows={1}
+                aria-label='문의 메시지 입력'
+                className={clsx(
+                  'max-h-52 flex-1 min-w-0 overflow-y-auto p-3 outline-none resize-none border rounded-lg scrollbar-hide',
+                  'border-gray-200 hover:border-blue-500 focus:border-blue-500',
+                  !draft && 'bg-gray-50'
+                )}
+              />
+              <button
+                type='button'
+                onMouseDown={e => e.preventDefault()}
+                onClick={sendMessage}
+                disabled={draft.trim() === ''}
+                className={clsx(
+                  'shrink-0 text-sm font-medium text-white px-4 rounded-full',
+                  'h-9 flex items-center justify-center bg-blue-600',
+                  draft.trim() !== ''
+                    ? 'hover:bg-blue-500 cursor-pointer'
+                    : 'opacity-50'
+                )}
+              >
+                보내기
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 
