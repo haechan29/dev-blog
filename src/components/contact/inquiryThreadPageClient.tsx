@@ -1,98 +1,13 @@
 'use client';
 
 import type { InquiryMessageDto } from '@/features/inquiry/data/dto/inquiryMessageDto';
+import * as InquiryClientRepository from '@/features/inquiry/data/repository/inquiryClientRepository';
+import { inquiryKeys } from '@/queries/keys';
+import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useEffect, useRef, useState } from 'react';
-
-const MOCK_MESSAGES_BY_THREAD: Record<string, InquiryMessageDto[]> = {
-  'mock-thread-1': [
-    {
-      id: 'mock-msg-1',
-      senderType: 'USER',
-      createdAt: '2026-04-01T10:00:00.000Z',
-      content: '결제 내역이 이상하게 보여서 문의드립니다.',
-      imageUrls: [],
-    },
-    {
-      id: 'mock-msg-1b',
-      senderType: 'USER',
-      createdAt: '2026-04-01T10:00:45.000Z',
-      content: '스크린샷도 함께 첨부했습니다.',
-      imageUrls: [],
-    },
-    {
-      id: 'mock-msg-2',
-      senderType: 'ADMIN',
-      createdAt: '2026-04-05T02:30:00.000Z',
-      content:
-        '안녕하세요. 주문번호와 결제 시각을 알려주시면 확인해 드리겠습니다.',
-      imageUrls: [],
-    },
-    {
-      id: 'mock-msg-2b',
-      senderType: 'ADMIN',
-      createdAt: '2026-04-05T02:30:00.000Z',
-      content: '가능하시면 스크린샷도 함께 부탁드립니다.',
-      imageUrls: [],
-    },
-    {
-      id: 'mock-msg-3',
-      senderType: 'USER',
-      createdAt: '2026-04-06T08:15:00.000Z',
-      content: '주문번호 ORD-9981입니다. 감사합니다.',
-      imageUrls: [],
-    },
-  ],
-  'mock-thread-2': [
-    {
-      id: 'mock-msg-3',
-      senderType: 'USER',
-      createdAt: '2026-03-20T09:00:00.000Z',
-      content: '계정 삭제 절차가 궁금합니다.',
-      imageUrls: [],
-    },
-    {
-      id: 'mock-msg-4',
-      senderType: 'ADMIN',
-      createdAt: '2026-03-21T02:00:00.000Z',
-      content:
-        '설정 > 계정 > 계정 삭제에서 진행하실 수 있습니다. 진행 중 막히는 단계가 있으면 알려주세요.',
-      imageUrls: [],
-    },
-    {
-      id: 'mock-msg-4b',
-      senderType: 'USER',
-      createdAt: '2026-03-21T03:00:00.000Z',
-      content: '안내해 주신 대로 진행하면 됩니다. 추가 문의는 언제든 주세요.',
-      imageUrls: [],
-    },
-  ],
-  'mock-thread-3': [
-    {
-      id: 'mock-msg-5',
-      senderType: 'USER',
-      createdAt: '2026-02-10T08:00:00.000Z',
-      content: '이전에 문의드린 건 해결되었습니다.',
-      imageUrls: [],
-    },
-    {
-      id: 'mock-msg-6',
-      senderType: 'ADMIN',
-      createdAt: '2026-02-15T07:00:00.000Z',
-      content: '도움이 되었다니 다행입니다. 감사합니다.',
-      imageUrls: [],
-    },
-    {
-      id: 'mock-msg-6b',
-      senderType: 'USER',
-      createdAt: '2026-02-15T07:00:30.000Z',
-      content: '감사합니다.',
-      imageUrls: [],
-    },
-  ],
-};
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 function localDateKey(iso: string): string {
   const d = new Date(iso);
@@ -146,44 +61,30 @@ const inquiryThreadShellLayout = clsx(
 
 export default function InquiryThreadPageClient({
   inquiryThreadId,
+  initialMessages,
 }: {
   inquiryThreadId: string;
+  initialMessages: InquiryMessageDto[];
 }) {
-  const [messages, setMessages] = useState<InquiryMessageDto[]>([]);
   const [draft, setDraft] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
+  const isDraftEmpty = useMemo(() => draft.trim() === '', [draft]);
+
+  const {
+    data: { messages },
+  } = useQuery({
+    queryKey: inquiryKeys.messages(inquiryThreadId),
+    queryFn: () =>
+      InquiryClientRepository.getMyInquiryMessagesByThreadId(inquiryThreadId),
+    initialData: { messages: initialMessages },
+  });
+
   useEffect(() => {
-    const raw = MOCK_MESSAGES_BY_THREAD[inquiryThreadId] ?? [];
-    setMessages(
-      [...raw].sort(
-        (a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      )
-    );
     setDraft('');
   }, [inquiryThreadId]);
 
-  const sendMessage = useCallback(() => {
-    const text = draft.trim();
-    if (text === '') return;
-
-    const next: InquiryMessageDto = {
-      id: `local-${Date.now()}`,
-      senderType: 'USER',
-      createdAt: new Date().toISOString(),
-      content: text,
-      imageUrls: [],
-    };
-    setMessages(prev => [...prev, next]);
-    setDraft('');
-    requestAnimationFrame(() => {
-      const el = textareaRef.current;
-      if (el) {
-        el.style.height = 'auto';
-      }
-    });
-  }, [draft]);
+  const sendMessage = () => {};
 
   return (
     <>
@@ -284,13 +185,13 @@ export default function InquiryThreadPageClient({
                 type='button'
                 onMouseDown={e => e.preventDefault()}
                 onClick={sendMessage}
-                disabled={draft.trim() === ''}
+                disabled={isDraftEmpty}
                 className={clsx(
                   'shrink-0 text-sm font-medium text-white px-4 rounded-full',
                   'h-9 flex items-center justify-center bg-blue-600',
-                  draft.trim() !== ''
-                    ? 'hover:bg-blue-500 cursor-pointer'
-                    : 'opacity-50'
+                  isDraftEmpty
+                    ? 'opacity-50'
+                    : 'hover:bg-blue-500 cursor-pointer'
                 )}
               >
                 보내기

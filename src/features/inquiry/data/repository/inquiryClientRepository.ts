@@ -1,3 +1,4 @@
+import type { InquiryMessageDto } from '@/features/inquiry/data/dto/inquiryMessageDto';
 import type { InquiryThreadsPage } from '@/features/inquiry/data/dto/inquiryThreadDto';
 import type { InquiryCursor } from '@/features/inquiry/domain/types/page';
 import { api } from '@/lib/api';
@@ -29,5 +30,12 @@ export async function createInquiry(
     content,
     ...(images !== undefined && { images }),
   });
+  return response.data;
+}
+
+export async function getMyInquiryMessagesByThreadId(
+  threadId: string
+): Promise<{ messages: InquiryMessageDto[] }> {
+  const response = await api.get(`/api/inquiries/${threadId}/messages`);
   return response.data;
 }
