@@ -82,13 +82,17 @@ export default function ContactPageClient({
     >
       <div className='flex flex-col pt-8 pb-20'>
         <div className='flex justify-end mb-8'>
-          <button
-            type='button'
-            className='flex shrink-0 items-center justify-center gap-2 self-start px-6 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-700 transition-colors font-medium sm:self-auto'
+          <Link
+            href='/contact/new'
+            className={clsx(
+              'flex shrink-0 items-center justify-center gap-2 self-start sm:self-auto',
+              'px-6 py-3 rounded-xl text-gray-600 hover:text-gray-700 font-medium',
+              'bg-gray-100 hover:bg-gray-200 transition-colors'
+            )}
           >
             <MessageSquarePlus className='w-5 h-5' strokeWidth={2} />
             문의하기
-          </button>
+          </Link>
         </div>
 
         <section aria-labelledby='inquiry-history-heading'>
