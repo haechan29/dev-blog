@@ -1,9 +1,10 @@
 'use client';
 
-import type { InquiryThreadDto } from '@/features/inquiry/data/dto/inquiryThreadDto';
 import * as InquiryClientRepository from '@/features/inquiry/data/repository/inquiryClientRepository';
-import type { InquiryThreadStatus } from '@/features/inquiry/domain/types/inquiryThreadStatus';
-import type { InquiryCursor } from '@/features/inquiry/domain/types/page';
+import { InquiryThreadStatus } from '@/features/inquiry/domain/types/inquiryThreadStatus';
+import { InquiryCursor } from '@/features/inquiry/domain/types/page';
+import { toDto } from '@/features/inquiry/ui/mapper/inquiryThreadMapper';
+import { InquiryThreadProps } from '@/features/inquiry/ui/model/inquiryThreadProps';
 import { formatDate } from '@/features/post/domain/lib/date';
 import { inquiryKeys } from '@/queries/keys';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -30,19 +31,11 @@ function statusIcon(status: InquiryThreadStatus) {
   }
 }
 
-function firstLineText(thread: InquiryThreadDto) {
-  return thread.firstMessagePreview ?? '(문의 내용 없음)';
-}
-
-function secondLineText(thread: InquiryThreadDto) {
-  return thread.lastMessagePreview ?? '아직 답변이 없습니다.';
-}
-
 export default function ContactPageClient({
   initialThreads,
   initialCursor,
 }: {
-  initialThreads: InquiryThreadDto[];
+  initialThreads: InquiryThreadProps[];
   initialCursor: InquiryCursor | null;
 }) {
   const { ref, inView } = useInView();
@@ -55,7 +48,14 @@ export default function ContactPageClient({
   } = useInfiniteQuery({
     queryKey: inquiryKeys.threads(),
     queryFn: ({ pageParam }) =>
-      InquiryClientRepository.getMyInquiryThreads({ cursor: pageParam }),
+      InquiryClientRepository.getMyInquiryThreads({ cursor: pageParam }).then(
+        page => {
+          return {
+            ...page,
+            threads: page.threads.map(toDto),
+          };
+        }
+      ),
     initialPageParam: null as InquiryCursor | null,
     getNextPageParam: lastPage => lastPage.nextCursor,
     initialData: {
@@ -125,14 +125,14 @@ export default function ContactPageClient({
                     <div className='flex-1 min-w-0'>
                       <div className='flex items-baseline justify-between gap-3'>
                         <p className='text-[15px] font-semibold text-gray-900 leading-snug line-clamp-1'>
-                          {firstLineText(thread)}
+                          {thread.firstLineText}
                         </p>
                         <span className='shrink-0 text-xs text-gray-500'>
                           {formatDate(thread.updatedAt)}
                         </span>
                       </div>
                       <p className='mt-1 text-sm text-gray-600 leading-snug line-clamp-2'>
-                        {secondLineText(thread)}
+                        {thread.secondLineText}
                       </p>
                     </div>
                   </Link>

@@ -1,5 +1,6 @@
 import ContactPageClient from '@/components/contact/contactPageClient';
 import * as InquiryServerRepository from '@/features/inquiry/data/repository/inquiryServerRepository';
+import { toDto } from '@/features/inquiry/ui/mapper/inquiryThreadMapper';
 import { getUserId } from '@/lib/user';
 
 export default async function ContactPage() {
@@ -9,6 +10,11 @@ export default async function ContactPage() {
     userId,
     cursorUpdatedAt: null,
     cursorId: null,
+  }).then(page => {
+    return {
+      ...page,
+      threads: page.threads.map(toDto),
+    };
   });
 
   return (

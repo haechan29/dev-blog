@@ -15,12 +15,12 @@ function localDateKey(iso: string): string {
   ].join('-');
 }
 
-function formatDateDivider(iso: string): string {
+function formatDate(iso: string): string {
   const d = new Date(iso);
   return `${d.getMonth() + 1}월 ${d.getDate()}일`;
 }
 
-function formatTimeHm(iso: string): string {
+function formatTime(iso: string): string {
   const d = new Date(iso);
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
@@ -140,7 +140,7 @@ export default function InquiryThreadContainer({
                         )}
                       >
                         <span className='text-[11px] font-medium text-gray-400 tracking-wide'>
-                          {formatDateDivider(msg.createdAt)}
+                          {formatDate(msg.createdAt)}
                         </span>
                       </div>
                     )}
@@ -148,7 +148,7 @@ export default function InquiryThreadContainer({
                     <MessageRow
                       content={msg.content}
                       showTime={showTime}
-                      timeLabel={formatTimeHm(msg.createdAt)}
+                      timeLabel={formatTime(msg.createdAt)}
                       isUser={isUser}
                     />
                   </li>
