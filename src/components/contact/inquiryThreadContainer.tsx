@@ -173,6 +173,7 @@ export default function InquiryThreadContainer({
                   target.style.height = `${target.scrollHeight}px`;
                 }}
                 onKeyDown={e => {
+                  if (e.nativeEvent.isComposing) return;
                   if (e.key !== 'Enter' || e.shiftKey) return;
                   e.preventDefault();
                   sendMessage();
