@@ -15,6 +15,7 @@ export default function InquiryThreadPageClient({
   initialMessages: InquiryMessageDto[];
 }) {
   const [draft, setDraft] = useState('');
+  const [images] = useState<string[]>([]);
 
   const {
     data: { messages },
@@ -25,7 +26,7 @@ export default function InquiryThreadPageClient({
     initialData: { messages: initialMessages },
   });
 
-  const sendMessage = async () => {};
+  const sendMessage = () => {};
 
   useEffect(() => {
     setDraft('');
@@ -34,6 +35,7 @@ export default function InquiryThreadPageClient({
   return (
     <InquiryThreadContainer
       draft={draft}
+      images={images}
       messages={messages}
       onDraftChange={setDraft}
       onSend={sendMessage}

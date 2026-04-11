@@ -2,7 +2,7 @@
 
 import type { InquiryMessageDto } from '@/features/inquiry/data/dto/inquiryMessageDto';
 import clsx from 'clsx';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useMemo, useRef } from 'react';
 
@@ -57,31 +57,38 @@ const inquiryThreadShellLayout = clsx(
 
 export default function InquiryThreadContainer({
   draft,
+  images,
   messages,
   onDraftChange,
   onSend,
   autoFocus = false,
+  isSending = false,
 }: {
   draft: string;
+  images: string[];
   messages: InquiryMessageDto[];
   onDraftChange: (draft: string) => void;
-  onSend: () => Promise<void> | void;
+  onSend: () => void;
   autoFocus?: boolean;
+  isSending?: boolean;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
-  const isDraftEmpty = useMemo(() => draft.trim() === '', [draft]);
+  const isInputValid = useMemo(
+    () => draft.trim().length > 0 || images.length > 0,
+    [draft, images]
+  );
+
+  const canSend = isInputValid && !isSending;
 
   useEffect(() => {
     if (!autoFocus) return;
     textareaRef.current?.focus();
   }, [autoFocus]);
 
-  const sendMessage = async () => {
-    const trimmed = draft.trim();
-    if (!trimmed) return;
-
-    await onSend();
+  const sendMessage = () => {
+    if (!canSend) return;
+    onSend();
   };
 
   return (
@@ -168,7 +175,7 @@ export default function InquiryThreadContainer({
                 onKeyDown={e => {
                   if (e.key !== 'Enter' || e.shiftKey) return;
                   e.preventDefault();
-                  void sendMessage();
+                  sendMessage();
                 }}
                 placeholder='메시지를 입력하세요'
                 rows={1}
@@ -176,23 +183,26 @@ export default function InquiryThreadContainer({
                 className={clsx(
                   'max-h-52 flex-1 min-w-0 overflow-y-auto p-3 outline-none resize-none border rounded-lg scrollbar-hide',
                   'border-gray-200 hover:border-blue-500 focus:border-blue-500',
-                  !draft && 'bg-gray-50'
+                  !isInputValid && 'bg-gray-50'
                 )}
               />
               <button
                 type='button'
                 onMouseDown={e => e.preventDefault()}
-                onClick={() => void sendMessage()}
-                disabled={isDraftEmpty}
+                onClick={sendMessage}
+                disabled={!canSend}
+                aria-label={'문의 보내기'}
                 className={clsx(
                   'shrink-0 text-sm font-medium text-white px-4 rounded-full',
                   'h-9 flex items-center justify-center bg-blue-600',
-                  isDraftEmpty
-                    ? 'opacity-50'
-                    : 'hover:bg-blue-500 cursor-pointer'
+                  canSend ? 'hover:bg-blue-500 cursor-pointer' : 'opacity-50'
                 )}
               >
-                보내기
+                {isSending ? (
+                  <Loader2 size={16} className='animate-spin' aria-hidden />
+                ) : (
+                  '보내기'
+                )}
               </button>
             </div>
           </div>

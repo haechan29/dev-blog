@@ -22,13 +22,13 @@ export async function getMyInquiryThreads({
   return response.data;
 }
 
-export async function createInquiry(
+export async function createInquiryThread(
   content: string,
   images?: string[]
 ): Promise<{ threadId: string }> {
   const response = await api.post(`/api/inquiries`, {
     content,
-    ...(images !== undefined && { images }),
+    images,
   });
   return response.data;
 }

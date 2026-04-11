@@ -31,7 +31,7 @@ export default function InquiryDialog({
 
     setIsPending(true);
     try {
-      await InquiryClientRepository.createInquiry(content);
+      await InquiryClientRepository.createInquiryThread(content);
       toast.success('문의가 접수되었습니다');
       setContent('');
       setIsOpen(false);
