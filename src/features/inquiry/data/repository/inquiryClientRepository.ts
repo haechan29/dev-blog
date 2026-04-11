@@ -33,6 +33,18 @@ export async function createInquiryThread(
   return response.data;
 }
 
+export async function createInquiryMessage(
+  threadId: string,
+  content: string,
+  images?: string[]
+): Promise<{ messageId: string }> {
+  const response = await api.post(`/api/inquiries/${threadId}/messages`, {
+    content,
+    images,
+  });
+  return response.data;
+}
+
 export async function getMyInquiryMessagesByThreadId(
   threadId: string
 ): Promise<{ messages: InquiryMessageDto[] }> {
