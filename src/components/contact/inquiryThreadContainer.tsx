@@ -1,5 +1,6 @@
 'use client';
 
+import InquiryImageDialog from '@/components/contact/inquiryImageDialog';
 import { INQUIRY_MAX_IMAGES } from '@/features/inquiry/constants/inquiry';
 import type { InquiryImageProps } from '@/features/inquiry/ui/model/inquiryImageProps';
 import { InquiryMessageProps } from '@/features/inquiry/ui/model/inquiryMessageProps';
@@ -47,6 +48,10 @@ export default function InquiryThreadContainer({
   const [messageInputHeightPx, setMessageInputHeightPx] = useState(
     MESSAGE_INPUT_HEIGHT_PX_MIN
   );
+  const [imagePreview, setImagePreview] = useState<{
+    src: string;
+    alt: string;
+  } | null>(null);
 
   const isTouch = useMediaQuery(TOUCH_QUERY);
 
@@ -88,6 +93,14 @@ export default function InquiryThreadContainer({
     if (!autoFocus) return;
     textareaRef.current?.focus();
   }, [autoFocus]);
+
+  useEffect(() => {
+    if (!imagePreview) return;
+    const stillAttached = images.some(
+      img => img.status === 'ready' && img.url === imagePreview.src
+    );
+    if (!stillAttached) setImagePreview(null);
+  }, [images, imagePreview]);
 
   const sendMessage = () => {
     if (!canSend) return;
@@ -154,7 +167,7 @@ export default function InquiryThreadContainer({
 
       <div
         ref={messageInputRef}
-        className='fixed inset-x-0 bottom-0 z-100 border-t border-gray-200 bg-white'
+        className='fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white'
       >
         <div
           className={clsx(
@@ -199,13 +212,25 @@ export default function InquiryThreadContainer({
                       className='group relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50'
                     >
                       {img.status === 'ready' ? (
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        <img
-                          src={img.url}
-                          alt={`첨부된 이미지 ${index + 1}`}
-                          className='h-full w-full object-cover'
-                          draggable={false}
-                        />
+                        <button
+                          type='button'
+                          aria-label={`첨부 이미지 ${index + 1} 크게 보기`}
+                          className='block h-full w-full cursor-zoom-in border-0 bg-transparent p-0'
+                          onClick={() =>
+                            setImagePreview({
+                              src: img.url,
+                              alt: `첨부된 이미지 ${index + 1}`,
+                            })
+                          }
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={img.url}
+                            alt={`첨부된 이미지 ${index + 1}`}
+                            className='pointer-events-none h-full w-full object-cover'
+                            draggable={false}
+                          />
+                        </button>
                       ) : (
                         <>
                           {/* eslint-disable-next-line @next/next/no-img-element*/}
@@ -237,7 +262,10 @@ export default function InquiryThreadContainer({
                         type='button'
                         aria-label='첨부 이미지 제거'
                         onMouseDown={e => e.preventDefault()}
-                        onClick={() => onImageRemove(img)}
+                        onClick={e => {
+                          e.stopPropagation();
+                          onImageRemove(img);
+                        }}
                         className={clsx(
                           'h-5 w-5 absolute top-0.5 right-0.5 z-10',
                           'flex items-center justify-center',
@@ -300,6 +328,11 @@ export default function InquiryThreadContainer({
           </div>
         </div>
       </div>
+
+      <InquiryImageDialog
+        imagePreview={imagePreview}
+        setImagePreview={setImagePreview}
+      />
     </>
   );
 }
