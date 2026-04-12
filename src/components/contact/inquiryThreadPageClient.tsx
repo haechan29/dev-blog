@@ -5,13 +5,18 @@ import { ApiError } from '@/errors/errors';
 import { INQUIRY_MAX_IMAGES } from '@/features/inquiry/constants/inquiry';
 import * as InquiryClientRepository from '@/features/inquiry/data/repository/inquiryClientRepository';
 import { toPropsList } from '@/features/inquiry/ui/lib';
+import type {
+  InquiryImageProps,
+  InquiryReadyImageProps,
+  InquiryUploadingImageProps,
+} from '@/features/inquiry/ui/model/inquiryImageProps';
 import { InquiryMessageProps } from '@/features/inquiry/ui/model/inquiryMessageProps';
-import type { InquiryImageDto } from '@/features/media/data/dto/inquiryImageDto';
 import * as MediaClientRepository from '@/features/media/data/repository/mediaClientRepository';
 import { inquiryKeys } from '@/queries/keys';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import imageCompression from 'browser-image-compression';
-import { useEffect, useState } from 'react';
+import { nanoid } from 'nanoid';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
 export default function InquiryThreadPageClient({
@@ -23,7 +28,9 @@ export default function InquiryThreadPageClient({
 }) {
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState('');
-  const [images, setImages] = useState<InquiryImageDto[]>([]);
+  const [images, setImages] = useState<InquiryImageProps[]>([]);
+  const imagesRef = useRef<InquiryImageProps[]>([]);
+  imagesRef.current = images;
 
   const {
     data: { messages },
@@ -66,12 +73,30 @@ export default function InquiryThreadPageClient({
   const handleSend = () => {
     sendMutation.mutate({
       content: draft,
-      images: images.map(({ id }) => id),
+      images: images
+        .filter((img): img is InquiryReadyImageProps => img.status === 'ready')
+        .slice(0, INQUIRY_MAX_IMAGES)
+        .map(({ id }) => id),
     });
   };
 
-  const handleImageFilesPicked = async (files: File[]) => {
-    for (const file of files) {
+  const handleImageFilesPicked = useCallback(async (files: File[]) => {
+    const images = imagesRef.current;
+    const left = INQUIRY_MAX_IMAGES - images.length;
+    if (left === 0) return;
+
+    const uploadingImages: InquiryUploadingImageProps[] = files
+      .slice(0, left)
+      .map(file => ({
+        status: 'uploading' as const,
+        file,
+        clientId: nanoid(),
+        previewUrl: URL.createObjectURL(file),
+      }));
+
+    setImages(prev => [...prev, ...uploadingImages]);
+
+    for (const { file, clientId, previewUrl } of uploadingImages) {
       try {
         const shouldSkipCompression =
           file.size < 1024 * 1024 || file.type === 'image/gif';
@@ -84,25 +109,49 @@ export default function InquiryThreadPageClient({
               maxWidthOrHeight: 1920,
             });
 
-        const dto = await MediaClientRepository.uploadInquiryImage(compressed);
-        setImages(prev => {
-          if (prev.length >= INQUIRY_MAX_IMAGES) return prev;
-          return [...prev, dto];
-        });
-      } catch (error) {
-        const message =
-          error instanceof ApiError
-            ? error.message
-            : '이미지를 올리지 못했습니다';
-        toast.error(message);
+        const { id, url } =
+          await MediaClientRepository.uploadInquiryImage(compressed);
+        URL.revokeObjectURL(previewUrl);
+        setImages(prev =>
+          prev.map(img =>
+            img.status !== 'ready' && img.clientId === clientId
+              ? { status: 'ready' as const, id, url }
+              : img
+          )
+        );
+      } catch {
+        setImages(prev =>
+          prev.map(img =>
+            img.status === 'uploading' && img.clientId === clientId
+              ? { status: 'error' as const, clientId, previewUrl }
+              : img
+          )
+        );
       }
     }
-  };
+  }, []);
 
   useEffect(() => {
     setDraft('');
-    setImages([]);
+    setImages(prev => {
+      prev.forEach(img => {
+        if (img.status !== 'ready') {
+          URL.revokeObjectURL(img.previewUrl);
+        }
+      });
+      return [];
+    });
   }, [inquiryThreadId]);
+
+  useEffect(() => {
+    return () => {
+      imagesRef.current.forEach(img => {
+        if (img.status !== 'ready') {
+          URL.revokeObjectURL(img.previewUrl);
+        }
+      });
+    };
+  }, []);
 
   return (
     <InquiryThreadContainer

@@ -1,12 +1,12 @@
 'use client';
 
 import { INQUIRY_MAX_IMAGES } from '@/features/inquiry/constants/inquiry';
+import type { InquiryImageProps } from '@/features/inquiry/ui/model/inquiryImageProps';
 import { InquiryMessageProps } from '@/features/inquiry/ui/model/inquiryMessageProps';
-import type { InquiryImageDto } from '@/features/media/data/dto/inquiryImageDto';
 import { canTouch } from '@/lib/browser';
 import { createRipple } from '@/lib/dom';
 import clsx from 'clsx';
-import { ImageIcon, Loader2 } from 'lucide-react';
+import { AlertCircle, ImageIcon, Loader2 } from 'lucide-react';
 import {
   ChangeEvent,
   useEffect,
@@ -29,7 +29,7 @@ export default function InquiryThreadContainer({
   isSending = false,
 }: {
   draft: string;
-  images: InquiryImageDto[];
+  images: InquiryImageProps[];
   messages: InquiryMessageProps[];
   onDraftChange: (draft: string) => void;
   onImageFilesPicked: (files: File[]) => void;
@@ -45,12 +45,23 @@ export default function InquiryThreadContainer({
     MESSAGE_INPUT_HEIGHT_PX_MIN
   );
 
-  const isInputValid = useMemo(
-    () => draft.trim().length > 0 || images.length > 0,
-    [draft, images]
+  const hasReadyImage = useMemo(
+    () => images.some(img => img.status === 'ready'),
+    [images]
   );
 
-  const canSend = isInputValid && !isSending;
+  const hasBlockingImage = useMemo(
+    () =>
+      images.some(img => img.status === 'uploading' || img.status === 'error'),
+    [images]
+  );
+
+  const isInputValid = useMemo(
+    () => draft.trim().length > 0 || hasReadyImage,
+    [draft, hasReadyImage]
+  );
+
+  const canSend = isInputValid && !hasBlockingImage && !isSending;
   const canAddMoreImages = images.length < INQUIRY_MAX_IMAGES;
 
   useLayoutEffect(() => {
@@ -179,16 +190,44 @@ export default function InquiryThreadContainer({
                 <div className='flex gap-2 overflow-x-auto scrollbar-hide'>
                   {images.map((img, index) => (
                     <div
-                      key={img.id}
-                      className='h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50'
+                      key={img.status === 'ready' ? img.id : img.clientId}
+                      className='relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50'
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element*/}
-                      <img
-                        src={img.url}
-                        alt={`첨부된 이미지 ${index + 1}`}
-                        className='h-full w-full object-cover'
-                        draggable={false}
-                      />
+                      {img.status === 'ready' ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={img.url}
+                          alt={`첨부된 이미지 ${index + 1}`}
+                          className='h-full w-full object-cover'
+                          draggable={false}
+                        />
+                      ) : (
+                        <>
+                          {/* eslint-disable-next-line @next/next/no-img-element*/}
+                          <img
+                            src={img.previewUrl}
+                            alt={`첨부된 이미지 ${index + 1}`}
+                            className='h-full w-full object-cover opacity-60 blur-[1px]'
+                            draggable={false}
+                            aria-busy={img.status === 'uploading'}
+                          />
+                          <div className='absolute inset-0 flex items-center justify-center bg-black/25'>
+                            {img.status === 'uploading' ? (
+                              <Loader2
+                                size={22}
+                                className='animate-spin text-white'
+                                aria-hidden
+                              />
+                            ) : (
+                              <AlertCircle
+                                size={22}
+                                className='text-white'
+                                aria-hidden
+                              />
+                            )}
+                          </div>
+                        </>
+                      )}
                     </div>
                   ))}
                 </div>
