@@ -5,6 +5,22 @@ import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useMemo, useRef } from 'react';
 
+const THREAD_PROMPT_MESSAGE_ID = 'THREAD_PROMPT_MESSAGE_ID';
+const THREAD_PROMPT_MESSAGE_CONTENT =
+  '문의를 보내 주시면, 확인 후 답변드릴게요.';
+
+const INQUIRY_COMPOSER_BOTTOM_PADDING = 'pb-[calc(1px+2rem+13rem)]';
+
+function buildThreadPromptMessage(anchorIso: string): InquiryMessageDto {
+  return {
+    id: THREAD_PROMPT_MESSAGE_ID,
+    senderType: 'ADMIN',
+    createdAt: anchorIso,
+    content: THREAD_PROMPT_MESSAGE_CONTENT,
+    imageUrls: [],
+  };
+}
+
 function localDateKey(iso: string): string {
   const d = new Date(iso);
   return [
@@ -46,8 +62,6 @@ function showTimeForMessage(
   return !isSameTimeGroup(messages[index], next);
 }
 
-const INQUIRY_COMPOSER_BOTTOM_PADDING = 'pb-[calc(1px+2rem+13rem)]';
-
 export default function InquiryThreadContainer({
   draft,
   images,
@@ -74,6 +88,16 @@ export default function InquiryThreadContainer({
 
   const canSend = isInputValid && !isSending;
 
+  const displayMessages = useMemo(() => {
+    const threadPromptMessageCreatedAt = messages[0]
+      ? new Date(messages[0].createdAt).toISOString()
+      : new Date().toISOString();
+    return [
+      buildThreadPromptMessage(threadPromptMessageCreatedAt),
+      ...messages,
+    ];
+  }, [messages]);
+
   useEffect(() => {
     if (!autoFocus) return;
     textareaRef.current?.focus();
@@ -96,46 +120,40 @@ export default function InquiryThreadContainer({
           <div className='text-lg font-semibold min-w-0'>문의 상세</div>
         </div>
 
-        {messages.length === 0 ? (
-          <div className='text-center py-20 text-gray-500'>
-            문의 내용을 입력해 주세요.
-          </div>
-        ) : (
-          <ul className='flex flex-col gap-3 list-none p-0 m-0' role='list'>
-            {messages.map((msg, index) => {
-              const showDate =
-                index === 0 ||
-                localDateKey(msg.createdAt) !==
-                  localDateKey(messages[index - 1].createdAt);
-              const showTime = showTimeForMessage(messages, index);
-              const isUser = msg.senderType === 'USER';
+        <ul className='flex flex-col gap-3 list-none p-0 m-0' role='list'>
+          {displayMessages.map((msg, index) => {
+            const showDate =
+              index === 0 ||
+              localDateKey(msg.createdAt) !==
+                localDateKey(displayMessages[index - 1].createdAt);
+            const showTime = showTimeForMessage(displayMessages, index);
+            const isUser = msg.senderType === 'USER';
 
-              return (
-                <li key={msg.id} className='w-full'>
-                  {showDate && (
-                    <div
-                      className={clsx(
-                        'flex justify-center my-5',
-                        index === 0 && 'mt-0'
-                      )}
-                    >
-                      <span className='text-[11px] font-medium text-gray-400 tracking-wide'>
-                        {formatDate(msg.createdAt)}
-                      </span>
-                    </div>
-                  )}
+            return (
+              <li key={msg.id} className='w-full'>
+                {showDate && (
+                  <div
+                    className={clsx(
+                      'flex justify-center my-5',
+                      index === 0 && 'mt-0'
+                    )}
+                  >
+                    <span className='text-[11px] font-medium text-gray-400 tracking-wide'>
+                      {formatDate(msg.createdAt)}
+                    </span>
+                  </div>
+                )}
 
-                  <InquiryMessage
-                    content={msg.content}
-                    showTime={showTime}
-                    timeLabel={formatTime(msg.createdAt)}
-                    isUser={isUser}
-                  />
-                </li>
-              );
-            })}
-          </ul>
-        )}
+                <InquiryMessage
+                  content={msg.content}
+                  showTime={showTime}
+                  timeLabel={formatTime(msg.createdAt)}
+                  isUser={isUser}
+                />
+              </li>
+            );
+          })}
+        </ul>
       </div>
 
       <div className='fixed inset-x-0 bottom-0 z-100 border-t border-gray-200 bg-white'>
@@ -218,33 +236,37 @@ function InquiryMessage({
     </div>
   );
 
-  const timeEl = showTime === true && (
-    <span className='shrink-0 text-[11px] tabular-nums leading-none text-gray-400 pb-px'>
-      {timeLabel}
-    </span>
+  const timeEl = showTime && (
+    <span className='shrink-0 text-xs text-gray-400 pb-px'>{timeLabel}</span>
   );
 
   return (
-    <div
-      className={clsx('flex w-full', isUser ? 'justify-end' : 'justify-start')}
-    >
+    <div className='flex flex-col gap-1'>
+      {!isUser && <div className='text-sm ml-1'>관리자</div>}
       <div
         className={clsx(
-          'flex max-w-[min(100%,85%)] flex-row items-end gap-2',
+          'flex w-full',
           isUser ? 'justify-end' : 'justify-start'
         )}
       >
-        {isUser ? (
-          <>
-            {timeEl}
-            {bubble}
-          </>
-        ) : (
-          <>
-            {bubble}
-            {timeEl}
-          </>
-        )}
+        <div
+          className={clsx(
+            'flex max-w-[min(100%,85%)] items-end gap-2',
+            isUser ? 'justify-end' : 'justify-start'
+          )}
+        >
+          {isUser ? (
+            <>
+              {timeEl}
+              {bubble}
+            </>
+          ) : (
+            <>
+              {bubble}
+              {timeEl}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
