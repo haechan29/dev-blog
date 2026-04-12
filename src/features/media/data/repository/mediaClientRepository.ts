@@ -1,3 +1,4 @@
+import { InquiryImageDto } from '@/features/media/data/dto/inquiryImageDto';
 import { api } from '@/lib/api';
 
 export async function uploadPostImage(file: File): Promise<string> {
@@ -8,9 +9,7 @@ export async function uploadPostImage(file: File): Promise<string> {
   return response.data;
 }
 
-export async function uploadInquiryImage(
-  file: File
-): Promise<{ id: string; url: string }> {
+export async function uploadInquiryImage(file: File): Promise<InquiryImageDto> {
   const formData = new FormData();
   formData.append('file', file);
 

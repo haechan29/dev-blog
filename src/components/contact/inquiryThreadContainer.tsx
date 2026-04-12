@@ -1,30 +1,49 @@
 'use client';
 
+import { INQUIRY_MAX_IMAGES } from '@/features/inquiry/constants/inquiry';
 import { InquiryMessageProps } from '@/features/inquiry/ui/model/inquiryMessageProps';
+import type { InquiryImageDto } from '@/features/media/data/dto/inquiryImageDto';
+import { canTouch } from '@/lib/browser';
+import { createRipple } from '@/lib/dom';
 import clsx from 'clsx';
-import { Loader2 } from 'lucide-react';
-import { useEffect, useMemo, useRef } from 'react';
+import { ImageIcon, Loader2 } from 'lucide-react';
+import {
+  ChangeEvent,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
-const INQUIRY_COMPOSER_BOTTOM_PADDING = 'pb-[calc(1px+2rem+13rem)]';
+const MESSAGE_INPUT_HEIGHT_PX_MIN = 120;
 
 export default function InquiryThreadContainer({
   draft,
   images,
   messages,
   onDraftChange,
+  onImageFilesPicked,
   onSend,
   autoFocus = false,
   isSending = false,
 }: {
   draft: string;
-  images: string[];
+  images: InquiryImageDto[];
   messages: InquiryMessageProps[];
   onDraftChange: (draft: string) => void;
+  onImageFilesPicked: (files: File[]) => void;
   onSend: () => void;
   autoFocus?: boolean;
   isSending?: boolean;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const messageInputRef = useRef<HTMLDivElement | null>(null);
+
+  const [messageInputHeightPx, setMessageInputHeightPx] = useState(
+    MESSAGE_INPUT_HEIGHT_PX_MIN
+  );
 
   const isInputValid = useMemo(
     () => draft.trim().length > 0 || images.length > 0,
@@ -32,6 +51,22 @@ export default function InquiryThreadContainer({
   );
 
   const canSend = isInputValid && !isSending;
+  const canAddMoreImages = images.length < INQUIRY_MAX_IMAGES;
+
+  useLayoutEffect(() => {
+    const el = messageInputRef.current;
+    if (!el) return;
+
+    const apply = () => {
+      const h = Math.ceil(el.getBoundingClientRect().height);
+      setMessageInputHeightPx(Math.max(h, MESSAGE_INPUT_HEIGHT_PX_MIN));
+    };
+
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!autoFocus) return;
@@ -43,9 +78,35 @@ export default function InquiryThreadContainer({
     onSend();
   };
 
+  const handleFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const picked = e.target.files;
+    if (!picked?.length || !canAddMoreImages) {
+      e.target.value = '';
+      return;
+    }
+
+    const left = INQUIRY_MAX_IMAGES - images.length;
+    const files = Array.from(picked).slice(0, left);
+    if (files.length) onImageFilesPicked(files);
+
+    e.target.value = '';
+  };
+
   return (
     <>
-      <div className={clsx('pt-4', INQUIRY_COMPOSER_BOTTOM_PADDING)}>
+      <input
+        ref={fileInputRef}
+        type='file'
+        accept='image/*'
+        multiple
+        className='hidden'
+        onChange={handleFileInputChange}
+      />
+
+      <div
+        className={clsx('pt-4', 'pb-(--message-input-height)')}
+        style={{ '--message-input-height': `${messageInputHeightPx}px` }}
+      >
         <ul className='flex flex-col gap-3 list-none p-0 m-0' role='list'>
           {messages.map((msg, index) => {
             return (
@@ -75,7 +136,10 @@ export default function InquiryThreadContainer({
         </ul>
       </div>
 
-      <div className='fixed inset-x-0 bottom-0 z-100 border-t border-gray-200 bg-white'>
+      <div
+        ref={messageInputRef}
+        className='fixed inset-x-0 bottom-0 z-100 border-t border-gray-200 bg-white'
+      >
         <div
           className={clsx(
             'px-6 md:px-12 xl:px-18',
@@ -84,30 +148,76 @@ export default function InquiryThreadContainer({
           )}
         >
           <div className='flex gap-3 items-end py-4'>
-            <textarea
-              ref={textareaRef}
-              value={draft}
-              onChange={e => onDraftChange(e.target.value)}
-              onInput={e => {
-                const target = e.target as HTMLTextAreaElement;
-                target.style.height = 'auto';
-                target.style.height = `${target.scrollHeight}px`;
+            <button
+              type='button'
+              onMouseDown={e => e.preventDefault()}
+              onClick={e => {
+                if (canTouch) createRipple(e);
+
+                if (!canAddMoreImages) return;
+                fileInputRef.current?.click();
               }}
-              onKeyDown={e => {
-                if (e.nativeEvent.isComposing) return;
-                if (e.key !== 'Enter' || e.shiftKey) return;
-                e.preventDefault();
-                sendMessage();
-              }}
-              placeholder='메시지를 입력하세요'
-              rows={1}
-              aria-label='문의 메시지 입력'
+              disabled={!canAddMoreImages}
+              aria-label='이미지 추가'
               className={clsx(
-                'max-h-52 flex-1 min-w-0 overflow-y-auto p-3 outline-none resize-none border rounded-lg scrollbar-hide',
-                'border-gray-200 hover:border-blue-500 focus:border-blue-500',
+                'shrink-0 flex h-11 w-11 -m-1 -ml-3 p-1 items-center justify-center rounded-full',
+                'text-gray-600 hover:text-gray-500 hover:bg-gray-100 cursor-pointer',
+                'disabled:pointer-events-none disabled:opacity-50'
+              )}
+            >
+              <ImageIcon size={20} aria-hidden />
+            </button>
+
+            <div
+              className={clsx(
+                'flex flex-col gap-3 flex-1 min-w-0 p-3',
+                'rounded-lg border border-gray-200 hover:border-blue-500 focus-within:border-blue-500',
                 !isInputValid && 'bg-gray-50'
               )}
-            />
+            >
+              {images.length > 0 && (
+                <div className='flex gap-2 overflow-x-auto scrollbar-hide'>
+                  {images.map((img, index) => (
+                    <div
+                      key={img.id}
+                      className='h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50'
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element*/}
+                      <img
+                        src={img.url}
+                        alt={`첨부된 이미지 ${index + 1}`}
+                        className='h-full w-full object-cover'
+                        draggable={false}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <textarea
+                ref={textareaRef}
+                value={draft}
+                onChange={e => onDraftChange(e.target.value)}
+                onInput={e => {
+                  const target = e.target as HTMLTextAreaElement;
+                  target.style.height = 'auto';
+                  target.style.height = `${target.scrollHeight}px`;
+                }}
+                onKeyDown={e => {
+                  if (e.nativeEvent.isComposing) return;
+                  if (e.key !== 'Enter' || e.shiftKey) return;
+                  e.preventDefault();
+                  sendMessage();
+                }}
+                placeholder='메시지를 입력하세요'
+                rows={1}
+                aria-label='문의 메시지 입력'
+                className={clsx(
+                  'max-h-52 flex-1 min-w-0 overflow-y-auto outline-none resize-none scrollbar-hide'
+                )}
+              />
+            </div>
+
             <button
               type='button'
               onMouseDown={e => e.preventDefault()}
