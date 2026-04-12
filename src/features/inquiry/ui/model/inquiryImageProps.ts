@@ -1,5 +1,6 @@
 export interface InquiryReadyImageProps {
   status: 'ready';
+  clientId: string;
   id: string;
   url: string;
 }

@@ -56,6 +56,13 @@ export default function NewInquiryThreadPageClient() {
     });
   };
 
+  const handleImageRemove = useCallback((img: InquiryImageProps) => {
+    if (img.status !== 'ready') {
+      URL.revokeObjectURL(img.previewUrl);
+    }
+    setImages(prev => prev.filter(item => item.clientId !== img.clientId));
+  }, []);
+
   const handleImageFilesPicked = useCallback(async (files: File[]) => {
     const images = imagesRef.current;
     const left = INQUIRY_MAX_IMAGES - images.length;
@@ -85,12 +92,13 @@ export default function NewInquiryThreadPageClient() {
               maxWidthOrHeight: 1920,
             });
 
-        const dto = await MediaClientRepository.uploadInquiryImage(compressed);
+        const { id, url } =
+          await MediaClientRepository.uploadInquiryImage(compressed);
         URL.revokeObjectURL(previewUrl);
         setImages(prev =>
           prev.map(img =>
-            img.status !== 'ready' && img.clientId === clientId
-              ? { status: 'ready' as const, id: dto.id, url: dto.url }
+            img.clientId === clientId
+              ? { status: 'ready' as const, clientId, id, url }
               : img
           )
         );
@@ -123,6 +131,7 @@ export default function NewInquiryThreadPageClient() {
       messages={toPropsList([])}
       onDraftChange={setDraft}
       onImageFilesPicked={handleImageFilesPicked}
+      onImageRemove={handleImageRemove}
       onSend={handleSend}
       isSending={createMutation.isPending}
       autoFocus

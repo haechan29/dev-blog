@@ -3,10 +3,11 @@
 import { INQUIRY_MAX_IMAGES } from '@/features/inquiry/constants/inquiry';
 import type { InquiryImageProps } from '@/features/inquiry/ui/model/inquiryImageProps';
 import { InquiryMessageProps } from '@/features/inquiry/ui/model/inquiryMessageProps';
+import useMediaQuery, { TOUCH_QUERY } from '@/hooks/useMediaQuery';
 import { canTouch } from '@/lib/browser';
 import { createRipple } from '@/lib/dom';
 import clsx from 'clsx';
-import { AlertCircle, ImageIcon, Loader2 } from 'lucide-react';
+import { AlertCircle, ImageIcon, Loader2, X } from 'lucide-react';
 import {
   ChangeEvent,
   useEffect,
@@ -24,6 +25,7 @@ export default function InquiryThreadContainer({
   messages,
   onDraftChange,
   onImageFilesPicked,
+  onImageRemove,
   onSend,
   autoFocus = false,
   isSending = false,
@@ -33,6 +35,7 @@ export default function InquiryThreadContainer({
   messages: InquiryMessageProps[];
   onDraftChange: (draft: string) => void;
   onImageFilesPicked: (files: File[]) => void;
+  onImageRemove: (img: InquiryImageProps) => void;
   onSend: () => void;
   autoFocus?: boolean;
   isSending?: boolean;
@@ -44,6 +47,8 @@ export default function InquiryThreadContainer({
   const [messageInputHeightPx, setMessageInputHeightPx] = useState(
     MESSAGE_INPUT_HEIGHT_PX_MIN
   );
+
+  const isTouch = useMediaQuery(TOUCH_QUERY);
 
   const hasReadyImage = useMemo(
     () => images.some(img => img.status === 'ready'),
@@ -190,8 +195,8 @@ export default function InquiryThreadContainer({
                 <div className='flex gap-2 overflow-x-auto scrollbar-hide'>
                   {images.map((img, index) => (
                     <div
-                      key={img.status === 'ready' ? img.id : img.clientId}
-                      className='relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50'
+                      key={img.clientId}
+                      className='group relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50'
                     >
                       {img.status === 'ready' ? (
                         /* eslint-disable-next-line @next/next/no-img-element */
@@ -228,6 +233,23 @@ export default function InquiryThreadContainer({
                           </div>
                         </>
                       )}
+                      <button
+                        type='button'
+                        aria-label='첨부 이미지 제거'
+                        onMouseDown={e => e.preventDefault()}
+                        onClick={() => onImageRemove(img)}
+                        className={clsx(
+                          'h-5 w-5 absolute top-0.5 right-0.5 z-10',
+                          'flex items-center justify-center',
+                          'rounded-full bg-black/70 text-white hover:bg-black cursor-pointer',
+                          !isTouch && img.status !== 'error' && 'hidden',
+                          !isTouch &&
+                            img.status === 'ready' &&
+                            'group-hover:flex'
+                        )}
+                      >
+                        <X size={12} strokeWidth={2.5} aria-hidden />
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -252,7 +274,7 @@ export default function InquiryThreadContainer({
                 rows={1}
                 aria-label='문의 메시지 입력'
                 className={clsx(
-                  'max-h-52 flex-1 min-w-0 overflow-y-auto outline-none resize-none scrollbar-hide'
+                  'max-h-52 overflow-y-auto outline-none resize-none scrollbar-hide'
                 )}
               />
             </div>
