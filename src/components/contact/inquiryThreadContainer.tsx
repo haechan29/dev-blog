@@ -2,8 +2,7 @@
 
 import type { InquiryMessageDto } from '@/features/inquiry/data/dto/inquiryMessageDto';
 import clsx from 'clsx';
-import { ChevronLeft, Loader2 } from 'lucide-react';
-import Link from 'next/link';
+import { Loader2 } from 'lucide-react';
 import { useEffect, useMemo, useRef } from 'react';
 
 function localDateKey(iso: string): string {
@@ -49,12 +48,6 @@ function showTimeForMessage(
 
 const INQUIRY_COMPOSER_BOTTOM_PADDING = 'pb-[calc(1px+2rem+13rem)]';
 
-const inquiryThreadShellLayout = clsx(
-  'px-6 md:px-12 xl:px-18',
-  'xl:ml-(--sidebar-width)',
-  'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
-);
-
 export default function InquiryThreadContainer({
   draft,
   images,
@@ -94,118 +87,108 @@ export default function InquiryThreadContainer({
   return (
     <>
       <div
-        className={clsx('mt-(--toolbar-height) mb-8', inquiryThreadShellLayout)}
+        className={clsx(
+          'flex flex-col gap-4 pt-4',
+          INQUIRY_COMPOSER_BOTTOM_PADDING
+        )}
       >
-        <div
-          className={clsx(
-            'flex flex-col pt-8 max-w-2xl mx-auto w-full',
-            INQUIRY_COMPOSER_BOTTOM_PADDING
-          )}
-        >
-          <div className='mb-6'>
-            <Link
-              href='/contact'
-              className='inline-flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors'
-            >
-              <ChevronLeft className='w-4 h-4' aria-hidden />
-              문의 목록으로
-            </Link>
-          </div>
-
-          <h1 className='text-lg font-semibold text-gray-900 mb-6'>
-            문의 상세
-          </h1>
-
-          {messages.length === 0 ? (
-            <p className='text-center py-16 text-gray-500'>
-              문의 내용을 입력해 주세요.
-            </p>
-          ) : (
-            <ul className='flex flex-col gap-3 list-none p-0 m-0' role='list'>
-              {messages.map((msg, index) => {
-                const showDate =
-                  index === 0 ||
-                  localDateKey(msg.createdAt) !==
-                    localDateKey(messages[index - 1].createdAt);
-                const showTime = showTimeForMessage(messages, index);
-                const isUser = msg.senderType === 'USER';
-
-                return (
-                  <li key={msg.id} className='w-full'>
-                    {showDate && (
-                      <div
-                        className={clsx(
-                          'flex justify-center my-5',
-                          index === 0 && 'mt-0'
-                        )}
-                      >
-                        <span className='text-[11px] font-medium text-gray-400 tracking-wide'>
-                          {formatDate(msg.createdAt)}
-                        </span>
-                      </div>
-                    )}
-
-                    <MessageRow
-                      content={msg.content}
-                      showTime={showTime}
-                      timeLabel={formatTime(msg.createdAt)}
-                      isUser={isUser}
-                    />
-                  </li>
-                );
-              })}
-            </ul>
-          )}
+        <div className='h-10 flex items-center'>
+          <div className='text-lg font-semibold min-w-0'>문의 상세</div>
         </div>
+
+        {messages.length === 0 ? (
+          <div className='text-center py-20 text-gray-500'>
+            문의 내용을 입력해 주세요.
+          </div>
+        ) : (
+          <ul className='flex flex-col gap-3 list-none p-0 m-0' role='list'>
+            {messages.map((msg, index) => {
+              const showDate =
+                index === 0 ||
+                localDateKey(msg.createdAt) !==
+                  localDateKey(messages[index - 1].createdAt);
+              const showTime = showTimeForMessage(messages, index);
+              const isUser = msg.senderType === 'USER';
+
+              return (
+                <li key={msg.id} className='w-full'>
+                  {showDate && (
+                    <div
+                      className={clsx(
+                        'flex justify-center my-5',
+                        index === 0 && 'mt-0'
+                      )}
+                    >
+                      <span className='text-[11px] font-medium text-gray-400 tracking-wide'>
+                        {formatDate(msg.createdAt)}
+                      </span>
+                    </div>
+                  )}
+
+                  <InquiryMessage
+                    content={msg.content}
+                    showTime={showTime}
+                    timeLabel={formatTime(msg.createdAt)}
+                    isUser={isUser}
+                  />
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </div>
 
       <div className='fixed inset-x-0 bottom-0 z-100 border-t border-gray-200 bg-white'>
-        <div className={inquiryThreadShellLayout}>
-          <div className='max-w-2xl mx-auto w-full'>
-            <div className='flex gap-3 items-end py-4'>
-              <textarea
-                ref={textareaRef}
-                value={draft}
-                onChange={e => onDraftChange(e.target.value)}
-                onInput={e => {
-                  const target = e.target as HTMLTextAreaElement;
-                  target.style.height = 'auto';
-                  target.style.height = `${target.scrollHeight}px`;
-                }}
-                onKeyDown={e => {
-                  if (e.nativeEvent.isComposing) return;
-                  if (e.key !== 'Enter' || e.shiftKey) return;
-                  e.preventDefault();
-                  sendMessage();
-                }}
-                placeholder='메시지를 입력하세요'
-                rows={1}
-                aria-label='문의 메시지 입력'
-                className={clsx(
-                  'max-h-52 flex-1 min-w-0 overflow-y-auto p-3 outline-none resize-none border rounded-lg scrollbar-hide',
-                  'border-gray-200 hover:border-blue-500 focus:border-blue-500',
-                  !isInputValid && 'bg-gray-50'
-                )}
-              />
-              <button
-                type='button'
-                onMouseDown={e => e.preventDefault()}
-                onClick={sendMessage}
-                disabled={!canSend}
-                aria-label={'문의 보내기'}
-                className={clsx(
-                  'shrink-0 text-sm font-medium text-white px-4 rounded-full',
-                  'h-9 flex items-center justify-center bg-blue-600',
-                  canSend ? 'hover:bg-blue-500 cursor-pointer' : 'opacity-50'
-                )}
-              >
-                {isSending ? (
-                  <Loader2 size={16} className='animate-spin' aria-hidden />
-                ) : (
-                  '보내기'
-                )}
-              </button>
-            </div>
+        <div
+          className={clsx(
+            'px-6 md:px-12 xl:px-18',
+            'xl:ml-(--sidebar-width)',
+            'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
+          )}
+        >
+          <div className='flex gap-3 items-end py-4'>
+            <textarea
+              ref={textareaRef}
+              value={draft}
+              onChange={e => onDraftChange(e.target.value)}
+              onInput={e => {
+                const target = e.target as HTMLTextAreaElement;
+                target.style.height = 'auto';
+                target.style.height = `${target.scrollHeight}px`;
+              }}
+              onKeyDown={e => {
+                if (e.nativeEvent.isComposing) return;
+                if (e.key !== 'Enter' || e.shiftKey) return;
+                e.preventDefault();
+                sendMessage();
+              }}
+              placeholder='메시지를 입력하세요'
+              rows={1}
+              aria-label='문의 메시지 입력'
+              className={clsx(
+                'max-h-52 flex-1 min-w-0 overflow-y-auto p-3 outline-none resize-none border rounded-lg scrollbar-hide',
+                'border-gray-200 hover:border-blue-500 focus:border-blue-500',
+                !isInputValid && 'bg-gray-50'
+              )}
+            />
+            <button
+              type='button'
+              onMouseDown={e => e.preventDefault()}
+              onClick={sendMessage}
+              disabled={!canSend}
+              aria-label={'문의 보내기'}
+              className={clsx(
+                'shrink-0 text-sm font-medium text-white px-4 rounded-full',
+                'h-9 flex items-center justify-center bg-blue-600',
+                canSend ? 'hover:bg-blue-500 cursor-pointer' : 'opacity-50'
+              )}
+            >
+              {isSending ? (
+                <Loader2 size={16} className='animate-spin' aria-hidden />
+              ) : (
+                '보내기'
+              )}
+            </button>
           </div>
         </div>
       </div>
@@ -213,7 +196,7 @@ export default function InquiryThreadContainer({
   );
 }
 
-function MessageRow({
+function InquiryMessage({
   content,
   showTime,
   timeLabel,

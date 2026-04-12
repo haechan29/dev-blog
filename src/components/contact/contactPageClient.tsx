@@ -1,6 +1,5 @@
 'use client';
 
-import ContactToolbar from '@/components/contact/contactToolbar';
 import * as InquiryClientRepository from '@/features/inquiry/data/repository/inquiryClientRepository';
 import { InquiryThreadStatus } from '@/features/inquiry/domain/types/inquiryThreadStatus';
 import { InquiryCursor } from '@/features/inquiry/domain/types/page';
@@ -80,11 +79,9 @@ function InquiryThreadPreview({ thread }: { thread: InquiryThreadProps }) {
 }
 
 export default function ContactPageClient({
-  isLoggedIn,
   initialThreads,
   initialCursor,
 }: {
-  isLoggedIn: boolean;
   initialThreads: InquiryThreadProps[];
   initialCursor: InquiryCursor | null;
 }) {
@@ -123,59 +120,47 @@ export default function ContactPageClient({
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
-    <>
-      <ContactToolbar isLoggedIn={isLoggedIn} />
-
-      <div
-        className={clsx(
-          'mt-(--toolbar-height) mb-8 px-6 md:px-12 xl:px-18',
-          'xl:ml-(--sidebar-width)',
-          'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
-        )}
-      >
-        <div className='flex flex-col gap-8 pt-4 pb-20'>
-          <div className='flex items-center justify-between gap-3'>
-            <h2 className='text-lg font-semibold min-w-0'>문의 내역</h2>
-            <Link
-              href='/contact/new'
-              className={clsx(
-                'flex shrink-0 items-center gap-1.5 rounded-xl px-4 py-2',
-                'bg-gray-100 text-sm font-medium text-gray-600 transition-colors',
-                'hover:bg-gray-200 hover:text-gray-700'
-              )}
-            >
-              <Plus className='h-4 w-4' />
-              문의하기
-            </Link>
-          </div>
-
-          {threads.length === 0 ? (
-            <div className='text-center py-20 text-gray-500'>
-              문의 내역이 없습니다.
-            </div>
-          ) : (
-            <div className='flex flex-col'>
-              {threads.map((thread, index) => (
-                <div key={thread.id} className='mb-8'>
-                  <InquiryThreadPreview thread={thread} />
-
-                  {index !== threads.length - 1 && (
-                    <div className='h-px bg-gray-200' />
-                  )}
-                </div>
-              ))}
-            </div>
+    <div className='flex flex-col gap-8 pt-4 pb-20'>
+      <div className='h-10 flex items-center justify-between gap-3'>
+        <div className='text-lg font-semibold min-w-0'>문의 내역</div>
+        <Link
+          href='/contact/new'
+          className={clsx(
+            'flex shrink-0 items-center gap-1.5 rounded-xl px-4 py-2',
+            'bg-gray-100 text-sm font-medium text-gray-600 transition-colors',
+            'hover:bg-gray-200 hover:text-gray-700'
           )}
-
-          <div ref={ref} />
-
-          {isFetchingNextPage && (
-            <div className='flex justify-center py-4'>
-              <Loader2 strokeWidth={3} className='animate-spin text-gray-400' />
-            </div>
-          )}
-        </div>
+        >
+          <Plus className='h-4 w-4' />
+          문의하기
+        </Link>
       </div>
-    </>
+
+      {threads.length === 0 ? (
+        <div className='text-center py-20 text-gray-500'>
+          문의 내역이 없습니다.
+        </div>
+      ) : (
+        <div className='flex flex-col'>
+          {threads.map((thread, index) => (
+            <div key={thread.id} className='mb-8'>
+              <InquiryThreadPreview thread={thread} />
+
+              {index !== threads.length - 1 && (
+                <div className='h-px bg-gray-200' />
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div ref={ref} />
+
+      {isFetchingNextPage && (
+        <div className='flex justify-center py-4'>
+          <Loader2 strokeWidth={3} className='animate-spin text-gray-400' />
+        </div>
+      )}
+    </div>
   );
 }
