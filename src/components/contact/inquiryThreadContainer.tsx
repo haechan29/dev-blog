@@ -7,7 +7,7 @@ import { useEffect, useMemo, useRef } from 'react';
 
 const THREAD_PROMPT_MESSAGE_ID = 'THREAD_PROMPT_MESSAGE_ID';
 const THREAD_PROMPT_MESSAGE_CONTENT =
-  '문의를 보내 주시면, 확인 후 답변드릴게요.';
+  '언제든 편하게 문의를 남겨주세요. 꼭 확인할게요.';
 
 const INQUIRY_COMPOSER_BOTTOM_PADDING = 'pb-[calc(1px+2rem+13rem)]';
 
@@ -30,6 +30,17 @@ function localDateKey(iso: string): string {
   ].join('-');
 }
 
+function localTimeKey(iso: string): string {
+  const d = new Date(iso);
+  return [
+    d.getFullYear(),
+    String(d.getMonth() + 1).padStart(2, '0'),
+    String(d.getDate()).padStart(2, '0'),
+    String(d.getHours()).padStart(2, '0'),
+    String(d.getMinutes()).padStart(2, '0'),
+  ].join('-');
+}
+
 function formatDate(iso: string): string {
   const d = new Date(iso);
   return `${d.getMonth() + 1}월 ${d.getDate()}일`;
@@ -38,28 +49,6 @@ function formatDate(iso: string): string {
 function formatTime(iso: string): string {
   const d = new Date(iso);
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-}
-
-function isSameTimeGroup(a: InquiryMessageDto, b: InquiryMessageDto): boolean {
-  if (a.senderType !== b.senderType) return false;
-  const da = new Date(a.createdAt);
-  const db = new Date(b.createdAt);
-  return (
-    da.getFullYear() === db.getFullYear() &&
-    da.getMonth() === db.getMonth() &&
-    da.getDate() === db.getDate() &&
-    da.getHours() === db.getHours() &&
-    da.getMinutes() === db.getMinutes()
-  );
-}
-
-function showTimeForMessage(
-  messages: InquiryMessageDto[],
-  index: number
-): boolean {
-  const next = messages[index + 1];
-  if (!next) return true;
-  return !isSameTimeGroup(messages[index], next);
 }
 
 export default function InquiryThreadContainer({
@@ -122,11 +111,16 @@ export default function InquiryThreadContainer({
 
         <ul className='flex flex-col gap-3 list-none p-0 m-0' role='list'>
           {displayMessages.map((msg, index) => {
+            const isPromptMessage = index === 0;
             const showDate =
-              index === 0 ||
+              isPromptMessage ||
               localDateKey(msg.createdAt) !==
                 localDateKey(displayMessages[index - 1].createdAt);
-            const showTime = showTimeForMessage(displayMessages, index);
+            const showTime =
+              !isPromptMessage &&
+              (index === displayMessages.length - 1 ||
+                localTimeKey(msg.createdAt) !==
+                  localTimeKey(displayMessages[index + 1].createdAt));
             const isUser = msg.senderType === 'USER';
 
             return (
@@ -194,7 +188,7 @@ export default function InquiryThreadContainer({
               onMouseDown={e => e.preventDefault()}
               onClick={sendMessage}
               disabled={!canSend}
-              aria-label={'문의 보내기'}
+              aria-label='문의 보내기'
               className={clsx(
                 'shrink-0 text-sm font-medium text-white px-4 rounded-full',
                 'h-9 flex items-center justify-center bg-blue-600',
@@ -242,7 +236,7 @@ function InquiryMessage({
 
   return (
     <div className='flex flex-col gap-1'>
-      {!isUser && <div className='text-sm ml-1'>관리자</div>}
+      {!isUser && <div className='text-sm ml-1'>운영자</div>}
       <div
         className={clsx(
           'flex w-full',
