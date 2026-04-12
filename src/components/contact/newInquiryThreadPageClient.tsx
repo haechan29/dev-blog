@@ -3,6 +3,7 @@
 import InquiryThreadContainer from '@/components/contact/inquiryThreadContainer';
 import { ApiError } from '@/errors/errors';
 import * as InquiryClientRepository from '@/features/inquiry/data/repository/inquiryClientRepository';
+import { toPropsList } from '@/features/inquiry/ui/lib';
 import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { inquiryKeys } from '@/queries/keys';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -42,7 +43,7 @@ export default function NewInquiryThreadPageClient() {
     <InquiryThreadContainer
       draft={draft}
       images={images}
-      messages={[]}
+      messages={toPropsList([])}
       onDraftChange={setDraft}
       onSend={handleSend}
       isSending={createMutation.isPending}

@@ -1,55 +1,11 @@
 'use client';
 
-import type { InquiryMessageDto } from '@/features/inquiry/data/dto/inquiryMessageDto';
+import { InquiryMessageProps } from '@/features/inquiry/ui/model/inquiryMessageProps';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useMemo, useRef } from 'react';
 
-const THREAD_PROMPT_MESSAGE_ID = 'THREAD_PROMPT_MESSAGE_ID';
-const THREAD_PROMPT_MESSAGE_CONTENT =
-  '언제든 편하게 문의를 남겨주세요. 꼭 확인할게요.';
-
 const INQUIRY_COMPOSER_BOTTOM_PADDING = 'pb-[calc(1px+2rem+13rem)]';
-
-function buildThreadPromptMessage(anchorIso: string): InquiryMessageDto {
-  return {
-    id: THREAD_PROMPT_MESSAGE_ID,
-    senderType: 'ADMIN',
-    createdAt: anchorIso,
-    content: THREAD_PROMPT_MESSAGE_CONTENT,
-    imageUrls: [],
-  };
-}
-
-function localDateKey(iso: string): string {
-  const d = new Date(iso);
-  return [
-    d.getFullYear(),
-    String(d.getMonth() + 1).padStart(2, '0'),
-    String(d.getDate()).padStart(2, '0'),
-  ].join('-');
-}
-
-function localTimeKey(iso: string): string {
-  const d = new Date(iso);
-  return [
-    d.getFullYear(),
-    String(d.getMonth() + 1).padStart(2, '0'),
-    String(d.getDate()).padStart(2, '0'),
-    String(d.getHours()).padStart(2, '0'),
-    String(d.getMinutes()).padStart(2, '0'),
-  ].join('-');
-}
-
-function formatDate(iso: string): string {
-  const d = new Date(iso);
-  return `${d.getMonth() + 1}월 ${d.getDate()}일`;
-}
-
-function formatTime(iso: string): string {
-  const d = new Date(iso);
-  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-}
 
 export default function InquiryThreadContainer({
   draft,
@@ -62,7 +18,7 @@ export default function InquiryThreadContainer({
 }: {
   draft: string;
   images: string[];
-  messages: InquiryMessageDto[];
+  messages: InquiryMessageProps[];
   onDraftChange: (draft: string) => void;
   onSend: () => void;
   autoFocus?: boolean;
@@ -77,16 +33,6 @@ export default function InquiryThreadContainer({
 
   const canSend = isInputValid && !isSending;
 
-  const displayMessages = useMemo(() => {
-    const threadPromptMessageCreatedAt = messages[0]
-      ? new Date(messages[0].createdAt).toISOString()
-      : new Date().toISOString();
-    return [
-      buildThreadPromptMessage(threadPromptMessageCreatedAt),
-      ...messages,
-    ];
-  }, [messages]);
-
   useEffect(() => {
     if (!autoFocus) return;
     textareaRef.current?.focus();
@@ -99,33 +45,12 @@ export default function InquiryThreadContainer({
 
   return (
     <>
-      <div
-        className={clsx(
-          'flex flex-col gap-4 pt-4',
-          INQUIRY_COMPOSER_BOTTOM_PADDING
-        )}
-      >
-        <div className='h-10 flex items-center'>
-          <div className='text-lg font-semibold min-w-0'>문의 상세</div>
-        </div>
-
+      <div className={clsx('pt-4', INQUIRY_COMPOSER_BOTTOM_PADDING)}>
         <ul className='flex flex-col gap-3 list-none p-0 m-0' role='list'>
-          {displayMessages.map((msg, index) => {
-            const isPromptMessage = index === 0;
-            const showDate =
-              isPromptMessage ||
-              localDateKey(msg.createdAt) !==
-                localDateKey(displayMessages[index - 1].createdAt);
-            const showTime =
-              !isPromptMessage &&
-              (index === displayMessages.length - 1 ||
-                localTimeKey(msg.createdAt) !==
-                  localTimeKey(displayMessages[index + 1].createdAt));
-            const isUser = msg.senderType === 'USER';
-
+          {messages.map((msg, index) => {
             return (
               <li key={msg.id} className='w-full'>
-                {showDate && (
+                {msg.showDate && (
                   <div
                     className={clsx(
                       'flex justify-center my-5',
@@ -133,16 +58,16 @@ export default function InquiryThreadContainer({
                     )}
                   >
                     <span className='text-[11px] font-medium text-gray-400 tracking-wide'>
-                      {formatDate(msg.createdAt)}
+                      {msg.dateLabel}
                     </span>
                   </div>
                 )}
 
                 <InquiryMessage
                   content={msg.content}
-                  showTime={showTime}
-                  timeLabel={formatTime(msg.createdAt)}
-                  isUser={isUser}
+                  showTime={msg.showTime}
+                  timeLabel={msg.timeLabel}
+                  isUser={msg.senderType === 'USER'}
                 />
               </li>
             );

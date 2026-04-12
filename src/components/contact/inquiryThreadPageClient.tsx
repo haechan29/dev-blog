@@ -2,8 +2,9 @@
 
 import InquiryThreadContainer from '@/components/contact/inquiryThreadContainer';
 import { ApiError } from '@/errors/errors';
-import type { InquiryMessageDto } from '@/features/inquiry/data/dto/inquiryMessageDto';
 import * as InquiryClientRepository from '@/features/inquiry/data/repository/inquiryClientRepository';
+import { toPropsList } from '@/features/inquiry/ui/lib';
+import { InquiryMessageProps } from '@/features/inquiry/ui/model/inquiryMessageProps';
 import { inquiryKeys } from '@/queries/keys';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
@@ -14,7 +15,7 @@ export default function InquiryThreadPageClient({
   initialMessages,
 }: {
   inquiryThreadId: string;
-  initialMessages: InquiryMessageDto[];
+  initialMessages: InquiryMessageProps[];
 }) {
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState('');
@@ -25,7 +26,9 @@ export default function InquiryThreadPageClient({
   } = useQuery({
     queryKey: inquiryKeys.messages(inquiryThreadId),
     queryFn: () =>
-      InquiryClientRepository.getMyInquiryMessagesByThreadId(inquiryThreadId),
+      InquiryClientRepository.getMyInquiryMessagesByThreadId(
+        inquiryThreadId
+      ).then(({ messages }) => ({ messages: toPropsList(messages) })),
     initialData: { messages: initialMessages },
   });
 
@@ -49,7 +52,9 @@ export default function InquiryThreadPageClient({
     },
     onError: error => {
       const message =
-        error instanceof ApiError ? error.message : '메시지를 보내지 못했습니다';
+        error instanceof ApiError
+          ? error.message
+          : '메시지를 보내지 못했습니다';
       toast.error(message);
     },
   });
