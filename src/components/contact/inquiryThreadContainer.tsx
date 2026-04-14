@@ -186,7 +186,7 @@ export default function InquiryThreadContainer({
               type='button'
               onMouseDown={e => e.preventDefault()}
               onClick={e => {
-                if (canTouch) createRipple(e);
+                if (canTouch()) createRipple(e);
 
                 if (!canAddMoreImages) return;
                 fileInputRef.current?.click();

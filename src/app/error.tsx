@@ -35,7 +35,7 @@ export default function Error({
 
       <button
         onClick={e => {
-          if (canTouch) createRipple(e);
+          if (canTouch()) createRipple(e);
           reset();
         }}
         className='mt-6 rounded px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 cursor-pointer'
