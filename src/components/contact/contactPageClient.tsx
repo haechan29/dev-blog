@@ -1,82 +1,17 @@
 'use client';
 
+import InquiryThreadPreview from '@/components/contact/inquiryThreadPreview';
 import * as InquiryClientRepository from '@/features/inquiry/data/repository/inquiryClientRepository';
-import { InquiryThreadStatus } from '@/features/inquiry/domain/types/inquiryThreadStatus';
 import { InquiryCursor } from '@/features/inquiry/domain/types/page';
 import { toDto } from '@/features/inquiry/ui/mapper/inquiryThreadMapper';
 import { InquiryThreadProps } from '@/features/inquiry/ui/model/inquiryThreadProps';
-import { formatDate } from '@/features/post/domain/lib/date';
 import { inquiryKeys } from '@/queries/keys';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { Archive, CircleCheck, Clock, Loader2, Plus } from 'lucide-react';
+import { Loader2, Plus } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
-
-function statusIcon(status: InquiryThreadStatus) {
-  switch (status) {
-    case 'AWAITING_REPLY':
-      return <Clock className='w-5 h-5 text-amber-500' />;
-    case 'ANSWERED':
-      return <CircleCheck className='w-5 h-5 text-emerald-500' />;
-    case 'CLOSED':
-      return <Archive className='w-5 h-5 text-gray-400' />;
-  }
-}
-
-function InquiryThreadPreview({ thread }: { thread: InquiryThreadProps }) {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <div className='relative flex flex-col mb-8'>
-      <div
-        className={clsx(
-          'absolute -inset-x-6 -inset-y-4 -z-50 rounded-xl bg-gray-100/50',
-          'origin-center transition duration-300 ease-in-out',
-          isHovered ? 'scale-100 opacity-100' : 'scale-90 opacity-0'
-        )}
-      />
-
-      <div
-        onMouseLeave={() => setIsHovered(false)}
-        className='w-full flex flex-col'
-      >
-        <Link
-          href={`/contact/${thread.id}`}
-          className='w-full flex gap-4 text-left text-gray-900'
-          onMouseEnter={() => setIsHovered(true)}
-        >
-          <div className='relative shrink-0 pt-1'>
-            {statusIcon(thread.status)}
-            {thread.userUnreadCount > 0 && (
-              <span className='absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full bg-red-500 ring-2 ring-white' />
-            )}
-          </div>
-
-          <div className='flex min-w-0 flex-1 flex-col gap-2'>
-            <div className='flex justify-between gap-3'>
-              <p
-                className={clsx(
-                  'line-clamp-1 text-lg sm:text-xl font-semibold text-gray-900'
-                )}
-              >
-                {thread.firstLineText}
-              </p>
-              <span className='shrink-0 text-xs text-gray-500'>
-                {formatDate(thread.updatedAt)}
-              </span>
-            </div>
-
-            <p className='text-sm text-gray-500 line-clamp-2'>
-              {thread.secondLineText}
-            </p>
-          </div>
-        </Link>
-      </div>
-    </div>
-  );
-}
 
 export default function ContactPageClient({
   initialThreads,
