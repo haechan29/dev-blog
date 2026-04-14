@@ -1,6 +1,7 @@
 'use client';
 
 import InquiryImageDialog from '@/components/contact/inquiryImageDialog';
+import InquiryMessage from '@/components/contact/inquiryMessage';
 import { INQUIRY_MAX_IMAGES } from '@/features/inquiry/constants/inquiry';
 import useImages from '@/features/inquiry/domain/hooks/useImages';
 import type { InquiryImageProps } from '@/features/inquiry/ui/model/inquiryImageProps';
@@ -116,14 +117,6 @@ export default function InquiryThreadContainer({
     textareaRef.current?.focus();
   }, [autoFocus]);
 
-  useEffect(() => {
-    if (!imagePreview) return;
-    const stillAttached = images.some(
-      img => img.status === 'ready' && img.url === imagePreview.src
-    );
-    if (!stillAttached) setImagePreview(null);
-  }, [images, imagePreview]);
-
   return (
     <>
       <input
@@ -158,9 +151,13 @@ export default function InquiryThreadContainer({
 
                 <InquiryMessage
                   content={msg.content}
+                  imageUrls={msg.imageUrls}
                   showTime={msg.showTime}
                   timeLabel={msg.timeLabel}
                   isUser={msg.senderType === 'USER'}
+                  onImagePreview={(src, alt) => {
+                    setImagePreview({ src, alt });
+                  }}
                 />
               </li>
             );
@@ -225,12 +222,12 @@ export default function InquiryThreadContainer({
                           type='button'
                           aria-label={`첨부 이미지 ${index + 1} 크게 보기`}
                           className='block h-full w-full cursor-zoom-in border-0 bg-transparent p-0'
-                          onClick={() =>
+                          onClick={() => {
                             setImagePreview({
                               src: img.url,
                               alt: `첨부된 이미지 ${index + 1}`,
-                            })
-                          }
+                            });
+                          }}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
@@ -332,7 +329,7 @@ export default function InquiryThreadContainer({
               {isSending ? (
                 <Loader2 size={16} className='animate-spin' aria-hidden />
               ) : (
-                '보내기'
+                '완료'
               )}
             </button>
           </div>
@@ -344,63 +341,5 @@ export default function InquiryThreadContainer({
         setImagePreview={setImagePreview}
       />
     </>
-  );
-}
-
-function InquiryMessage({
-  content,
-  showTime,
-  timeLabel,
-  isUser,
-}: {
-  content: string;
-  showTime: boolean;
-  timeLabel: string;
-  isUser: boolean;
-}) {
-  const bubble = (
-    <div
-      className={clsx(
-        'min-w-0 rounded-2xl px-3.5 py-2.5 text-[15px] leading-snug wrap-break-word',
-        isUser ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900'
-      )}
-    >
-      {content}
-    </div>
-  );
-
-  const timeEl = showTime && (
-    <span className='shrink-0 text-xs text-gray-400 pb-px'>{timeLabel}</span>
-  );
-
-  return (
-    <div className='flex flex-col gap-1'>
-      {!isUser && <div className='text-sm ml-1'>운영자</div>}
-      <div
-        className={clsx(
-          'flex w-full',
-          isUser ? 'justify-end' : 'justify-start'
-        )}
-      >
-        <div
-          className={clsx(
-            'flex max-w-[min(100%,85%)] items-end gap-2',
-            isUser ? 'justify-end' : 'justify-start'
-          )}
-        >
-          {isUser ? (
-            <>
-              {timeEl}
-              {bubble}
-            </>
-          ) : (
-            <>
-              {bubble}
-              {timeEl}
-            </>
-          )}
-        </div>
-      </div>
-    </div>
   );
 }
