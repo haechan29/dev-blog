@@ -1,34 +1,69 @@
 'use client';
 
 import InquiryMessageDropdown from '@/components/contact/inquiryMessageDropdown';
+import { ApiError } from '@/errors/errors';
+import * as InquiryClientRepository from '@/features/inquiry/data/repository/inquiryClientRepository';
 import useMediaQuery, { TOUCH_QUERY } from '@/hooks/useMediaQuery';
+import { inquiryKeys } from '@/queries/keys';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { MoreVertical } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 
 const LONG_PRESS_MS = 500;
 
 export default function InquiryMessage({
+  threadId,
+  messageId,
   content,
   imageUrls,
   showTime,
   timeLabel,
   isUser,
   onImagePreview,
-  onDeleteConfirmed,
 }: {
+  threadId?: string;
+  messageId: string;
   content: string;
   imageUrls: string[];
   showTime: boolean;
   timeLabel: string;
   isUser: boolean;
   onImagePreview: (src: string, alt: string) => void;
-  onDeleteConfirmed?: () => void;
 }) {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const queryClient = useQueryClient();
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const isTouchDevice = useMediaQuery(TOUCH_QUERY);
+
+  const deleteMessageMutation = useMutation({
+    mutationFn: (threadId: string) =>
+      InquiryClientRepository.deleteInquiryMessage(threadId, messageId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: inquiryKeys.threads() });
+      toast.success('메시지가 삭제되었습니다');
+      setDeleteDialogOpen(false);
+    },
+    onError: error => {
+      const message =
+        error instanceof ApiError
+          ? error.message
+          : '메시지 삭제에 실패했습니다';
+      toast.error(message);
+    },
+  });
+
+  const handleDeleteConfirmed = useCallback(
+    (threadId: string) => {
+      if (!threadId) return;
+      deleteMessageMutation.mutate(threadId);
+    },
+    [deleteMessageMutation]
+  );
 
   const hasText = content.trim().length > 0;
   const hasImages = imageUrls.length > 0;
@@ -79,10 +114,14 @@ export default function InquiryMessage({
 
   const bubble = (
     <InquiryMessageDropdown
+      threadId={threadId}
       skipRender={isTouchDevice !== true}
       open={isMobileDropdownOpen}
+      deleteDialogOpen={deleteDialogOpen}
+      isDeleting={deleteMessageMutation.isPending}
       setOpen={handleDropdownOpenChange}
-      onDeleteConfirmed={onDeleteConfirmed}
+      setDeleteDialogOpen={setDeleteDialogOpen}
+      onDeleteConfirmed={handleDeleteConfirmed}
     >
       <div
         onTouchStart={onTouchStartLongPress}
@@ -115,10 +154,14 @@ export default function InquiryMessage({
 
   const menu = showMenu && (
     <InquiryMessageDropdown
+      threadId={threadId}
       skipRender={isTouchDevice !== false}
       open={isDesktopDropdownOpen}
+      deleteDialogOpen={deleteDialogOpen}
+      isDeleting={deleteMessageMutation.isPending}
       setOpen={handleDropdownOpenChange}
-      onDeleteConfirmed={onDeleteConfirmed}
+      setDeleteDialogOpen={setDeleteDialogOpen}
+      onDeleteConfirmed={handleDeleteConfirmed}
     >
       <button
         type='button'

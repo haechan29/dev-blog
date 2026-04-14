@@ -22,6 +22,13 @@ export async function getMyInquiryThreads({
   return response.data;
 }
 
+export async function getMyInquiryMessagesByThreadId(
+  threadId: string
+): Promise<{ messages: InquiryMessageDto[] }> {
+  const response = await api.get(`/api/inquiries/${threadId}/messages`);
+  return response.data;
+}
+
 export async function createInquiryThread(
   content: string,
   images?: string[]
@@ -45,9 +52,9 @@ export async function createInquiryMessage(
   return response.data;
 }
 
-export async function getMyInquiryMessagesByThreadId(
-  threadId: string
-): Promise<{ messages: InquiryMessageDto[] }> {
-  const response = await api.get(`/api/inquiries/${threadId}/messages`);
-  return response.data;
+export async function deleteInquiryMessage(
+  threadId: string,
+  messageId: string
+): Promise<void> {
+  await api.delete(`/api/inquiries/${threadId}/messages/${messageId}`);
 }

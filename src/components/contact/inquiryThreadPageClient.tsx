@@ -162,6 +162,7 @@ export default function InquiryThreadPageClient({
 
   return (
     <InquiryThreadContainer
+      threadId={inquiryThreadId}
       draft={draft}
       images={images}
       messages={messages}

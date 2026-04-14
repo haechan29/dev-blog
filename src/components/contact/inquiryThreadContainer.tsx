@@ -16,6 +16,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 const MESSAGE_INPUT_HEIGHT_PX_MIN = 120;
 
 export default function InquiryThreadContainer({
+  threadId,
   draft,
   images,
   messages,
@@ -26,6 +27,7 @@ export default function InquiryThreadContainer({
   autoFocus = false,
   isSending = false,
 }: {
+  threadId?: string;
   draft: string;
   images: InquiryImageProps[];
   messages: InquiryMessageProps[];
@@ -150,6 +152,8 @@ export default function InquiryThreadContainer({
                 )}
 
                 <InquiryMessage
+                  threadId={threadId}
+                  messageId={msg.id}
                   content={msg.content}
                   imageUrls={msg.imageUrls}
                   showTime={msg.showTime}
