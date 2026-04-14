@@ -1,6 +1,5 @@
 'use client';
 
-import InquiryDialog from '@/components/inquiry/inquiryDialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,7 +30,6 @@ export default function ProfileDropdown({
 }) {
   const router = useRouterWithProgress();
   const [isDeleteDialogVisible, setIsDeleteDialogVisible] = useState(false);
-  const [isInquiryDialogVisible, setIsInquiryDialogVisible] = useState(false);
 
   const handleAction = useCallback(
     async (e: MouseEvent<HTMLElement>) => {
@@ -51,7 +49,7 @@ export default function ProfileDropdown({
           break;
         }
         case 'inquiry': {
-          setIsInquiryDialogVisible(true);
+          router.push('/contact');
           break;
         }
       }
@@ -64,11 +62,6 @@ export default function ProfileDropdown({
       <DeleteAccountDialog
         isOpen={isDeleteDialogVisible}
         setIsOpen={setIsDeleteDialogVisible}
-      />
-
-      <InquiryDialog
-        isOpen={isInquiryDialogVisible}
-        setIsOpen={setIsInquiryDialogVisible}
       />
 
       <DropdownMenu>
