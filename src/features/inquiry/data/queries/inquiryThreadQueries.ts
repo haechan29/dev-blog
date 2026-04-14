@@ -96,7 +96,7 @@ export async function createInquiryThread({
   }
 
   if (data == null || typeof data !== 'string') {
-    throw new Error('문의 스레드 생성 응답이 올바르지 않습니다');
+    throw new Error('스레드 생성 응답이 올바르지 않습니다');
   }
 
   return data;

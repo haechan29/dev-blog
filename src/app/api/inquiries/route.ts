@@ -19,14 +19,14 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data });
   } catch (error) {
-    console.error('문의 스레드 목록 조회에 실패했습니다', error);
+    console.error('스레드 목록 조회에 실패했습니다', error);
 
     if (error instanceof ApiError) {
       return error.toResponse();
     }
 
     return NextResponse.json(
-      { error: '문의 스레드 목록 조회에 실패했습니다' },
+      { error: '스레드 목록 조회에 실패했습니다' },
       { status: 500 }
     );
   }
@@ -48,14 +48,14 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ data }, { status: 201 });
   } catch (error) {
-    console.error('문의 스레드 생성에 실패했습니다', error);
+    console.error('스레드 생성에 실패했습니다', error);
 
     if (error instanceof ApiError) {
       return error.toResponse();
     }
 
     return NextResponse.json(
-      { error: '문의 스레드 생성에 실패했습니다' },
+      { error: '스레드 생성에 실패했습니다' },
       { status: 500 }
     );
   }

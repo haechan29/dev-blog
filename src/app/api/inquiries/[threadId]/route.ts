@@ -15,14 +15,14 @@ export async function DELETE(
 
     return NextResponse.json({ data: null });
   } catch (error) {
-    console.error('문의 스레드 삭제에 실패했습니다', error);
+    console.error('스레드 삭제에 실패했습니다', error);
 
     if (error instanceof ApiError) {
       return error.toResponse();
     }
 
     return NextResponse.json(
-      { error: '문의 스레드 삭제에 실패했습니다' },
+      { error: '스레드 삭제에 실패했습니다' },
       { status: 500 }
     );
   }

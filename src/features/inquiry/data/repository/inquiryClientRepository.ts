@@ -58,3 +58,7 @@ export async function deleteInquiryMessage(
 ): Promise<void> {
   await api.delete(`/api/inquiries/${threadId}/messages/${messageId}`);
 }
+
+export async function deleteInquiryThread(threadId: string): Promise<void> {
+  await api.delete(`/api/inquiries/${threadId}`);
+}

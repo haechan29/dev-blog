@@ -1,13 +1,18 @@
 'use client';
 
 import InquiryThreadDropdown from '@/components/contact/inquiryThreadDropdown';
+import { ApiError } from '@/errors/errors';
+import * as InquiryClientRepository from '@/features/inquiry/data/repository/inquiryClientRepository';
 import { InquiryThreadStatus } from '@/features/inquiry/domain/types/inquiryThreadStatus';
 import { InquiryThreadProps } from '@/features/inquiry/ui/model/inquiryThreadProps';
 import { formatDate } from '@/features/post/domain/lib/date';
+import { inquiryKeys } from '@/queries/keys';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Archive, CircleCheck, Clock, MoreVertical } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import toast from 'react-hot-toast';
 
 function statusIcon(status: InquiryThreadStatus) {
   switch (status) {
@@ -25,7 +30,32 @@ export default function InquiryThreadPreview({
 }: {
   thread: InquiryThreadProps;
 }) {
+  const queryClient = useQueryClient();
   const [isHovered, setIsHovered] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const deleteThreadMutation = useMutation({
+    mutationFn: (threadId: string) =>
+      InquiryClientRepository.deleteInquiryThread(threadId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: inquiryKeys.threads() });
+      toast.success('문의가 삭제되었습니다');
+      setDeleteDialogOpen(false);
+    },
+    onError: error => {
+      const message =
+        error instanceof ApiError ? error.message : '문의 삭제에 실패했습니다';
+      toast.error(message);
+    },
+  });
+
+  const handleDeleteConfirmed = useCallback(
+    (threadId: string) => {
+      if (!threadId) return;
+      deleteThreadMutation.mutate(threadId);
+    },
+    [deleteThreadMutation]
+  );
 
   return (
     <div className='relative flex flex-col mb-8'>
@@ -38,7 +68,13 @@ export default function InquiryThreadPreview({
       />
 
       <div className='absolute top-0 right-0 z-10 flex items-center'>
-        <InquiryThreadDropdown threadId={thread.id}>
+        <InquiryThreadDropdown
+          threadId={thread.id}
+          deleteDialogOpen={deleteDialogOpen}
+          isDeleting={deleteThreadMutation.isPending}
+          setDeleteDialogOpen={setDeleteDialogOpen}
+          onDeleteConfirmed={handleDeleteConfirmed}
+        >
           <MoreVertical className='w-9 h-9 text-gray-400 hover:text-gray-500 hover:bg-gray-200 rounded-full p-2 -m-2 cursor-pointer' />
         </InquiryThreadDropdown>
       </div>
