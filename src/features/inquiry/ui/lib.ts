@@ -40,6 +40,7 @@ function buildThreadPromptMessage(anchorIso: string): InquiryMessageDto {
     id: THREAD_PROMPT_MESSAGE_ID,
     senderType: 'ADMIN',
     createdAt: anchorIso,
+    isDeleted: false,
     content: THREAD_PROMPT_MESSAGE_CONTENT,
     imageUrls: [],
   };
@@ -69,6 +70,7 @@ export function toPropsList(dtos: InquiryMessageDto[]): InquiryMessageProps[] {
       id: message.id,
       senderType: message.senderType,
       createdAt: message.createdAt,
+      isDeleted: message.isDeleted,
       content: message.content,
       imageUrls: message.imageUrls,
       showDate,

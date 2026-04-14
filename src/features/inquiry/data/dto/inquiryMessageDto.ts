@@ -6,4 +6,5 @@ export interface InquiryMessageDto {
   createdAt: string;
   content: string;
   imageUrls: string[];
+  isDeleted: boolean;
 }

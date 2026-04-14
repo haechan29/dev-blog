@@ -16,6 +16,7 @@ const LONG_PRESS_MS = 500;
 export default function InquiryMessage({
   threadId,
   messageId,
+  isDeleted,
   content,
   imageUrls,
   showTime,
@@ -25,6 +26,7 @@ export default function InquiryMessage({
 }: {
   threadId?: string;
   messageId: string;
+  isDeleted: boolean;
   content: string;
   imageUrls: string[];
   showTime: boolean;
@@ -56,6 +58,15 @@ export default function InquiryMessage({
       toast.error(message);
     },
   });
+
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(content);
+      toast.success('복사되었습니다');
+    } catch {
+      toast.error('복사에 실패했습니다');
+    }
+  }, [content]);
 
   const handleDeleteConfirmed = useCallback(
     (threadId: string) => {
@@ -118,10 +129,12 @@ export default function InquiryMessage({
       skipRender={isTouchDevice !== true}
       open={isMobileDropdownOpen}
       deleteDialogOpen={deleteDialogOpen}
+      isDeleted={isDeleted}
       isDeleting={deleteMessageMutation.isPending}
       setOpen={handleDropdownOpenChange}
       setDeleteDialogOpen={setDeleteDialogOpen}
       onDeleteConfirmed={handleDeleteConfirmed}
+      onCopy={handleCopy}
     >
       <div
         onTouchStart={onTouchStartLongPress}
@@ -158,10 +171,12 @@ export default function InquiryMessage({
       skipRender={isTouchDevice !== false}
       open={isDesktopDropdownOpen}
       deleteDialogOpen={deleteDialogOpen}
+      isDeleted={isDeleted}
       isDeleting={deleteMessageMutation.isPending}
       setOpen={handleDropdownOpenChange}
       setDeleteDialogOpen={setDeleteDialogOpen}
       onDeleteConfirmed={handleDeleteConfirmed}
+      onCopy={handleCopy}
     >
       <button
         type='button'

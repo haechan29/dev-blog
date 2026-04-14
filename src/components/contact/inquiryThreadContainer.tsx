@@ -154,6 +154,7 @@ export default function InquiryThreadContainer({
                 <InquiryMessage
                   threadId={threadId}
                   messageId={msg.id}
+                  isDeleted={msg.isDeleted}
                   content={msg.content}
                   imageUrls={msg.imageUrls}
                   showTime={msg.showTime}

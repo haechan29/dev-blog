@@ -18,6 +18,7 @@ export function toDto(
       createdAt: entity.created_at,
       content: DELETED_MESSAGE_CONTENT,
       imageUrls: [],
+      isDeleted: true,
     };
   }
 
@@ -32,5 +33,6 @@ export function toDto(
     createdAt: entity.created_at,
     content: entity.content,
     imageUrls,
+    isDeleted: false,
   };
 }

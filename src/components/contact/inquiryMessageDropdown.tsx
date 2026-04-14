@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import useMediaQuery, { TOUCH_QUERY } from '@/hooks/useMediaQuery';
 import clsx from 'clsx';
-import { Loader2, Trash2, X } from 'lucide-react';
+import { Copy, Loader2, Trash2, X } from 'lucide-react';
 import { ReactNode, useCallback } from 'react';
 
 function DeleteInquiryMessageDialog({
@@ -86,31 +86,33 @@ export default function InquiryMessageDropdown({
   skipRender = false,
   open,
   deleteDialogOpen,
+  isDeleted,
   isDeleting = false,
   setOpen,
   setDeleteDialogOpen,
   onDeleteConfirmed,
+  onCopy,
   children,
 }: {
   threadId?: string;
   skipRender?: boolean;
   open: boolean;
   deleteDialogOpen: boolean;
+  isDeleted: boolean;
   isDeleting?: boolean;
   setOpen: (open: boolean) => void;
   setDeleteDialogOpen: (open: boolean) => void;
   onDeleteConfirmed: (threadId: string) => void;
+  onCopy: () => Promise<void>;
   children: ReactNode;
 }) {
-  const canDelete = !!threadId;
+  const canDelete = !isDeleted && !!threadId;
 
   const isTouchDevice = useMediaQuery(TOUCH_QUERY);
 
   const side = isTouchDevice ? 'top' : 'bottom';
 
   if (skipRender) return children;
-
-  if (!canDelete) return children;
 
   return (
     <>
@@ -128,6 +130,11 @@ export default function InquiryMessageDropdown({
         <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
 
         <DropdownMenuContent side={side} align='end'>
+          <DropdownMenuItem className='cursor-pointer' onSelect={onCopy}>
+            <Copy className='size-4' />
+            <span>복사</span>
+          </DropdownMenuItem>
+
           {canDelete && (
             <DropdownMenuItem
               variant='destructive'

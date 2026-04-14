@@ -4,6 +4,7 @@ export interface InquiryMessageProps {
   id: string;
   senderType: InquiryMessageSenderType;
   createdAt: string;
+  isDeleted: boolean;
   content: string;
   imageUrls: string[];
   showDate: boolean;
