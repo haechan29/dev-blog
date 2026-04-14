@@ -11,16 +11,16 @@ import {
   InquiryUploadingImageProps,
 } from '@/features/inquiry/ui/model/inquiryImageProps';
 import * as MediaClientRepository from '@/features/media/data/repository/mediaClientRepository';
-import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { inquiryKeys } from '@/queries/keys';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import imageCompression from 'browser-image-compression';
 import { nanoid } from 'nanoid';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
 export default function NewInquiryThreadPageClient() {
-  const router = useRouterWithProgress();
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const [draft, setDraft] = useState('');
@@ -37,9 +37,10 @@ export default function NewInquiryThreadPageClient() {
       });
       setDraft('');
       setImages([]);
-      router.push(`/contact/${threadId}`);
+      router.replace(`/contact/${threadId}`);
     },
     onError: error => {
+      console.log(error);
       const message =
         error instanceof ApiError ? error.message : '문의를 보내지 못했습니다';
       toast.error(message);
