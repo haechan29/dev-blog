@@ -1,6 +1,11 @@
 'use client';
 
+import useMediaQuery, { TOUCH_QUERY } from '@/hooks/useMediaQuery';
 import clsx from 'clsx';
+import { MoreVertical } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+const LONG_PRESS_MS = 500;
 
 export default function InquiryMessage({
   content,
@@ -17,11 +22,48 @@ export default function InquiryMessage({
   isUser: boolean;
   onImagePreview: (src: string, alt: string) => void;
 }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const isTouchDevice = useMediaQuery(TOUCH_QUERY);
+
   const hasText = content.trim().length > 0;
   const hasImages = imageUrls.length > 0;
+  const showMenu = isUser && hasText && isTouchDevice === false;
+  const canLongPress = isUser && hasText && isTouchDevice === true;
+
+  const clearLongPressTimer = useCallback(() => {
+    if (!canLongPress) return;
+    if (longPressTimerRef.current === null) return;
+
+    clearTimeout(longPressTimerRef.current);
+    longPressTimerRef.current = null;
+  }, [canLongPress]);
+
+  const onTouchStartLongPress = useCallback(() => {
+    if (!canLongPress) return;
+    clearLongPressTimer();
+    longPressTimerRef.current = setTimeout(() => {
+      longPressTimerRef.current = null;
+      setIsOpen(true);
+    }, LONG_PRESS_MS);
+  }, [canLongPress, clearLongPressTimer]);
+
+  const onTouchEndLongPress = useCallback(() => {
+    if (!canLongPress) return;
+    clearLongPressTimer();
+  }, [canLongPress, clearLongPressTimer]);
+
+  useEffect(() => () => clearLongPressTimer(), [clearLongPressTimer]);
 
   const bubble = (
     <div
+      onTouchStart={onTouchStartLongPress}
+      onTouchEnd={onTouchEndLongPress}
+      onTouchCancel={onTouchEndLongPress}
+      onContextMenu={e => {
+        if (canLongPress) e.preventDefault();
+      }}
       className={clsx(
         'min-w-0 rounded-2xl px-3.5 py-2.5 text-[15px] leading-snug wrap-break-word',
         isUser ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900'
@@ -32,7 +74,34 @@ export default function InquiryMessage({
   );
 
   const timeEl = showTime && (
-    <span className='shrink-0 text-xs text-gray-400 pb-px'>{timeLabel}</span>
+    <span
+      className={clsx(
+        'absolute right-0 bottom-0 text-xs text-gray-400 pb-px pointer-events-none',
+        showMenu &&
+          'transition-opacity opacity-100 group-hover/msg:opacity-0 group-focus-within/slot:opacity-0'
+      )}
+    >
+      {timeLabel}
+    </span>
+  );
+
+  const menu = showMenu && (
+    <button
+      type='button'
+      aria-label='메시지 메뉴'
+      aria-expanded={isOpen}
+      className={clsx(
+        'absolute right-0 bottom-0 z-10 flex h-8 w-8 items-center justify-center rounded-md text-gray-400 hover:bg-black/5 hover:text-gray-600',
+        'transition-opacity opacity-0 group-hover/msg:opacity-100',
+        'group-focus-within/slot:opacity-100 focus-visible:opacity-100 focus-visible:outline-none'
+      )}
+      onClick={e => {
+        e.stopPropagation();
+        setIsOpen(open => !open);
+      }}
+    >
+      <MoreVertical size={18} aria-hidden className='shrink-0' />
+    </button>
   );
 
   const imageGrid = hasImages && (
@@ -66,6 +135,13 @@ export default function InquiryMessage({
     </div>
   );
 
+  const slot = (
+    <div className='min-w-8 min-h-8 group/slot relative shrink-0'>
+      {timeEl}
+      {menu}
+    </div>
+  );
+
   return (
     <div className='flex flex-col gap-1'>
       {!isUser && <div className='text-sm ml-1'>운영자</div>}
@@ -85,19 +161,19 @@ export default function InquiryMessage({
           {hasText && (
             <div
               className={clsx(
-                'flex w-full items-end gap-2',
+                'flex w-full items-end gap-2 group/msg',
                 isUser ? 'justify-end' : 'justify-start'
               )}
             >
               {isUser ? (
                 <>
-                  {timeEl}
+                  {slot}
                   {bubble}
                 </>
               ) : (
                 <>
                   {bubble}
-                  {timeEl}
+                  {slot}
                 </>
               )}
             </div>
