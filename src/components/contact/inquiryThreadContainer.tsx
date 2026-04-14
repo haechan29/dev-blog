@@ -2,6 +2,7 @@
 
 import InquiryImageDialog from '@/components/contact/inquiryImageDialog';
 import { INQUIRY_MAX_IMAGES } from '@/features/inquiry/constants/inquiry';
+import useImages from '@/features/inquiry/domain/hooks/useImages';
 import type { InquiryImageProps } from '@/features/inquiry/ui/model/inquiryImageProps';
 import { InquiryMessageProps } from '@/features/inquiry/ui/model/inquiryMessageProps';
 import useMediaQuery, { TOUCH_QUERY } from '@/hooks/useMediaQuery';
@@ -9,14 +10,7 @@ import { canTouch } from '@/lib/browser';
 import { createRipple } from '@/lib/dom';
 import clsx from 'clsx';
 import { AlertCircle, ImageIcon, Loader2, X } from 'lucide-react';
-import {
-  ChangeEvent,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 const MESSAGE_INPUT_HEIGHT_PX_MIN = 120;
 
@@ -48,6 +42,7 @@ export default function InquiryThreadContainer({
   const [messageInputHeightPx, setMessageInputHeightPx] = useState(
     MESSAGE_INPUT_HEIGHT_PX_MIN
   );
+  const [isFileDragOver, setIsFileDragOver] = useState(false);
   const [imagePreview, setImagePreview] = useState<{
     src: string;
     alt: string;
@@ -71,8 +66,35 @@ export default function InquiryThreadContainer({
     [draft, hasReadyImage]
   );
 
-  const canSend = isInputValid && !hasBlockingImage && !isSending;
-  const canAddMoreImages = images.length < INQUIRY_MAX_IMAGES;
+  const canSend = useMemo(
+    () => isInputValid && !hasBlockingImage && !isSending,
+    [hasBlockingImage, isInputValid, isSending]
+  );
+
+  const canAddMoreImages = useMemo(
+    () => images.length < INQUIRY_MAX_IMAGES,
+    [images]
+  );
+
+  const {
+    handleFileInputChange,
+    handleDragEnter,
+    handleDragLeave,
+    handleDragOver,
+    handleDrop,
+    handlePaste,
+  } = useImages({
+    images,
+    isFileDragOver,
+    canAddMoreImages,
+    setIsFileDragOver,
+    onImageFilesPicked,
+  });
+
+  const sendMessage = () => {
+    if (!canSend) return;
+    onSend();
+  };
 
   useLayoutEffect(() => {
     const el = messageInputRef.current;
@@ -101,25 +123,6 @@ export default function InquiryThreadContainer({
     );
     if (!stillAttached) setImagePreview(null);
   }, [images, imagePreview]);
-
-  const sendMessage = () => {
-    if (!canSend) return;
-    onSend();
-  };
-
-  const handleFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const picked = e.target.files;
-    if (!picked?.length || !canAddMoreImages) {
-      e.target.value = '';
-      return;
-    }
-
-    const left = INQUIRY_MAX_IMAGES - images.length;
-    const files = Array.from(picked).slice(0, left);
-    if (files.length) onImageFilesPicked(files);
-
-    e.target.value = '';
-  };
 
   return (
     <>
@@ -201,8 +204,14 @@ export default function InquiryThreadContainer({
               className={clsx(
                 'flex flex-col gap-3 flex-1 min-w-0 p-3',
                 'rounded-lg border border-gray-200 hover:border-blue-500 focus-within:border-blue-500',
-                !isInputValid && 'bg-gray-50'
+                !isInputValid && 'bg-gray-50',
+                isFileDragOver &&
+                  'border-blue-500 bg-blue-50/50 ring-2 ring-blue-200'
               )}
+              onDragEnter={handleDragEnter}
+              onDragLeave={handleDragLeave}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
             >
               {images.length > 0 && (
                 <div className='flex gap-2 overflow-x-auto scrollbar-hide'>
@@ -287,6 +296,7 @@ export default function InquiryThreadContainer({
                 ref={textareaRef}
                 value={draft}
                 onChange={e => onDraftChange(e.target.value)}
+                onPaste={handlePaste}
                 onInput={e => {
                   const target = e.target as HTMLTextAreaElement;
                   target.style.height = 'auto';
