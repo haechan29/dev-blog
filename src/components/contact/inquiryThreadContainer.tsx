@@ -41,6 +41,8 @@ export default function InquiryThreadContainer({
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const messageInputRef = useRef<HTMLDivElement | null>(null);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+  const shouldScrollRef = useRef<boolean>(true);
 
   const [messageInputHeightPx, setMessageInputHeightPx] = useState(
     MESSAGE_INPUT_HEIGHT_PX_MIN
@@ -96,6 +98,7 @@ export default function InquiryThreadContainer({
 
   const sendMessage = () => {
     if (!canSend) return;
+    shouldScrollRef.current = true;
     onSend();
   };
 
@@ -113,6 +116,13 @@ export default function InquiryThreadContainer({
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (shouldScrollRef.current) {
+      bottomRef.current?.scrollIntoView({ block: 'start' });
+      shouldScrollRef.current = false;
+    }
+  }, [threadId, messages.length]);
 
   useEffect(() => {
     if (!autoFocus) return;
@@ -168,6 +178,7 @@ export default function InquiryThreadContainer({
             );
           })}
         </ul>
+        <div ref={bottomRef} aria-hidden />
       </div>
 
       <div
