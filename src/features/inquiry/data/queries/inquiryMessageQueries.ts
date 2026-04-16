@@ -60,6 +60,17 @@ export async function resetInquiryThreadUserUnreadCount(threadId: string) {
   }
 }
 
+export async function resetInquiryThreadAdminUnreadCount(threadId: string) {
+  const { error } = await supabase
+    .from('inquiry_threads')
+    .update({ admin_unread_count: 0 })
+    .eq('id', threadId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
 export async function createInquiryMessage({
   threadId,
   userId,

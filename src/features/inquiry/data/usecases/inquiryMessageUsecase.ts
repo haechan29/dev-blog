@@ -15,6 +15,77 @@ import * as InquiryThreadQueries from '@/features/inquiry/data/queries/inquiryTh
 import * as MediaQueries from '@/features/media/data/queries/mediaQueries';
 import 'server-only';
 
+export async function getMyInquiryMessagesByThreadId({
+  userId,
+  threadId,
+}: {
+  userId?: string;
+  threadId: string;
+}) {
+  if (!userId) {
+    throw new UnauthorizedError('인증되지 않은 요청입니다');
+  }
+
+  const thread = await InquiryThreadQueries.fetchInquiryThreadForAuth(threadId);
+  if (!thread || thread.is_deleted) {
+    throw new NotFoundError('문의를 찾을 수 없습니다');
+  }
+  if (thread.user_id !== userId) {
+    throw new ForbiddenError('이 문의에 접근할 수 없습니다');
+  }
+
+  const messages =
+    await InquiryMessageQueries.fetchInquiryMessagesByThreadId(threadId);
+
+  try {
+    await InquiryMessageQueries.resetInquiryThreadUserUnreadCount(threadId);
+  } catch (error) {
+    console.error('문의 읽음 처리에 실패했습니다', error);
+  }
+
+  const imageIds = [
+    ...new Set(
+      messages.filter(m => !m.is_deleted).flatMap(m => m.images ?? [])
+    ),
+  ];
+  const urlById = await MediaQueries.fetchMediaUrlsByIds(imageIds);
+
+  return {
+    messages: messages.map(m => InquiryMessageMapper.toDto(m, urlById)),
+  };
+}
+
+export async function getInquiryMessagesByThreadId({
+  threadId,
+}: {
+  threadId: string;
+}) {
+  const thread = await InquiryThreadQueries.fetchInquiryThreadForAuth(threadId);
+  if (!thread || thread.is_deleted) {
+    throw new NotFoundError('문의를 찾을 수 없습니다');
+  }
+
+  const messages =
+    await InquiryMessageQueries.fetchInquiryMessagesByThreadId(threadId);
+
+  try {
+    await InquiryMessageQueries.resetInquiryThreadAdminUnreadCount(threadId);
+  } catch (error) {
+    console.error('어드민 문의 읽음 처리에 실패했습니다', error);
+  }
+
+  const imageIds = [
+    ...new Set(
+      messages.filter(m => !m.is_deleted).flatMap(m => m.images ?? [])
+    ),
+  ];
+  const urlById = await MediaQueries.fetchMediaUrlsByIds(imageIds);
+
+  return {
+    messages: messages.map(m => InquiryMessageMapper.toDto(m, urlById)),
+  };
+}
+
 export async function createMyInquiryMessage({
   userId,
   threadId,
@@ -96,46 +167,6 @@ export async function createAdminInquiryMessage({
   });
 
   return { messageId };
-}
-
-export async function getMyInquiryMessagesByThreadId({
-  userId,
-  threadId,
-}: {
-  userId?: string;
-  threadId: string;
-}) {
-  if (!userId) {
-    throw new UnauthorizedError('인증되지 않은 요청입니다');
-  }
-
-  const thread = await InquiryThreadQueries.fetchInquiryThreadForAuth(threadId);
-  if (!thread || thread.is_deleted) {
-    throw new NotFoundError('문의를 찾을 수 없습니다');
-  }
-  if (thread.user_id !== userId) {
-    throw new ForbiddenError('이 문의에 접근할 수 없습니다');
-  }
-
-  const messages =
-    await InquiryMessageQueries.fetchInquiryMessagesByThreadId(threadId);
-
-  try {
-    await InquiryMessageQueries.resetInquiryThreadUserUnreadCount(threadId);
-  } catch (error) {
-    console.error('문의 읽음 처리에 실패했습니다', error);
-  }
-
-  const imageIds = [
-    ...new Set(
-      messages.filter(m => !m.is_deleted).flatMap(m => m.images ?? [])
-    ),
-  ];
-  const urlById = await MediaQueries.fetchMediaUrlsByIds(imageIds);
-
-  return {
-    messages: messages.map(m => InquiryMessageMapper.toDto(m, urlById)),
-  };
 }
 
 export async function deleteMyInquiryMessage({
