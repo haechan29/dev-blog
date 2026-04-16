@@ -14,6 +14,12 @@ import { AlertCircle, ImageIcon, Loader2, X } from 'lucide-react';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 const MESSAGE_INPUT_HEIGHT_PX_MIN = 120;
+const SCROLL_THRESHOLD_PX = 100;
+
+function isNearBottom(el: HTMLElement, px: number) {
+  const { scrollTop, scrollHeight, clientHeight } = el;
+  return scrollHeight - scrollTop - clientHeight <= px;
+}
 
 export default function InquiryThreadContainer({
   threadId,
@@ -42,6 +48,7 @@ export default function InquiryThreadContainer({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const messageInputRef = useRef<HTMLDivElement | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const isNearBottomRef = useRef<boolean>(false);
   const shouldScrollRef = useRef<boolean>(true);
 
   const [messageInputHeightPx, setMessageInputHeightPx] = useState(
@@ -114,16 +121,27 @@ export default function InquiryThreadContainer({
     const el = messageInputRef.current;
     if (!el) return;
 
-    const apply = () => {
+    const measureMessageInputHeight = () => {
+      isNearBottomRef.current = isNearBottom(
+        document.documentElement,
+        SCROLL_THRESHOLD_PX
+      );
       const h = Math.ceil(el.getBoundingClientRect().height);
       setMessageInputHeightPx(Math.max(h, MESSAGE_INPUT_HEIGHT_PX_MIN));
     };
 
-    apply();
-    const ro = new ResizeObserver(apply);
+    measureMessageInputHeight();
+    const ro = new ResizeObserver(measureMessageInputHeight);
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+
+  useLayoutEffect(() => {
+    if (isNearBottomRef.current) {
+      bottomRef.current?.scrollIntoView({ block: 'start' });
+      isNearBottomRef.current = false;
+    }
+  }, [messageInputHeightPx]);
 
   useEffect(() => {
     if (shouldScrollRef.current) {
