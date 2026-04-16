@@ -1,4 +1,5 @@
 import { InquiryThreadEntity } from '@/features/inquiry/data/entities/inquiryThreadEntities';
+import { InquiryThreadStatus } from '@/features/inquiry/domain/types/inquiryThreadStatus';
 import { supabase } from '@/lib/supabase';
 import 'server-only';
 
@@ -38,7 +39,7 @@ export async function fetchInquiryThreadForAuth(threadId: string) {
   > | null;
 }
 
-export async function fetchInquiryThreads({
+export async function fetchMyInquiryThreads({
   userId,
   limit,
   cursorUpdatedAt,
@@ -57,6 +58,42 @@ export async function fetchInquiryThreads({
     .order('updated_at', { ascending: false })
     .order('id', { ascending: false })
     .limit(limit);
+
+  if (cursorUpdatedAt != null && cursorId != null) {
+    const t = applyQuotedLiteral(cursorUpdatedAt);
+    const id = applyQuotedLiteral(cursorId);
+    query = query.or(`updated_at.lt.${t},and(updated_at.eq.${t},id.lt.${id})`);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data as unknown as InquiryThreadEntity[];
+}
+
+export async function fetchInquiryThreads({
+  limit,
+  cursorUpdatedAt,
+  cursorId,
+  status,
+}: {
+  limit: number;
+  cursorUpdatedAt?: string;
+  cursorId?: string;
+  status?: InquiryThreadStatus;
+}) {
+  let query = supabase
+    .from('inquiry_threads')
+    .select(INQUIRY_THREAD_SELECT_FIELDS)
+    .eq('is_deleted', false)
+    .order('updated_at', { ascending: false })
+    .order('id', { ascending: false })
+    .limit(limit);
+
+  if (status) query = query.eq('status', status);
 
   if (cursorUpdatedAt != null && cursorId != null) {
     const t = applyQuotedLiteral(cursorUpdatedAt);
