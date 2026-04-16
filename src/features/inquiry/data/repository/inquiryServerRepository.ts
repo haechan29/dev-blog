@@ -18,3 +18,12 @@ export async function getMyInquiryMessagesByThreadId(params: {
 }): Promise<{ messages: InquiryMessageDto[] }> {
   return await InquiryMessageUsecase.getMyInquiryMessagesByThreadId(params);
 }
+
+export async function createAdminInquiryMessage(params: {
+  adminId: string;
+  threadId: string;
+  content: string;
+  images?: string[];
+}): Promise<{ messageId: string }> {
+  return await InquiryMessageUsecase.createAdminInquiryMessage(params);
+}

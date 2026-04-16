@@ -60,6 +60,44 @@ export async function createMyInquiryMessage({
   return { messageId };
 }
 
+export async function createAdminInquiryMessage({
+  adminId,
+  threadId,
+  content: contentRaw,
+  images = [],
+}: {
+  adminId: string;
+  threadId: string;
+  content: string;
+  images?: string[];
+}): Promise<{ messageId: string }> {
+  const thread = await InquiryThreadQueries.fetchInquiryThreadForAuth(threadId);
+  if (!thread || thread.is_deleted) {
+    throw new NotFoundError('문의를 찾을 수 없습니다');
+  }
+
+  const trimmedContent = contentRaw.trim();
+  if (!trimmedContent && images.length === 0) {
+    throw new ValidationError('내용을 입력해주세요');
+  }
+
+  if (images.length > INQUIRY_MAX_IMAGES) {
+    throw new ValidationError('최대 이미지 개수를 초과했습니다');
+  }
+
+  const content = trimmedContent ? trimmedContent : `사진 ${images.length}장`;
+
+  const messageId = await InquiryMessageQueries.createAdminInquiryMessage({
+    threadId,
+    adminId,
+    content,
+    images,
+    lastMessagePreview: content.slice(0, MESSAGE_PREVIEW_MAX),
+  });
+
+  return { messageId };
+}
+
 export async function getMyInquiryMessagesByThreadId({
   userId,
   threadId,
