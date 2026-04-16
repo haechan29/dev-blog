@@ -144,7 +144,7 @@ export default function InquiryMessage({
           if (canLongPress) e.preventDefault();
         }}
         className={clsx(
-          'min-w-0 rounded-2xl px-3.5 py-2.5 text-[15px] leading-snug wrap-break-word',
+          'min-w-0 rounded-2xl px-3.5 py-2.5 text-[15px] leading-snug wrap-break-word whitespace-pre-wrap',
           isUser ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900'
         )}
       >

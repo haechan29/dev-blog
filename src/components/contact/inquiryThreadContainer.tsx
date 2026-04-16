@@ -103,6 +103,14 @@ export default function InquiryThreadContainer({
   };
 
   useLayoutEffect(() => {
+    const target = textareaRef.current;
+    if (!target) return;
+
+    target.style.height = 'auto';
+    target.style.height = `${target.scrollHeight}px`;
+  }, [draft]);
+
+  useLayoutEffect(() => {
     const el = messageInputRef.current;
     if (!el) return;
 
@@ -310,11 +318,6 @@ export default function InquiryThreadContainer({
                 value={draft}
                 onChange={e => onDraftChange(e.target.value)}
                 onPaste={handlePaste}
-                onInput={e => {
-                  const target = e.target as HTMLTextAreaElement;
-                  target.style.height = 'auto';
-                  target.style.height = `${target.scrollHeight}px`;
-                }}
                 onKeyDown={e => {
                   if (e.nativeEvent.isComposing) return;
                   if (e.key !== 'Enter' || e.shiftKey) return;
@@ -324,9 +327,7 @@ export default function InquiryThreadContainer({
                 placeholder='메시지를 입력하세요'
                 rows={1}
                 aria-label='문의 메시지 입력'
-                className={clsx(
-                  'max-h-52 overflow-y-auto outline-none resize-none scrollbar-hide'
-                )}
+                className='max-h-52 overflow-y-auto outline-none resize-none scrollbar-hide'
               />
             </div>
 

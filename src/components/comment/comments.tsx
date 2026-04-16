@@ -24,7 +24,14 @@ import {
 } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import toast from 'react-hot-toast';
 import { useInView } from 'react-intersection-observer';
 import SimpleBar from 'simplebar-react';
@@ -104,12 +111,6 @@ export default function Comments({
 
   const representativeComment = comments.length === 0 ? null : comments[0];
 
-  useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
-    }
-  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
-
   const createCommentMutation = useMutation({
     mutationFn: (params: {
       postId: string;
@@ -183,6 +184,20 @@ export default function Comments({
     },
     [content, createCommentMutation, isLoggedIn, isPasswordDialogOpen, postId]
   );
+
+  useLayoutEffect(() => {
+    const target = textareaRef.current;
+    if (!target) return;
+
+    target.style.height = 'auto';
+    target.style.height = `${target.scrollHeight}px`;
+  }, [content]);
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
     <>
@@ -271,10 +286,11 @@ export default function Comments({
                 ref={textareaRef}
                 value={content}
                 onChange={e => setContent(e.target.value)}
-                onInput={e => {
-                  const target = e.target as HTMLTextAreaElement;
-                  target.style.height = 'auto';
-                  target.style.height = `${target.scrollHeight}px`;
+                onKeyDown={e => {
+                  if (e.nativeEvent.isComposing) return;
+                  if (e.key !== 'Enter' || e.shiftKey) return;
+                  e.preventDefault();
+                  handleSubmit();
                 }}
                 placeholder='댓글을 입력하세요'
                 className={clsx(
