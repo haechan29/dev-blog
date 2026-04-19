@@ -38,7 +38,7 @@ export function AdminInquiryThreadPageClient({
   } = useQuery({
     queryKey: inquiryKeys.messages(inquiryThreadId),
     queryFn: () =>
-      InquiryClientRepository.getAdminInquiryMessagesByThreadId(
+      InquiryClientRepository.getInquiryMessagesByThreadId(
         inquiryThreadId
       ).then(({ messages }) => ({ messages: toPropsList(messages) })),
     initialData: { messages: initialMessages },

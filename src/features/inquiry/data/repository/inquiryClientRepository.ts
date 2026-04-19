@@ -3,7 +3,7 @@ import type { InquiryThreadsPage } from '@/features/inquiry/data/dto/inquiryThre
 import type { InquiryCursor } from '@/features/inquiry/domain/types/page';
 import { api } from '@/lib/api';
 
-export async function getMyInquiryThreads({
+export async function getInquiryThreads({
   cursor,
 }: {
   cursor: InquiryCursor | null;
@@ -22,7 +22,7 @@ export async function getMyInquiryThreads({
   return response.data;
 }
 
-export async function getMyInquiryMessagesByThreadId(
+export async function getInquiryMessagesByThreadId(
   threadId: string
 ): Promise<{ messages: InquiryMessageDto[] }> {
   const response = await api.get(`/api/inquiries/${threadId}/messages`);
@@ -61,20 +61,4 @@ export async function deleteInquiryMessage(
 
 export async function deleteInquiryThread(threadId: string): Promise<void> {
   await api.delete(`/api/inquiries/${threadId}`);
-}
-
-/** 관리자 문의 스레드 목록 — API 연결 후 구현 */
-export async function getAdminInquiryThreads(params: {
-  cursor: InquiryCursor | null;
-}): Promise<InquiryThreadsPage> {
-  void params;
-  throw new Error('관리자 문의 스레드 목록 API는 아직 연결되지 않았습니다');
-}
-
-/** 관리자 문의 스레드 메시지 — API 연결 후 구현 */
-export async function getAdminInquiryMessagesByThreadId(
-  threadId: string
-): Promise<{ messages: InquiryMessageDto[] }> {
-  void threadId;
-  throw new Error('관리자 문의 메시지 조회 API는 아직 연결되지 않았습니다');
 }

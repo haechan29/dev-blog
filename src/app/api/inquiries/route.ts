@@ -1,5 +1,7 @@
 import { ApiError, UnauthorizedError } from '@/errors/errors';
 import * as InquiryThreadUsecase from '@/features/inquiry/data/usecases/inquiryThreadUsecase';
+import { isInquiryThreadStatus } from '@/features/inquiry/domain/types/inquiryThreadStatus';
+import { checkAdmin } from '@/lib/admin';
 import { getUserId } from '@/lib/user';
 import { NextRequest, NextResponse } from 'next/server';
 import 'server-only';
@@ -7,15 +9,27 @@ import 'server-only';
 export async function GET(request: NextRequest) {
   try {
     const userId = await getUserId();
+    const isAdmin = await checkAdmin();
+
     const { searchParams } = new URL(request.url);
     const cursorUpdatedAt = searchParams.get('cursorUpdatedAt');
     const cursorId = searchParams.get('cursorId');
+    const statusRaw = searchParams.get('status');
 
-    const data = await InquiryThreadUsecase.getMyInquiryThreads({
-      userId,
-      cursorUpdatedAt,
-      cursorId,
-    });
+    const status =
+      statusRaw && isInquiryThreadStatus(statusRaw) ? statusRaw : undefined;
+
+    const data = isAdmin
+      ? await InquiryThreadUsecase.getInquiryThreads({
+          cursorUpdatedAt,
+          cursorId,
+          status,
+        })
+      : await InquiryThreadUsecase.getMyInquiryThreads({
+          userId,
+          cursorUpdatedAt,
+          cursorId,
+        });
 
     return NextResponse.json({ data });
   } catch (error) {

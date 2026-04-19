@@ -1,5 +1,6 @@
 import { ApiError, UnauthorizedError } from '@/errors/errors';
 import * as InquiryMessageUsecase from '@/features/inquiry/data/usecases/inquiryMessageUsecase';
+import { checkAdmin } from '@/lib/admin';
 import { getUserId } from '@/lib/user';
 import { NextRequest, NextResponse } from 'next/server';
 import 'server-only';
@@ -45,10 +46,13 @@ export async function GET(
   try {
     const { threadId } = await params;
     const userId = await getUserId();
-    const data = await InquiryMessageUsecase.getMyInquiryMessagesByThreadId({
-      userId,
-      threadId,
-    });
+    const isAdmin = await checkAdmin();
+    const data = isAdmin
+      ? await InquiryMessageUsecase.getInquiryMessagesByThreadId({ threadId })
+      : await InquiryMessageUsecase.getMyInquiryMessagesByThreadId({
+          userId,
+          threadId,
+        });
 
     return NextResponse.json({ data });
   } catch (error) {

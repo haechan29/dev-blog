@@ -37,7 +37,7 @@ export default function InquiryThreadPageClient({
   } = useQuery({
     queryKey: inquiryKeys.messages(inquiryThreadId),
     queryFn: () =>
-      InquiryClientRepository.getMyInquiryMessagesByThreadId(
+      InquiryClientRepository.getInquiryMessagesByThreadId(
         inquiryThreadId
       ).then(({ messages }) => ({ messages: toPropsList(messages) })),
     initialData: { messages: initialMessages },

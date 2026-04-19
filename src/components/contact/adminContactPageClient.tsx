@@ -28,7 +28,7 @@ export function AdminContactPageClient({
   const { data } = useQuery({
     queryKey: inquiryKeys.threads(),
     queryFn: async () => {
-      const page = await InquiryClientRepository.getAdminInquiryThreads({
+      const page = await InquiryClientRepository.getInquiryThreads({
         cursor: null,
       });
       return {

@@ -30,7 +30,7 @@ export default function ContactPageClient({
   } = useInfiniteQuery({
     queryKey: inquiryKeys.threads(),
     queryFn: ({ pageParam }) =>
-      InquiryClientRepository.getMyInquiryThreads({ cursor: pageParam }).then(
+      InquiryClientRepository.getInquiryThreads({ cursor: pageParam }).then(
         page => {
           return {
             ...page,
