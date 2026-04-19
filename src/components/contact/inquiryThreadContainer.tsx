@@ -60,7 +60,7 @@ export default function InquiryThreadContainer({
 }) {
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const isNearBottomRef = useRef<boolean>(false);
-  const shouldScrollRef = useRef<boolean>(true);
+  const shouldScrollRef = useRef<boolean>(false);
 
   const [messageInputHeightPx, setMessageInputHeightPx] = useState(
     MESSAGE_INPUT_HEIGHT_PX_MIN
@@ -100,6 +100,10 @@ export default function InquiryThreadContainer({
       isNearBottomRef.current = false;
     }
   }, [messageInputHeightPx]);
+
+  useEffect(() => {
+    shouldScrollRef.current = true;
+  }, [threadId]);
 
   useEffect(() => {
     if (shouldScrollRef.current) {
