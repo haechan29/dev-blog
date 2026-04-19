@@ -2,6 +2,7 @@ import type { InquiryMessageDto } from '@/features/inquiry/data/dto/inquiryMessa
 import type { InquiryThreadsPage } from '@/features/inquiry/data/dto/inquiryThreadDto';
 import * as InquiryMessageUsecase from '@/features/inquiry/data/usecases/inquiryMessageUsecase';
 import * as InquiryThreadUsecase from '@/features/inquiry/data/usecases/inquiryThreadUsecase';
+import type { InquiryThreadStatus } from '@/features/inquiry/domain/types/inquiryThreadStatus';
 import 'server-only';
 
 export async function getMyInquiryThreads(params: {
@@ -12,11 +13,25 @@ export async function getMyInquiryThreads(params: {
   return await InquiryThreadUsecase.getMyInquiryThreads(params);
 }
 
+export async function getInquiryThreads(params: {
+  cursorUpdatedAt: string | null;
+  cursorId: string | null;
+  status?: InquiryThreadStatus;
+}): Promise<InquiryThreadsPage> {
+  return await InquiryThreadUsecase.getInquiryThreads(params);
+}
+
 export async function getMyInquiryMessagesByThreadId(params: {
   userId?: string;
   threadId: string;
 }): Promise<{ messages: InquiryMessageDto[] }> {
   return await InquiryMessageUsecase.getMyInquiryMessagesByThreadId(params);
+}
+
+export async function getInquiryMessagesByThreadId(params: {
+  threadId: string;
+}): Promise<{ messages: InquiryMessageDto[] }> {
+  return await InquiryMessageUsecase.getInquiryMessagesByThreadId(params);
 }
 
 export async function createAdminInquiryMessage(params: {
