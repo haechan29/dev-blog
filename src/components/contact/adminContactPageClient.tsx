@@ -78,7 +78,12 @@ export function AdminContactPageClient({
         </SimpleBar>
       </aside>
 
-      <main className='ml-(--sidebar-width) flex min-h-screen min-w-0 flex-1 flex-col'>
+      <main
+        className={clsx(
+          'flex min-h-screen min-w-0 flex-1 flex-col',
+          'ml-(--sidebar-width) px-18'
+        )}
+      >
         {!threadId ? (
           <div className='flex flex-1 items-center justify-center text-gray-400'>
             스레드를 선택해주세요

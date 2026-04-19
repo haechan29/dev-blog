@@ -4,14 +4,24 @@ import InquiryImageDialog from '@/components/contact/inquiryImageDialog';
 import InquiryMessage from '@/components/contact/inquiryMessage';
 import { INQUIRY_MAX_IMAGES } from '@/features/inquiry/constants/inquiry';
 import useImages from '@/features/inquiry/domain/hooks/useImages';
-import type { InquiryImageProps } from '@/features/inquiry/ui/model/inquiryImageProps';
+import type {
+  InquiryImageProps,
+  InquiryReadyImageProps,
+} from '@/features/inquiry/ui/model/inquiryImageProps';
 import { InquiryMessageProps } from '@/features/inquiry/ui/model/inquiryMessageProps';
 import useMediaQuery, { TOUCH_QUERY } from '@/hooks/useMediaQuery';
 import { canTouch } from '@/lib/browser';
 import { createRipple } from '@/lib/dom';
 import clsx from 'clsx';
 import { AlertCircle, ImageIcon, Loader2, X } from 'lucide-react';
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 const MESSAGE_INPUT_HEIGHT_PX_MIN = 120;
 const SCROLL_THRESHOLD_PX = 100;
@@ -45,14 +55,9 @@ export default function InquiryThreadContainer({
   onSend: () => void;
   autoFocus?: boolean;
   isSending?: boolean;
-  /** true면 말풍선 삭제·복사 UI 없음 */
   readOnlyMessages?: boolean;
-  /** true면 하단 입력바를 사이트 TOC/사이드바가 아닌 어드민 패널용 여백으로 표시 */
   embeddedInAdmin?: boolean;
 }) {
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const messageInputRef = useRef<HTMLDivElement | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const isNearBottomRef = useRef<boolean>(false);
   const shouldScrollRef = useRef<boolean>(true);
@@ -60,11 +65,145 @@ export default function InquiryThreadContainer({
   const [messageInputHeightPx, setMessageInputHeightPx] = useState(
     MESSAGE_INPUT_HEIGHT_PX_MIN
   );
-  const [isFileDragOver, setIsFileDragOver] = useState(false);
+
   const [imagePreview, setImagePreview] = useState<{
     src: string;
     alt: string;
   } | null>(null);
+
+  const handleSend = useCallback(() => {
+    shouldScrollRef.current = true;
+    onSend();
+  }, [onSend]);
+
+  const handleHeightChange = useCallback((height: number) => {
+    isNearBottomRef.current = isNearBottom(
+      document.documentElement,
+      SCROLL_THRESHOLD_PX
+    );
+    setMessageInputHeightPx(Math.max(height, MESSAGE_INPUT_HEIGHT_PX_MIN));
+  }, []);
+
+  const handleReadyImageClick = useCallback(
+    (img: InquiryReadyImageProps, index: number) => {
+      setImagePreview({
+        src: img.url,
+        alt: `첨부된 이미지 ${index + 1}`,
+      });
+    },
+    []
+  );
+
+  useLayoutEffect(() => {
+    if (isNearBottomRef.current) {
+      bottomRef.current?.scrollIntoView({ block: 'start' });
+      isNearBottomRef.current = false;
+    }
+  }, [messageInputHeightPx]);
+
+  useEffect(() => {
+    if (shouldScrollRef.current) {
+      bottomRef.current?.scrollIntoView({ block: 'start' });
+      shouldScrollRef.current = false;
+    }
+  }, [threadId, messages.length]);
+
+  return (
+    <>
+      <div
+        className='pt-4 pb-(--message-input-height)'
+        style={{ '--message-input-height': `${messageInputHeightPx}px` }}
+      >
+        <ul className='flex flex-col gap-3 list-none p-0 m-0' role='list'>
+          {messages.map((msg, index) => {
+            return (
+              <li key={msg.id} className='w-full'>
+                {msg.showDate && (
+                  <div
+                    className={clsx(
+                      'flex justify-center my-5',
+                      index === 0 && 'mt-0'
+                    )}
+                  >
+                    <span className='text-[11px] font-medium text-gray-400 tracking-wide'>
+                      {msg.dateLabel}
+                    </span>
+                  </div>
+                )}
+
+                <InquiryMessage
+                  threadId={threadId}
+                  messageId={msg.id}
+                  isDeleted={msg.isDeleted}
+                  content={msg.content}
+                  imageUrls={msg.imageUrls}
+                  showTime={msg.showTime}
+                  timeLabel={msg.timeLabel}
+                  isUser={msg.senderType === 'USER'}
+                  readOnly={readOnlyMessages}
+                  onImagePreview={(src, alt) => {
+                    setImagePreview({ src, alt });
+                  }}
+                />
+              </li>
+            );
+          })}
+        </ul>
+        <div ref={bottomRef} aria-hidden />
+      </div>
+
+      <InquiryMessageInput
+        draft={draft}
+        images={images}
+        onDraftChange={onDraftChange}
+        onImageFilesPicked={onImageFilesPicked}
+        onImageRemove={onImageRemove}
+        onSend={handleSend}
+        onHeightChange={handleHeightChange}
+        onReadyImageClick={handleReadyImageClick}
+        autoFocus={autoFocus}
+        isSending={isSending}
+        embeddedInAdmin={embeddedInAdmin}
+      />
+
+      <InquiryImageDialog
+        imagePreview={imagePreview}
+        setImagePreview={setImagePreview}
+      />
+    </>
+  );
+}
+
+function InquiryMessageInput({
+  draft,
+  images,
+  onDraftChange,
+  onImageFilesPicked,
+  onImageRemove,
+  onSend,
+  onHeightChange,
+  onReadyImageClick,
+  autoFocus = false,
+  isSending = false,
+  embeddedInAdmin = false,
+}: {
+  draft: string;
+  images: InquiryImageProps[];
+  onDraftChange: (draft: string) => void;
+  onImageFilesPicked: (files: File[]) => void;
+  onImageRemove: (img: InquiryImageProps) => void;
+  onSend: () => void;
+  onHeightChange: (height: number) => void;
+  onReadyImageClick: (img: InquiryReadyImageProps, index: number) => void;
+  autoFocus?: boolean;
+  isSending?: boolean;
+  embeddedInAdmin?: boolean;
+}) {
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const messageInputRef = useRef<HTMLDivElement | null>(null);
+
+  const [isFileDragOver, setIsFileDragOver] = useState(false);
 
   const isTouch = useMediaQuery(TOUCH_QUERY);
 
@@ -111,7 +250,6 @@ export default function InquiryThreadContainer({
 
   const sendMessage = () => {
     if (!canSend) return;
-    shouldScrollRef.current = true;
     onSend();
   };
 
@@ -127,34 +265,14 @@ export default function InquiryThreadContainer({
     const el = messageInputRef.current;
     if (!el) return;
 
-    const measureMessageInputHeight = () => {
-      isNearBottomRef.current = isNearBottom(
-        document.documentElement,
-        SCROLL_THRESHOLD_PX
-      );
-      const h = Math.ceil(el.getBoundingClientRect().height);
-      setMessageInputHeightPx(Math.max(h, MESSAGE_INPUT_HEIGHT_PX_MIN));
+    const measure = () => {
+      const height = Math.ceil(el.getBoundingClientRect().height);
+      onHeightChange(height);
     };
-
-    measureMessageInputHeight();
-    const ro = new ResizeObserver(measureMessageInputHeight);
+    const ro = new ResizeObserver(measure);
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
-
-  useLayoutEffect(() => {
-    if (isNearBottomRef.current) {
-      bottomRef.current?.scrollIntoView({ block: 'start' });
-      isNearBottomRef.current = false;
-    }
-  }, [messageInputHeightPx]);
-
-  useEffect(() => {
-    if (shouldScrollRef.current) {
-      bottomRef.current?.scrollIntoView({ block: 'start' });
-      shouldScrollRef.current = false;
-    }
-  }, [threadId, messages.length]);
+  }, [onHeightChange]);
 
   useEffect(() => {
     if (!autoFocus) return;
@@ -173,60 +291,17 @@ export default function InquiryThreadContainer({
       />
 
       <div
-        className={clsx('pt-4', 'pb-(--message-input-height)')}
-        style={{ '--message-input-height': `${messageInputHeightPx}px` }}
-      >
-        <ul className='flex flex-col gap-3 list-none p-0 m-0' role='list'>
-          {messages.map((msg, index) => {
-            return (
-              <li key={msg.id} className='w-full'>
-                {msg.showDate && (
-                  <div
-                    className={clsx(
-                      'flex justify-center my-5',
-                      index === 0 && 'mt-0'
-                    )}
-                  >
-                    <span className='text-[11px] font-medium text-gray-400 tracking-wide'>
-                      {msg.dateLabel}
-                    </span>
-                  </div>
-                )}
-
-                <InquiryMessage
-                  threadId={threadId}
-                  messageId={msg.id}
-                  isDeleted={msg.isDeleted}
-                  content={msg.content}
-                  imageUrls={msg.imageUrls}
-                  showTime={msg.showTime}
-                  timeLabel={msg.timeLabel}
-                  isUser={msg.senderType === 'USER'}
-                  readOnly={readOnlyMessages}
-                  onImagePreview={(src, alt) => {
-                    setImagePreview({ src, alt });
-                  }}
-                />
-              </li>
-            );
-          })}
-        </ul>
-        <div ref={bottomRef} aria-hidden />
-      </div>
-
-      <div
         ref={messageInputRef}
         className={clsx(
-          'fixed bottom-0 z-40 border-t border-gray-200 bg-white',
-          embeddedInAdmin ? 'left-(--sidebar-width) right-0' : 'inset-x-0'
+          'fixed bottom-0 z-40 border-t border-gray-200 bg-white right-0',
+          embeddedInAdmin ? 'left-(--sidebar-width)' : 'left-0'
         )}
       >
         <div
           className={clsx(
-            embeddedInAdmin ? 'px-4' : 'px-6 md:px-12 xl:px-18',
-            !embeddedInAdmin && 'xl:ml-(--sidebar-width)',
-            !embeddedInAdmin &&
-              'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
+            embeddedInAdmin
+              ? 'px-18'
+              : 'px-6 md:px-12 xl:px-18 xl:ml-(--sidebar-width) xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
           )}
         >
           <div className='flex gap-3 items-end py-4'>
@@ -275,12 +350,7 @@ export default function InquiryThreadContainer({
                           type='button'
                           aria-label={`첨부 이미지 ${index + 1} 크게 보기`}
                           className='block h-full w-full cursor-zoom-in border-0 bg-transparent p-0'
-                          onClick={() => {
-                            setImagePreview({
-                              src: img.url,
-                              alt: `첨부된 이미지 ${index + 1}`,
-                            });
-                          }}
+                          onClick={() => onReadyImageClick(img, index)}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
@@ -381,11 +451,6 @@ export default function InquiryThreadContainer({
           </div>
         </div>
       </div>
-
-      <InquiryImageDialog
-        imagePreview={imagePreview}
-        setImagePreview={setImagePreview}
-      />
     </>
   );
 }

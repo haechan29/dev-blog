@@ -34,7 +34,6 @@ export default function InquiryMessage({
   timeLabel: string;
   isUser: boolean;
   onImagePreview: (src: string, alt: string) => void;
-  /** true면 복사·삭제 메뉴·롱프레스 없음 (어드민 조회 등) */
   readOnly?: boolean;
 }) {
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
