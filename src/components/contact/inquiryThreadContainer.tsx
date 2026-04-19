@@ -32,6 +32,8 @@ export default function InquiryThreadContainer({
   onSend,
   autoFocus = false,
   isSending = false,
+  readOnlyMessages = false,
+  embeddedInAdmin = false,
 }: {
   threadId?: string;
   draft: string;
@@ -43,6 +45,10 @@ export default function InquiryThreadContainer({
   onSend: () => void;
   autoFocus?: boolean;
   isSending?: boolean;
+  /** true면 말풍선 삭제·복사 UI 없음 */
+  readOnlyMessages?: boolean;
+  /** true면 하단 입력바를 사이트 TOC/사이드바가 아닌 어드민 패널용 여백으로 표시 */
+  embeddedInAdmin?: boolean;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -196,6 +202,7 @@ export default function InquiryThreadContainer({
                   showTime={msg.showTime}
                   timeLabel={msg.timeLabel}
                   isUser={msg.senderType === 'USER'}
+                  readOnly={readOnlyMessages}
                   onImagePreview={(src, alt) => {
                     setImagePreview({ src, alt });
                   }}
@@ -209,13 +216,17 @@ export default function InquiryThreadContainer({
 
       <div
         ref={messageInputRef}
-        className='fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white'
+        className={clsx(
+          'fixed bottom-0 z-40 border-t border-gray-200 bg-white',
+          embeddedInAdmin ? 'left-(--sidebar-width) right-0' : 'inset-x-0'
+        )}
       >
         <div
           className={clsx(
-            'px-6 md:px-12 xl:px-18',
-            'xl:ml-(--sidebar-width)',
-            'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
+            embeddedInAdmin ? 'px-4' : 'px-6 md:px-12 xl:px-18',
+            !embeddedInAdmin && 'xl:ml-(--sidebar-width)',
+            !embeddedInAdmin &&
+              'xl:mr-[calc(var(--toc-width)+var(--toc-margin))]'
           )}
         >
           <div className='flex gap-3 items-end py-4'>

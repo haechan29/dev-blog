@@ -4,7 +4,6 @@ import { auth } from '@/auth';
 import { UnauthorizedError } from '@/errors/errors';
 import * as InquiryServerRepository from '@/features/inquiry/data/repository/inquiryServerRepository';
 import { assertAdmin } from '@/lib/admin';
-import { revalidatePath } from 'next/cache';
 
 export async function createAdminInquiryMessageAction({
   threadId,
@@ -23,14 +22,10 @@ export async function createAdminInquiryMessageAction({
     throw new UnauthorizedError('인증되지 않은 요청입니다');
   }
 
-  const result = await InquiryServerRepository.createAdminInquiryMessage({
+  return await InquiryServerRepository.createAdminInquiryMessage({
     adminId,
     threadId,
     content,
     images,
   });
-
-  revalidatePath('/admin/contact', 'layout');
-
-  return result;
 }

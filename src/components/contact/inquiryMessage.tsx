@@ -23,6 +23,7 @@ export default function InquiryMessage({
   timeLabel,
   isUser,
   onImagePreview,
+  readOnly = false,
 }: {
   threadId?: string;
   messageId: string;
@@ -33,6 +34,8 @@ export default function InquiryMessage({
   timeLabel: string;
   isUser: boolean;
   onImagePreview: (src: string, alt: string) => void;
+  /** true면 복사·삭제 메뉴·롱프레스 없음 (어드민 조회 등) */
+  readOnly?: boolean;
 }) {
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const queryClient = useQueryClient();
@@ -78,8 +81,8 @@ export default function InquiryMessage({
 
   const hasText = content.trim().length > 0;
   const hasImages = imageUrls.length > 0;
-  const showMenu = isUser && hasText && isTouchDevice === false;
-  const canLongPress = isUser && hasText && isTouchDevice === true;
+  const showMenu = !readOnly && isUser && hasText && isTouchDevice === false;
+  const canLongPress = !readOnly && isUser && hasText && isTouchDevice === true;
 
   const isDesktopDropdownOpen = useMemo(
     () => isTouchDevice === false && isDropdownOpen,
@@ -100,18 +103,18 @@ export default function InquiryMessage({
   }, [canLongPress]);
 
   const onTouchStartLongPress = useCallback(() => {
-    if (!canLongPress) return;
+    if (readOnly || !canLongPress) return;
     clearLongPressTimer();
     longPressTimerRef.current = setTimeout(() => {
       longPressTimerRef.current = null;
       setIsDropdownOpen(true);
     }, LONG_PRESS_MS);
-  }, [canLongPress, clearLongPressTimer]);
+  }, [canLongPress, clearLongPressTimer, readOnly]);
 
   const onTouchEndLongPress = useCallback(() => {
-    if (!canLongPress) return;
+    if (readOnly || !canLongPress) return;
     clearLongPressTimer();
-  }, [canLongPress, clearLongPressTimer]);
+  }, [canLongPress, clearLongPressTimer, readOnly]);
 
   useEffect(() => () => clearLongPressTimer(), [clearLongPressTimer]);
 
@@ -123,7 +126,26 @@ export default function InquiryMessage({
     [isTouchDevice]
   );
 
-  const bubble = (
+  const bubbleInner = (
+    <div
+      onTouchStart={onTouchStartLongPress}
+      onTouchEnd={onTouchEndLongPress}
+      onTouchCancel={onTouchEndLongPress}
+      onContextMenu={e => {
+        if (!readOnly && canLongPress) e.preventDefault();
+      }}
+      className={clsx(
+        'min-w-0 rounded-2xl px-3.5 py-2.5 text-[15px] leading-snug wrap-break-word whitespace-pre-wrap',
+        isUser ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900'
+      )}
+    >
+      {content}
+    </div>
+  );
+
+  const bubble = readOnly ? (
+    bubbleInner
+  ) : (
     <InquiryMessageDropdown
       threadId={threadId}
       skipRender={isTouchDevice !== true}
@@ -136,20 +158,7 @@ export default function InquiryMessage({
       onDeleteConfirmed={handleDeleteConfirmed}
       onCopy={handleCopy}
     >
-      <div
-        onTouchStart={onTouchStartLongPress}
-        onTouchEnd={onTouchEndLongPress}
-        onTouchCancel={onTouchEndLongPress}
-        onContextMenu={e => {
-          if (canLongPress) e.preventDefault();
-        }}
-        className={clsx(
-          'min-w-0 rounded-2xl px-3.5 py-2.5 text-[15px] leading-snug wrap-break-word whitespace-pre-wrap',
-          isUser ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900'
-        )}
-      >
-        {content}
-      </div>
+      {bubbleInner}
     </InquiryMessageDropdown>
   );
 
