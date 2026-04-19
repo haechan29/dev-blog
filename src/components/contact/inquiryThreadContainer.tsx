@@ -139,6 +139,7 @@ export default function InquiryThreadContainer({
                   imageUrls={msg.imageUrls}
                   showTime={msg.showTime}
                   timeLabel={msg.timeLabel}
+                  showSenderLabel={msg.showSenderLabel}
                   isUser={msg.senderType === 'USER'}
                   readOnly={readOnlyMessages}
                   onImagePreview={(src, alt) => {
@@ -293,7 +294,7 @@ function InquiryMessageInput({
       <div
         ref={messageInputRef}
         className={clsx(
-          'fixed bottom-0 z-40 border-t border-gray-200 bg-white right-0',
+          'fixed bottom-0 z-40 border-gray-200 bg-white/80 backdrop-blur-md right-0',
           embeddedInAdmin ? 'left-(--sidebar-width)' : 'left-0'
         )}
       >

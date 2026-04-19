@@ -57,15 +57,20 @@ export function toPropsList(dtos: InquiryMessageDto[]): InquiryMessageProps[] {
 
   return messages.map((message, index) => {
     const isPromptMessage = index === 0;
+    const prev = messages[index - 1];
     const showDate =
       isPromptMessage ||
-      localDateKey(message.createdAt) !==
-        localDateKey(messages[index - 1].createdAt);
+      localDateKey(message.createdAt) !== localDateKey(prev.createdAt);
     const showTime =
       !isPromptMessage &&
       (index === messages.length - 1 ||
         localTimeKey(message.createdAt) !==
           localTimeKey(messages[index + 1].createdAt));
+    const showSenderLabel =
+      message.senderType === 'ADMIN' &&
+      (isPromptMessage ||
+        prev.senderType !== 'ADMIN' ||
+        localTimeKey(message.createdAt) !== localTimeKey(prev.createdAt));
     return {
       id: message.id,
       senderType: message.senderType,
@@ -77,6 +82,7 @@ export function toPropsList(dtos: InquiryMessageDto[]): InquiryMessageProps[] {
       dateLabel: formatDate(message.createdAt),
       showTime,
       timeLabel: formatTime(message.createdAt),
+      showSenderLabel,
     };
   });
 }

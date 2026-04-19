@@ -11,4 +11,5 @@ export interface InquiryMessageProps {
   dateLabel: string;
   showTime: boolean;
   timeLabel: string;
+  showSenderLabel: boolean;
 }

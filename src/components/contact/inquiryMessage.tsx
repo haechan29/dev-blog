@@ -21,6 +21,7 @@ export default function InquiryMessage({
   imageUrls,
   showTime,
   timeLabel,
+  showSenderLabel,
   isUser,
   onImagePreview,
   readOnly = false,
@@ -32,6 +33,7 @@ export default function InquiryMessage({
   imageUrls: string[];
   showTime: boolean;
   timeLabel: string;
+  showSenderLabel: boolean;
   isUser: boolean;
   onImagePreview: (src: string, alt: string) => void;
   readOnly?: boolean;
@@ -245,7 +247,7 @@ export default function InquiryMessage({
 
   return (
     <div className='flex flex-col gap-1'>
-      {!isUser && <div className='text-sm ml-1'>운영자</div>}
+      {showSenderLabel && <div className='text-sm ml-1'>운영자</div>}
       <div
         className={clsx(
           'flex w-full',
