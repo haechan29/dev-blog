@@ -5,6 +5,7 @@ export interface NotificationEntity {
   user_id: string;
   type: NotificationType;
   is_read: boolean;
+  inquiry_thread_id: string | null;
   post_id: string | null;
   comment_id: number | null;
   comment_count: number | null;
@@ -20,4 +21,5 @@ export interface NotificationEntity {
   } | null;
   representative_comment: { content: string } | null;
   comment: { content: string } | null;
+  inquiry_thread: { first_message_preview: string | null } | null;
 }

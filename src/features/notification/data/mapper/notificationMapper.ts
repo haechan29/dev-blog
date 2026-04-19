@@ -7,6 +7,8 @@ export function toDto(entity: NotificationEntity): NotificationDto {
     userId: entity.user_id,
     type: entity.type,
     isRead: entity.is_read,
+    inquiryThreadId: entity.inquiry_thread_id ?? null,
+    firstMessagePreview: entity.inquiry_thread?.first_message_preview ?? null,
     postId: entity.post_id,
     commentId: entity.comment_id,
     commentCount: entity.comment_count,

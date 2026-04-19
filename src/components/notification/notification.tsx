@@ -3,7 +3,7 @@
 import ProfileIcon from '@/components/user/profileIcon';
 import type { NotificationProps } from '@/features/notification/ui/model/notificationProps';
 import clsx from 'clsx';
-import { BarChart3, Heart, ThumbsUp, Users } from 'lucide-react';
+import { BarChart3, Heart, MessageCircle, ThumbsUp, Users } from 'lucide-react';
 import Link from 'next/link';
 
 function NotificationLeading({
@@ -45,6 +45,12 @@ function NotificationLeading({
       return (
         <div className={clsx(iconShellClass, 'bg-indigo-100')} aria-hidden>
           <Users className='w-4 h-4 text-indigo-700' strokeWidth={2} />
+        </div>
+      );
+    case 'inquiry_reply':
+      return (
+        <div className={clsx(iconShellClass, 'bg-amber-50')} aria-hidden>
+          <MessageCircle className='w-4 h-4 text-amber-800' strokeWidth={2} />
         </div>
       );
   }

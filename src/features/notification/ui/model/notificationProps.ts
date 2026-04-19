@@ -32,9 +32,14 @@ export interface CommentNotificationProps extends NotificationPropsBase {
   representativeProfileImageUrl: string | null;
 }
 
+export interface InquiryReplyNotificationProps extends NotificationPropsBase {
+  type: 'inquiry_reply';
+}
+
 export type NotificationProps =
   | PostViewMilestoneNotificationProps
   | PostLikesMilestoneNotificationProps
   | CommentLikeMilestoneNotificationProps
   | SubscriberMilestoneNotificationProps
-  | CommentNotificationProps;
+  | CommentNotificationProps
+  | InquiryReplyNotificationProps;

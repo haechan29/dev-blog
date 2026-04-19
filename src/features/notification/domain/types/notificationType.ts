@@ -3,4 +3,5 @@ export type NotificationType =
   | 'post_view_milestone'
   | 'post_like_milestone'
   | 'comment_like_milestone'
-  | 'subscriber_milestone';
+  | 'subscriber_milestone'
+  | 'inquiry_reply';

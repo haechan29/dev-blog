@@ -7,6 +7,8 @@ const NOTIFICATION_SELECT_FIELDS = `
   user_id, 
   type, 
   is_read, 
+  inquiry_thread_id,
+  inquiry_thread:inquiry_thread_id ( first_message_preview ),
   post_id, 
   comment_id, 
   comment_count, 
