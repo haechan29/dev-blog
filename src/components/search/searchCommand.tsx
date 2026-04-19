@@ -107,6 +107,7 @@ export default function SearchCommand({
               onValueChange={setQuery}
               onFocus={() => setIsDropdownOpen(true)}
               onKeyDown={e => {
+                if (e.nativeEvent.isComposing) return;
                 if (e.key === 'Enter') {
                   navigateFromSearchInput();
                 }

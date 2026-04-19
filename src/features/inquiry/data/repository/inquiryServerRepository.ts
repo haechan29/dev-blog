@@ -1,7 +1,44 @@
-import { toDomain } from '@/features/inquiry/data/mapper/inquiryMapper';
-import * as InquiryQueries from '@/features/inquiry/data/queries/inquiryQueries';
+import type { InquiryMessageDto } from '@/features/inquiry/data/dto/inquiryMessageDto';
+import type { InquiryThreadsPage } from '@/features/inquiry/data/dto/inquiryThreadDto';
+import * as InquiryMessageUsecase from '@/features/inquiry/data/usecases/inquiryMessageUsecase';
+import * as InquiryThreadUsecase from '@/features/inquiry/data/usecases/inquiryThreadUsecase';
+import type { InquiryThreadStatus } from '@/features/inquiry/domain/types/inquiryThreadStatus';
+import 'server-only';
 
-export async function getInquiries() {
-  const entites = await InquiryQueries.getInquiries();
-  return entites.map(toDomain);
+export async function getMyInquiryThreads(params: {
+  userId?: string;
+  cursorUpdatedAt: string | null;
+  cursorId: string | null;
+}): Promise<InquiryThreadsPage> {
+  return await InquiryThreadUsecase.getMyInquiryThreads(params);
+}
+
+export async function getInquiryThreads(params: {
+  cursorUpdatedAt: string | null;
+  cursorId: string | null;
+  status?: InquiryThreadStatus;
+}): Promise<InquiryThreadsPage> {
+  return await InquiryThreadUsecase.getInquiryThreads(params);
+}
+
+export async function getMyInquiryMessagesByThreadId(params: {
+  userId?: string;
+  threadId: string;
+}): Promise<{ messages: InquiryMessageDto[] }> {
+  return await InquiryMessageUsecase.getMyInquiryMessagesByThreadId(params);
+}
+
+export async function getInquiryMessagesByThreadId(params: {
+  threadId: string;
+}): Promise<{ messages: InquiryMessageDto[] }> {
+  return await InquiryMessageUsecase.getInquiryMessagesByThreadId(params);
+}
+
+export async function createAdminInquiryMessage(params: {
+  adminId: string;
+  threadId: string;
+  content: string;
+  images?: string[];
+}): Promise<{ messageId: string }> {
+  return await InquiryMessageUsecase.createAdminInquiryMessage(params);
 }

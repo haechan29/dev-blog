@@ -101,6 +101,7 @@ export default function SearchPageClient({
               value={query}
               onChange={e => setQuery(e.target.value)}
               onKeyDown={e => {
+                if (e.nativeEvent.isComposing) return;
                 if (e.key === 'Enter') {
                   navigateFromSearchInput();
                 }

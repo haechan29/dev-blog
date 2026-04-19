@@ -1,5 +1,64 @@
+import type { InquiryMessageDto } from '@/features/inquiry/data/dto/inquiryMessageDto';
+import type { InquiryThreadsPage } from '@/features/inquiry/data/dto/inquiryThreadDto';
+import type { InquiryCursor } from '@/features/inquiry/domain/types/page';
 import { api } from '@/lib/api';
 
-export async function createInquiry(content: string): Promise<void> {
-  await api.post('/api/inquiries', { content });
+export async function getInquiryThreads({
+  cursor,
+}: {
+  cursor: InquiryCursor | null;
+}): Promise<InquiryThreadsPage> {
+  const searchParams = new URLSearchParams({
+    ...(!!cursor && {
+      cursorUpdatedAt: cursor.updatedAt,
+      cursorId: cursor.id,
+    }),
+  });
+
+  const qs = searchParams.toString();
+  const response = await api.get(
+    qs ? `/api/inquiries?${qs}` : '/api/inquiries'
+  );
+  return response.data;
+}
+
+export async function getInquiryMessagesByThreadId(
+  threadId: string
+): Promise<{ messages: InquiryMessageDto[] }> {
+  const response = await api.get(`/api/inquiries/${threadId}/messages`);
+  return response.data;
+}
+
+export async function createInquiryThread(
+  content: string,
+  images?: string[]
+): Promise<{ threadId: string }> {
+  const response = await api.post(`/api/inquiries`, {
+    content,
+    images,
+  });
+  return response.data;
+}
+
+export async function createInquiryMessage(
+  threadId: string,
+  content: string,
+  images?: string[]
+): Promise<{ messageId: string }> {
+  const response = await api.post(`/api/inquiries/${threadId}/messages`, {
+    content,
+    images,
+  });
+  return response.data;
+}
+
+export async function deleteInquiryMessage(
+  threadId: string,
+  messageId: string
+): Promise<void> {
+  await api.delete(`/api/inquiries/${threadId}/messages/${messageId}`);
+}
+
+export async function deleteInquiryThread(threadId: string): Promise<void> {
+  await api.delete(`/api/inquiries/${threadId}`);
 }

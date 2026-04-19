@@ -5,7 +5,9 @@ import { formatDateBrief, formatRelativeTime } from '@/lib/date';
 
 const FALLBACK_POST_TITLE = '제목 없음';
 const FALLBACK_COMMENT_PREVIEW = '댓글 내용 없음';
+const FALLBACK_INQUIRY_PREVIEW = '문의 제목 없음';
 const COMMENT_PREVIEW_LIMIT = 120;
+const INQUIRY_PREVIEW_LIMIT = 120;
 
 function toPostUrl({
   postId,
@@ -36,6 +38,13 @@ function toCommentPreview(commentContent: string | null) {
   return previewRaw
     ? previewRaw.slice(0, COMMENT_PREVIEW_LIMIT)
     : FALLBACK_COMMENT_PREVIEW;
+}
+
+function toInquiryPreview(preview: string | null) {
+  const previewRaw = preview?.trim();
+  return previewRaw
+    ? previewRaw.slice(0, INQUIRY_PREVIEW_LIMIT)
+    : FALLBACK_INQUIRY_PREVIEW;
 }
 
 function formatNotificationTime(isoString: string): string {
@@ -122,6 +131,15 @@ export function toProps(dto: NotificationDto): NotificationProps {
         href: null,
         primary: `구독자가 ${value.toLocaleString()}명이 되었어요`,
         secondary: null,
+      };
+    }
+    case 'inquiry_reply': {
+      return {
+        type: 'inquiry_reply',
+        ...baseFields(dto),
+        href: dto.inquiryThreadId ? `/contact/${dto.inquiryThreadId}` : null,
+        primary: '문의에 새로운 답변이 도착했어요',
+        secondary: toInquiryPreview(dto.firstMessagePreview),
       };
     }
   }

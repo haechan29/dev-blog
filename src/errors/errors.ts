@@ -40,6 +40,12 @@ export class NotFoundError extends ApiError {
   }
 }
 
+export class ForbiddenError extends ApiError {
+  constructor(message: string) {
+    super(message, ErrorCode.FORBIDDEN, 403);
+  }
+}
+
 export class ExternalServiceError extends ApiError {
   constructor(message: string) {
     super(message, ErrorCode.EXTERNAL_SERVICE_ERROR, 422);

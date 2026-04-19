@@ -42,7 +42,7 @@ export default function Bgm({
           disabled={isDisabled}
           onClick={e => {
             if (isDisabled) return;
-            if (canTouch) createRipple(e);
+            if (canTouch()) createRipple(e);
             dispatch(setRequestedBgm({ src, containerId }));
           }}
           className={clsx(

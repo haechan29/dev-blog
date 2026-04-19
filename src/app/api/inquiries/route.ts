@@ -1,34 +1,75 @@
-import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
-import * as InquiryQueries from '@/features/inquiry/data/queries/inquiryQueries';
+import { ApiError, UnauthorizedError } from '@/errors/errors';
+import * as InquiryThreadUsecase from '@/features/inquiry/data/usecases/inquiryThreadUsecase';
+import { isInquiryThreadStatus } from '@/features/inquiry/domain/types/inquiryThreadStatus';
+import { checkAdmin } from '@/lib/admin';
 import { getUserId } from '@/lib/user';
 import { NextRequest, NextResponse } from 'next/server';
+import 'server-only';
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
     const userId = await getUserId();
+    const isAdmin = await checkAdmin();
 
-    if (!userId) {
-      throw new UnauthorizedError('사용자 아이디를 찾을 수 없습니다');
-    }
+    const { searchParams } = new URL(request.url);
+    const cursorUpdatedAt = searchParams.get('cursorUpdatedAt');
+    const cursorId = searchParams.get('cursorId');
+    const statusRaw = searchParams.get('status');
 
-    const { content } = await request.json();
+    const status =
+      statusRaw && isInquiryThreadStatus(statusRaw) ? statusRaw : undefined;
 
-    if (!content || content.trim() === '') {
-      throw new ValidationError('내용을 입력해주세요');
-    }
+    const data = isAdmin
+      ? await InquiryThreadUsecase.getInquiryThreads({
+          cursorUpdatedAt,
+          cursorId,
+          status,
+        })
+      : await InquiryThreadUsecase.getMyInquiryThreads({
+          userId,
+          cursorUpdatedAt,
+          cursorId,
+        });
 
-    await InquiryQueries.createInquiry({ userId, content });
-
-    return NextResponse.json({ data: null });
+    return NextResponse.json({ data });
   } catch (error) {
-    console.error('문의 등록에 실패했습니다', error);
+    console.error('스레드 목록 조회에 실패했습니다', error);
 
     if (error instanceof ApiError) {
       return error.toResponse();
     }
 
     return NextResponse.json(
-      { error: '문의 등록에 실패했습니다' },
+      { error: '스레드 목록 조회에 실패했습니다' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const userId = await getUserId();
+    if (!userId) {
+      throw new UnauthorizedError('인증되지 않은 요청입니다');
+    }
+
+    const { content = '', images } = await request.json();
+    const data = await InquiryThreadUsecase.createMyInquiryThread({
+      userId,
+      content,
+      images,
+    });
+
+    return NextResponse.json({ data }, { status: 201 });
+  } catch (error) {
+    console.error('스레드 생성에 실패했습니다', error);
+
+    if (error instanceof ApiError) {
+      return error.toResponse();
+    }
+
+    return NextResponse.json(
+      { error: '스레드 생성에 실패했습니다' },
       { status: 500 }
     );
   }

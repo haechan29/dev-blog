@@ -40,7 +40,7 @@ export default function Bgm({ node }: NodeViewProps) {
           disabled={isDisabled}
           onClick={e => {
             if (isDisabled) return;
-            if (canTouch) createRipple(e);
+            if (canTouch()) createRipple(e);
             dispatch(setRequestedBgm({ src, containerId: id }));
           }}
           className={clsx(

@@ -5,6 +5,8 @@ export interface NotificationDto {
   userId: string;
   type: NotificationType;
   isRead: boolean;
+  inquiryThreadId: string | null;
+  firstMessagePreview: string | null;
   postId: string | null;
   commentId: number | null;
   commentCount: number | null;

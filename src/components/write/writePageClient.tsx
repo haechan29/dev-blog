@@ -23,7 +23,7 @@ import { draftKeys, postKeys } from '@/queries/keys';
 import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Heart } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
 function getInitialState(
@@ -71,6 +71,7 @@ export default function WritePageClient({
   );
 
   const editorRef = useRef<TiptapEditorRef>(null);
+  const titleRef = useRef<HTMLTextAreaElement>(null);
   const saveSucceededTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null
   );
@@ -83,6 +84,18 @@ export default function WritePageClient({
 
   useBgmController();
 
+  const setTitleWithNormalization = (value: string) => {
+    setTitle(value.replace(/\n/g, ' '));
+  };
+
+  useLayoutEffect(() => {
+    const target = titleRef.current;
+    if (!target) return;
+
+    target.style.height = 'auto';
+    target.style.height = `${target.scrollHeight}px`;
+  }, [title]);
+
   useEffect(() => {
     return () => {
       if (saveSucceededTimeoutRef.current) {
@@ -92,7 +105,7 @@ export default function WritePageClient({
   }, []);
 
   const applyDraftToEditor = (draft: DraftDto) => {
-    setTitle(draft.title ?? '');
+    setTitleWithNormalization(draft.title ?? '');
     setTags(draft.tags ?? []);
     editorRef.current?.setContent(draft.contentJson);
   };
@@ -273,11 +286,10 @@ export default function WritePageClient({
         <div className='max-w-[65ch] mx-auto'>
           <div className='flex flex-col gap-6 mb-10'>
             <textarea
+              ref={titleRef}
               value={title}
               onChange={e => {
-                setTitle(e.target.value);
-                e.target.style.height = 'auto';
-                e.target.style.height = e.target.scrollHeight + 'px';
+                setTitleWithNormalization(e.target.value);
               }}
               placeholder='제목'
               rows={1}

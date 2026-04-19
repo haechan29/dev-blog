@@ -45,3 +45,9 @@ export const notificationKeys = {
   unreadCount: () => ['notifications', 'unread-count'] as const,
   list: () => ['notifications', 'list'] as const,
 };
+
+export const inquiryKeys = {
+  threads: () => ['inquiry', 'threads'] as const,
+  messages: (threadId: string) =>
+    ['inquiry', 'threads', { threadId }, 'messages'] as const,
+};

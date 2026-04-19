@@ -29,7 +29,7 @@ export default function LoginPage() {
             <button
               key={provider}
               onClick={e => {
-                if (canTouch) createRipple(e);
+                if (canTouch()) createRipple(e);
                 localStorage.setItem(LAST_LOGIN_PROVIDER_KEY, provider);
                 setIsPending(true);
                 signIn(provider, { callbackUrl });
