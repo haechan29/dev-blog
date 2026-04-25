@@ -11,15 +11,15 @@ export function toDomain(dto: PostDto): Post {
     dto.preview,
     dto.tags,
     dto.userId,
-    dto.authorName,
-    dto.bio,
-    dto.profileImageUrl,
+    dto.user.nickname,
+    dto.user.bio,
+    dto.user.profileImageUrl,
     dto.seriesId,
     dto.seriesOrder,
-    dto.seriesTitle,
-    dto.likeCount,
-    dto.viewCount,
-    dto.commentCount,
+    dto.series?.title ?? null,
+    dto.postStat.likeCount,
+    dto.postStat.viewCount,
+    dto.postStat.commentCount,
     dto.visibility
   );
 }

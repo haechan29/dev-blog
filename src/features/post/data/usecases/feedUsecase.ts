@@ -1,6 +1,7 @@
 import * as PostSkipQueries from '@/features/post-interaction/data/queries/postSkipQueries';
 import * as PostViewQueries from '@/features/post-interaction/data/queries/postViewQueries';
-import { FeedPostEntity, toDto } from '@/features/post/data/mapper/feedMapper';
+import { FeedPostEntity } from '@/features/post/data/entities/feedPostEntities';
+import { toDto } from '@/features/post/data/mapper/feedMapper';
 import * as FeedQueries from '@/features/post/data/queries/feedQueries';
 import * as SubscriptionQueries from '@/features/subscription/data/queries/subscriptionQueries';
 

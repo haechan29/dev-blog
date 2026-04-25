@@ -11,7 +11,17 @@ export function toDomain(dto: SeriesDto): Series {
     userId: dto.userId,
     authorName: dto.authorName,
     profileImageUrl: dto.profileImageUrl,
-    posts: dto.posts,
+    posts: dto.posts.map(post => ({
+      id: post.id,
+      title: post.title,
+      createdAt: post.createdAt,
+      seriesId: post.seriesId,
+      seriesOrder: post.seriesOrder,
+      likeCount: post.postStat.likeCount,
+      viewCount: post.postStat.viewCount,
+      commentCount: post.postStat.commentCount,
+      visibility: post.visibility,
+    })),
     postCount: dto.postCount,
   };
 }

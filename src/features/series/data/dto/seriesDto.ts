@@ -9,17 +9,14 @@ export interface SeriesDto {
   userId: string;
   authorName: string | null;
   profileImageUrl: string | null;
-  posts: Pick<
+  posts: (Pick<
     PostDto,
-    | 'id'
-    | 'title'
-    | 'createdAt'
-    | 'seriesId'
-    | 'seriesOrder'
-    | 'likeCount'
-    | 'viewCount'
-    | 'commentCount'
-    | 'visibility'
-  >[];
+    'id' | 'title' | 'createdAt' | 'seriesId' | 'seriesOrder' | 'visibility'
+  > & {
+    postStat: Pick<
+      PostDto['postStat'],
+      'likeCount' | 'viewCount' | 'commentCount'
+    >;
+  })[];
   postCount: number;
 }

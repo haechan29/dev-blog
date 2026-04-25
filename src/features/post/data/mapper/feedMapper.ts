@@ -1,10 +1,6 @@
 import { PostDto } from '@/features/post/data/dto/postDto';
-import * as FeedQueries from '@/features/post/data/queries/feedQueries';
+import { FeedPostEntity } from '@/features/post/data/entities/feedPostEntities';
 import { toPostVisibility } from '@/features/post/domain/types/postVisibility';
-
-export type FeedPostEntity = Awaited<
-  ReturnType<typeof FeedQueries.fetchFeedPosts>
->[number];
 
 export function toDto(post: FeedPostEntity): PostDto {
   return {
@@ -16,17 +12,11 @@ export function toDto(post: FeedPostEntity): PostDto {
     createdAt: post.createdAt,
     updatedAt: post.updatedAt ?? post.createdAt,
     userId: post.userId,
-    authorName: post.user.nickname ?? null,
-    bio: post.user.bio,
-    profileImageUrl: post.user.profileImageUrl,
-    deletedAt: post.user.deletedAt,
-    registeredAt: post.user.registeredAt,
     seriesId: post.seriesId,
     seriesOrder: post.seriesOrder,
-    seriesTitle: post.series?.title ?? null,
-    likeCount: post.postStat.likeCount,
-    viewCount: post.postStat.viewCount,
-    commentCount: post.postStat.commentCount,
     visibility: toPostVisibility(post.visibility),
+    user: post.user,
+    series: post.series,
+    postStat: post.postStat,
   };
 }

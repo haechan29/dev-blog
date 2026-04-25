@@ -9,16 +9,22 @@ export interface PostDto {
   createdAt: string;
   updatedAt: string;
   userId: string;
-  authorName: string | null;
-  bio: string | null;
-  profileImageUrl: string | null;
-  deletedAt: string | null;
-  registeredAt: string | null;
   seriesId: string | null;
   seriesOrder: number | null;
-  seriesTitle: string | null;
-  likeCount: number;
-  viewCount: number;
-  commentCount: number;
   visibility: PostVisibility;
+  user: {
+    nickname: string | null;
+    bio: string | null;
+    profileImageUrl: string | null;
+    deletedAt: string | null;
+    registeredAt: string | null;
+  };
+  series: {
+    title: string;
+  } | null;
+  postStat: {
+    likeCount: number;
+    viewCount: number;
+    commentCount: number;
+  };
 }

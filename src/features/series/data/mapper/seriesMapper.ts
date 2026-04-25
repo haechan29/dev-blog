@@ -17,10 +17,12 @@ export function toDto(entity: SeriesEntity): SeriesDto {
       createdAt: post.created_at,
       seriesId: post.series_id,
       seriesOrder: post.series_order,
-      likeCount: post.post_stats?.like_count ?? 0,
-      viewCount: post.post_stats?.view_count ?? 0,
-      commentCount: post.post_stats?.comment_count ?? 0,
       visibility: post.visibility,
+      postStat: {
+        likeCount: post.post_stats?.like_count ?? 0,
+        viewCount: post.post_stats?.view_count ?? 0,
+        commentCount: post.post_stats?.comment_count ?? 0,
+      },
     })),
     postCount: entity.posts.length,
   };
