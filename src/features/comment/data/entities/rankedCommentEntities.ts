@@ -1,5 +1,5 @@
-import { CommentEntityFlat } from '@/features/comment/data/entities/commentEntities';
+import * as RankedCommentQueries from '@/features/comment/data/queries/rankedCommentQueries';
 
-export interface RankedCommentEntity extends CommentEntityFlat {
-  score: number;
-}
+export type RankedCommentEntity = Awaited<
+  Awaited<ReturnType<typeof RankedCommentQueries.fetchRankedComments>>[number]
+>;
