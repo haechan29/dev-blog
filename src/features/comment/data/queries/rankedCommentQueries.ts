@@ -30,5 +30,18 @@ export async function fetchRankedComments({
     throw new Error(error.message);
   }
 
-  return data as RankedCommentEntity[];
+  return (data ?? []).map(comment => ({
+    id: comment.id,
+    postId: comment.post_id,
+    content: comment.content,
+    createdAt: comment.created_at,
+    updatedAt: comment.updated_at,
+    likeCount: comment.like_count,
+    userId: comment.user_id,
+    nickname: comment.nickname,
+    deletedAt: comment.deleted_at,
+    registeredAt: comment.registered_at,
+    profileImageUrl: comment.profile_image_url,
+    score: comment.score,
+  })) as RankedCommentEntity[];
 }

@@ -1,4 +1,5 @@
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
+import { toDto } from '@/features/comment/data/mapper/commentMapper';
 import * as CommentQueries from '@/features/comment/data/queries/commentQueries';
 import * as NotificationUsecase from '@/features/notification/data/usecases/notificationUsecase';
 import { getUserId } from '@/lib/user';
@@ -23,9 +24,9 @@ export async function POST(
     }
 
     const {
-      post_id: commentPostId,
-      user_id: commentUserId,
-      like_count: likeCount,
+      postId: commentPostId,
+      userId: commentUserId,
+      likeCount,
     } = await CommentQueries.fetchComment(commentIdNum);
 
     if (commentPostId !== postId) {
@@ -51,7 +52,8 @@ export async function POST(
       console.error('댓글 좋아요 마일스톤 알림 생성에 실패했습니다', error);
     }
 
-    return NextResponse.json({ data: updated });
+    const comment = toDto(updated);
+    return NextResponse.json({ data: comment });
   } catch (error) {
     console.error('댓글 좋아요 수 증가 요청이 실패했습니다', error);
 

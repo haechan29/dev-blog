@@ -7,31 +7,31 @@ import {
 export function toDto(comment: CommentEntity): CommentResponseDto {
   return {
     id: comment.id,
-    postId: comment.post_id,
-    authorName: comment.users.nickname,
+    postId: comment.postId,
+    authorName: comment.user.nickname,
     content: comment.content,
-    createdAt: comment.created_at,
-    updatedAt: comment.updated_at,
-    likeCount: comment.like_count,
-    userId: comment.user_id,
-    deletedAt: comment.users.deleted_at,
-    registeredAt: comment.users.registered_at,
-    profileImageUrl: comment.users.profile_image_url,
+    createdAt: comment.createdAt,
+    updatedAt: comment.updatedAt,
+    likeCount: comment.likeCount,
+    userId: comment.userId,
+    deletedAt: comment.user.deletedAt,
+    registeredAt: comment.user.registeredAt,
+    profileImageUrl: comment.user.profileImageUrl,
   };
 }
 
 export function flatToDto(comment: CommentEntityFlat): CommentResponseDto {
   return {
     id: comment.id,
-    postId: comment.post_id,
+    postId: comment.postId,
     authorName: comment.nickname,
     content: comment.content,
-    createdAt: comment.created_at,
-    updatedAt: comment.updated_at,
-    likeCount: comment.like_count,
-    userId: comment.user_id,
-    deletedAt: comment.deleted_at,
-    registeredAt: comment.registered_at,
-    profileImageUrl: comment.profile_image_url,
+    createdAt: comment.createdAt,
+    updatedAt: comment.updatedAt,
+    likeCount: comment.likeCount,
+    userId: comment.userId,
+    deletedAt: comment.deletedAt,
+    registeredAt: comment.registeredAt,
+    profileImageUrl: comment.profileImageUrl,
   };
 }

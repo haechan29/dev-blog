@@ -1,31 +1,21 @@
+import * as CommentQueries from '@/features/comment/data/queries/commentQueries';
 import { UserEntity } from '@/features/user/data/entities/userEntities';
 
-export interface CommentEntity {
-  id: number;
-  post_id: string;
-  content: string;
-  created_at: string;
-  updated_at: string;
-  like_count: number;
-  user_id: string;
-  users: Pick<
-    UserEntity,
-    'nickname' | 'deleted_at' | 'registered_at' | 'profile_image_url'
-  >;
-  password_hash?: string | null;
-}
+export type CommentEntity = Awaited<
+  ReturnType<typeof CommentQueries.fetchComment>
+>;
 
 export interface CommentEntityFlat {
   id: number;
-  post_id: string;
+  postId: string;
   content: string;
-  created_at: string;
-  updated_at: string;
-  like_count: number;
-  user_id: string;
+  createdAt: string;
+  updatedAt: string;
+  likeCount: number;
+  userId: string;
   nickname: UserEntity['nickname'];
-  deleted_at: UserEntity['deleted_at'];
-  registered_at: UserEntity['registered_at'];
-  profile_image_url: UserEntity['profile_image_url'];
-  password_hash?: string | null;
+  deletedAt: UserEntity['deleted_at'];
+  registeredAt: UserEntity['registered_at'];
+  profileImageUrl: UserEntity['profile_image_url'];
+  passwordHash?: string | null;
 }

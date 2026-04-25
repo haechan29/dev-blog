@@ -50,7 +50,7 @@ export async function getRankedComments({
     } else {
       const highlightComment =
         await CommentQueries.fetchComment(highlightCommentId);
-      if (highlightComment.post_id !== postId) {
+      if (highlightComment.postId !== postId) {
         throw new ValidationError('댓글이 속한 게시글이 일치하지 않습니다');
       }
       highlightCommentDto = CommentMapper.toDto(highlightComment);

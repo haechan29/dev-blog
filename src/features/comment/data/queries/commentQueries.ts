@@ -1,54 +1,61 @@
+import { db } from '@/db/index';
+import { comments, users } from '@/db/schema';
 import { NotFoundError } from '@/errors/errors';
-import { CommentEntity } from '@/features/comment/data/entities/commentEntities';
-import { toDto } from '@/features/comment/data/mapper/commentMapper';
-import { supabase } from '@/lib/supabase';
+import { InferInsertModel, eq } from 'drizzle-orm';
 import 'server-only';
 
-const COMMENT_SELECT = `
-  id,
-  post_id,
-  content,
-  created_at,
-  updated_at,
-  like_count,
-  user_id,
-  users:user_id(nickname, deleted_at, registered_at, profile_image_url)
-`;
+const COMMENT_FIELDS = {
+  id: comments.id,
+  postId: comments.postId,
+  content: comments.content,
+  createdAt: comments.createdAt,
+  updatedAt: comments.updatedAt,
+  likeCount: comments.likeCount,
+  userId: comments.userId,
+};
+
+const COMMENT_USER_FIELDS = {
+  nickname: users.nickname,
+  deletedAt: users.deletedAt,
+  registeredAt: users.registeredAt,
+  profileImageUrl: users.profileImageUrl,
+};
+
+const COMMENT_SELECT_FIELDS = {
+  ...COMMENT_FIELDS,
+  user: COMMENT_USER_FIELDS,
+} as const;
 
 export async function fetchComment(commentId: number) {
-  const { data, error } = await supabase
-    .from('comments')
-    .select(COMMENT_SELECT)
-    .eq('id', commentId)
-    .maybeSingle();
+  const data = await db
+    .select(COMMENT_SELECT_FIELDS)
+    .from(comments)
+    .innerJoin(users, eq(comments.userId, users.id))
+    .where(eq(comments.id, commentId))
+    .limit(1);
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  if (!data) {
+  if (!data[0]) {
     throw new NotFoundError('댓글이 존재하지 않습니다');
   }
 
-  return data as unknown as CommentEntity;
+  return data[0];
 }
 
 export async function fetchCommentForAuth(commentId: number) {
-  const { data, error } = await supabase
-    .from('comments')
-    .select('user_id, password_hash')
-    .eq('id', commentId)
-    .maybeSingle();
+  const data = await db
+    .select({
+      userId: comments.userId,
+      passwordHash: comments.passwordHash,
+    })
+    .from(comments)
+    .where(eq(comments.id, commentId))
+    .limit(1);
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  if (!data) {
+  if (!data[0]) {
     throw new NotFoundError('댓글을 찾을 수 없습니다');
   }
 
-  return data as Pick<CommentEntity, 'user_id' | 'password_hash'>;
+  return data[0];
 }
 
 export async function createComment(
@@ -57,22 +64,21 @@ export async function createComment(
   passwordHash: string | null,
   userId: string
 ) {
-  const { data, error } = await supabase
-    .from('comments')
-    .insert({
-      post_id: postId,
+  const [comment] = await db
+    .insert(comments)
+    .values({
+      postId,
       content,
-      password_hash: passwordHash,
-      user_id: userId,
+      passwordHash,
+      userId,
     })
-    .select(COMMENT_SELECT)
-    .single();
+    .returning();
 
-  if (error) {
-    throw new Error(error.message);
+  if (!comment) {
+    throw new NotFoundError('댓글을 찾을 수 없습니다');
   }
 
-  return toDto(data as unknown as CommentEntity);
+  return await fetchComment(comment.id);
 }
 
 export async function updateComment({
@@ -84,29 +90,25 @@ export async function updateComment({
   content?: string;
   likeCount?: number;
 }) {
-  const { data, error } = await supabase
-    .from('comments')
-    .update({
-      ...(content !== undefined && { content }),
-      ...(likeCount !== undefined && { like_count: likeCount }),
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', commentId)
-    .select(COMMENT_SELECT)
-    .single();
+  const updates: Partial<InferInsertModel<typeof comments>> = {
+    updatedAt: new Date().toISOString(),
+    ...(content !== undefined ? { content } : {}),
+    ...(likeCount !== undefined ? { likeCount } : {}),
+  };
 
-  if (error) {
-    throw new Error(error.message);
+  const [comment] = await db
+    .update(comments)
+    .set(updates)
+    .where(eq(comments.id, commentId))
+    .returning({ id: comments.id });
+
+  if (!comment) {
+    throw new NotFoundError('댓글을 찾을 수 없습니다');
   }
 
-  return toDto(data as unknown as CommentEntity);
+  return await fetchComment(comment.id);
 }
 
 export async function deleteComment(commentId: number) {
-  const { error } = await supabase
-    .from('comments')
-    .delete()
-    .eq('id', commentId);
-
-  if (error) throw new Error(error.message);
+  await db.delete(comments).where(eq(comments.id, commentId));
 }
