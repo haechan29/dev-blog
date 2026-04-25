@@ -1,4 +1,4 @@
-import Post from '@/features/post/domain/model/post';
+import { PostDto } from '@/features/post/data/dto/postDto';
 
 export interface Series {
   id: string;
@@ -9,17 +9,10 @@ export interface Series {
   userId: string;
   authorName: string | null;
   profileImageUrl: string | null;
-  posts: Pick<
-    Post,
-    | 'id'
-    | 'title'
-    | 'createdAt'
-    | 'seriesId'
-    | 'seriesOrder'
-    | 'likeCount'
-    | 'viewCount'
-    | 'commentCount'
-    | 'visibility'
-  >[];
+  posts: (Pick<
+    PostDto,
+    'id' | 'title' | 'createdAt' | 'seriesId' | 'seriesOrder' | 'visibility'
+  > &
+    Pick<PostDto['postStat'], 'likeCount' | 'viewCount' | 'commentCount'>)[];
   postCount: number;
 }

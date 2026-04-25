@@ -1,7 +1,7 @@
 import { db } from '@/db/index';
 import { postStats, posts, series, users } from '@/db/schema';
 import { NotFoundError } from '@/errors/errors';
-import Post from '@/features/post/domain/model/post';
+import { PostEntity } from '@/features/post/data/entities/postEntities';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import { JSONContent } from '@tiptap/core';
 import { InferInsertModel, and, desc, eq, inArray, sql } from 'drizzle-orm';
@@ -275,7 +275,7 @@ export async function updatePost({
 }
 
 export async function updatePostsInSeries(
-  postsToUpdate: Pick<Post, 'id' | 'seriesId' | 'seriesOrder'>[]
+  postsToUpdate: Pick<PostEntity, 'id' | 'seriesId' | 'seriesOrder'>[]
 ) {
   await db.transaction(async tx => {
     for (const { id, seriesId, seriesOrder } of postsToUpdate) {

@@ -4,7 +4,7 @@ import PostPageClient from '@/components/post/postPageClient';
 import * as CommentServerService from '@/features/comment/domain/service/commentServerService';
 import * as CreatorServerRepository from '@/features/creator/data/repository/creatorServerRepository';
 import { PostForbiddenError } from '@/features/post/data/errors/postErrors';
-import * as PostServerService from '@/features/post/domain/service/postServerService';
+import * as PostServerRepository from '@/features/post/data/repository/postServerRepository';
 import { createProps } from '@/features/post/ui/postProps';
 import { Metadata } from 'next';
 import { cookies } from 'next/headers';
@@ -28,7 +28,7 @@ export default async function PostPage({
 
   try {
     const [post, commentsPage, postsPage, creator] = await Promise.all([
-      PostServerService.getPost(postId).then(createProps),
+      PostServerRepository.getPost(postId).then(createProps),
       CommentServerService.getRankedComments({
         postId,
         userId,
@@ -38,7 +38,7 @@ export default async function PostPage({
         comments: page.comments.map(comment => comment.toProps()),
         nextCursor: page.nextCursor,
       })),
-      PostServerService.getFeedPosts({
+      PostServerRepository.getFeedPosts({
         cursor: null,
         userId,
         excludeId: postId,
@@ -77,7 +77,7 @@ export async function generateMetadata({
   const { postId } = await params;
 
   try {
-    const post = await PostServerService.getPost(postId);
+    const post = await PostServerRepository.getPost(postId);
     const postProps = createProps(post);
 
     const description = postProps.preview;

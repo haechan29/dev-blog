@@ -1,7 +1,7 @@
 'use client';
 
 import { ApiError } from '@/errors/errors';
-import * as PostClientService from '@/features/post/domain/service/postClientService';
+import * as PostClientRepository from '@/features/post/data/repository/postClientRepository';
 import * as SeriesClientService from '@/features/series/domain/service/seriesClientService';
 import { createProps, SeriesProps } from '@/features/series/ui/seriesProps';
 import { userKeys } from '@/queries/keys';
@@ -24,7 +24,7 @@ export default function useSeries(initialSeries: SeriesProps) {
 
   const addPostMutation = useMutation({
     mutationFn: (postId: string) => {
-      return PostClientService.updatePostsInSeries([
+      return PostClientRepository.updatePostsInSeries([
         {
           id: postId,
           seriesId,
@@ -59,7 +59,7 @@ export default function useSeries(initialSeries: SeriesProps) {
           })),
       ];
 
-      return PostClientService.updatePostsInSeries(updates);
+      return PostClientRepository.updatePostsInSeries(updates);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -77,7 +77,7 @@ export default function useSeries(initialSeries: SeriesProps) {
 
   const reorderPostsMutation = useMutation({
     mutationFn: (reorderedPosts: SeriesProps['posts']) => {
-      return PostClientService.updatePostsInSeries(reorderedPosts);
+      return PostClientRepository.updatePostsInSeries(reorderedPosts);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({

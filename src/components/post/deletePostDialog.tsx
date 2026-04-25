@@ -7,7 +7,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
-import * as PostClientService from '@/features/post/domain/service/postClientService';
+import * as PostClientRepository from '@/features/post/data/repository/postClientRepository';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
@@ -39,7 +39,7 @@ export default function DeletePostDialog({
 
       setIsLoading(true);
       try {
-        await PostClientService.deletePost(postId, password);
+        await PostClientRepository.deletePost(postId, password);
         setIsOpen(false);
         onDeleteSuccess?.();
         toast.success('게시글이 삭제되었습니다');

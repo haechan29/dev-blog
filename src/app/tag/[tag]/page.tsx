@@ -1,6 +1,6 @@
 import { auth } from '@/auth';
 import HomePageClient from '@/components/home/homePageClient';
-import * as PostServerService from '@/features/post/domain/service/postServerService';
+import * as PostServerRepository from '@/features/post/data/repository/postServerRepository';
 import { createProps } from '@/features/post/ui/postProps';
 import { cookies } from 'next/headers';
 
@@ -16,7 +16,7 @@ export default async function TagPage({
   const { tag: encodedTag } = await params;
   const tag = decodeURIComponent(encodedTag);
 
-  const { posts, nextCursor } = await PostServerService.getFeedPosts({
+  const { posts, nextCursor } = await PostServerRepository.getFeedPosts({
     cursor: null,
     userId,
     tag,
