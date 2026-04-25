@@ -1,4 +1,4 @@
-import { toFlatDto } from '@/features/post/data/mapper/postMapper';
+import { toDto } from '@/features/post/data/mapper/postMapper';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 
 const SEARCH_LIMIT = 5;
@@ -27,12 +27,12 @@ export async function searchPosts({
     isLastPage || !lastPost
       ? null
       : {
-          score: lastPost.relevance_score,
+          score: lastPost.relevanceScore,
           id: lastPost.id,
         };
 
   return {
-    posts: posts.map(toFlatDto),
+    posts: posts.map(toDto),
     nextCursor,
   };
 }

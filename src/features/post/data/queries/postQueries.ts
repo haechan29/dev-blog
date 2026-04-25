@@ -1,15 +1,15 @@
 import { db } from '@/db/index';
 import { postStats, posts, series, users } from '@/db/schema';
 import { NotFoundError } from '@/errors/errors';
-import { PostEntityFlat } from '@/features/post/data/entities/postEntities';
 import Post from '@/features/post/domain/model/post';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
-import { supabase } from '@/lib/supabase';
 import { JSONContent } from '@tiptap/core';
-import { InferInsertModel, and, desc, eq, inArray } from 'drizzle-orm';
+import { InferInsertModel, and, desc, eq, inArray, sql } from 'drizzle-orm';
 import 'server-only';
 
-const POST_SELECT_FIELDS = {
+const SIMILARITY_THRESHOLD = 0.1;
+
+const POST_FIELDS = {
   id: posts.id,
   title: posts.title,
   contentJson: posts.contentJson,
@@ -21,16 +21,31 @@ const POST_SELECT_FIELDS = {
   seriesId: posts.seriesId,
   seriesOrder: posts.seriesOrder,
   visibility: posts.visibility,
-  passwordHash: posts.passwordHash,
+};
+
+const USER_FIELDS = {
   nickname: users.nickname,
   deletedAt: users.deletedAt,
   registeredAt: users.registeredAt,
   bio: users.bio,
   profileImageUrl: users.profileImageUrl,
-  seriesTitle: series.title,
+};
+
+const SERIES_FIELDS = {
+  title: series.title,
+};
+
+const POST_STATS_FIELDS = {
   likeCount: postStats.likeCount,
   viewCount: postStats.viewCount,
   commentCount: postStats.commentCount,
+};
+
+const POST_SELECT_FIELDS = {
+  ...POST_FIELDS,
+  ...USER_FIELDS,
+  ...SERIES_FIELDS,
+  ...POST_STATS_FIELDS,
 } as const;
 
 export async function fetchPostsByUserId(
@@ -111,18 +126,66 @@ export async function searchPosts({
   cursorScore?: number;
   cursorId?: string;
 }) {
-  const { data, error } = await supabase.rpc('search_posts', {
-    search_query: query,
-    result_limit: limit,
-    cursor_score: cursorScore ?? null,
-    cursor_id: cursorId ?? null,
+  const relevanceScore = sql<number>`
+    ROUND(GREATEST(
+      similarity(${posts.title}, ${query}) * 2,
+      similarity(immutable_array_to_string(${posts.tags}, ' '), ${query})
+    ) * 1000000)::bigint
+  `.as('relevance_score');
+
+  const matchCondition = sql`(
+    ${posts.title} % ${query}
+    OR immutable_array_to_string(${posts.tags}, ' ') % ${query}
+  )`;
+
+  const scored = db
+    .select({
+      ...POST_FIELDS,
+      relevanceScore,
+    })
+    .from(posts)
+    .where(and(matchCondition, eq(posts.visibility, 'public')))
+    .as('scored');
+
+  const cursorCondition =
+    cursorScore != null && cursorId != null
+      ? sql`(
+          ${scored.relevanceScore} < ${cursorScore}
+          OR (${scored.relevanceScore} = ${cursorScore} AND ${scored.id} < ${cursorId})
+        )`
+      : undefined;
+
+  return await db.transaction(async tx => {
+    await tx.execute(
+      sql`SELECT set_config('pg_trgm.similarity_threshold', ${String(SIMILARITY_THRESHOLD)}, true)`
+    );
+
+    return tx
+      .select({
+        ...USER_FIELDS,
+        ...SERIES_FIELDS,
+        ...POST_STATS_FIELDS,
+        id: scored.id,
+        title: scored.title,
+        contentJson: scored.contentJson,
+        preview: scored.preview,
+        tags: scored.tags,
+        createdAt: scored.createdAt,
+        updatedAt: scored.updatedAt,
+        userId: scored.userId,
+        seriesId: scored.seriesId,
+        seriesOrder: scored.seriesOrder,
+        visibility: scored.visibility,
+        relevanceScore: scored.relevanceScore,
+      })
+      .from(scored)
+      .leftJoin(users, eq(users.id, scored.userId))
+      .leftJoin(series, eq(series.id, scored.seriesId))
+      .leftJoin(postStats, eq(postStats.postId, scored.id))
+      .where(cursorCondition)
+      .orderBy(desc(scored.relevanceScore), desc(scored.id))
+      .limit(limit);
   });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data as PostEntityFlat[];
 }
 
 export async function createPost({
