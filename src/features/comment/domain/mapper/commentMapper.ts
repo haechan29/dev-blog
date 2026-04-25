@@ -5,8 +5,8 @@ export function toDomain(dto: CommentResponseDto): Comment {
   return new Comment(
     dto.id,
     dto.postId,
-    dto.authorName,
-    dto.profileImageUrl,
+    dto.user.nickname,
+    dto.user.profileImageUrl,
     dto.content,
     dto.createdAt,
     dto.updatedAt,

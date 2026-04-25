@@ -10,9 +10,11 @@ export function toDto(comment: RankedCommentEntity): CommentResponseDto {
     updatedAt: comment.updatedAt,
     likeCount: comment.likeCount,
     userId: comment.userId,
-    authorName: comment.user.nickname,
-    deletedAt: comment.user.deletedAt,
-    registeredAt: comment.user.registeredAt,
-    profileImageUrl: comment.user.profileImageUrl,
+    user: {
+      nickname: comment.user.nickname,
+      deletedAt: comment.user.deletedAt,
+      registeredAt: comment.user.registeredAt,
+      profileImageUrl: comment.user.profileImageUrl,
+    },
   };
 }
