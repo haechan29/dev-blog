@@ -2,6 +2,7 @@ import { auth } from '@/auth';
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries';
 import * as DraftQueries from '@/features/draft/data/queries/draftQueries';
+import { toDto } from '@/features/post/data/mapper/postMapper';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as PostUsecase from '@/features/post/data/usecases/postUsecase';
 import { rendererExtensions } from '@/features/post/domain/lib/extensions';
@@ -57,9 +58,10 @@ export async function PATCH(
       throw new ValidationError('사용자 아이디를 찾을 수 없습니다');
     }
 
-    const post = await PostQueries.fetchPostForAuth(postId);
+    const { userId: postUserId, passwordHash } =
+      await PostQueries.fetchPostForAuth(postId);
 
-    if (userId !== post.user_id) {
+    if (userId !== postUserId) {
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 
@@ -72,8 +74,7 @@ export async function PATCH(
 
     if (!skipPasswordCheck) {
       const isValid =
-        post.password_hash &&
-        (await bcrypt.compare(password, post.password_hash));
+        passwordHash && (await bcrypt.compare(password, passwordHash));
 
       if (!isValid) {
         throw new UnauthorizedError('비밀번호가 일치하지 않습니다');
@@ -98,6 +99,8 @@ export async function PATCH(
       contentText,
     });
 
+    const post = toDto(updated);
+
     if (draftId) {
       try {
         const ownership = await DraftQueries.fetchDraftOwnership(draftId);
@@ -110,7 +113,7 @@ export async function PATCH(
       }
     }
 
-    return NextResponse.json({ data: updated });
+    return NextResponse.json({ data: post });
   } catch (error) {
     console.error('게시글 수정 요청이 실패했습니다', error);
 
@@ -142,7 +145,7 @@ export async function DELETE(
 
     const post = await PostQueries.fetchPostForAuth(postId);
 
-    if (userId !== post.user_id) {
+    if (userId !== post.userId) {
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 
@@ -156,8 +159,8 @@ export async function DELETE(
     if (!skipPasswordCheck) {
       const isValid =
         password &&
-        post.password_hash &&
-        (await bcrypt.compare(password, post.password_hash));
+        post.passwordHash &&
+        (await bcrypt.compare(password, post.passwordHash));
 
       if (!isValid) {
         throw new UnauthorizedError('비밀번호가 일치하지 않습니다');

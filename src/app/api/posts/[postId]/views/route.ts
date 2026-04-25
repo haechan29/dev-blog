@@ -20,7 +20,7 @@ export async function POST(
     }
 
     const post = await PostQueries.fetchPostForAuth(postId);
-    if (post.user_id === userId) {
+    if (post.userId === userId) {
       return NextResponse.json({ data: null });
     }
 
@@ -47,7 +47,7 @@ export async function POST(
         }),
         NotificationUsecase.insertPostViewMilestoneNotification({
           postId,
-          authorId: post.user_id,
+          authorId: post.userId,
           milestoneValue: prevViewCount + 1,
         }),
       ]);

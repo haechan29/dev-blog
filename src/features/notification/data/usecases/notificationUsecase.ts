@@ -93,7 +93,7 @@ export async function insertPostLikeMilestoneNotification({
   milestoneValue: number;
 }) {
   const post = await PostQueries.fetchPostForAuth(postId);
-  const authorId = post.user_id;
+  const authorId = post.userId;
 
   if (authorId === userId) {
     return;

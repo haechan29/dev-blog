@@ -90,10 +90,10 @@ export async function POST(
 
     try {
       const post = await PostQueries.fetchPostForAuth(postId);
-      if (post.user_id !== comment.userId) {
+      if (post.userId !== comment.userId) {
         await NotificationQueries.upsertUnreadCommentNotification({
           postId,
-          authorId: post.user_id,
+          authorId: post.userId,
           commentUserId: comment.userId,
           representativeCommentId: comment.id,
         });

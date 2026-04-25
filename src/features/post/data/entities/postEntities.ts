@@ -1,51 +1,35 @@
+import { posts, postStats, series, users } from '@/db/schema';
+import { fetchPost } from '@/features/post/data/queries/postQueries';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
-import { UserEntity } from '@/features/user/data/entities/userEntities';
+import { InferSelectModel } from 'drizzle-orm';
 
-export interface PostEntity {
-  id: string;
-  title: string;
-  tags: string[];
-  content_json: object;
-  preview: string;
-  created_at: string;
-  updated_at: string | null;
-  user_id: string;
-  series_id: string | null;
-  series_order: number | null;
-  visibility: PostVisibility;
-  users: Pick<
-    UserEntity,
-    'nickname' | 'deleted_at' | 'registered_at' | 'bio' | 'profile_image_url'
-  >;
-  series: { title: string } | null;
-  post_stats: {
-    like_count: number;
-    view_count: number;
-    comment_count: number;
-  } | null;
-  password_hash?: string | null;
-}
+type PostRow = InferSelectModel<typeof posts>;
+type UserRow = InferSelectModel<typeof users>;
+type SeriesRow = InferSelectModel<typeof series>;
+type PostStatsRow = InferSelectModel<typeof postStats>;
 
-export interface PostEntityFlat {
-  id: string;
-  title: string;
-  tags: string[];
-  content_json: object;
-  preview: string;
-  created_at: string;
-  updated_at: string | null;
-  user_id: string;
-  series_id: string | null;
-  series_order: number | null;
+export type PostEntity = Awaited<ReturnType<typeof fetchPost>>;
+
+export type PostEntityFlat = {
+  id: PostRow['id'];
+  title: PostRow['title'];
+  tags: PostRow['tags'];
+  content_json: PostRow['contentJson'];
+  preview: PostRow['preview'];
+  created_at: PostRow['createdAt'];
+  updated_at: PostRow['updatedAt'];
+  user_id: PostRow['userId'];
+  series_id: PostRow['seriesId'];
+  series_order: PostRow['seriesOrder'];
   visibility: PostVisibility;
-  nickname: UserEntity['nickname'];
-  deleted_at: UserEntity['deleted_at'];
-  registered_at: UserEntity['registered_at'];
-  bio: UserEntity['bio'];
-  profile_image_url: UserEntity['profile_image_url'];
-  series_title: string | null;
-  like_count: number | null;
-  view_count: number | null;
-  comment_count: number | null;
+  nickname: UserRow['nickname'];
+  deleted_at: UserRow['deletedAt'];
+  registered_at: UserRow['registeredAt'];
+  bio: UserRow['bio'];
+  profile_image_url: UserRow['profileImageUrl'];
+  series_title: SeriesRow['title'];
+  like_count: PostStatsRow['likeCount'] | null;
+  view_count: PostStatsRow['viewCount'] | null;
+  comment_count: PostStatsRow['commentCount'] | null;
   relevance_score: number;
-}
+};
