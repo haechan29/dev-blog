@@ -1,27 +1,32 @@
 import { PostDto } from '@/features/post/data/dto/postDto';
-import { FeedPostEntity } from '@/features/post/data/entities/feedPostEntities';
+import * as FeedQueries from '@/features/post/data/queries/feedQueries';
+import { toPostVisibility } from '@/features/post/domain/types/postVisibility';
+
+export type FeedPostEntity = Awaited<
+  ReturnType<typeof FeedQueries.fetchFeedPosts>
+>[number];
 
 export function toDto(post: FeedPostEntity): PostDto {
   return {
     id: post.id,
     title: post.title,
     tags: post.tags,
-    contentJson: post.content_json,
+    contentJson: post.contentJson as object,
     preview: post.preview,
-    createdAt: post.created_at,
-    updatedAt: post.updated_at ?? post.created_at,
-    userId: post.user_id,
-    authorName: post.users.nickname,
-    bio: post.users.bio ?? null,
-    profileImageUrl: post.users.profile_image_url ?? null,
-    deletedAt: post.users.deleted_at ?? null,
-    registeredAt: post.users.registered_at ?? null,
-    seriesId: post.series_id,
-    seriesOrder: post.series_order,
+    createdAt: post.createdAt,
+    updatedAt: post.updatedAt ?? post.createdAt,
+    userId: post.userId,
+    authorName: post.user.nickname ?? null,
+    bio: post.user.bio,
+    profileImageUrl: post.user.profileImageUrl,
+    deletedAt: post.user.deletedAt,
+    registeredAt: post.user.registeredAt,
+    seriesId: post.seriesId,
+    seriesOrder: post.seriesOrder,
     seriesTitle: post.series?.title ?? null,
-    likeCount: post.post_stats?.like_count ?? 0,
-    viewCount: post.post_stats?.view_count ?? 0,
-    commentCount: post.post_stats?.comment_count ?? 0,
-    visibility: post.visibility,
+    likeCount: post.postStat.likeCount,
+    viewCount: post.postStat.viewCount,
+    commentCount: post.postStat.commentCount,
+    visibility: toPostVisibility(post.visibility),
   };
 }

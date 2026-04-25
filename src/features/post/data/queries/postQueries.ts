@@ -43,9 +43,9 @@ const POST_STATS_FIELDS = {
 
 const POST_SELECT_FIELDS = {
   ...POST_FIELDS,
-  ...USER_FIELDS,
-  ...SERIES_FIELDS,
-  ...POST_STATS_FIELDS,
+  user: USER_FIELDS,
+  series: SERIES_FIELDS,
+  postStat: POST_STATS_FIELDS,
 } as const;
 
 export async function fetchPostsByUserId(
@@ -60,9 +60,9 @@ export async function fetchPostsByUserId(
   return await db
     .select(POST_SELECT_FIELDS)
     .from(posts)
-    .leftJoin(users, eq(posts.userId, users.id))
+    .innerJoin(users, eq(posts.userId, users.id))
     .leftJoin(series, eq(posts.seriesId, series.id))
-    .leftJoin(postStats, eq(posts.id, postStats.postId))
+    .innerJoin(postStats, eq(posts.id, postStats.postId))
     .where(where)
     .orderBy(desc(posts.createdAt));
 }
@@ -85,9 +85,9 @@ export async function fetchPost(postId: string) {
   const data = await db
     .select(POST_SELECT_FIELDS)
     .from(posts)
-    .leftJoin(users, eq(posts.userId, users.id))
+    .innerJoin(users, eq(posts.userId, users.id))
     .leftJoin(series, eq(posts.seriesId, series.id))
-    .leftJoin(postStats, eq(posts.id, postStats.postId))
+    .innerJoin(postStats, eq(posts.id, postStats.postId))
     .where(eq(posts.id, postId))
     .limit(1);
 
@@ -162,9 +162,9 @@ export async function searchPosts({
 
     return tx
       .select({
-        ...USER_FIELDS,
-        ...SERIES_FIELDS,
-        ...POST_STATS_FIELDS,
+        user: USER_FIELDS,
+        series: SERIES_FIELDS,
+        postStat: POST_STATS_FIELDS,
         id: scored.id,
         title: scored.title,
         contentJson: scored.contentJson,
@@ -179,9 +179,9 @@ export async function searchPosts({
         relevanceScore: scored.relevanceScore,
       })
       .from(scored)
-      .leftJoin(users, eq(users.id, scored.userId))
+      .innerJoin(users, eq(users.id, scored.userId))
       .leftJoin(series, eq(series.id, scored.seriesId))
-      .leftJoin(postStats, eq(postStats.postId, scored.id))
+      .innerJoin(postStats, eq(postStats.postId, scored.id))
       .where(cursorCondition)
       .orderBy(desc(scored.relevanceScore), desc(scored.id))
       .limit(limit);

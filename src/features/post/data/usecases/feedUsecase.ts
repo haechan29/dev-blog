@@ -1,7 +1,6 @@
 import * as PostSkipQueries from '@/features/post-interaction/data/queries/postSkipQueries';
 import * as PostViewQueries from '@/features/post-interaction/data/queries/postViewQueries';
-import { FeedPostEntity } from '@/features/post/data/entities/feedPostEntities';
-import { toDto } from '@/features/post/data/mapper/feedMapper';
+import { FeedPostEntity, toDto } from '@/features/post/data/mapper/feedMapper';
 import * as FeedQueries from '@/features/post/data/queries/feedQueries';
 import * as SubscriptionQueries from '@/features/subscription/data/queries/subscriptionQueries';
 
@@ -33,7 +32,7 @@ export async function getFeedPosts({
       posts: posts.map(toDto),
       nextCursor: isLastPage
         ? null
-        : (posts.at(-1)?.post_stats.popularity.toString() ?? null),
+        : (posts.at(-1)?.postStat.popularity.toString() ?? null),
     };
   }
 
@@ -76,7 +75,7 @@ export async function getFeedPosts({
     posts: scoredPosts.map(p => toDto(p)),
     nextCursor: isLastPage
       ? null
-      : (posts.at(-1)?.post_stats.popularity.toString() ?? null),
+      : (posts.at(-1)?.postStat.popularity.toString() ?? null),
   };
 }
 
@@ -88,11 +87,11 @@ function findSeriesFirstUnread(
   const seenSeries = new Set<string>();
 
   posts
-    .filter(post => post.series_id && viewedSeriesIds.includes(post.series_id))
-    .sort((a, b) => (a.series_order ?? 0) - (b.series_order ?? 0))
+    .filter(post => post.seriesId && viewedSeriesIds.includes(post.seriesId))
+    .sort((a, b) => (a.seriesOrder ?? 0) - (b.seriesOrder ?? 0))
     .forEach(post => {
-      if (!seenSeries.has(post.series_id!)) {
-        seenSeries.add(post.series_id!);
+      if (!seenSeries.has(post.seriesId!)) {
+        seenSeries.add(post.seriesId!);
         seriesFirstUnread.add(post.id);
       }
     });
@@ -113,10 +112,10 @@ function calculateScores(
   }
 ) {
   return posts.map(post => {
-    const popularity = post.post_stats.popularity ?? 0;
+    const popularity = post.postStat.popularity ?? 0;
     let multiplier = 1.0;
 
-    if (followingIds.includes(post.user_id)) multiplier += 0.3;
+    if (followingIds.includes(post.userId)) multiplier += 0.3;
     if (seriesFirstUnread.has(post.id)) multiplier += 0.3;
 
     const skipCount = skipMap.get(post.id) ?? 0;
