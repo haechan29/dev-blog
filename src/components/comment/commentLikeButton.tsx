@@ -1,8 +1,8 @@
 'use client';
 
-import * as CommentClientService from '@/features/comment/domain/service/commentClientService';
-import { CommentsPage } from '@/features/comment/domain/types/page';
-import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import * as CommentClientRepository from '@/features/comment/data/repository/commentClientRepository';
+import { CommentItemProps } from '@/features/comment/ui/props/commentItemProps';
+import { CommentsPage } from '@/features/comment/ui/types/page';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import useThrottle from '@/hooks/useThrottle';
 import { postKeys } from '@/queries/keys';
@@ -31,7 +31,7 @@ export default function CommentLikeButton({
 
   const incrementLikeCount = useMutation({
     mutationFn: () =>
-      CommentClientService.incrementLikeCount(comment.postId, comment.id),
+      CommentClientRepository.incrementLikeCount(comment.postId, comment.id),
     onMutate: async () => {
       await queryClient.cancelQueries({
         queryKey: postKeys.comments(comment.postId, highlightCommentId),
@@ -72,7 +72,7 @@ export default function CommentLikeButton({
 
   const decrementLikeCount = useMutation({
     mutationFn: () =>
-      CommentClientService.decrementLikeCount(comment.postId, comment.id),
+      CommentClientRepository.decrementLikeCount(comment.postId, comment.id),
     onMutate: async () => {
       await queryClient.cancelQueries({
         queryKey: postKeys.comments(comment.postId, highlightCommentId),

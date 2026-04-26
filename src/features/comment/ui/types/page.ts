@@ -1,4 +1,4 @@
-import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import { CommentItemProps } from '@/features/comment/ui/props/commentItemProps';
 
 export interface CommentCursor {
   score: number;

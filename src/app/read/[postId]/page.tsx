@@ -1,7 +1,8 @@
 import { auth } from '@/auth';
 import ForbiddenPostPage from '@/components/post/forbiddenPostPage';
 import PostPageClient from '@/components/post/postPageClient';
-import * as CommentServerService from '@/features/comment/domain/service/commentServerService';
+import * as CommentServerRepository from '@/features/comment/data/repository/commentServerRepository';
+import { toProps } from '@/features/comment/ui/mapper/commentMapper';
 import * as CreatorServerRepository from '@/features/creator/data/repository/creatorServerRepository';
 import { PostForbiddenError } from '@/features/post/data/errors/postErrors';
 import * as PostServerRepository from '@/features/post/data/repository/postServerRepository';
@@ -29,13 +30,13 @@ export default async function PostPage({
   try {
     const [post, commentsPage, postsPage, creator] = await Promise.all([
       PostServerRepository.getPost(postId).then(createProps),
-      CommentServerService.getRankedComments({
+      CommentServerRepository.getRankedComments({
         postId,
         userId,
         timestamp,
         highlightCommentId,
       }).then(page => ({
-        comments: page.comments.map(comment => comment.toProps()),
+        comments: page.comments.map(toProps),
         nextCursor: page.nextCursor,
       })),
       PostServerRepository.getFeedPosts({

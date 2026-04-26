@@ -12,7 +12,7 @@ import PostSidebar from '@/components/post/postSidebar';
 import PostToolbar from '@/components/post/postToolbar';
 import PostVisibilityBanner from '@/components/post/postVisibilityBanner';
 import TableOfContents from '@/components/post/tableOfContents';
-import { CommentsPage } from '@/features/comment/domain/types/page';
+import { CommentsPage } from '@/features/comment/ui/types/page';
 import { PostForbiddenError } from '@/features/post/data/errors/postErrors';
 import * as PostClientRepository from '@/features/post/data/repository/postClientRepository';
 import { renderContentElement } from '@/features/post/domain/lib/render';
