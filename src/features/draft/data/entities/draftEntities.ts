@@ -1,11 +1,5 @@
-export interface DraftEntity {
-  id: string;
-  user_id: string;
-  post_id: string | null;
-  title: string;
-  content_json: object | null;
-  tags: string[];
-  created_at: string;
-  updated_at: string;
-}
+import * as DraftQueries from '@/features/draft/data/queries/draftQueries';
 
+export type DraftEntity = Awaited<
+  ReturnType<typeof DraftQueries.fetchDraftsByUserId>
+>[number];

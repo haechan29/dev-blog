@@ -1,4 +1,5 @@
 import { ApiError, NotFoundError, UnauthorizedError } from '@/errors/errors';
+import { toDto } from '@/features/draft/data/mapper/draftMapper';
 import * as DraftQueries from '@/features/draft/data/queries/draftQueries';
 import { getUserId } from '@/lib/user';
 import { NextRequest, NextResponse } from 'next/server';
@@ -28,14 +29,16 @@ export async function PATCH(
 
     const { postId, title, contentJson, tags } = await request.json();
 
-    const data = await DraftQueries.updateDraft({
+    const updated = await DraftQueries.updateDraft({
       draftId,
       postId,
       title,
       contentJson,
       tags,
     });
-    return NextResponse.json({ data });
+    const draft = toDto(updated);
+
+    return NextResponse.json({ data: draft });
   } catch (error) {
     console.error('임시저장 수정 요청이 실패했습니다', error);
 

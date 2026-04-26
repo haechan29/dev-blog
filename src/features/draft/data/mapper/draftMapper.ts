@@ -4,13 +4,12 @@ import { DraftEntity } from '@/features/draft/data/entities/draftEntities';
 export function toDto(draft: DraftEntity): DraftDto {
   return {
     id: draft.id,
-    userId: draft.user_id,
-    postId: draft.post_id,
+    userId: draft.userId,
+    postId: draft.postId,
     title: draft.title,
-    contentJson: draft.content_json,
+    contentJson: draft.contentJson as object | null,
     tags: draft.tags,
-    createdAt: draft.created_at,
-    updatedAt: draft.updated_at,
+    createdAt: draft.createdAt,
+    updatedAt: draft.updatedAt,
   };
 }
-
