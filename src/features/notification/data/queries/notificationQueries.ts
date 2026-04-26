@@ -1,30 +1,69 @@
-import { NotificationEntity } from '@/features/notification/data/entities/notificationEntities';
-import { supabase } from '@/lib/supabase';
+import { db } from '@/db/index';
+import {
+  comments,
+  inquiryThreads,
+  notifications,
+  posts,
+  users,
+} from '@/db/schema';
+import { and, desc, eq, lt, or, sql } from 'drizzle-orm';
 import 'server-only';
 
-const NOTIFICATION_SELECT_FIELDS = `
-  id, 
-  user_id, 
-  type, 
-  is_read, 
-  inquiry_thread_id,
-  inquiry_thread:inquiry_thread_id ( first_message_preview ),
-  post_id, 
-  comment_id, 
-  comment_count, 
-  representative_user_id, 
-  representative_comment_id, 
-  milestone_value, 
-  created_at, 
-  updated_at,
-  post:post_id ( title ),
-  representative_user:representative_user_id ( nickname, profile_image_url ),
-  representative_comment:comments!representative_comment_id ( content ),
-  comment:comment_id ( content )
-`;
+const representativeComments = db
+  .select({
+    id: comments.id,
+    content: comments.content,
+  })
+  .from(comments)
+  .as('representative_comments');
 
-function applyQuotedLiteral(value: string) {
-  return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '""')}"`;
+const notificationComments = db
+  .select({
+    id: comments.id,
+    content: comments.content,
+  })
+  .from(comments)
+  .as('notification_comments');
+
+const NOTIFICATION_SELECT_FIELDS = {
+  id: notifications.id,
+  userId: notifications.userId,
+  type: notifications.type,
+  isRead: notifications.isRead,
+  inquiryThreadId: notifications.inquiryThreadId,
+  postId: notifications.postId,
+  commentId: notifications.commentId,
+  commentCount: notifications.commentCount,
+  representativeUserId: notifications.representativeUserId,
+  representativeCommentId: notifications.representativeCommentId,
+  milestoneValue: notifications.milestoneValue,
+  createdAt: notifications.createdAt,
+  updatedAt: notifications.updatedAt,
+  post: {
+    title: posts.title,
+  },
+  representativeUser: {
+    nickname: users.nickname,
+    profileImageUrl: users.profileImageUrl,
+  },
+  representativeComment: {
+    content: representativeComments.content,
+  },
+  comment: {
+    content: notificationComments.content,
+  },
+  inquiryThread: {
+    firstMessagePreview: inquiryThreads.firstMessagePreview,
+  },
+} as const;
+
+function isUniqueViolation(error: unknown) {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as { code?: string }).code === '23505'
+  );
 }
 
 export async function fetchNotifications({
@@ -38,41 +77,48 @@ export async function fetchNotifications({
   cursorUpdatedAt?: string;
   cursorId?: string;
 }) {
-  let query = supabase
-    .from('notifications')
+  const cursorCondition =
+    cursorUpdatedAt != null && cursorId != null
+      ? or(
+          lt(notifications.updatedAt, cursorUpdatedAt),
+          and(
+            eq(notifications.updatedAt, cursorUpdatedAt),
+            lt(notifications.id, cursorId)
+          )
+        )
+      : undefined;
+
+  return await db
     .select(NOTIFICATION_SELECT_FIELDS)
-    .eq('user_id', userId)
-    .order('updated_at', { ascending: false })
-    .order('id', { ascending: false })
+    .from(notifications)
+    .leftJoin(posts, eq(notifications.postId, posts.id))
+    .leftJoin(users, eq(notifications.representativeUserId, users.id))
+    .leftJoin(
+      representativeComments,
+      eq(notifications.representativeCommentId, representativeComments.id)
+    )
+    .leftJoin(
+      notificationComments,
+      eq(notifications.commentId, notificationComments.id)
+    )
+    .leftJoin(
+      inquiryThreads,
+      eq(notifications.inquiryThreadId, inquiryThreads.id)
+    )
+    .where(and(eq(notifications.userId, userId), cursorCondition))
+    .orderBy(desc(notifications.updatedAt), desc(notifications.id))
     .limit(limit);
-
-  if (cursorUpdatedAt != null && cursorId != null) {
-    const t = applyQuotedLiteral(cursorUpdatedAt);
-    const id = applyQuotedLiteral(cursorId);
-    query = query.or(`updated_at.lt.${t},and(updated_at.eq.${t},id.lt.${id})`);
-  }
-
-  const { data, error } = await query;
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data as unknown as NotificationEntity[];
 }
 
 export async function countUnreadNotifications({ userId }: { userId: string }) {
-  const { count, error } = await supabase
-    .from('notifications')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .eq('is_read', false);
+  const [data] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(notifications)
+    .where(
+      and(eq(notifications.userId, userId), eq(notifications.isRead, false))
+    );
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return count ?? 0;
+  return data?.count ?? 0;
 }
 
 export async function markAllUnreadNotificationsAsRead({
@@ -80,15 +126,12 @@ export async function markAllUnreadNotificationsAsRead({
 }: {
   userId: string;
 }) {
-  const { error } = await supabase
-    .from('notifications')
-    .update({ is_read: true })
-    .eq('user_id', userId)
-    .eq('is_read', false);
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  await db
+    .update(notifications)
+    .set({ isRead: true })
+    .where(
+      and(eq(notifications.userId, userId), eq(notifications.isRead, false))
+    );
 }
 
 export async function upsertUnreadCommentNotification({
@@ -106,153 +149,67 @@ export async function upsertUnreadCommentNotification({
     return;
   }
 
-  const { data: existing, error: selectError } = await supabase
-    .from('notifications')
-    .select('id, comment_count')
-    .eq('user_id', authorId)
-    .eq('type', 'comment')
-    .eq('post_id', postId)
-    .eq('is_read', false)
-    .maybeSingle();
-
-  if (selectError) {
-    throw new Error(selectError.message);
-  }
-
   const now = new Date().toISOString();
 
-  if (existing) {
-    const nextCount = (existing.comment_count ?? 0) + 1;
-    const { error: updateError } = await supabase
-      .from('notifications')
-      .update({
-        comment_count: nextCount,
-        updated_at: now,
-      })
-      .eq('id', existing.id);
-
-    if (updateError) {
-      throw new Error(updateError.message);
-    }
-  } else {
-    const { error: insertError } = await supabase.from('notifications').insert({
-      user_id: authorId,
+  await db
+    .insert(notifications)
+    .values({
+      userId: authorId,
       type: 'comment',
-      is_read: false,
-      post_id: postId,
-      comment_id: null,
-      comment_count: 1,
-      representative_user_id: commentUserId,
-      representative_comment_id: representativeCommentId,
-      milestone_value: null,
+      isRead: false,
+      postId,
+      commentId: null,
+      commentCount: 1,
+      representativeUserId: commentUserId,
+      representativeCommentId,
+      milestoneValue: null,
+      updatedAt: now,
+    })
+    .onConflictDoUpdate({
+      target: [notifications.postId, notifications.type],
+      targetWhere: and(
+        eq(notifications.type, 'comment'),
+        eq(notifications.isRead, false)
+      ),
+      set: {
+        commentCount: sql`${notifications.commentCount} + 1`,
+        updatedAt: now,
+      },
     });
-
-    if (insertError) {
-      throw new Error(insertError.message);
-    }
-  }
 }
 
-export async function insertPostViewMilestoneNotification({
+export async function insertMilestoneNotification({
+  userId,
+  type,
   postId,
-  authorId,
-  milestoneValue,
-}: {
-  postId: string;
-  authorId: string;
-  milestoneValue: number;
-}) {
-  const { error } = await supabase.from('notifications').insert({
-    user_id: authorId,
-    type: 'post_view_milestone',
-    is_read: false,
-    post_id: postId,
-    comment_id: null,
-    comment_count: null,
-    representative_user_id: null,
-    representative_comment_id: null,
-    milestone_value: milestoneValue,
-  });
-
-  if (error && error.code !== '23505') {
-    throw new Error(error.message);
-  }
-}
-
-export async function insertPostLikeMilestoneNotification({
-  postId,
-  authorId,
-  milestoneValue,
-}: {
-  postId: string;
-  authorId: string;
-  milestoneValue: number;
-}) {
-  const { error } = await supabase.from('notifications').insert({
-    user_id: authorId,
-    type: 'post_like_milestone',
-    is_read: false,
-    post_id: postId,
-    comment_id: null,
-    comment_count: null,
-    representative_user_id: null,
-    representative_comment_id: null,
-    milestone_value: milestoneValue,
-  });
-
-  if (error && error.code !== '23505') {
-    throw new Error(error.message);
-  }
-}
-
-export async function insertCommentLikeMilestoneNotification({
-  postId,
-  commentUserId,
   commentId,
   milestoneValue,
 }: {
-  postId: string;
-  commentUserId: string;
-  commentId: number;
+  userId: string;
+  type:
+    | 'post_view_milestone'
+    | 'post_like_milestone'
+    | 'comment_like_milestone'
+    | 'subscriber_milestone';
+  postId: string | null;
+  commentId: number | null;
   milestoneValue: number;
 }) {
-  const { error } = await supabase.from('notifications').insert({
-    user_id: commentUserId,
-    type: 'comment_like_milestone',
-    is_read: false,
-    post_id: postId,
-    comment_id: commentId,
-    comment_count: null,
-    representative_user_id: null,
-    representative_comment_id: null,
-    milestone_value: milestoneValue,
-  });
-
-  if (error && error.code !== '23505') {
-    throw new Error(error.message);
-  }
-}
-
-export async function insertSubscriberMilestoneNotification({
-  followingUserId,
-  milestoneValue,
-}: {
-  followingUserId: string;
-  milestoneValue: number;
-}) {
-  const { error } = await supabase.from('notifications').insert({
-    user_id: followingUserId,
-    type: 'subscriber_milestone',
-    is_read: false,
-    post_id: null,
-    comment_id: null,
-    comment_count: null,
-    representative_user_id: null,
-    representative_comment_id: null,
-    milestone_value: milestoneValue,
-  });
-
-  if (error && error.code !== '23505') {
-    throw new Error(error.message);
+  try {
+    await db.insert(notifications).values({
+      userId,
+      type,
+      isRead: false,
+      postId,
+      commentId,
+      commentCount: null,
+      representativeUserId: null,
+      representativeCommentId: null,
+      milestoneValue,
+    });
+  } catch (error) {
+    if (!isUniqueViolation(error)) {
+      throw error;
+    }
   }
 }

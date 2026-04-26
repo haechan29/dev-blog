@@ -69,14 +69,16 @@ export function toProps(dto: NotificationDto): NotificationProps {
     case 'comment': {
       const nickname = toUserNickname({
         id: dto.representativeUserId ?? '0000',
-        nickname: dto.representativeUserNickname,
+        nickname: dto.representativeUser?.nickname ?? null,
       });
       const total = dto.commentCount ?? 1;
       const primary =
         total > 1
           ? `${nickname}님 외 ${(total - 1).toLocaleString()}명이 댓글을 남겼어요`
           : `${nickname}님이 댓글을 남겼어요`;
-      const secondary = toCommentPreview(dto.representativeCommentContent);
+      const secondary = toCommentPreview(
+        dto.representativeComment?.content ?? null
+      );
       return {
         type: 'comment',
         ...baseFields(dto),
@@ -87,7 +89,8 @@ export function toProps(dto: NotificationDto): NotificationProps {
         primary,
         secondary,
         representativeNickname: nickname,
-        representativeProfileImageUrl: dto.representativeUserProfileImageUrl,
+        representativeProfileImageUrl:
+          dto.representativeUser?.profileImageUrl ?? null,
       };
     }
     case 'post_view_milestone': {
@@ -97,7 +100,7 @@ export function toProps(dto: NotificationDto): NotificationProps {
         ...baseFields(dto),
         href: toPostUrl({ postId: dto.postId }),
         primary: `조회수 ${value.toLocaleString()}회를 돌파했어요`,
-        secondary: toPostTitle(dto.postTitle),
+        secondary: toPostTitle(dto.post?.title ?? null),
       };
     }
     case 'post_like_milestone': {
@@ -107,7 +110,7 @@ export function toProps(dto: NotificationDto): NotificationProps {
         ...baseFields(dto),
         href: toPostUrl({ postId: dto.postId }),
         primary: `좋아요를 ${value.toLocaleString()}개 받았어요`,
-        secondary: toPostTitle(dto.postTitle),
+        secondary: toPostTitle(dto.post?.title ?? null),
       };
     }
     case 'comment_like_milestone': {
@@ -120,7 +123,7 @@ export function toProps(dto: NotificationDto): NotificationProps {
           highlightCommentId: dto.commentId,
         }),
         primary: `내 댓글이 좋아요 ${value.toLocaleString()}개를 받았어요`,
-        secondary: toCommentPreview(dto.commentContent),
+        secondary: toCommentPreview(dto.comment?.content ?? null),
       };
     }
     case 'subscriber_milestone': {
@@ -139,7 +142,9 @@ export function toProps(dto: NotificationDto): NotificationProps {
         ...baseFields(dto),
         href: dto.inquiryThreadId ? `/contact/${dto.inquiryThreadId}` : null,
         primary: '문의에 새로운 답변이 도착했어요',
-        secondary: toInquiryPreview(dto.firstMessagePreview),
+        secondary: toInquiryPreview(
+          dto.inquiryThread?.firstMessagePreview ?? null
+        ),
       };
     }
   }

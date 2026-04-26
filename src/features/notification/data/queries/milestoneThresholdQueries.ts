@@ -1,5 +1,7 @@
+import { db } from '@/db/index';
+import { milestoneThresholds } from '@/db/schema';
 import { cached } from '@/lib/cache';
-import { supabase } from '@/lib/supabase';
+import { asc, eq } from 'drizzle-orm';
 import 'server-only';
 
 export type MilestoneThresholdType =
@@ -16,17 +18,13 @@ export async function fetchMilestoneThresholds(
   return cached(
     type,
     async () => {
-      const { data, error } = await supabase
-        .from('milestone_thresholds')
-        .select('threshold')
-        .eq('type', type)
-        .order('threshold', { ascending: true });
+      const data = await db
+        .select({ threshold: milestoneThresholds.threshold })
+        .from(milestoneThresholds)
+        .where(eq(milestoneThresholds.type, type))
+        .orderBy(asc(milestoneThresholds.threshold));
 
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      return (data ?? []).map(row => row.threshold);
+      return data.map(row => row.threshold);
     },
     MILESTONE_THRESHOLD_CACHE_TTL_MS
   );
