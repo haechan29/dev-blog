@@ -1,12 +1,5 @@
-export type CreatorStatus = 'pending' | 'sent' | 'accepted' | 'rejected';
+import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries';
 
-export interface CreatorEntity {
-  id: string;
-  channel_name: string;
-  email: string;
-  memo: string | null;
-  status: CreatorStatus;
-  created_at: string;
-  last_mailed_at: string | null;
-  user_id: string | null;
-}
+export type CreatorEntity = Awaited<
+  ReturnType<typeof CreatorQueries.fetchCreator>
+>;

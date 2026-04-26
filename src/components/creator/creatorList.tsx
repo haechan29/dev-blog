@@ -4,9 +4,9 @@ import { CreatorSettingsDropdown } from '@/components/creator/creatorSettingsDro
 import { CreatorStatusFilter } from '@/components/creator/creatorStatusFilter';
 import {
   Creator,
-  CreatorStatus,
   STATUS_FILTER_OPTIONS,
 } from '@/features/creator/domain/model/creator';
+import { CreatorStatus } from '@/features/creator/domain/type/creatorStatus';
 import clsx from 'clsx';
 import { MoreVertical, Plus, RefreshCw, SlidersHorizontal } from 'lucide-react';
 import { useMemo, useState } from 'react';

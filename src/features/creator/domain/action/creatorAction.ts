@@ -1,8 +1,8 @@
 'use server';
 
 import { ValidationError } from '@/errors/errors';
-import { CreatorStatus } from '@/features/creator/data/entities/creatorEntities';
 import * as CreatorServerRepository from '@/features/creator/data/repository/creatorServerRepository';
+import { CreatorStatus } from '@/features/creator/domain/type/creatorStatus';
 import { assertAdmin } from '@/lib/admin';
 import { revalidatePath } from 'next/cache';
 

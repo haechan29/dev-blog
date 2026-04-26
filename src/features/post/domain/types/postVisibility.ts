@@ -10,5 +10,5 @@ export function toPostVisibility(str: string): PostVisibility {
   if (!isPostVisibility(str)) {
     throw new Error(`형식이 올바르지 않습니다: ${str}`);
   }
-  return str as PostVisibility;
+  return str;
 }

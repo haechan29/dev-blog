@@ -10,8 +10,8 @@ import {
 import {
   Creator,
   CREATOR_STATUS_CONFIG,
-  CreatorStatus,
 } from '@/features/creator/domain/model/creator';
+import { CreatorStatus } from '@/features/creator/domain/type/creatorStatus';
 import { OutreachEmail } from '@/features/outreach-email/domain/model/outreachEmail';
 import { formatDateBrief, formatRelativeTime } from '@/lib/date';
 import clsx from 'clsx';

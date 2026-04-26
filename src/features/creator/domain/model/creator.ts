@@ -1,4 +1,4 @@
-export type CreatorStatus = 'pending' | 'sent' | 'accepted' | 'rejected';
+import { CreatorStatus } from '@/features/creator/domain/type/creatorStatus';
 
 export const CREATOR_STATUS_CONFIG: Record<
   CreatorStatus,

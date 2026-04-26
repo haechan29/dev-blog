@@ -8,9 +8,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
   Creator,
-  CreatorStatus,
   STATUS_FILTER_OPTIONS,
 } from '@/features/creator/domain/model/creator';
+import { CreatorStatus } from '@/features/creator/domain/type/creatorStatus';
 import { Check } from 'lucide-react';
 import { ReactNode } from 'react';
 

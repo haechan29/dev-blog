@@ -7,10 +7,8 @@ import { DeleteCreatorDialog } from '@/components/creator/deleteCreatorDialog';
 import { EmailFormDialog } from '@/components/creator/emailFormDialog';
 import { ApiError } from '@/errors/errors';
 import * as CreatorAction from '@/features/creator/domain/action/creatorAction';
-import {
-  Creator,
-  CreatorStatus,
-} from '@/features/creator/domain/model/creator';
+import { Creator } from '@/features/creator/domain/model/creator';
+import { CreatorStatus } from '@/features/creator/domain/type/creatorStatus';
 import * as OutreachEmailClientRepository from '@/features/outreach-email/data/repository/outreachEmailClientRepository';
 import * as OutreachEmailAction from '@/features/outreach-email/domain/action/outreachEmailAction';
 import { OutreachEmail } from '@/features/outreach-email/domain/model/outreachEmail';
