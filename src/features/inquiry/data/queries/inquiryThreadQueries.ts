@@ -1,7 +1,6 @@
 import { db } from '@/db/index';
-import { inquiryThreads } from '@/db/schema';
+import { inquiryMessages, inquiryThreads } from '@/db/schema';
 import { InquiryThreadStatus } from '@/features/inquiry/domain/types/inquiryThreadStatus';
-import { supabase } from '@/lib/supabase';
 import { and, desc, eq, lt, or } from 'drizzle-orm';
 import 'server-only';
 
@@ -99,11 +98,7 @@ export async function fetchInquiryThreads({
     .select(INQUIRY_THREAD_SELECT_FIELDS)
     .from(inquiryThreads)
     .where(
-      and(
-        eq(inquiryThreads.isDeleted, false),
-        statusCondition,
-        cursorCondition
-      )
+      and(eq(inquiryThreads.isDeleted, false), statusCondition, cursorCondition)
     )
     .orderBy(desc(inquiryThreads.updatedAt), desc(inquiryThreads.id))
     .limit(limit);
@@ -120,22 +115,39 @@ export async function createInquiryThread({
   images: string[];
   messagePreview: string;
 }) {
-  const { data, error } = await supabase.rpc('create_inquiry', {
-    p_user_id: userId,
-    p_content: content,
-    p_images: images,
-    p_message_preview: messagePreview,
+  return db.transaction(async tx => {
+    const [thread] = await tx
+      .insert(inquiryThreads)
+      .values({
+        userId,
+        status: 'AWAITING_REPLY',
+        firstMessagePreview: messagePreview,
+        lastMessagePreview: messagePreview,
+        adminUnreadCount: 1,
+      })
+      .returning({ id: inquiryThreads.id });
+
+    const [message] = await tx
+      .insert(inquiryMessages)
+      .values({
+        threadId: thread.id,
+        senderType: 'USER',
+        senderId: userId,
+        content,
+        images,
+      })
+      .returning({ id: inquiryMessages.id });
+
+    await tx
+      .update(inquiryThreads)
+      .set({
+        lastMessageId: message.id,
+        firstMessageId: message.id,
+      })
+      .where(eq(inquiryThreads.id, thread.id));
+
+    return thread.id;
   });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  if (data == null || typeof data !== 'string') {
-    throw new Error('스레드 생성 응답이 올바르지 않습니다');
-  }
-
-  return data;
 }
 
 export async function softDeleteInquiryThread({
