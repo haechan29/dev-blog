@@ -1,4 +1,6 @@
-import { supabase } from '@/lib/supabase';
+import { db } from '@/db/index';
+import { media } from '@/db/schema';
+import { and, eq, gte, inArray, sql } from 'drizzle-orm';
 import 'server-only';
 
 export async function fetchMediaUrlsByIds(ids: string[]) {
@@ -6,17 +8,16 @@ export async function fetchMediaUrlsByIds(ids: string[]) {
     return new Map<string, string>();
   }
 
-  const { data, error } = await supabase
-    .from('media')
-    .select('id, url')
-    .in('id', ids);
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  const data = await db
+    .select({
+      id: media.id,
+      url: media.url,
+    })
+    .from(media)
+    .where(inArray(media.id, ids));
 
   const map = new Map<string, string>();
-  for (const { id, url } of data ?? []) {
+  for (const { id, url } of data) {
     if (id != null && url != null) {
       map.set(id, url);
     }
@@ -25,21 +26,17 @@ export async function fetchMediaUrlsByIds(ids: string[]) {
   return map;
 }
 
-export async function getUsageSince(
-  userId: string,
-  since: Date
-): Promise<number> {
-  const { data, error } = await supabase
-    .from('media')
-    .select('size_bytes')
-    .eq('user_id', userId)
-    .gte('created_at', since.toISOString());
+export async function getUsageSince(userId: string, since: Date) {
+  const [usage] = await db
+    .select({
+      totalSizeBytes: sql<number>`coalesce(sum(${media.sizeBytes}), 0)::int`,
+    })
+    .from(media)
+    .where(
+      and(eq(media.userId, userId), gte(media.createdAt, since.toISOString()))
+    );
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data.reduce((sum, row) => sum + (row.size_bytes || 0), 0);
+  return usage?.totalSizeBytes ?? 0;
 }
 
 export async function createMedia({
@@ -53,20 +50,19 @@ export async function createMedia({
   userId: string;
   type: 'image' | 'audio';
 }) {
-  const { data, error } = await supabase
-    .from('media')
-    .insert({
+  const [createdMedia] = await db
+    .insert(media)
+    .values({
       url,
-      size_bytes: sizeBytes,
-      user_id: userId,
+      sizeBytes,
+      userId,
       type,
     })
-    .select('id')
-    .single();
+    .returning({ id: media.id });
 
-  if (error) {
-    throw new Error(error.message);
+  if (!createdMedia) {
+    throw new Error('미디어 생성에 실패했습니다');
   }
 
-  return data.id;
+  return createdMedia.id;
 }
