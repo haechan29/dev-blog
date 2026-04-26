@@ -10,9 +10,9 @@ import * as CreatorAction from '@/features/creator/domain/action/creatorAction';
 import { CreatorStatus } from '@/features/creator/domain/type/creatorStatus';
 import { toProps } from '@/features/creator/ui/mapper/creatorMapper';
 import { CreatorProps } from '@/features/creator/ui/props/creatorProps';
+import { OutreachEmailDto } from '@/features/outreach-email/data/dto/outreachEmailDto';
 import * as OutreachEmailClientRepository from '@/features/outreach-email/data/repository/outreachEmailClientRepository';
 import * as OutreachEmailAction from '@/features/outreach-email/domain/action/outreachEmailAction';
-import { OutreachEmail } from '@/features/outreach-email/domain/model/outreachEmail';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 
@@ -32,7 +32,7 @@ export function CreatorPageClient({
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
 
   const [isEmailFormOpen, setIsEmailFormOpen] = useState(false);
-  const [emails, setEmails] = useState<OutreachEmail[]>([]);
+  const [emails, setEmails] = useState<OutreachEmailDto[]>([]);
   const [isEmailsLoading, setIsEmailsLoading] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(null);

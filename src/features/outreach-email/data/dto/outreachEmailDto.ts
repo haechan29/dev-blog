@@ -1,4 +1,4 @@
-export interface OutreachEmail {
+export interface OutreachEmailDto {
   id: string;
   creatorId: string;
   direction: 'sent' | 'received';

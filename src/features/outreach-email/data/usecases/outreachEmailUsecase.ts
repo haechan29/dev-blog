@@ -31,10 +31,10 @@ export async function sendEmail({
   if (replyToEmailId) {
     const originalEmail =
       await OutreachEmailQueries.fetchOutreachEmail(replyToEmailId);
-    if (originalEmail?.gmail_thread_id && originalEmail?.message_id) {
+    if (originalEmail?.gmailThreadId && originalEmail?.messageId) {
       replyTo = {
-        threadId: originalEmail.gmail_thread_id,
-        messageId: originalEmail.message_id,
+        threadId: originalEmail.gmailThreadId,
+        messageId: originalEmail.messageId,
       };
     }
   }

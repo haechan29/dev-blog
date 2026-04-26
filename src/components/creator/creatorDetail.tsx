@@ -10,7 +10,7 @@ import {
 import { CreatorStatus } from '@/features/creator/domain/type/creatorStatus';
 import { CREATOR_STATUS_CONFIG } from '@/features/creator/ui/constants/creatorStatusConfig';
 import { CreatorProps } from '@/features/creator/ui/props/creatorProps';
-import { OutreachEmail } from '@/features/outreach-email/domain/model/outreachEmail';
+import { OutreachEmailDto } from '@/features/outreach-email/data/dto/outreachEmailDto';
 import { formatDateBrief, formatRelativeTime } from '@/lib/date';
 import clsx from 'clsx';
 import { ChevronRight, MoreVertical, RefreshCw } from 'lucide-react';
@@ -31,7 +31,7 @@ export function CreatorDetail({
   onMarkAsRead,
 }: {
   creator: CreatorProps | null;
-  emails: OutreachEmail[];
+  emails: OutreachEmailDto[];
   isEmailsLoading: boolean;
   onSendEmail: () => void;
   onSync: () => void;
@@ -181,7 +181,7 @@ function EmailTimelineItem({
   onToggle,
   onMarkAsRead,
 }: {
-  email: OutreachEmail;
+  email: OutreachEmailDto;
   isFirst: boolean;
   isLast: boolean;
   isOpen: boolean;

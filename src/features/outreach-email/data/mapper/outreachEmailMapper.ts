@@ -1,14 +1,16 @@
+import { OutreachEmailDto } from '@/features/outreach-email/data/dto/outreachEmailDto';
 import { OutreachEmailEntity } from '@/features/outreach-email/data/entities/outreachEmailEntities';
-import { OutreachEmail } from '@/features/outreach-email/domain/model/outreachEmail';
 
-export function toDomain(entity: OutreachEmailEntity): OutreachEmail {
+export function toData(entity: OutreachEmailEntity): OutreachEmailDto {
+  const direction = entity.direction === 'sent' ? 'sent' : 'received';
+
   return {
     id: entity.id,
-    creatorId: entity.creator_id,
-    direction: entity.direction,
+    creatorId: entity.creatorId,
+    direction,
     subject: entity.subject,
     body: entity.body,
-    sentAt: entity.sent_at,
-    isRead: entity.is_read,
+    sentAt: entity.sentAt,
+    isRead: entity.isRead,
   };
 }
