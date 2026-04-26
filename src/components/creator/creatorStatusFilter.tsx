@@ -6,11 +6,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Creator,
-  STATUS_FILTER_OPTIONS,
-} from '@/features/creator/domain/model/creator';
 import { CreatorStatus } from '@/features/creator/domain/type/creatorStatus';
+import { CREATOR_STATUS_FILTER_CONFIG } from '@/features/creator/ui/constants/creatorStatusConfig';
+import { CreatorProps } from '@/features/creator/ui/props/creatorProps';
 import { Check } from 'lucide-react';
 import { ReactNode } from 'react';
 
@@ -22,7 +20,7 @@ export function CreatorStatusFilter({
 }: {
   value: CreatorStatus | 'all';
   onChange: (value: CreatorStatus | 'all') => void;
-  creators: Creator[];
+  creators: CreatorProps[];
   children: ReactNode;
 }) {
   return (
@@ -30,7 +28,7 @@ export function CreatorStatusFilter({
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
 
       <DropdownMenuContent align='end'>
-        {Object.entries(STATUS_FILTER_OPTIONS)
+        {Object.entries(CREATOR_STATUS_FILTER_CONFIG)
           .filter(([key]) => {
             if (key === 'all') return true;
             return creators.some(c => c.status === key);

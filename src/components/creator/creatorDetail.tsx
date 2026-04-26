@@ -7,11 +7,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Creator,
-  CREATOR_STATUS_CONFIG,
-} from '@/features/creator/domain/model/creator';
 import { CreatorStatus } from '@/features/creator/domain/type/creatorStatus';
+import { CREATOR_STATUS_CONFIG } from '@/features/creator/ui/constants/creatorStatusConfig';
+import { CreatorProps } from '@/features/creator/ui/props/creatorProps';
 import { OutreachEmail } from '@/features/outreach-email/domain/model/outreachEmail';
 import { formatDateBrief, formatRelativeTime } from '@/lib/date';
 import clsx from 'clsx';
@@ -32,7 +30,7 @@ export function CreatorDetail({
   onStatusChange,
   onMarkAsRead,
 }: {
-  creator: Creator | null;
+  creator: CreatorProps | null;
   emails: OutreachEmail[];
   isEmailsLoading: boolean;
   onSendEmail: () => void;
@@ -95,10 +93,10 @@ export function CreatorDetail({
             <button
               className={clsx(
                 'text-xs px-2 py-0.5 rounded cursor-pointer',
-                CREATOR_STATUS_CONFIG[creator.status].color
+                creator.color
               )}
             >
-              {CREATOR_STATUS_CONFIG[creator.status].label}
+              {creator.label}
             </button>
           </StatusDropdown>
           <div className='flex-1' />

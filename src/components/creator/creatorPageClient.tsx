@@ -7,8 +7,9 @@ import { DeleteCreatorDialog } from '@/components/creator/deleteCreatorDialog';
 import { EmailFormDialog } from '@/components/creator/emailFormDialog';
 import { ApiError } from '@/errors/errors';
 import * as CreatorAction from '@/features/creator/domain/action/creatorAction';
-import { Creator } from '@/features/creator/domain/model/creator';
 import { CreatorStatus } from '@/features/creator/domain/type/creatorStatus';
+import { toProps } from '@/features/creator/ui/mapper/creatorMapper';
+import { CreatorProps } from '@/features/creator/ui/props/creatorProps';
 import * as OutreachEmailClientRepository from '@/features/outreach-email/data/repository/outreachEmailClientRepository';
 import * as OutreachEmailAction from '@/features/outreach-email/domain/action/outreachEmailAction';
 import { OutreachEmail } from '@/features/outreach-email/domain/model/outreachEmail';
@@ -18,7 +19,7 @@ import toast from 'react-hot-toast';
 export function CreatorPageClient({
   initialCreators,
 }: {
-  initialCreators: Creator[];
+  initialCreators: CreatorProps[];
 }) {
   const [selectedCreatorId, setSelectedCreatorId] = useState<string | null>(
     null
@@ -55,7 +56,7 @@ export function CreatorPageClient({
   }, []);
 
   const handleFormSuccess = useCallback(
-    (creator: Creator) => {
+    (creator: CreatorProps) => {
       if (formMode === 'create') {
         setCreators(prev => [creator, ...prev]);
         setSelectedCreatorId(creator.id);
@@ -75,7 +76,8 @@ export function CreatorPageClient({
           id: selectedCreatorId,
           status,
         });
-        setCreators(prev => prev.map(c => (c.id === updated.id ? updated : c)));
+        const props = toProps(updated);
+        setCreators(prev => prev.map(c => (c.id === props.id ? props : c)));
       } catch (error) {
         const message =
           error instanceof ApiError

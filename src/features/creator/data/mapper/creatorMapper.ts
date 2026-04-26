@@ -1,8 +1,8 @@
+import { CreatorDto } from '@/features/creator/data/dto/creatorDto';
 import { CreatorEntity } from '@/features/creator/data/entities/creatorEntities';
-import { Creator } from '@/features/creator/domain/model/creator';
 import { toCreatorStatus } from '@/features/creator/domain/type/creatorStatus';
 
-export function toDomain(entity: CreatorEntity): Creator {
+export function toDto(entity: CreatorEntity): CreatorDto {
   return {
     id: entity.id,
     channelName: entity.channelName,

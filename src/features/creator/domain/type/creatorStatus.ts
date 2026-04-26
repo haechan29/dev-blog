@@ -1,4 +1,9 @@
-const CREATOR_STATUS = ['pending', 'sent', 'accepted', 'rejected'] as const;
+export const CREATOR_STATUS = [
+  'pending',
+  'sent',
+  'accepted',
+  'rejected',
+] as const;
 
 export type CreatorStatus = (typeof CREATOR_STATUS)[number];
 
