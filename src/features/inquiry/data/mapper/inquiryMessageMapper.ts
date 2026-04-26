@@ -11,11 +11,11 @@ export function toDto(
   entity: InquiryMessageEntity,
   urlById: Map<string, string>
 ): InquiryMessageDto {
-  if (entity.is_deleted) {
+  if (entity.isDeleted) {
     return {
       id: entity.id,
-      senderType: toSenderType(entity.sender_type),
-      createdAt: entity.created_at,
+      senderType: toSenderType(entity.senderType),
+      createdAt: entity.createdAt,
       content: DELETED_MESSAGE_CONTENT,
       imageUrls: [],
       isDeleted: true,
@@ -29,8 +29,8 @@ export function toDto(
 
   return {
     id: entity.id,
-    senderType: toSenderType(entity.sender_type),
-    createdAt: entity.created_at,
+    senderType: toSenderType(entity.senderType),
+    createdAt: entity.createdAt,
     content: entity.content,
     imageUrls,
     isDeleted: false,

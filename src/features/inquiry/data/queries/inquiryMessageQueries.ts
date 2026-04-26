@@ -1,74 +1,64 @@
-import { InquiryMessageEntity } from '@/features/inquiry/data/entities/inquiryMessageEntities';
+import { db } from '@/db/index';
+import { inquiryMessages, inquiryThreads } from '@/db/schema';
 import { supabase } from '@/lib/supabase';
+import { and, asc, eq } from 'drizzle-orm';
 import 'server-only';
 
-const INQUIRY_MESSAGE_SELECT_FIELDS = `
-  id,
-  thread_id,
-  sender_type,
-  sender_id,
-  content,
-  images,
-  is_deleted,
-  created_at
-`;
+const INQUIRY_MESSAGE_SELECT_FIELDS = {
+  id: inquiryMessages.id,
+  threadId: inquiryMessages.threadId,
+  senderType: inquiryMessages.senderType,
+  senderId: inquiryMessages.senderId,
+  content: inquiryMessages.content,
+  images: inquiryMessages.images,
+  isDeleted: inquiryMessages.isDeleted,
+  createdAt: inquiryMessages.createdAt,
+} as const;
 
 export async function fetchInquiryMessageForAuth(
   threadId: string,
   messageId: string
 ) {
-  const { data, error } = await supabase
-    .from('inquiry_messages')
-    .select('id, thread_id, sender_id, sender_type, is_deleted')
-    .eq('thread_id', threadId)
-    .eq('id', messageId)
-    .maybeSingle();
+  const data = await db
+    .select({
+      id: inquiryMessages.id,
+      threadId: inquiryMessages.threadId,
+      senderId: inquiryMessages.senderId,
+      senderType: inquiryMessages.senderType,
+      isDeleted: inquiryMessages.isDeleted,
+    })
+    .from(inquiryMessages)
+    .where(
+      and(
+        eq(inquiryMessages.threadId, threadId),
+        eq(inquiryMessages.id, messageId)
+      )
+    )
+    .limit(1);
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data as unknown as Pick<
-    InquiryMessageEntity,
-    'id' | 'thread_id' | 'sender_id' | 'sender_type' | 'is_deleted'
-  > | null;
+  return data[0] ?? null;
 }
 
 export async function fetchInquiryMessagesByThreadId(threadId: string) {
-  const { data, error } = await supabase
-    .from('inquiry_messages')
+  return db
     .select(INQUIRY_MESSAGE_SELECT_FIELDS)
-    .eq('thread_id', threadId)
-    .order('created_at', { ascending: true })
-    .order('id', { ascending: true });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return (data ?? []) as unknown as InquiryMessageEntity[];
+    .from(inquiryMessages)
+    .where(eq(inquiryMessages.threadId, threadId))
+    .orderBy(asc(inquiryMessages.createdAt), asc(inquiryMessages.id));
 }
 
 export async function resetInquiryThreadUserUnreadCount(threadId: string) {
-  const { error } = await supabase
-    .from('inquiry_threads')
-    .update({ user_unread_count: 0 })
-    .eq('id', threadId);
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  await db
+    .update(inquiryThreads)
+    .set({ userUnreadCount: 0 })
+    .where(eq(inquiryThreads.id, threadId));
 }
 
 export async function resetInquiryThreadAdminUnreadCount(threadId: string) {
-  const { error } = await supabase
-    .from('inquiry_threads')
-    .update({ admin_unread_count: 0 })
-    .eq('id', threadId);
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  await db
+    .update(inquiryThreads)
+    .set({ adminUnreadCount: 0 })
+    .where(eq(inquiryThreads.id, threadId));
 }
 
 export async function createInquiryMessage({
