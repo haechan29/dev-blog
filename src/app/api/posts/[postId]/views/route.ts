@@ -35,7 +35,7 @@ export async function POST(
         throw new ValidationError('게시글 통계를 찾을 수 없습니다');
       }
 
-      const { view_count: prevViewCount, avg_read_time: prevAvgReadTime } =
+      const { viewCount: prevViewCount, avgReadTime: prevAvgReadTime } =
         postStat;
 
       await Promise.all([

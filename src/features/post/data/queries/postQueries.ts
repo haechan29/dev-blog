@@ -251,14 +251,14 @@ export async function updatePost({
 }) {
   const updates: Partial<InferInsertModel<typeof posts>> = {
     updatedAt: new Date().toISOString(),
-    ...(title !== undefined ? { title } : {}),
-    ...(contentJson !== undefined ? { contentJson } : {}),
-    ...(tags !== undefined ? { tags } : {}),
-    ...(seriesId !== undefined ? { seriesId } : {}),
-    ...(seriesOrder !== undefined ? { seriesOrder } : {}),
-    ...(visibility !== undefined ? { visibility } : {}),
-    ...(preview !== undefined ? { preview } : {}),
-    ...(contentText !== undefined ? { contentText } : {}),
+    ...(title !== undefined && { title }),
+    ...(contentJson !== undefined && { contentJson }),
+    ...(tags !== undefined && { tags }),
+    ...(seriesId !== undefined && { seriesId }),
+    ...(seriesOrder !== undefined && { seriesOrder }),
+    ...(visibility !== undefined && { visibility }),
+    ...(preview !== undefined && { preview }),
+    ...(contentText !== undefined && { contentText }),
   };
 
   const [post] = await db

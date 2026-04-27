@@ -56,7 +56,7 @@ export async function POST(
         throw new ValidationError('게시글 통계를 찾을 수 없습니다');
       }
 
-      const { like_count: prevLikeCount } = postStat;
+      const { likeCount: prevLikeCount } = postStat;
 
       await Promise.all([
         PostStatUsecase.incrementPostStatLikeCount({

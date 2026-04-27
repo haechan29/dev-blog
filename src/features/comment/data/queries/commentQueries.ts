@@ -92,8 +92,8 @@ export async function updateComment({
 }) {
   const updates: Partial<InferInsertModel<typeof comments>> = {
     updatedAt: new Date().toISOString(),
-    ...(content !== undefined ? { content } : {}),
-    ...(likeCount !== undefined ? { likeCount } : {}),
+    ...(content !== undefined && { content }),
+    ...(likeCount !== undefined && { likeCount }),
   };
 
   const [comment] = await db
