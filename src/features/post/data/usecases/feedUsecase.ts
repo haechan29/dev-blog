@@ -44,9 +44,13 @@ export async function getFeedPosts({
   ]);
 
   const viewedSeriesIds = [
-    ...new Set(viewedPosts.map(v => v.posts[0]?.series_id).filter(Boolean)),
+    ...new Set(
+      viewedPosts
+        .map(v => v.seriesId)
+        .filter((seriesId): seriesId is string => Boolean(seriesId))
+    ),
   ];
-  const skipMap = new Map(skippedPosts.map(s => [s.post_id, s.skip_count]));
+  const skipMap = new Map(skippedPosts.map(s => [s.postId, s.skipCount]));
 
   const fetchedPosts = await FeedQueries.fetchFeedPosts({
     limit: FEED_LIMIT + 1,
