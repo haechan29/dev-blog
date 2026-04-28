@@ -52,7 +52,6 @@ export async function PATCH(request: NextRequest) {
 
     await UserQueries.updateUser({
       userId,
-      userIdFromSession,
       nickname,
       registeredAt: now,
       deletedAt: null,
@@ -82,10 +81,7 @@ export async function DELETE() {
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 
-    await Promise.all([
-      UserUsecase.softDeleteUser(userIdFromSession),
-      UserQueries.deleteUserFromAuth(userIdFromSession),
-    ]);
+    await UserUsecase.softDeleteUser(userIdFromSession);
 
     return NextResponse.json({ data: null });
   } catch (error) {

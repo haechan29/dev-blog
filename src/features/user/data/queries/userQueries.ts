@@ -2,7 +2,6 @@ import { db } from '@/db/index';
 import { users } from '@/db/schema';
 import { isUniqueViolation } from '@/errors/lib';
 import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
-import { supabaseNextAuth } from '@/lib/supabase';
 import { InferInsertModel, eq } from 'drizzle-orm';
 import 'server-only';
 
@@ -31,7 +30,7 @@ export async function fetchUser(userId: string) {
 export async function createUser(nickname: string | null = null) {
   const [createdUser] = await db
     .insert(users)
-    .values({ nickname, authUserId: null })
+    .values({ nickname })
     .returning({ id: users.id });
 
   if (!createdUser) {
@@ -43,14 +42,12 @@ export async function createUser(nickname: string | null = null) {
 
 export async function updateUser({
   userId,
-  userIdFromSession,
   nickname,
   subscriberCount,
   registeredAt,
   deletedAt,
 }: {
   userId: string;
-  userIdFromSession?: string;
   nickname?: string | null;
   subscriberCount?: number;
   registeredAt?: string | null;
@@ -58,7 +55,6 @@ export async function updateUser({
 }) {
   const updates: Partial<InferInsertModel<typeof users>> = {
     ...(nickname !== undefined && { nickname }),
-    ...(userIdFromSession !== undefined && { authUserId: userIdFromSession }),
     ...(subscriberCount !== undefined && { subscriberCount }),
     ...(registeredAt !== undefined && { registeredAt }),
     ...(deletedAt !== undefined && { deletedAt }),
@@ -71,16 +67,5 @@ export async function updateUser({
       throw new DuplicateNicknameError(nickname);
     }
     throw error;
-  }
-}
-
-export async function deleteUserFromAuth(userIdFromSession: string) {
-  const { error } = await supabaseNextAuth
-    .from('users')
-    .delete()
-    .eq('id', userIdFromSession);
-
-  if (error) {
-    throw new Error(error.message);
   }
 }
