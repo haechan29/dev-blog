@@ -1,4 +1,5 @@
 import {
+  accountsInNextAuth,
   comments,
   creators,
   drafts,
@@ -16,8 +17,10 @@ import {
   postsV2,
   postViews,
   series,
+  sessionsInNextAuth,
   subscriptions,
   users,
+  usersInNextAuth,
   usersV2,
 } from '@/db/schema';
 import { relations } from 'drizzle-orm/relations';
@@ -57,9 +60,13 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
   postSkips: many(postSkips),
 }));
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ one, many }) => ({
   comments: many(comments),
   series: many(series),
+  usersInNextAuth: one(usersInNextAuth, {
+    fields: [users.authUserId],
+    references: [usersInNextAuth.id],
+  }),
   notifications_representativeUserId: many(notifications, {
     relationName: 'notifications_representativeUserId_users_id',
   }),
@@ -93,6 +100,36 @@ export const seriesRelations = relations(series, ({ one, many }) => ({
   posts: many(posts),
   postsV2s: many(postsV2),
 }));
+
+export const usersInNextAuthRelations = relations(
+  usersInNextAuth,
+  ({ many }) => ({
+    users: many(users),
+    accountsInNextAuths: many(accountsInNextAuth),
+    sessionsInNextAuths: many(sessionsInNextAuth),
+    usersV2s: many(usersV2),
+  })
+);
+
+export const accountsInNextAuthRelations = relations(
+  accountsInNextAuth,
+  ({ one }) => ({
+    usersInNextAuth: one(usersInNextAuth, {
+      fields: [accountsInNextAuth.userId],
+      references: [usersInNextAuth.id],
+    }),
+  })
+);
+
+export const sessionsInNextAuthRelations = relations(
+  sessionsInNextAuth,
+  ({ one }) => ({
+    usersInNextAuth: one(usersInNextAuth, {
+      fields: [sessionsInNextAuth.userId],
+      references: [usersInNextAuth.id],
+    }),
+  })
+);
 
 export const notificationsRelations = relations(notifications, ({ one }) => ({
   comment_commentId: one(comments, {
@@ -230,6 +267,10 @@ export const mediaV2Relations = relations(mediaV2, ({ one, many }) => ({
 }));
 
 export const usersV2Relations = relations(usersV2, ({ one }) => ({
+  usersInNextAuth: one(usersInNextAuth, {
+    fields: [usersV2.authUserId],
+    references: [usersInNextAuth.id],
+  }),
   mediaV2: one(mediaV2, {
     fields: [usersV2.profileImageId],
     references: [mediaV2.id],
