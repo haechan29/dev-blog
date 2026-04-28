@@ -186,60 +186,6 @@ export const users = pgTable(
   ]
 );
 
-export const usersInNextAuth = nextAuth.table(
-  'users',
-  {
-    id: uuid().defaultRandom().primaryKey().notNull(),
-    name: text(),
-    email: text(),
-    emailVerified: timestamp({ withTimezone: true, mode: 'string' }),
-    image: text(),
-    userId: uuid('user_id'),
-  },
-  table => [
-    unique('email_unique').on(table.email),
-    pgPolicy('Block all access', {
-      as: 'permissive',
-      for: 'all',
-      to: ['public'],
-      using: sql`false`,
-    }),
-  ]
-);
-
-export const accountsInNextAuth = nextAuth.table(
-  'accounts',
-  {
-    id: uuid().defaultRandom().primaryKey().notNull(),
-    type: text().notNull(),
-    provider: text().notNull(),
-    providerAccountId: text().notNull(),
-    refreshToken: text('refresh_token'),
-    accessToken: text('access_token'),
-    // You can use { mode: "bigint" } if numbers are exceeding js number limitations
-    expiresAt: bigint('expires_at', { mode: 'number' }),
-    tokenType: text('token_type'),
-    scope: text(),
-    idToken: text('id_token'),
-    sessionState: text('session_state'),
-    userId: uuid().notNull(),
-  },
-  table => [
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [usersInNextAuth.id],
-      name: 'accounts_userId_fkey',
-    }).onDelete('cascade'),
-    unique('provider_unique').on(table.provider, table.providerAccountId),
-    pgPolicy('Block all access', {
-      as: 'permissive',
-      for: 'all',
-      to: ['public'],
-      using: sql`false`,
-    }),
-  ]
-);
-
 export const milestoneThresholds = pgTable(
   'milestone_thresholds',
   {
@@ -265,30 +211,6 @@ export const milestoneThresholds = pgTable(
       'milestone_thresholds_type_check',
       sql`type = ANY (ARRAY['post_view'::text, 'post_like'::text, 'comment_like'::text, 'subscriber'::text])`
     ),
-  ]
-);
-
-export const sessionsInNextAuth = nextAuth.table(
-  'sessions',
-  {
-    id: uuid().defaultRandom().primaryKey().notNull(),
-    expires: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
-    sessionToken: text().notNull(),
-    userId: uuid().notNull(),
-  },
-  table => [
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [usersInNextAuth.id],
-      name: 'sessions_userId_fkey',
-    }).onDelete('cascade'),
-    unique('session_token_unique').on(table.sessionToken),
-    pgPolicy('Block all access', {
-      as: 'permissive',
-      for: 'all',
-      to: ['public'],
-      using: sql`false`,
-    }),
   ]
 );
 
@@ -1061,13 +983,6 @@ export const usersV2 = pgTable(
     uniqueIndex('users_v2_nickname_idx')
       .using('btree', table.nickname.asc().nullsLast().op('text_ops'))
       .where(sql`(deleted_at IS NULL)`),
-    foreignKey({
-      columns: [table.authUserId],
-      foreignColumns: [usersInNextAuth.id],
-      name: 'users_v2_auth_user_id_fkey',
-    })
-      .onUpdate('cascade')
-      .onDelete('set null'),
     foreignKey({
       columns: [table.profileImageId],
       foreignColumns: [mediaV2.id],
