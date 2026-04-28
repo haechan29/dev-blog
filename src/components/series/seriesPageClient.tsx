@@ -5,7 +5,7 @@ import SeriesPostList from '@/components/series/seriesPostList';
 import SeriesSettingsDropdown from '@/components/series/seriesSettingsDropdown';
 import ProfileIcon from '@/components/user/profileIcon';
 import useSeries from '@/features/series/domain/hooks/useSeries';
-import { SeriesProps } from '@/features/series/ui/seriesProps';
+import { SeriesProps } from '@/features/series/ui/props/seriesProps';
 import clsx from 'clsx';
 import { MoreVertical, Plus } from 'lucide-react';
 import Link from 'next/link';

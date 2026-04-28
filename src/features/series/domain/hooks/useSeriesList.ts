@@ -1,8 +1,9 @@
 'use client';
 
 import { ApiError } from '@/errors/errors';
-import * as SeriesClientService from '@/features/series/domain/service/seriesClientService';
-import { createProps, SeriesProps } from '@/features/series/ui/seriesProps';
+import * as SeriesClientRepository from '@/features/series/data/repository/seriesClientRepository';
+import { toProps } from '@/features/series/ui/mapper/seriesMapper';
+import { SeriesProps } from '@/features/series/ui/props/seriesProps';
 import { userKeys } from '@/queries/keys';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
@@ -16,15 +17,16 @@ export default function useSeriesList(
   const { data: seriesList } = useQuery({
     queryKey: userKeys.seriesList(userId),
     queryFn: async () => {
-      const seriesList = await SeriesClientService.fetchSeriesByUserId(userId);
-      return seriesList.map(createProps);
+      const seriesList =
+        await SeriesClientRepository.fetchSeriesByUserId(userId);
+      return seriesList.map(toProps);
     },
     initialData,
   });
 
   const createSeriesMutation = useMutation({
     mutationFn: (params: { title: string; description: string | null }) =>
-      SeriesClientService.createSeries({ userId, ...params }),
+      SeriesClientRepository.createSeries({ userId, ...params }),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: userKeys.seriesList(userId),
@@ -44,7 +46,7 @@ export default function useSeriesList(
       seriesId: string;
       title: string;
       description: string | null;
-    }) => SeriesClientService.updateSeries({ userId, ...params }),
+    }) => SeriesClientRepository.updateSeries({ userId, ...params }),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: userKeys.seriesList(userId),
@@ -61,7 +63,7 @@ export default function useSeriesList(
 
   const deleteSeriesMutation = useMutation({
     mutationFn: (seriesId: string) =>
-      SeriesClientService.deleteSeries({ userId, seriesId }),
+      SeriesClientRepository.deleteSeries({ userId, seriesId }),
     onSuccess: (_, seriesId) => {
       queryClient.removeQueries({
         queryKey: userKeys.series(userId, seriesId),

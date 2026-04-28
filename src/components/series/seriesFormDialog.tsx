@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import useSeriesList from '@/features/series/domain/hooks/useSeriesList';
-import { SeriesProps } from '@/features/series/ui/seriesProps';
+import { SeriesProps } from '@/features/series/ui/props/seriesProps';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';

@@ -1,6 +1,6 @@
 import SeriesListPageClient from '@/components/series/seriesListPageClient';
-import * as SeriesServerService from '@/features/series/domain/service/seriesServerService';
-import { createProps } from '@/features/series/ui/seriesProps';
+import * as SeriesServerRepository from '@/features/series/data/repository/seriesServerRepository';
+import { toProps } from '@/features/series/ui/mapper/seriesMapper';
 import { getUserId } from '@/lib/user';
 
 export default async function SeriesListPage({
@@ -11,9 +11,9 @@ export default async function SeriesListPage({
   const { userId } = await params;
   const currentUserId = await getUserId();
 
-  const seriesList = await SeriesServerService.fetchSeriesByUserId(userId).then(
-    seriesList => seriesList.map(createProps)
-  );
+  const seriesList = await SeriesServerRepository.fetchSeriesByUserId(
+    userId
+  ).then(seriesList => seriesList.map(toProps));
 
   return (
     <SeriesListPageClient

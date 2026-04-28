@@ -7,8 +7,10 @@ export interface SeriesDto {
   createdAt: string;
   updatedAt: string;
   userId: string;
-  authorName: string | null;
-  profileImageUrl: string | null;
+  user: {
+    nickname: string | null;
+    profileImageUrl: string | null;
+  };
   posts: (Pick<
     PostDto,
     'id' | 'title' | 'createdAt' | 'seriesId' | 'seriesOrder' | 'visibility'

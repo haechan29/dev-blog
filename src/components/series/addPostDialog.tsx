@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import usePosts from '@/features/post/hooks/usePosts';
 import useSeries from '@/features/series/domain/hooks/useSeries';
-import { SeriesProps } from '@/features/series/ui/seriesProps';
+import { SeriesProps } from '@/features/series/ui/props/seriesProps';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
 import { useCallback, useMemo } from 'react';
