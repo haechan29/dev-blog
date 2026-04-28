@@ -139,6 +139,13 @@ export const users = pgTable(
   'users',
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
+    name: text(),
+    email: text(),
+    emailVerified: timestamp('email_verified', {
+      withTimezone: true,
+      mode: 'string',
+    }),
+    image: text(),
     nickname: text(),
     createdAt: timestamp('created_at', {
       withTimezone: true,
@@ -161,6 +168,9 @@ export const users = pgTable(
     subscriberCount: integer('subscriber_count').default(0).notNull(),
   },
   table => [
+    uniqueIndex('users_email_unique')
+      .using('btree', table.email.asc().nullsLast().op('text_ops'))
+      .where(sql`(email IS NOT NULL)`),
     uniqueIndex('users_nickname_unique')
       .using('btree', table.nickname.asc().nullsLast().op('text_ops'))
       .where(sql`(deleted_at IS NULL)`),
@@ -188,6 +198,44 @@ export const users = pgTable(
   ]
 );
 
+export const accounts = pgTable(
+  'accounts',
+  {
+    userId: uuid('user_id').notNull(),
+    type: text().notNull(),
+    provider: text().notNull(),
+    providerAccountId: text('provider_account_id').notNull(),
+    refreshToken: text('refresh_token'),
+    accessToken: text('access_token'),
+    expiresAt: integer('expires_at'),
+    tokenType: text('token_type'),
+    scope: text(),
+    idToken: text('id_token'),
+    sessionState: text('session_state'),
+  },
+  table => [
+    index('accounts_user_id_idx').using(
+      'btree',
+      table.userId.asc().nullsLast().op('uuid_ops')
+    ),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [users.id],
+      name: 'accounts_user_id_fkey',
+    }).onDelete('cascade'),
+    primaryKey({
+      columns: [table.provider, table.providerAccountId],
+      name: 'accounts_pkey',
+    }),
+    pgPolicy('Block all access', {
+      as: 'permissive',
+      for: 'all',
+      to: ['public'],
+      using: sql`false`,
+    }),
+  ]
+);
+
 export const usersInNextAuth = nextAuth.table(
   'users',
   {
@@ -200,6 +248,32 @@ export const usersInNextAuth = nextAuth.table(
   },
   table => [
     unique('email_unique').on(table.email),
+    pgPolicy('Block all access', {
+      as: 'permissive',
+      for: 'all',
+      to: ['public'],
+      using: sql`false`,
+    }),
+  ]
+);
+
+export const sessions = pgTable(
+  'sessions',
+  {
+    sessionToken: text('session_token').primaryKey().notNull(),
+    userId: uuid('user_id').notNull(),
+    expires: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
+  },
+  table => [
+    index('sessions_user_id_idx').using(
+      'btree',
+      table.userId.asc().nullsLast().op('uuid_ops')
+    ),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [users.id],
+      name: 'sessions_user_id_fkey',
+    }).onDelete('cascade'),
     pgPolicy('Block all access', {
       as: 'permissive',
       for: 'all',
@@ -233,6 +307,27 @@ export const accountsInNextAuth = nextAuth.table(
       name: 'accounts_userId_fkey',
     }).onDelete('cascade'),
     unique('provider_unique').on(table.provider, table.providerAccountId),
+    pgPolicy('Block all access', {
+      as: 'permissive',
+      for: 'all',
+      to: ['public'],
+      using: sql`false`,
+    }),
+  ]
+);
+
+export const verificationTokens = pgTable(
+  'verification_tokens',
+  {
+    identifier: text().notNull(),
+    token: text().notNull(),
+    expires: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
+  },
+  table => [
+    primaryKey({
+      columns: [table.identifier, table.token],
+      name: 'verification_tokens_pkey',
+    }),
     pgPolicy('Block all access', {
       as: 'permissive',
       for: 'all',

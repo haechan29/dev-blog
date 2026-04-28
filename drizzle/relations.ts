@@ -1,4 +1,5 @@
 import {
+  accounts,
   accountsInNextAuth,
   comments,
   creators,
@@ -17,11 +18,13 @@ import {
   postsV2,
   postViews,
   series,
+  sessions,
   sessionsInNextAuth,
   subscriptions,
   users,
   usersInNextAuth,
   usersV2,
+  verificationTokens,
 } from '@/db/schema';
 import { relations } from 'drizzle-orm/relations';
 
@@ -61,7 +64,9 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
 }));
 
 export const usersRelations = relations(users, ({ one, many }) => ({
+  accounts: many(accounts),
   comments: many(comments),
+  sessions: many(sessions),
   series: many(series),
   usersInNextAuth: one(usersInNextAuth, {
     fields: [users.authUserId],
@@ -90,6 +95,13 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   }),
   postLikes: many(postLikes),
   postSkips: many(postSkips),
+}));
+
+export const accountsRelations = relations(accounts, ({ one }) => ({
+  user: one(users, {
+    fields: [accounts.userId],
+    references: [users.id],
+  }),
 }));
 
 export const seriesRelations = relations(series, ({ one, many }) => ({
@@ -129,6 +141,18 @@ export const sessionsInNextAuthRelations = relations(
       references: [usersInNextAuth.id],
     }),
   })
+);
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, {
+    fields: [sessions.userId],
+    references: [users.id],
+  }),
+}));
+
+export const verificationTokensRelations = relations(
+  verificationTokens,
+  () => ({})
 );
 
 export const notificationsRelations = relations(notifications, ({ one }) => ({
