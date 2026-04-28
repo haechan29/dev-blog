@@ -1,3 +1,4 @@
+import { toPostVisibility } from '@/features/post/domain/types/postVisibility';
 import { SeriesDto } from '@/features/series/data/dto/seriesDto';
 import { SeriesEntity } from '@/features/series/data/entities/seriesEntities';
 
@@ -6,22 +7,22 @@ export function toDto(entity: SeriesEntity): SeriesDto {
     id: entity.id,
     title: entity.title,
     description: entity.description,
-    createdAt: entity.created_at,
-    updatedAt: entity.updated_at,
-    userId: entity.user_id,
-    authorName: entity.users.nickname,
-    profileImageUrl: entity.users.profile_image_url,
+    createdAt: entity.createdAt,
+    updatedAt: entity.updatedAt,
+    userId: entity.userId,
+    authorName: entity.user.nickname,
+    profileImageUrl: entity.user.profileImageUrl,
     posts: entity.posts.map(post => ({
       id: post.id,
       title: post.title,
-      createdAt: post.created_at,
-      seriesId: post.series_id,
-      seriesOrder: post.series_order,
-      visibility: post.visibility,
+      createdAt: post.createdAt,
+      seriesId: post.seriesId,
+      seriesOrder: post.seriesOrder,
+      visibility: toPostVisibility(post.visibility),
       postStat: {
-        likeCount: post.post_stats?.like_count ?? 0,
-        viewCount: post.post_stats?.view_count ?? 0,
-        commentCount: post.post_stats?.comment_count ?? 0,
+        likeCount: post.postStats?.likeCount ?? 0,
+        viewCount: post.postStats?.viewCount ?? 0,
+        commentCount: post.postStats?.commentCount ?? 0,
       },
     })),
     postCount: entity.posts.length,

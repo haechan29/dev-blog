@@ -1,4 +1,5 @@
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
+import { toDto } from '@/features/series/data/mapper/seriesMapper';
 import * as SeriesQueries from '@/features/series/data/queries/seriesQueries';
 import * as SeriesUsecase from '@/features/series/data/usecases/seriesUsecase';
 import { getUserId } from '@/lib/user';
@@ -49,8 +50,9 @@ export async function PATCH(
       description: description ?? null,
       userId,
     });
+    const data = toDto(updated);
 
-    return NextResponse.json({ data: updated });
+    return NextResponse.json({ data });
   } catch (error) {
     console.error('시리즈 수정 요청이 실패했습니다');
 

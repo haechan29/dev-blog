@@ -6,7 +6,7 @@ export async function getSeries(seriesId: string) {
   const currentUserId = await getUserId();
   const series = await SeriesQueries.fetchSeries(seriesId);
 
-  if (currentUserId !== series.user_id) {
+  if (currentUserId !== series.userId) {
     series.posts = series.posts.filter(post => post.visibility === 'public');
   }
 

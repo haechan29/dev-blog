@@ -50,7 +50,7 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
     fields: [posts.userId],
     references: [users.id],
   }),
-  postStats: many(postStats),
+  postStats: one(postStats),
   postViews: many(postViews),
   drafts: many(drafts),
   postLikes: many(postLikes),
