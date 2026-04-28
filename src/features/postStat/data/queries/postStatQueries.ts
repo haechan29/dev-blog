@@ -1,39 +1,36 @@
-import { PostStatEntity } from '@/features/postStat/data/entities/postStatEntities';
+import { db } from '@/db/index';
+import { postStats } from '@/db/schema';
 import { PostStatCreationError } from '@/features/postStat/data/errors/postStatErrors';
-import { supabase } from '@/lib/supabase';
+import { InferInsertModel, eq, sql } from 'drizzle-orm';
 import 'server-only';
 
-const POST_STAT_SELECT = `
-  post_id,
-  like_count,
-  view_count,
-  comment_count,
-  avg_read_time,
-  popularity
-`;
+const POST_STAT_SELECT_FIELDS = {
+  postId: postStats.postId,
+  likeCount: postStats.likeCount,
+  viewCount: postStats.viewCount,
+  commentCount: postStats.commentCount,
+  avgReadTime: sql<number>`${postStats.avgReadTime}::float8`,
+  popularity: sql<number>`${postStats.popularity}::float8`,
+} as const;
 
 export async function fetchPostStatByPostId(postId: string) {
-  const { data, error } = await supabase
-    .from('post_stats')
-    .select(POST_STAT_SELECT)
-    .eq('post_id', postId)
-    .maybeSingle();
+  const data = await db
+    .select(POST_STAT_SELECT_FIELDS)
+    .from(postStats)
+    .where(eq(postStats.postId, postId))
+    .limit(1);
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data as PostStatEntity | null;
+  return data[0] ?? null;
 }
 
 export async function createPostStat(postId: string) {
-  const { error } = await supabase.from('post_stats').insert({
-    post_id: postId,
-    view_count: 0,
-    like_count: 0,
-  });
-
-  if (error) {
+  try {
+    await db.insert(postStats).values({
+      postId,
+      viewCount: 0,
+      likeCount: 0,
+    });
+  } catch {
     throw new PostStatCreationError('게시글 통계 생성 실패', postId);
   }
 }
@@ -51,17 +48,12 @@ export async function updatePostStat({
   viewCount?: number;
   avgReadTime?: number;
 }) {
-  const { error } = await supabase
-    .from('post_stats')
-    .update({
-      ...(likeCount !== undefined && { like_count: likeCount }),
-      ...(commentCount !== undefined && { comment_count: commentCount }),
-      ...(viewCount !== undefined && { view_count: viewCount }),
-      ...(avgReadTime !== undefined && { avg_read_time: avgReadTime }),
-    })
-    .eq('post_id', postId);
+  const updates: Partial<InferInsertModel<typeof postStats>> = {
+    ...(likeCount !== undefined && { likeCount }),
+    ...(commentCount !== undefined && { commentCount }),
+    ...(viewCount !== undefined && { viewCount }),
+    ...(avgReadTime !== undefined && { avgReadTime: String(avgReadTime) }),
+  };
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  await db.update(postStats).set(updates).where(eq(postStats.postId, postId));
 }

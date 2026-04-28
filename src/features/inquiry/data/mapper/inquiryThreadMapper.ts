@@ -13,13 +13,13 @@ export function toDto(entity: InquiryThreadEntity): InquiryThreadDto {
   return {
     id: entity.id,
     status: toStatus(entity.status),
-    firstMessagePreview: entity.first_message_preview,
-    firstMessageId: entity.first_message_id,
-    lastMessagePreview: entity.last_message_preview,
-    lastMessageId: entity.last_message_id,
-    userUnreadCount: entity.user_unread_count,
-    adminUnreadCount: entity.admin_unread_count,
-    createdAt: entity.created_at,
-    updatedAt: entity.updated_at,
+    firstMessagePreview: entity.firstMessagePreview,
+    firstMessageId: entity.firstMessageId,
+    lastMessagePreview: entity.lastMessagePreview,
+    lastMessageId: entity.lastMessageId,
+    userUnreadCount: entity.userUnreadCount,
+    adminUnreadCount: entity.adminUnreadCount,
+    createdAt: entity.createdAt,
+    updatedAt: entity.updatedAt,
   };
 }

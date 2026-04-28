@@ -1,5 +1,5 @@
 import { ApiError } from '@/errors/errors';
-import { toDomain } from '@/features/outreach-email/data/mapper/outreachEmailMapper';
+import { toData } from '@/features/outreach-email/data/mapper/outreachEmailMapper';
 import * as OutreachEmailQueries from '@/features/outreach-email/data/queries/outreachEmailQueries';
 import { assertAdmin } from '@/lib/admin';
 import { NextRequest, NextResponse } from 'next/server';
@@ -12,7 +12,9 @@ export async function GET(request: NextRequest) {
     const creatorId = searchParams.get('creatorId') ?? undefined;
 
     const emails = await OutreachEmailQueries.fetchOutreachEmails(creatorId);
-    return NextResponse.json({ data: emails.map(toDomain) });
+    const data = emails.map(toData);
+
+    return NextResponse.json({ data });
   } catch (error) {
     if (error instanceof ApiError) {
       return error.toResponse();

@@ -1,6 +1,56 @@
-import { FeedPostEntity } from '@/features/post/data/entities/feedPostEntities';
-import { supabase } from '@/lib/supabase';
+import { db } from '@/db/index';
+import { postStats, posts, series, users } from '@/db/schema';
+import {
+  and,
+  arrayContains,
+  desc,
+  eq,
+  lt,
+  ne,
+  notInArray,
+  sql,
+} from 'drizzle-orm';
 import 'server-only';
+
+const FEED_POST_FIELDS = {
+  id: posts.id,
+  title: posts.title,
+  contentJson: posts.contentJson,
+  preview: posts.preview,
+  tags: posts.tags,
+  createdAt: posts.createdAt,
+  updatedAt: posts.updatedAt,
+  userId: posts.userId,
+  seriesId: posts.seriesId,
+  seriesOrder: posts.seriesOrder,
+  visibility: posts.visibility,
+};
+
+const FEED_USER_FIELDS = {
+  nickname: users.nickname,
+  deletedAt: users.deletedAt,
+  registeredAt: users.registeredAt,
+  bio: users.bio,
+  profileImageUrl: users.profileImageUrl,
+};
+
+const FEED_SERIES_FIELDS = {
+  title: series.title,
+};
+
+const FEED_POST_STATS_FIELDS = {
+  likeCount: postStats.likeCount,
+  viewCount: postStats.viewCount,
+  commentCount: postStats.commentCount,
+  popularity: sql<number>`${postStats.popularity}::float8`,
+};
+
+const FEED_POST_SELECT_FIELDS = {
+  ...FEED_POST_FIELDS,
+  user: FEED_USER_FIELDS,
+  series: FEED_SERIES_FIELDS,
+  postStat: FEED_POST_STATS_FIELDS,
+};
 
 export async function fetchFeedPosts({
   limit,
@@ -15,53 +65,33 @@ export async function fetchFeedPosts({
   cursor: string | null;
   tag?: string;
 }) {
-  let query = supabase
-    .from('posts')
-    .select(
-      `
-        id,
-        title,
-        content_json,
-        preview,
-        tags,
-        created_at,
-        updated_at,
-        user_id,
-        series_id,
-        series_order,
-        visibility,
-        users:user_id(nickname, deleted_at, registered_at, bio, profile_image_url),
-        series:series_id(title),
-        post_stats!inner(like_count, view_count, comment_count, popularity)
-      `
-    )
-    .eq('visibility', 'public');
+  const conditions = [eq(posts.visibility, 'public')];
 
   if (excludeIds.length > 0) {
-    query = query.not('id', 'in', `(${excludeIds.join(',')})`);
+    conditions.push(notInArray(posts.id, excludeIds));
   }
 
   if (excludeUserId) {
-    query = query.neq('user_id', excludeUserId);
+    conditions.push(ne(posts.userId, excludeUserId));
   }
 
   if (cursor) {
-    query = query.lt('post_stats.popularity', cursor);
+    conditions.push(lt(postStats.popularity, cursor));
   }
 
   if (tag) {
-    query = query.contains('tags', [tag]);
+    conditions.push(arrayContains(posts.tags, [tag]));
   }
 
-  query = query
-    .order('post_stats(popularity)', { ascending: false })
+  const data = await db
+    .select(FEED_POST_SELECT_FIELDS)
+    .from(posts)
+    .innerJoin(users, eq(posts.userId, users.id))
+    .leftJoin(series, eq(posts.seriesId, series.id))
+    .innerJoin(postStats, eq(posts.id, postStats.postId))
+    .where(and(...conditions))
+    .orderBy(desc(postStats.popularity))
     .limit(limit);
 
-  const { data, error } = await query;
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data as unknown as FeedPostEntity[];
+  return data;
 }

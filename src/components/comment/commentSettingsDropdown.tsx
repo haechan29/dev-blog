@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import { CommentItemProps } from '@/features/comment/ui/props/commentItemProps';
 import { createRipple } from '@/lib/dom';
 import { Edit2, Trash2 } from 'lucide-react';
 import { useState } from 'react';

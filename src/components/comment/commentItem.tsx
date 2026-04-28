@@ -3,7 +3,7 @@
 import CommentContentSection from '@/components/comment/commentContentSection';
 import CommentSettingsDropdown from '@/components/comment/commentSettingsDropdown';
 import ProfileIcon from '@/components/user/profileIcon';
-import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import { CommentItemProps } from '@/features/comment/ui/props/commentItemProps';
 import clsx from 'clsx';
 import { MoreVertical } from 'lucide-react';
 import Link from 'next/link';

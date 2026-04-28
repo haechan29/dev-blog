@@ -12,11 +12,11 @@ import PostSidebar from '@/components/post/postSidebar';
 import PostToolbar from '@/components/post/postToolbar';
 import PostVisibilityBanner from '@/components/post/postVisibilityBanner';
 import TableOfContents from '@/components/post/tableOfContents';
-import { CommentsPage } from '@/features/comment/domain/types/page';
+import { CommentsPage } from '@/features/comment/ui/types/page';
 import { PostForbiddenError } from '@/features/post/data/errors/postErrors';
+import * as PostClientRepository from '@/features/post/data/repository/postClientRepository';
 import { renderContentElement } from '@/features/post/domain/lib/render';
 import { getToolbarHeightPx } from '@/features/post/domain/lib/toolbarHeight';
-import * as PostClientService from '@/features/post/domain/service/postClientService';
 import Heading from '@/features/post/domain/types/heading';
 import { PostsPage } from '@/features/post/domain/types/page';
 import useActiveHeading from '@/features/post/hooks/useActiveHeading';
@@ -61,7 +61,7 @@ export default function PostPageClient({
   } = useInfiniteQuery({
     queryKey: postKeys.list({ excludeId: initialPost.id }),
     queryFn: async ({ pageParam }) => {
-      const page = await PostClientService.getFeedPosts({
+      const page = await PostClientRepository.getFeedPosts({
         cursor: pageParam,
         excludeId: initialPost.id,
       });
@@ -80,7 +80,8 @@ export default function PostPageClient({
 
   const { data: post, error } = useQuery({
     queryKey: postKeys.detail(initialPost.id),
-    queryFn: () => PostClientService.getPost(initialPost.id).then(createProps),
+    queryFn: () =>
+      PostClientRepository.getPost(initialPost.id).then(createProps),
     initialData: initialPost,
   });
 

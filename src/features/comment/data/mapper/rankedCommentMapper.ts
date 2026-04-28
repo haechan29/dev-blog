@@ -4,15 +4,17 @@ import { RankedCommentEntity } from '@/features/comment/data/entities/rankedComm
 export function toDto(comment: RankedCommentEntity): CommentResponseDto {
   return {
     id: comment.id,
-    postId: comment.post_id,
-    authorName: comment.nickname,
+    postId: comment.postId,
     content: comment.content,
-    createdAt: comment.created_at,
-    updatedAt: comment.updated_at,
-    likeCount: comment.like_count,
-    userId: comment.user_id,
-    deletedAt: comment.deleted_at,
-    registeredAt: comment.registered_at,
-    profileImageUrl: comment.profile_image_url,
+    createdAt: comment.createdAt,
+    updatedAt: comment.updatedAt,
+    likeCount: comment.likeCount,
+    userId: comment.userId,
+    user: {
+      nickname: comment.user.nickname,
+      deletedAt: comment.user.deletedAt,
+      registeredAt: comment.user.registeredAt,
+      profileImageUrl: comment.user.profileImageUrl,
+    },
   };
 }

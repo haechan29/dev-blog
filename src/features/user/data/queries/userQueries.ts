@@ -1,47 +1,44 @@
-import { UserEntity } from '@/features/user/data/entities/userEntities';
+import { db } from '@/db/index';
+import { users } from '@/db/schema';
+import { isUniqueViolation } from '@/errors/lib';
 import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
-import { toDto } from '@/features/user/data/mapper/userMapper';
-import { supabase, supabaseNextAuth } from '@/lib/supabase';
+import { supabaseNextAuth } from '@/lib/supabase';
+import { InferInsertModel, eq } from 'drizzle-orm';
 import 'server-only';
 
+const USER_SELECT_FIELDS = {
+  id: users.id,
+  nickname: users.nickname,
+  createdAt: users.createdAt,
+  updatedAt: users.updatedAt,
+  deletedAt: users.deletedAt,
+  registeredAt: users.registeredAt,
+  profileImageUrl: users.profileImageUrl,
+  bio: users.bio,
+  subscriberCount: users.subscriberCount,
+} as const;
+
 export async function fetchUser(userId: string) {
-  const { data, error } = await supabase
-    .from('users')
-    .select(
-      `
-        id,
-        nickname,
-        created_at,
-        updated_at,
-        deleted_at,
-        registered_at,
-        profile_image_url,
-        bio,
-        subscriber_count
-      `
-    )
-    .eq('id', userId)
-    .maybeSingle();
+  const entities = await db
+    .select(USER_SELECT_FIELDS)
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
 
-  if (error) {
-    throw error;
-  }
-
-  return data ? toDto(data as unknown as UserEntity) : null;
+  return entities[0] ?? null;
 }
 
 export async function createUser(nickname: string | null = null) {
-  const { data, error } = await supabase
-    .from('users')
-    .insert({ nickname, auth_user_id: null })
-    .select('id')
-    .single();
+  const [createdUser] = await db
+    .insert(users)
+    .values({ nickname, authUserId: null })
+    .returning({ id: users.id });
 
-  if (error) {
-    throw new Error(error.message);
+  if (!createdUser) {
+    throw new Error('사용자 생성에 실패했습니다');
   }
 
-  return data.id as string;
+  return createdUser.id;
 }
 
 export async function updateUser({
@@ -59,26 +56,21 @@ export async function updateUser({
   registeredAt?: string | null;
   deletedAt?: string | null;
 }) {
-  const { error } = await supabase
-    .from('users')
-    .update({
-      ...(nickname !== undefined && { nickname }),
-      ...(userIdFromSession !== undefined && {
-        auth_user_id: userIdFromSession,
-      }),
-      ...(subscriberCount !== undefined && {
-        subscriber_count: subscriberCount,
-      }),
-      ...(registeredAt !== undefined && { registered_at: registeredAt }),
-      ...(deletedAt !== undefined && { deleted_at: deletedAt }),
-    })
-    .eq('id', userId);
+  const updates: Partial<InferInsertModel<typeof users>> = {
+    ...(nickname !== undefined && { nickname }),
+    ...(userIdFromSession !== undefined && { authUserId: userIdFromSession }),
+    ...(subscriberCount !== undefined && { subscriberCount }),
+    ...(registeredAt !== undefined && { registeredAt }),
+    ...(deletedAt !== undefined && { deletedAt }),
+  };
 
-  if (error) {
-    if (!!nickname && error.code === '23505') {
+  try {
+    await db.update(users).set(updates).where(eq(users.id, userId));
+  } catch (error) {
+    if (nickname && isUniqueViolation(error)) {
       throw new DuplicateNicknameError(nickname);
     }
-    throw new Error(error.message);
+    throw error;
   }
 }
 

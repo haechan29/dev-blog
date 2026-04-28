@@ -1,4 +1,4 @@
-import { SeriesProps } from '@/features/series/ui/seriesProps';
+import { SeriesProps } from '@/features/series/ui/props/seriesProps';
 import clsx from 'clsx';
 import Link from 'next/link';
 

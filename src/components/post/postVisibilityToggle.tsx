@@ -2,7 +2,7 @@
 
 import Tooltip from '@/components/tooltip';
 import { ApiError } from '@/errors/errors';
-import * as PostClientService from '@/features/post/domain/service/postClientService';
+import * as PostClientRepository from '@/features/post/data/repository/postClientRepository';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import clsx from 'clsx';
 import { useCallback, useEffect, useState } from 'react';
@@ -32,7 +32,10 @@ export default function PostVisibilityToggle({
     setIsLoading(true);
 
     try {
-      await PostClientService.updatePost({ postId, visibility: newVisibility });
+      await PostClientRepository.updatePost({
+        postId,
+        visibility: newVisibility,
+      });
       onSuccess?.();
     } catch (error) {
       setOptimisticVisibility(previousVisibility);

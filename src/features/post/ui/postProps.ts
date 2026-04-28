@@ -1,5 +1,5 @@
+import { PostDto } from '@/features/post/data/dto/postDto';
 import { formatDate } from '@/features/post/domain/lib/date';
-import Post from '@/features/post/domain/model/post';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import { toUserNickname } from '@/features/user/ui/userProps';
 import { JSONContent } from '@tiptap/core';
@@ -25,7 +25,7 @@ export interface PostProps {
   visibility: PostVisibility;
 }
 
-export function createProps(post: Post): PostProps {
+export function createProps(post: PostDto): PostProps {
   return {
     id: post.id,
     title: post.title,
@@ -35,16 +35,19 @@ export function createProps(post: Post): PostProps {
     contentJson: post.contentJson,
     preview: post.preview,
     userId: post.userId,
-    authorName: toUserNickname({ id: post.userId, nickname: post.authorName }),
-    bio: post.bio,
-    profileImageUrl: post.profileImageUrl,
+    visibility: post.visibility,
+    authorName: toUserNickname({
+      id: post.userId,
+      nickname: post.user.nickname,
+    }),
+    bio: post.user.bio,
+    profileImageUrl: post.user.profileImageUrl,
     seriesId: post.seriesId,
     seriesOrder: post.seriesOrder,
-    seriesTitle: post.seriesTitle,
-    likeCount: post.likeCount,
-    viewCount: formatViewCount(post.viewCount),
-    commentCount: post.commentCount,
-    visibility: post.visibility,
+    seriesTitle: post.series?.title ?? null,
+    likeCount: post.postStat.likeCount,
+    viewCount: formatViewCount(post.postStat.viewCount),
+    commentCount: post.postStat.commentCount,
   };
 }
 

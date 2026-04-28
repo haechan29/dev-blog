@@ -12,7 +12,7 @@ import {
   PopoverAnchor,
   PopoverContent,
 } from '@/components/ui/popover';
-import * as PostClientService from '@/features/post/domain/service/postClientService';
+import * as PostClientRepository from '@/features/post/data/repository/postClientRepository';
 import { createProps } from '@/features/post/ui/postProps';
 import * as TagClientRepository from '@/features/tag/data/repository/tagClientRepository';
 import useDebounce from '@/hooks/useDebounce';
@@ -50,7 +50,7 @@ export default function SearchCommand({
   const { data: posts = [], isLoading: isPostsLoading } = useQuery({
     queryKey: postKeys.search(postQuery),
     queryFn: () =>
-      PostClientService.searchPosts({ query: postQuery }).then(result =>
+      PostClientRepository.searchPosts({ query: postQuery }).then(result =>
         result.posts.map(createProps)
       ),
     enabled: isPostSearchEnabled,

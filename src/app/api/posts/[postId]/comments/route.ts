@@ -1,5 +1,6 @@
 import { auth } from '@/auth';
 import { ApiError, ValidationError } from '@/errors/errors';
+import { toDto } from '@/features/comment/data/mapper/commentMapper';
 import * as CommentQueries from '@/features/comment/data/queries/commentQueries';
 import * as RankedCommentUsecase from '@/features/comment/data/usecases/rankedCommentUsecase';
 import * as NotificationQueries from '@/features/notification/data/queries/notificationQueries';
@@ -75,12 +76,13 @@ export async function POST(
 
     const passwordHash = session ? null : await bcrypt.hash(password, 10);
 
-    const comment = await CommentQueries.createComment(
+    const created = await CommentQueries.createComment(
       postId,
       content,
       passwordHash,
       userId
     );
+    const comment = toDto(created);
 
     try {
       await PostStatUsecase.incrementPostStatCommentCount(postId);
@@ -90,10 +92,10 @@ export async function POST(
 
     try {
       const post = await PostQueries.fetchPostForAuth(postId);
-      if (post.user_id !== comment.userId) {
+      if (post.userId !== comment.userId) {
         await NotificationQueries.upsertUnreadCommentNotification({
           postId,
-          authorId: post.user_id,
+          authorId: post.userId,
           commentUserId: comment.userId,
           representativeCommentId: comment.id,
         });

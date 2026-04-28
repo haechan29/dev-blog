@@ -20,7 +20,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { ApiError } from '@/errors/errors';
-import * as PostClientService from '@/features/post/domain/service/postClientService';
+import * as PostClientRepository from '@/features/post/data/repository/postClientRepository';
 import { PostProps } from '@/features/post/ui/postProps';
 import useSeriesList from '@/features/series/domain/hooks/useSeriesList';
 import { postKeys, userKeys } from '@/queries/keys';
@@ -62,7 +62,7 @@ export default function SeriesSettingsDialog({
     setIsLoading(true);
 
     try {
-      await PostClientService.updatePostsInSeries([
+      await PostClientRepository.updatePostsInSeries([
         {
           id: post.id,
           seriesId: selectedSeriesId,

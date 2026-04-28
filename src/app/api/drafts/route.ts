@@ -1,4 +1,5 @@
 import { ApiError, UnauthorizedError } from '@/errors/errors';
+import { toDto } from '@/features/draft/data/mapper/draftMapper';
 import * as DraftQueries from '@/features/draft/data/queries/draftQueries';
 import * as DraftUsecase from '@/features/draft/data/usecases/draftUsecase';
 import { getUserId } from '@/lib/user';
@@ -33,18 +34,19 @@ export async function POST(request: NextRequest) {
       postId = null,
       title = '',
       contentJson = null,
-      tags = [],
+      tags = [''],
     } = await request.json();
 
-    const data = await DraftQueries.createDraft({
+    const created = await DraftQueries.createDraft({
       userId,
       postId,
       title,
       contentJson,
       tags,
     });
+    const draft = toDto(created);
 
-    return NextResponse.json({ data });
+    return NextResponse.json({ data: draft });
   } catch (error) {
     console.error('임시저장 생성 요청이 실패했습니다', error);
 

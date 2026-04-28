@@ -1,51 +1,98 @@
+import { db } from '@/db/index';
+import { posts, series } from '@/db/schema';
 import { NotFoundError } from '@/errors/errors';
-import { SeriesEntity } from '@/features/series/data/entities/seriesEntities';
-import { toDto } from '@/features/series/data/mapper/seriesMapper';
-import { supabase } from '@/lib/supabase';
+import { and, asc, desc, eq } from 'drizzle-orm';
 import 'server-only';
 
-const SERIES_SELECT_FIELDS = `
-  id, 
-  title, 
-  description, 
-  user_id, 
-  created_at, 
-  updated_at,
-  users:user_id(nickname, profile_image_url),
-  posts(id, title, created_at, series_id, series_order, visibility, post_stats(like_count, view_count, comment_count))
-`;
-
 export async function fetchSeries(seriesId: string) {
-  const { data, error } = await supabase
-    .from('series')
-    .select(SERIES_SELECT_FIELDS)
-    .eq('id', seriesId)
-    .order('series_order', { referencedTable: 'posts', ascending: true })
-    .maybeSingle();
+  const entity = await db.query.series.findFirst({
+    where: eq(series.id, seriesId),
+    columns: {
+      id: true,
+      title: true,
+      description: true,
+      userId: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+    with: {
+      user: {
+        columns: {
+          nickname: true,
+          profileImageUrl: true,
+        },
+      },
+      posts: {
+        columns: {
+          id: true,
+          title: true,
+          createdAt: true,
+          seriesId: true,
+          seriesOrder: true,
+          visibility: true,
+        },
+        with: {
+          postStats: {
+            columns: {
+              likeCount: true,
+              viewCount: true,
+              commentCount: true,
+            },
+          },
+        },
+        orderBy: [asc(posts.seriesOrder)],
+      },
+    },
+  });
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  if (!data) {
+  if (!entity) {
     throw new NotFoundError('시리즈를 찾을 수 없습니다');
   }
 
-  return data as unknown as SeriesEntity;
+  return entity;
 }
 
 export async function fetchSeriesByUserId(userId: string) {
-  const { data, error } = await supabase
-    .from('series')
-    .select(SERIES_SELECT_FIELDS)
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data as unknown as SeriesEntity[];
+  return await db.query.series.findMany({
+    where: eq(series.userId, userId),
+    columns: {
+      id: true,
+      title: true,
+      description: true,
+      userId: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+    with: {
+      user: {
+        columns: {
+          nickname: true,
+          profileImageUrl: true,
+        },
+      },
+      posts: {
+        columns: {
+          id: true,
+          title: true,
+          createdAt: true,
+          seriesId: true,
+          seriesOrder: true,
+          visibility: true,
+        },
+        with: {
+          postStats: {
+            columns: {
+              likeCount: true,
+              viewCount: true,
+              commentCount: true,
+            },
+          },
+        },
+        orderBy: [asc(posts.seriesOrder)],
+      },
+    },
+    orderBy: [desc(series.createdAt)],
+  });
 }
 
 export async function createSeries({
@@ -57,21 +104,20 @@ export async function createSeries({
   description: string | null;
   userId: string;
 }) {
-  const { data, error } = await supabase
-    .from('series')
-    .insert({
+  const [createdSeries] = await db
+    .insert(series)
+    .values({
       title,
       description,
-      user_id: userId,
+      userId,
     })
-    .select('id')
-    .single();
+    .returning({ id: series.id });
 
-  if (error) {
-    throw new Error(error.message);
+  if (!createdSeries) {
+    throw new Error('시리즈 생성에 실패했습니다');
   }
 
-  return { id: data.id };
+  return { id: createdSeries.id };
 }
 
 export async function updateSeries({
@@ -85,33 +131,25 @@ export async function updateSeries({
   description: string | null;
   userId: string;
 }) {
-  const { data, error } = await supabase
-    .from('series')
-    .update({
+  const [updatedSeries] = await db
+    .update(series)
+    .set({
       title,
       description,
-      updated_at: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     })
-    .eq('id', seriesId)
-    .eq('user_id', userId)
-    .select(SERIES_SELECT_FIELDS)
-    .single();
+    .where(and(eq(series.id, seriesId), eq(series.userId, userId)))
+    .returning({ id: series.id });
 
-  if (error) {
-    throw new Error(error.message);
+  if (!updatedSeries) {
+    throw new NotFoundError('시리즈를 찾을 수 없습니다');
   }
 
-  return toDto(data as unknown as SeriesEntity);
+  return await fetchSeries(updatedSeries.id);
 }
 
 export async function deleteSeries(seriesId: string, userId: string) {
-  const { error } = await supabase
-    .from('series')
-    .delete()
-    .eq('id', seriesId)
-    .eq('user_id', userId);
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  await db
+    .delete(series)
+    .where(and(eq(series.id, seriesId), eq(series.userId, userId)));
 }

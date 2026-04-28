@@ -4,7 +4,7 @@ import HomeSidebar from '@/components/home/homeSidebar';
 import HomeToolbar from '@/components/home/homeToolbar';
 import PostPreview from '@/components/post/postPreview';
 import ToolbarProfileIcon from '@/components/post/toolbarProfileIcon';
-import * as PostClientService from '@/features/post/domain/service/postClientService';
+import * as PostClientRepository from '@/features/post/data/repository/postClientRepository';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
 import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { postKeys } from '@/queries/keys';
@@ -38,7 +38,7 @@ export default function SearchResultPageClient({
   } = useInfiniteQuery({
     queryKey: postKeys.search(query, true),
     queryFn: async ({ pageParam }) => {
-      const result = await PostClientService.searchPosts({
+      const result = await PostClientRepository.searchPosts({
         query,
         cursorScore: pageParam?.score,
         cursorId: pageParam?.id,

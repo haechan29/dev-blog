@@ -4,7 +4,7 @@ import WritePageClient from '@/components/write/writePageClient';
 import * as CreatorServerRepository from '@/features/creator/data/repository/creatorServerRepository';
 import * as DraftServerRepository from '@/features/draft/data/repository/draftServerRepository';
 import { PostForbiddenError } from '@/features/post/data/errors/postErrors';
-import * as PostServerService from '@/features/post/domain/service/postServerService';
+import * as PostServerRepository from '@/features/post/data/repository/postServerRepository';
 import { createProps } from '@/features/post/ui/postProps';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -22,7 +22,7 @@ export default async function EditPage({
 
   try {
     const [post, drafts] = await Promise.all([
-      PostServerService.getPost(postId).then(createProps),
+      PostServerRepository.getPost(postId).then(createProps),
       DraftServerRepository.getDrafts(),
     ]);
 

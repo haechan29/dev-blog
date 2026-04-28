@@ -8,8 +8,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { ApiError } from '@/errors/errors';
-import * as CommentClientService from '@/features/comment/domain/service/commentClientService';
-import { CommentsPage } from '@/features/comment/domain/types/page';
+import * as CommentClientRepository from '@/features/comment/data/repository/commentClientRepository';
+import { CommentsPage } from '@/features/comment/ui/types/page';
 import { PostProps } from '@/features/post/ui/postProps';
 import { postKeys } from '@/queries/keys';
 import {
@@ -51,7 +51,7 @@ export default function DeleteCommentDialog({
       postId: string;
       commentId: number;
       password?: string;
-    }) => CommentClientService.deleteComment(postId, commentId, password),
+    }) => CommentClientRepository.deleteComment(postId, commentId, password),
     onSuccess: (_, variables) => {
       queryClient.setQueryData(
         postKeys.comments(postId, highlightCommentId),

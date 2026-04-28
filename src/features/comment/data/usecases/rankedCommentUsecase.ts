@@ -4,7 +4,7 @@ import * as CommentMapper from '@/features/comment/data/mapper/commentMapper';
 import * as RankedCommentMapper from '@/features/comment/data/mapper/rankedCommentMapper';
 import * as CommentQueries from '@/features/comment/data/queries/commentQueries';
 import * as RankedCommentQueries from '@/features/comment/data/queries/rankedCommentQueries';
-import { CommentCursor } from '@/features/comment/domain/types/page';
+import { CommentCursor } from '@/features/comment/ui/types/page';
 import 'server-only';
 
 const COMMENT_LIMIT = 5;
@@ -50,7 +50,7 @@ export async function getRankedComments({
     } else {
       const highlightComment =
         await CommentQueries.fetchComment(highlightCommentId);
-      if (highlightComment.post_id !== postId) {
+      if (highlightComment.postId !== postId) {
         throw new ValidationError('댓글이 속한 게시글이 일치하지 않습니다');
       }
       highlightCommentDto = CommentMapper.toDto(highlightComment);

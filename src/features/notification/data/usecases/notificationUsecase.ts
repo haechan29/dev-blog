@@ -56,7 +56,7 @@ export async function getNotifications({
   return {
     notifications: sliced.map(toDto),
     nextCursor:
-      isLastPage || !last ? null : { updatedAt: last.updated_at, id: last.id },
+      isLastPage || !last ? null : { updatedAt: last.updatedAt, id: last.id },
   };
 }
 
@@ -76,9 +76,11 @@ export async function insertPostViewMilestoneNotification({
     return;
   }
 
-  await NotificationQueries.insertPostViewMilestoneNotification({
+  await NotificationQueries.insertMilestoneNotification({
+    userId: authorId,
+    type: 'post_view_milestone',
     postId,
-    authorId,
+    commentId: null,
     milestoneValue,
   });
 }
@@ -93,7 +95,7 @@ export async function insertPostLikeMilestoneNotification({
   milestoneValue: number;
 }) {
   const post = await PostQueries.fetchPostForAuth(postId);
-  const authorId = post.user_id;
+  const authorId = post.userId;
 
   if (authorId === userId) {
     return;
@@ -106,9 +108,11 @@ export async function insertPostLikeMilestoneNotification({
     return;
   }
 
-  await NotificationQueries.insertPostLikeMilestoneNotification({
+  await NotificationQueries.insertMilestoneNotification({
+    userId: authorId,
+    type: 'post_like_milestone',
     postId,
-    authorId,
+    commentId: null,
     milestoneValue,
   });
 }
@@ -137,9 +141,10 @@ export async function insertCommentLikeMilestoneNotification({
     return;
   }
 
-  await NotificationQueries.insertCommentLikeMilestoneNotification({
+  await NotificationQueries.insertMilestoneNotification({
+    userId: commentUserId,
+    type: 'comment_like_milestone',
     postId,
-    commentUserId,
     commentId,
     milestoneValue,
   });
@@ -165,8 +170,11 @@ export async function insertSubscriberMilestoneNotification({
     return;
   }
 
-  await NotificationQueries.insertSubscriberMilestoneNotification({
-    followingUserId,
+  await NotificationQueries.insertMilestoneNotification({
+    userId: followingUserId,
+    type: 'subscriber_milestone',
+    postId: null,
+    commentId: null,
     milestoneValue,
   });
 }

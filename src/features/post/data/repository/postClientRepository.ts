@@ -1,5 +1,4 @@
 import { PostDto } from '@/features/post/data/dto/postDto';
-import Post from '@/features/post/domain/model/post';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import { api } from '@/lib/api';
 
@@ -90,7 +89,7 @@ export async function updatePost({
 }
 
 export async function updatePostsInSeries(
-  posts: Pick<Post, 'id' | 'seriesId' | 'seriesOrder'>[]
+  posts: Pick<PostDto, 'id' | 'seriesId' | 'seriesOrder'>[]
 ): Promise<void> {
   await api.patch(`/api/posts`, { posts });
 }

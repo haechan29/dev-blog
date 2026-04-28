@@ -2,11 +2,9 @@
 
 import { CreatorSettingsDropdown } from '@/components/creator/creatorSettingsDropdown';
 import { CreatorStatusFilter } from '@/components/creator/creatorStatusFilter';
-import {
-  Creator,
-  CreatorStatus,
-  STATUS_FILTER_OPTIONS,
-} from '@/features/creator/domain/model/creator';
+import { CreatorStatusFilter as CreatorStatusFilterType } from '@/features/creator/domain/type/creatorStatusFilter';
+import { CREATOR_STATUS_FILTER_CONFIG } from '@/features/creator/ui/constants/creatorStatusConfig';
+import { CreatorProps } from '@/features/creator/ui/props/creatorProps';
 import clsx from 'clsx';
 import { MoreVertical, Plus, RefreshCw, SlidersHorizontal } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -23,7 +21,7 @@ export function CreatorList({
   onSync,
   isSyncing,
 }: {
-  creators: Creator[];
+  creators: CreatorProps[];
   selectedId: string | null;
   unreadCounts: Record<string, number>;
   onSelect: (id: string) => void;
@@ -33,14 +31,20 @@ export function CreatorList({
   onSync: () => void;
   isSyncing: boolean;
 }) {
-  const [statusFilter, setStatusFilter] = useState<CreatorStatus | 'all'>(
-    'all'
-  );
+  const [statusFilter, setStatusFilter] =
+    useState<CreatorStatusFilterType>('all');
+
   const filtered = useMemo(() => {
     return creators.filter(c => {
       return statusFilter === 'all' || c.status === statusFilter;
     });
   }, [creators, statusFilter]);
+
+  const hideLabel = useMemo(() => statusFilter === 'all', [statusFilter]);
+  const currentLabel = useMemo(
+    () => CREATOR_STATUS_FILTER_CONFIG[statusFilter].label,
+    [statusFilter]
+  );
 
   return (
     <aside className='fixed top-0 left-0 w-(--sidebar-width) h-screen overflow-hidden border-gray-200 flex flex-col'>
@@ -72,11 +76,7 @@ export function CreatorList({
               )}
             >
               <SlidersHorizontal className='w-4 h-4' />
-              {statusFilter !== 'all' && (
-                <span className='text-sm'>
-                  {STATUS_FILTER_OPTIONS[statusFilter].label}
-                </span>
-              )}
+              {!hideLabel && <span className='text-sm'>{currentLabel}</span>}
             </button>
           </CreatorStatusFilter>
 

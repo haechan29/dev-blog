@@ -1,7 +1,7 @@
 'use client';
 
 import PostPreview from '@/components/post/postPreview';
-import * as PostClientService from '@/features/post/domain/service/postClientService';
+import * as PostClientRepository from '@/features/post/data/repository/postClientRepository';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
 import { postKeys } from '@/queries/keys';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -31,7 +31,7 @@ export default function HomePageClient({
   } = useInfiniteQuery({
     queryKey: postKeys.list({ tag }),
     queryFn: async ({ pageParam }) => {
-      const page = await PostClientService.getFeedPosts({
+      const page = await PostClientRepository.getFeedPosts({
         cursor: pageParam,
         tag,
       });

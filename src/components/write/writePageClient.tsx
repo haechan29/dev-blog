@@ -13,7 +13,7 @@ import { ApiError } from '@/errors/errors';
 import { DraftDto } from '@/features/draft/data/dto/draftDto';
 import useDrafts from '@/features/draft/hooks/useDrafts';
 import useSaveShortcut from '@/features/draft/hooks/useSaveShortcut';
-import * as PostClientService from '@/features/post/domain/service/postClientService';
+import * as PostClientRepository from '@/features/post/data/repository/postClientRepository';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import useBgmController from '@/features/post/hooks/useBgmController';
 import { createProps, PostProps } from '@/features/post/ui/postProps';
@@ -208,7 +208,7 @@ export default function WritePageClient({
     setIsPublishPending(true);
     try {
       if (isEditMode) {
-        await PostClientService.updatePost({
+        await PostClientRepository.updatePost({
           postId: post.id,
           title,
           contentJson,
@@ -225,7 +225,7 @@ export default function WritePageClient({
         });
         router.push(`/read/${post.id}`);
       } else {
-        const newPost = await PostClientService.createPost({
+        const newPost = await PostClientRepository.createPost({
           title,
           contentJson,
           tags,

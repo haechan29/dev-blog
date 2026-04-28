@@ -2,9 +2,10 @@
 
 import CommentLikeButton from '@/components/comment/commentLikeButton';
 import { ApiError } from '@/errors/errors';
-import * as CommentClientService from '@/features/comment/domain/service/commentClientService';
-import { CommentsPage } from '@/features/comment/domain/types/page';
-import { CommentItemProps } from '@/features/comment/ui/commentItemProps';
+import * as CommentClientRepository from '@/features/comment/data/repository/commentClientRepository';
+import { toProps } from '@/features/comment/ui/mapper/commentMapper';
+import { CommentItemProps } from '@/features/comment/ui/props/commentItemProps';
+import { CommentsPage } from '@/features/comment/ui/types/page';
 import { postKeys } from '@/queries/keys';
 import {
   InfiniteData,
@@ -58,7 +59,7 @@ export default function CommentContentSection({
       commentId: number;
       content: string;
       password?: string;
-    }) => CommentClientService.updateComment(params),
+    }) => CommentClientRepository.updateComment(params),
     onSuccess: updatedComment => {
       queryClient.setQueryData(
         postKeys.comments(comment.postId, highlightCommentId),
@@ -69,7 +70,7 @@ export default function CommentContentSection({
             pages: old.pages.map(page => ({
               ...page,
               comments: page.comments.map(c =>
-                c.id === updatedComment.id ? updatedComment.toProps() : c
+                c.id === updatedComment.id ? toProps(updatedComment) : c
               ),
             })),
           };

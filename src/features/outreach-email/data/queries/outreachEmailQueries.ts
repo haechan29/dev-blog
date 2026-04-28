@@ -1,41 +1,44 @@
-import { OutreachEmailEntity } from '@/features/outreach-email/data/entities/outreachEmailEntities';
-import { supabase } from '@/lib/supabase';
+import { db } from '@/db/index';
+import { outreachEmails } from '@/db/schema';
+import { NotFoundError } from '@/errors/errors';
+import { and, desc, eq, sql } from 'drizzle-orm';
 import 'server-only';
 
-const SELECT_FIELDS =
-  'id, creator_id, gmail_thread_id, gmail_message_id, message_id, direction, subject, body, sent_at, is_read';
+const OUTREACH_EMAIL_SELECT_FIELDS = {
+  id: outreachEmails.id,
+  creatorId: outreachEmails.creatorId,
+  gmailThreadId: outreachEmails.gmailThreadId,
+  gmailMessageId: outreachEmails.gmailMessageId,
+  messageId: outreachEmails.messageId,
+  direction: outreachEmails.direction,
+  subject: outreachEmails.subject,
+  body: outreachEmails.body,
+  sentAt: outreachEmails.sentAt,
+  isRead: outreachEmails.isRead,
+} as const;
 
 export async function fetchOutreachEmails(creatorId?: string) {
-  let query = supabase
-    .from('outreach_emails')
-    .select(SELECT_FIELDS)
-    .order('sent_at', { ascending: false });
+  const where = creatorId ? eq(outreachEmails.creatorId, creatorId) : undefined;
 
-  if (creatorId) {
-    query = query.eq('creator_id', creatorId);
-  }
-
-  const { data, error } = await query;
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data as unknown as OutreachEmailEntity[];
+  return await db
+    .select(OUTREACH_EMAIL_SELECT_FIELDS)
+    .from(outreachEmails)
+    .where(where)
+    .orderBy(desc(outreachEmails.sentAt));
 }
 
 export async function fetchOutreachEmail(id: string) {
-  const { data, error } = await supabase
-    .from('outreach_emails')
-    .select(SELECT_FIELDS)
-    .eq('id', id)
-    .single();
+  const data = await db
+    .select(OUTREACH_EMAIL_SELECT_FIELDS)
+    .from(outreachEmails)
+    .where(eq(outreachEmails.id, id))
+    .limit(1);
 
-  if (error) {
-    throw new Error(error.message);
+  if (!data[0]) {
+    throw new NotFoundError('아웃리치 이메일을 찾을 수 없습니다');
   }
 
-  return data as unknown as OutreachEmailEntity;
+  return data[0];
 }
 
 export async function createOutreachEmail({
@@ -57,75 +60,64 @@ export async function createOutreachEmail({
   body: string;
   sentAt: string;
 }) {
-  const { data, error } = await supabase
-    .from('outreach_emails')
-    .insert({
-      creator_id: creatorId,
-      gmail_thread_id: gmailThreadId,
-      gmail_message_id: gmailMessageId,
-      message_id: messageId,
+  const [email] = await db
+    .insert(outreachEmails)
+    .values({
+      creatorId,
+      gmailThreadId,
+      gmailMessageId,
+      messageId,
       direction,
       subject,
       body,
-      sent_at: sentAt,
+      sentAt,
     })
-    .select(SELECT_FIELDS)
-    .single();
+    .returning(OUTREACH_EMAIL_SELECT_FIELDS);
 
-  if (error) {
-    throw new Error(error.message);
+  if (!email) {
+    throw new Error('아웃리치 이메일 생성에 실패했습니다');
   }
 
-  return data as unknown as OutreachEmailEntity;
+  return email;
 }
 
 export async function deleteOutreachEmail(id: string) {
-  const { error } = await supabase
-    .from('outreach_emails')
-    .delete()
-    .eq('id', id);
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  await db.delete(outreachEmails).where(eq(outreachEmails.id, id));
 }
 
 export async function fetchUnreadCounts(): Promise<Record<string, number>> {
-  const { data, error } = await supabase
-    .from('outreach_emails')
-    .select('creator_id')
-    .eq('is_read', false)
-    .eq('direction', 'received');
+  const data = await db
+    .select({
+      creatorId: outreachEmails.creatorId,
+      count: sql<number>`count(*)::int`,
+    })
+    .from(outreachEmails)
+    .where(
+      and(
+        eq(outreachEmails.isRead, false),
+        eq(outreachEmails.direction, 'received')
+      )
+    )
+    .groupBy(outreachEmails.creatorId);
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  const counts: Record<string, number> = {};
-  for (const row of data) {
-    counts[row.creator_id] = (counts[row.creator_id] || 0) + 1;
-  }
-  return counts;
+  return Object.fromEntries(data.map(row => [row.creatorId, row.count]));
 }
 
 export async function markAsRead(id: string) {
-  const { error } = await supabase
-    .from('outreach_emails')
-    .update({ is_read: true })
-    .eq('id', id);
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  await db
+    .update(outreachEmails)
+    .set({ isRead: true })
+    .where(eq(outreachEmails.id, id));
 }
 
 export async function fetchLastSyncTimestamp(): Promise<number | null> {
-  const { data } = await supabase
-    .from('outreach_emails')
-    .select('sent_at')
-    .order('sent_at', { ascending: false })
-    .limit(1)
-    .single();
+  const data = await db
+    .select({
+      sentAt: outreachEmails.sentAt,
+    })
+    .from(outreachEmails)
+    .orderBy(desc(outreachEmails.sentAt))
+    .limit(1);
 
-  return data ? Math.floor(new Date(data.sent_at).getTime() / 1000) : null;
+  return data[0] ? Math.floor(new Date(data[0].sentAt).getTime() / 1000) : null;
 }

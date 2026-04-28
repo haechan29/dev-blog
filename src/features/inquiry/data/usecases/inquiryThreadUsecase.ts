@@ -9,7 +9,7 @@ import {
   MESSAGE_PREVIEW_MAX,
 } from '@/features/inquiry/constants/inquiry';
 import { InquiryThreadsPage } from '@/features/inquiry/data/dto/inquiryThreadDto';
-import * as InquiryThreadMapper from '@/features/inquiry/data/mapper/inquiryThreadMapper';
+import { toDto } from '@/features/inquiry/data/mapper/inquiryThreadMapper';
 import * as InquiryThreadQueries from '@/features/inquiry/data/queries/inquiryThreadQueries';
 import { InquiryThreadStatus } from '@/features/inquiry/domain/types/inquiryThreadStatus';
 import 'server-only';
@@ -41,9 +41,9 @@ export async function getMyInquiryThreads({
   const last = sliced.at(-1);
 
   return {
-    threads: sliced.map(InquiryThreadMapper.toDto),
+    threads: sliced.map(toDto),
     nextCursor:
-      isLastPage || !last ? null : { updatedAt: last.updated_at, id: last.id },
+      isLastPage || !last ? null : { updatedAt: last.updatedAt, id: last.id },
   };
 }
 
@@ -68,9 +68,9 @@ export async function getInquiryThreads({
   const last = sliced.at(-1);
 
   return {
-    threads: sliced.map(InquiryThreadMapper.toDto),
+    threads: sliced.map(toDto),
     nextCursor:
-      isLastPage || !last ? null : { updatedAt: last.updated_at, id: last.id },
+      isLastPage || !last ? null : { updatedAt: last.updatedAt, id: last.id },
   };
 }
 
@@ -119,10 +119,10 @@ export async function deleteMyInquiryThread({
   if (!row) {
     throw new NotFoundError('문의를 찾을 수 없습니다');
   }
-  if (row.user_id !== userId) {
+  if (row.userId !== userId) {
     throw new ForbiddenError('이 문의에 접근할 수 없습니다');
   }
-  if (row.is_deleted) {
+  if (row.isDeleted) {
     return;
   }
 

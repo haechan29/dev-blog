@@ -1,103 +1,118 @@
+import { db } from '@/db/index';
+import { postStats, posts, series, users } from '@/db/schema';
 import { NotFoundError } from '@/errors/errors';
-import {
-  PostEntity,
-  PostEntityFlat,
-} from '@/features/post/data/entities/postEntities';
-import { toDto } from '@/features/post/data/mapper/postMapper';
-import Post from '@/features/post/domain/model/post';
+import { PostEntity } from '@/features/post/data/entities/postEntities';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
-import { supabase } from '@/lib/supabase';
 import { JSONContent } from '@tiptap/core';
+import { InferInsertModel, and, desc, eq, inArray, sql } from 'drizzle-orm';
 import 'server-only';
 
-const POST_SELECT_FIELDS = `
-  id,
-  title,
-  content_json,
-  preview,
-  tags,
-  created_at,
-  updated_at,
-  user_id,
-  series_id,
-  series_order,
-  visibility,
-  users:user_id(nickname, deleted_at, registered_at, bio, profile_image_url),
-  series:series_id(title),
-  post_stats(like_count, view_count, comment_count)
-`;
+const SIMILARITY_THRESHOLD = 0.1;
+
+const POST_FIELDS = {
+  id: posts.id,
+  title: posts.title,
+  contentJson: posts.contentJson,
+  preview: posts.preview,
+  tags: posts.tags,
+  createdAt: posts.createdAt,
+  updatedAt: posts.updatedAt,
+  userId: posts.userId,
+  seriesId: posts.seriesId,
+  seriesOrder: posts.seriesOrder,
+  visibility: posts.visibility,
+};
+
+const USER_FIELDS = {
+  nickname: users.nickname,
+  deletedAt: users.deletedAt,
+  registeredAt: users.registeredAt,
+  bio: users.bio,
+  profileImageUrl: users.profileImageUrl,
+};
+
+const SERIES_FIELDS = {
+  title: series.title,
+};
+
+const POST_STATS_FIELDS = {
+  likeCount: postStats.likeCount,
+  viewCount: postStats.viewCount,
+  commentCount: postStats.commentCount,
+};
+
+const POST_SELECT_FIELDS = {
+  ...POST_FIELDS,
+  user: USER_FIELDS,
+  series: SERIES_FIELDS,
+  postStat: POST_STATS_FIELDS,
+} as const;
 
 export async function fetchPostsByUserId(
   userId: string,
   currentUserId?: string
 ) {
-  let query = supabase
-    .from('posts')
+  const where =
+    currentUserId !== userId
+      ? and(eq(posts.userId, userId), eq(posts.visibility, 'public'))
+      : eq(posts.userId, userId);
+
+  return await db
     .select(POST_SELECT_FIELDS)
-    .eq('user_id', userId);
-
-  if (currentUserId !== userId) {
-    query = query.eq('visibility', 'public');
-  }
-
-  query = query.order('created_at', { ascending: false });
-
-  const { data, error } = await query;
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data as unknown as PostEntity[];
+    .from(posts)
+    .innerJoin(users, eq(posts.userId, users.id))
+    .leftJoin(series, eq(posts.seriesId, series.id))
+    .innerJoin(postStats, eq(posts.id, postStats.postId))
+    .where(where)
+    .orderBy(desc(posts.createdAt));
 }
 
 export async function fetchPostsOwnership(postIds: string[]) {
-  const { data, error } = await supabase
-    .from('posts')
-    .select('id, user_id')
-    .in('id', postIds);
-
-  if (error) {
-    throw new Error(error.message);
+  if (postIds.length === 0) {
+    return [];
   }
 
-  return data as { id: string; user_id: string | null }[];
+  return await db
+    .select({
+      id: posts.id,
+      user_id: posts.userId,
+    })
+    .from(posts)
+    .where(inArray(posts.id, postIds));
 }
 
 export async function fetchPost(postId: string) {
-  const { data, error } = await supabase
-    .from('posts')
+  const data = await db
     .select(POST_SELECT_FIELDS)
-    .eq('id', postId)
-    .maybeSingle();
+    .from(posts)
+    .innerJoin(users, eq(posts.userId, users.id))
+    .leftJoin(series, eq(posts.seriesId, series.id))
+    .innerJoin(postStats, eq(posts.id, postStats.postId))
+    .where(eq(posts.id, postId))
+    .limit(1);
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  if (!data) {
+  if (!data[0]) {
     throw new NotFoundError('게시물을 찾을 수 없습니다');
   }
 
-  return data as unknown as PostEntity;
+  return data[0];
 }
 
 export async function fetchPostForAuth(postId: string) {
-  const { data, error } = await supabase
-    .from('posts')
-    .select('user_id, password_hash')
-    .eq('id', postId)
-    .maybeSingle();
+  const data = await db
+    .select({
+      userId: posts.userId,
+      passwordHash: posts.passwordHash,
+    })
+    .from(posts)
+    .where(eq(posts.id, postId))
+    .limit(1);
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  if (!data) {
+  if (!data[0]) {
     throw new NotFoundError('게시물을 찾을 수 없습니다');
   }
 
-  return data as Pick<PostEntity, 'user_id' | 'password_hash'>;
+  return data[0];
 }
 
 export async function searchPosts({
@@ -111,18 +126,66 @@ export async function searchPosts({
   cursorScore?: number;
   cursorId?: string;
 }) {
-  const { data, error } = await supabase.rpc('search_posts', {
-    search_query: query,
-    result_limit: limit,
-    cursor_score: cursorScore ?? null,
-    cursor_id: cursorId ?? null,
+  const relevanceScore = sql<number>`
+    ROUND(GREATEST(
+      similarity(${posts.title}, ${query}) * 2,
+      similarity(immutable_array_to_string(${posts.tags}, ' '), ${query})
+    ) * 1000000)::bigint
+  `.as('relevance_score');
+
+  const matchCondition = sql`(
+    ${posts.title} % ${query}
+    OR immutable_array_to_string(${posts.tags}, ' ') % ${query}
+  )`;
+
+  const scored = db
+    .select({
+      ...POST_FIELDS,
+      relevanceScore,
+    })
+    .from(posts)
+    .where(and(matchCondition, eq(posts.visibility, 'public')))
+    .as('scored');
+
+  const cursorCondition =
+    cursorScore != null && cursorId != null
+      ? sql`(
+          ${scored.relevanceScore} < ${cursorScore}
+          OR (${scored.relevanceScore} = ${cursorScore} AND ${scored.id} < ${cursorId})
+        )`
+      : undefined;
+
+  return await db.transaction(async tx => {
+    await tx.execute(
+      sql`SELECT set_config('pg_trgm.similarity_threshold', ${String(SIMILARITY_THRESHOLD)}, true)`
+    );
+
+    return tx
+      .select({
+        user: USER_FIELDS,
+        series: SERIES_FIELDS,
+        postStat: POST_STATS_FIELDS,
+        id: scored.id,
+        title: scored.title,
+        contentJson: scored.contentJson,
+        preview: scored.preview,
+        tags: scored.tags,
+        createdAt: scored.createdAt,
+        updatedAt: scored.updatedAt,
+        userId: scored.userId,
+        seriesId: scored.seriesId,
+        seriesOrder: scored.seriesOrder,
+        visibility: scored.visibility,
+        relevanceScore: scored.relevanceScore,
+      })
+      .from(scored)
+      .innerJoin(users, eq(users.id, scored.userId))
+      .leftJoin(series, eq(series.id, scored.seriesId))
+      .innerJoin(postStats, eq(postStats.postId, scored.id))
+      .where(cursorCondition)
+      .orderBy(desc(scored.relevanceScore), desc(scored.id))
+      .limit(limit);
   });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data as PostEntityFlat[];
 }
 
 export async function createPost({
@@ -144,26 +207,25 @@ export async function createPost({
   preview: string;
   contentText: string;
 }) {
-  const { data, error } = await supabase
-    .from('posts')
-    .insert({
+  const [post] = await db
+    .insert(posts)
+    .values({
       title,
-      content_json: contentJson,
+      contentJson,
       preview,
-      content_text: contentText,
+      contentText,
       tags,
-      password_hash: passwordHash,
+      passwordHash,
       visibility,
-      user_id: userId,
+      userId,
     })
-    .select(POST_SELECT_FIELDS)
-    .single();
+    .returning({ id: posts.id });
 
-  if (error) {
-    throw new Error(error.message);
+  if (!post) {
+    throw new NotFoundError('게시물을 찾을 수 없습니다');
   }
 
-  return toDto(data as unknown as PostEntity);
+  return await fetchPost(post.id);
 }
 
 export async function updatePost({
@@ -187,54 +249,44 @@ export async function updatePost({
   preview?: string;
   contentText?: string;
 }) {
-  const updates: Partial<PostEntity> & { content_text?: string } = {
-    updated_at: new Date().toISOString(),
+  const updates: Partial<InferInsertModel<typeof posts>> = {
+    updatedAt: new Date().toISOString(),
     ...(title !== undefined && { title }),
-    ...(contentJson !== undefined && { content_json: contentJson }),
+    ...(contentJson !== undefined && { contentJson }),
     ...(tags !== undefined && { tags }),
-    ...(seriesId !== undefined && { series_id: seriesId }),
-    ...(seriesOrder !== undefined && { series_order: seriesOrder }),
+    ...(seriesId !== undefined && { seriesId }),
+    ...(seriesOrder !== undefined && { seriesOrder }),
     ...(visibility !== undefined && { visibility }),
     ...(preview !== undefined && { preview }),
-    ...(contentText !== undefined && { content_text: contentText }),
+    ...(contentText !== undefined && { contentText }),
   };
 
-  const { data, error } = await supabase
-    .from('posts')
-    .update(updates)
-    .eq('id', postId)
-    .select(POST_SELECT_FIELDS)
-    .single();
+  const [post] = await db
+    .update(posts)
+    .set(updates)
+    .where(eq(posts.id, postId))
+    .returning({ id: posts.id });
 
-  if (error) {
-    throw new Error(error.message);
+  if (!post) {
+    throw new NotFoundError('게시물을 찾을 수 없습니다');
   }
 
-  return toDto(data as unknown as PostEntity);
+  return await fetchPost(post.id);
 }
 
 export async function updatePostsInSeries(
-  posts: Pick<Post, 'id' | 'seriesId' | 'seriesOrder'>[]
+  postsToUpdate: Pick<PostEntity, 'id' | 'seriesId' | 'seriesOrder'>[]
 ) {
-  const promises = posts.map(({ id, seriesId, seriesOrder }) =>
-    supabase
-      .from('posts')
-      .update({ series_id: seriesId, series_order: seriesOrder })
-      .eq('id', id)
-  );
-
-  const results = await Promise.all(promises);
-
-  const error = results.find(r => r.error)?.error;
-  if (error) {
-    throw new Error(error.message);
-  }
+  await db.transaction(async tx => {
+    for (const { id, seriesId, seriesOrder } of postsToUpdate) {
+      await tx
+        .update(posts)
+        .set({ seriesId, seriesOrder })
+        .where(eq(posts.id, id));
+    }
+  });
 }
 
 export async function deletePost(postId: string) {
-  const { error } = await supabase.from('posts').delete().eq('id', postId);
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  await db.delete(posts).where(eq(posts.id, postId));
 }

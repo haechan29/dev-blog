@@ -5,12 +5,12 @@ export function toDto(user: UserEntity): UserResponseDto {
   return {
     id: user.id,
     nickname: user.nickname,
-    createdAt: user.created_at,
-    updatedAt: user.updated_at,
-    deletedAt: user.deleted_at,
-    registeredAt: user.registered_at,
-    profileImageUrl: user.profile_image_url,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+    deletedAt: user.deletedAt,
+    registeredAt: user.registeredAt,
+    profileImageUrl: user.profileImageUrl,
     bio: user.bio,
-    subscriberCount: user.subscriber_count,
+    subscriberCount: user.subscriberCount,
   };
 }

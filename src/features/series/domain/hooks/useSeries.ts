@@ -1,9 +1,10 @@
 'use client';
 
 import { ApiError } from '@/errors/errors';
-import * as PostClientService from '@/features/post/domain/service/postClientService';
-import * as SeriesClientService from '@/features/series/domain/service/seriesClientService';
-import { createProps, SeriesProps } from '@/features/series/ui/seriesProps';
+import * as PostClientRepository from '@/features/post/data/repository/postClientRepository';
+import * as SeriesClientRepository from '@/features/series/data/repository/seriesClientRepository';
+import { toProps } from '@/features/series/ui/mapper/seriesMapper';
+import { SeriesProps } from '@/features/series/ui/props/seriesProps';
 import { userKeys } from '@/queries/keys';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
@@ -16,15 +17,15 @@ export default function useSeries(initialSeries: SeriesProps) {
   const { data: series } = useQuery({
     queryKey: userKeys.series(userId, seriesId),
     queryFn: async () => {
-      const series = await SeriesClientService.fetchSeries(userId, seriesId);
-      return createProps(series);
+      const series = await SeriesClientRepository.fetchSeries(userId, seriesId);
+      return toProps(series);
     },
     initialData: initialSeries,
   });
 
   const addPostMutation = useMutation({
     mutationFn: (postId: string) => {
-      return PostClientService.updatePostsInSeries([
+      return PostClientRepository.updatePostsInSeries([
         {
           id: postId,
           seriesId,
@@ -59,7 +60,7 @@ export default function useSeries(initialSeries: SeriesProps) {
           })),
       ];
 
-      return PostClientService.updatePostsInSeries(updates);
+      return PostClientRepository.updatePostsInSeries(updates);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -77,7 +78,7 @@ export default function useSeries(initialSeries: SeriesProps) {
 
   const reorderPostsMutation = useMutation({
     mutationFn: (reorderedPosts: SeriesProps['posts']) => {
-      return PostClientService.updatePostsInSeries(reorderedPosts);
+      return PostClientRepository.updatePostsInSeries(reorderedPosts);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({

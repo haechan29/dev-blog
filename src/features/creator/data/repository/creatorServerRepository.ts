@@ -1,16 +1,21 @@
-import { toDomain } from '@/features/creator/data/mapper/creatorMapper';
+import { toDto } from '@/features/creator/data/mapper/creatorMapper';
 import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries';
 import * as CreatorUsecases from '@/features/creator/data/usecases/creatorUsecase';
 import 'server-only';
 
 export async function getCreators() {
   const creators = await CreatorQueries.fetchCreators();
-  return creators.map(toDomain);
+  return creators.map(toDto);
 }
 
 export async function getCreator(id: string) {
   const creator = await CreatorQueries.fetchCreator(id);
-  return creator ? toDomain(creator) : null;
+  return creator ? toDto(creator) : null;
+}
+
+export async function getCreatorByUserId(userId: string) {
+  const creator = await CreatorQueries.fetchCreatorByUserId(userId);
+  return creator ? toDto(creator) : null;
 }
 
 export async function createCreator(params: {
@@ -18,8 +23,7 @@ export async function createCreator(params: {
   email: string;
   memo?: string;
 }) {
-  const creator = await CreatorUsecases.createCreatorWithUser(params);
-  return toDomain(creator);
+  return await CreatorUsecases.createCreatorWithUser(params);
 }
 
 export async function updateCreator(params: {
@@ -30,14 +34,9 @@ export async function updateCreator(params: {
   status?: 'pending' | 'sent' | 'accepted' | 'rejected';
 }) {
   const creator = await CreatorQueries.updateCreator(params);
-  return toDomain(creator);
+  return toDto(creator);
 }
 
 export async function deleteCreator(id: string) {
   await CreatorQueries.deleteCreator(id);
-}
-
-export async function getCreatorByUserId(userId: string) {
-  const creator = await CreatorQueries.fetchCreatorByUserId(userId);
-  return creator ? toDomain(creator) : null;
 }

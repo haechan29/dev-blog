@@ -6,7 +6,6 @@ export interface NotificationDto {
   type: NotificationType;
   isRead: boolean;
   inquiryThreadId: string | null;
-  firstMessagePreview: string | null;
   postId: string | null;
   commentId: number | null;
   commentCount: number | null;
@@ -15,9 +14,20 @@ export interface NotificationDto {
   milestoneValue: number | null;
   createdAt: string;
   updatedAt: string;
-  postTitle: string | null;
-  representativeUserNickname: string | null;
-  representativeUserProfileImageUrl: string | null;
-  commentContent: string | null;
-  representativeCommentContent: string | null;
+  post: {
+    title: string;
+  } | null;
+  representativeUser: {
+    nickname: string | null;
+    profileImageUrl: string | null;
+  } | null;
+  representativeComment: {
+    content: string | null;
+  } | null;
+  comment: {
+    content: string | null;
+  } | null;
+  inquiryThread: {
+    firstMessagePreview: string | null;
+  } | null;
 }

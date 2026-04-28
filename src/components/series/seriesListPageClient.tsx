@@ -3,7 +3,7 @@
 import SeriesFormDialog from '@/components/series/seriesFormDialog';
 import SeriesPreview from '@/components/series/seriesPreview';
 import useSeriesList from '@/features/series/domain/hooks/useSeriesList';
-import { SeriesProps } from '@/features/series/ui/seriesProps';
+import { SeriesProps } from '@/features/series/ui/props/seriesProps';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 

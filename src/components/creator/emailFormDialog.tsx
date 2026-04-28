@@ -20,8 +20,8 @@ import {
 } from '@/components/ui/popover';
 import { ApiError } from '@/errors/errors';
 import { OUTREACH_EMAIL_TEMPLATES } from '@/features/outreach-email/constants/templates';
+import { OutreachEmailDto } from '@/features/outreach-email/data/dto/outreachEmailDto';
 import * as OutreachEmailAction from '@/features/outreach-email/domain/action/outreachEmailAction';
-import { OutreachEmail } from '@/features/outreach-email/domain/model/outreachEmail';
 import clsx from 'clsx';
 import { Check, ChevronsUpDown, Loader2, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
@@ -37,7 +37,7 @@ export function EmailFormDialog({
 }: {
   creatorId: string;
   creatorName: string;
-  latestReceivedEmail: OutreachEmail | null;
+  latestReceivedEmail: OutreachEmailDto | null;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   onSuccess: () => void;

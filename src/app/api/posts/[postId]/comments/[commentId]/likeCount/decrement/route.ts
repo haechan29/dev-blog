@@ -1,4 +1,5 @@
 import { ApiError, ValidationError } from '@/errors/errors';
+import { toDto } from '@/features/comment/data/mapper/commentMapper';
 import * as CommentQueries from '@/features/comment/data/queries/commentQueries';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -14,7 +15,7 @@ export async function POST(
       throw new ValidationError('유효하지 않은 댓글 ID입니다');
     }
 
-    const { post_id: commentPostId, like_count: likeCount } =
+    const { postId: commentPostId, likeCount } =
       await CommentQueries.fetchComment(commentIdNum);
 
     if (commentPostId !== postId) {
@@ -28,7 +29,8 @@ export async function POST(
       likeCount: newLikeCount,
     });
 
-    return NextResponse.json({ data: updated });
+    const comment = toDto(updated);
+    return NextResponse.json({ data: comment });
   } catch (error) {
     console.error('댓글 좋아요 수 감소 요청이 실패했습니다', error);
 

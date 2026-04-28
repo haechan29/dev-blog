@@ -1,6 +1,6 @@
 import { auth } from '@/auth';
 import SearchResultPageClient from '@/components/search/searchResultPageClient';
-import * as PostServerService from '@/features/post/domain/service/postServerService';
+import * as PostServerRepository from '@/features/post/data/repository/postServerRepository';
 import { createProps } from '@/features/post/ui/postProps';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -20,7 +20,7 @@ export default async function SearchResultPage({
     redirect('/search');
   }
 
-  const { posts, nextCursor } = await PostServerService.searchPosts({
+  const { posts, nextCursor } = await PostServerRepository.searchPosts({
     query: q,
   });
   const postProps = posts.map(createProps);

@@ -1,4 +1,6 @@
-import { supabase } from '@/lib/supabase';
+import { db } from '@/db/index';
+import { users } from '@/db/schema';
+import { InferInsertModel, eq } from 'drizzle-orm';
 import 'server-only';
 
 export async function updateProfile({
@@ -10,17 +12,10 @@ export async function updateProfile({
   profileImageUrl?: string | null;
   bio?: string | null;
 }) {
-  const { error } = await supabase
-    .from('users')
-    .update({
-      ...(profileImageUrl !== undefined && {
-        profile_image_url: profileImageUrl,
-      }),
-      ...(bio !== undefined && { bio }),
-    })
-    .eq('id', userId);
+  const updates: Partial<InferInsertModel<typeof users>> = {
+    ...(profileImageUrl !== undefined && { profileImageUrl }),
+    ...(bio !== undefined && { bio }),
+  };
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  await db.update(users).set(updates).where(eq(users.id, userId));
 }

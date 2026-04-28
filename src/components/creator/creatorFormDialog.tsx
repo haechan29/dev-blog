@@ -8,7 +8,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import * as CreatorAction from '@/features/creator/domain/action/creatorAction';
-import { Creator } from '@/features/creator/domain/model/creator';
+import { toProps } from '@/features/creator/ui/mapper/creatorMapper';
+import { CreatorProps } from '@/features/creator/ui/props/creatorProps';
 import clsx from 'clsx';
 import { Loader2, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
@@ -24,10 +25,10 @@ export function CreatorFormDialog({
   onSuccess,
 }: {
   mode: Mode;
-  creator?: Creator | null;
+  creator?: CreatorProps | null;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  onSuccess: (creator: Creator) => void;
+  onSuccess: (creator: CreatorProps) => void;
 }) {
   const [channelName, setChannelName] = useState('');
   const [email, setEmail] = useState('');
@@ -64,7 +65,7 @@ export function CreatorFormDialog({
 
     setIsSubmitting(true);
     try {
-      const result =
+      const dto =
         mode === 'create'
           ? await CreatorAction.createCreator({
               channelName: channelName.trim(),
@@ -77,8 +78,9 @@ export function CreatorFormDialog({
               email: email.trim(),
               memo: memo.trim() || undefined,
             });
+      const props = toProps(dto);
 
-      onSuccess(result);
+      onSuccess(props);
       setIsOpen(false);
       toast.success(mode === 'create' ? '등록되었습니다' : '수정되었습니다');
     } catch {

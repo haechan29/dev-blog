@@ -1,5 +1,6 @@
 import { auth } from '@/auth';
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
+import { toDto } from '@/features/comment/data/mapper/commentMapper';
 import * as CommentQueries from '@/features/comment/data/queries/commentQueries';
 import * as PostStatUsecase from '@/features/postStat/data/usecases/postStatUsecase';
 import { getUserId } from '@/lib/user';
@@ -29,16 +30,16 @@ export async function PATCH(
       throw new ValidationError('비밀번호를 찾을 수 없습니다');
     }
 
-    const comment = await CommentQueries.fetchCommentForAuth(commentId);
+    const { userId: commentUserId, passwordHash } =
+      await CommentQueries.fetchCommentForAuth(commentId);
 
-    if (userId !== comment.user_id) {
+    if (userId !== commentUserId) {
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 
     if (!session) {
       const isValid =
-        comment.password_hash &&
-        (await bcrypt.compare(password, comment.password_hash));
+        passwordHash && (await bcrypt.compare(password, passwordHash));
 
       if (!isValid) {
         throw new UnauthorizedError('비밀번호가 일치하지 않습니다');
@@ -46,8 +47,9 @@ export async function PATCH(
     }
 
     const updated = await CommentQueries.updateComment({ commentId, content });
+    const comment = toDto(updated);
 
-    return NextResponse.json({ data: updated });
+    return NextResponse.json({ data: comment });
   } catch (error) {
     console.error('댓글 수정 요청이 실패했습니다', error);
 
@@ -80,17 +82,18 @@ export async function DELETE(
       throw new ValidationError('비밀번호를 찾을 수 없습니다');
     }
 
-    const comment = await CommentQueries.fetchCommentForAuth(commentId);
+    const { userId: commentUserId, passwordHash } =
+      await CommentQueries.fetchCommentForAuth(commentId);
 
-    if (userId !== comment.user_id) {
+    if (userId !== commentUserId) {
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 
     if (!session) {
       const isValid =
         password &&
-        comment.password_hash &&
-        (await bcrypt.compare(password, comment.password_hash));
+        passwordHash &&
+        (await bcrypt.compare(password, passwordHash));
 
       if (!isValid) {
         throw new UnauthorizedError('비밀번호가 일치하지 않습니다');

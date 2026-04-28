@@ -1,19 +1,21 @@
-import { supabase } from '@/lib/supabase';
+import { db } from '@/db/index';
+import { postViews, posts } from '@/db/schema';
+import { desc, eq } from 'drizzle-orm';
 import 'server-only';
 
+const POST_VIEW_SELECT_FIELDS = {
+  postId: postViews.postId,
+  seriesId: posts.seriesId,
+} as const;
+
 export async function fetchViewedPosts(userId: string) {
-  const { data, error } = await supabase
-    .from('post_views')
-    .select('post_id, posts(series_id)')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
+  return await db
+    .select(POST_VIEW_SELECT_FIELDS)
+    .from(postViews)
+    .innerJoin(posts, eq(postViews.postId, posts.id))
+    .where(eq(postViews.userId, userId))
+    .orderBy(desc(postViews.createdAt))
     .limit(1000);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data;
 }
 
 export async function createPostView(
@@ -21,13 +23,9 @@ export async function createPostView(
   postId: string,
   readDuration: number
 ) {
-  const { error } = await supabase.from('post_views').insert({
-    user_id: userId,
-    post_id: postId,
-    read_duration: readDuration,
+  await db.insert(postViews).values({
+    userId,
+    postId,
+    readDuration,
   });
-
-  if (error) {
-    throw new Error(error.message);
-  }
 }

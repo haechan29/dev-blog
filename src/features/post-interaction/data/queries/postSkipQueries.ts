@@ -1,39 +1,41 @@
-import { supabase } from '@/lib/supabase';
+import { db } from '@/db/index';
+import { postSkips } from '@/db/schema';
+import { and, desc, eq, sql } from 'drizzle-orm';
 import 'server-only';
 
+const POST_SKIP_SELECT_FIELDS = {
+  postId: postSkips.postId,
+  skipCount: postSkips.skipCount,
+} as const;
+
 export async function fetchSkippedPosts(userId: string) {
-  const { data, error } = await supabase
-    .from('post_skips')
-    .select('post_id, skip_count')
-    .eq('user_id', userId)
-    .order('updated_at', { ascending: false })
+  return await db
+    .select(POST_SKIP_SELECT_FIELDS)
+    .from(postSkips)
+    .where(eq(postSkips.userId, userId))
+    .orderBy(desc(postSkips.updatedAt))
     .limit(1000);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data;
 }
 
 export async function incrementPostSkips(userId: string, postIds: string[]) {
-  const { error } = await supabase.rpc('increment_skips', {
-    p_user_id: userId,
-    p_post_ids: postIds,
-  });
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  await db
+    .insert(postSkips)
+    .values(postIds.map(postId => ({ userId, postId, skipCount: 1 })))
+    .onConflictDoUpdate({
+      target: [postSkips.userId, postSkips.postId],
+      set: {
+        skipCount: sql`${postSkips.skipCount} + 1`,
+        updatedAt: new Date().toISOString(),
+      },
+    });
 }
 
 export async function decrementPostSkip(userId: string, postId: string) {
-  const { error } = await supabase.rpc('decrement_skip', {
-    p_user_id: userId,
-    p_post_id: postId,
-  });
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  await db
+    .update(postSkips)
+    .set({
+      skipCount: sql`GREATEST(${postSkips.skipCount} - 1, 0)`,
+      updatedAt: new Date().toISOString(),
+    })
+    .where(and(eq(postSkips.userId, userId), eq(postSkips.postId, postId)));
 }

@@ -7,19 +7,18 @@ export interface SeriesDto {
   createdAt: string;
   updatedAt: string;
   userId: string;
-  authorName: string | null;
-  profileImageUrl: string | null;
-  posts: Pick<
+  user: {
+    nickname: string | null;
+    profileImageUrl: string | null;
+  };
+  posts: (Pick<
     PostDto,
-    | 'id'
-    | 'title'
-    | 'createdAt'
-    | 'seriesId'
-    | 'seriesOrder'
-    | 'likeCount'
-    | 'viewCount'
-    | 'commentCount'
-    | 'visibility'
-  >[];
+    'id' | 'title' | 'createdAt' | 'seriesId' | 'seriesOrder' | 'visibility'
+  > & {
+    postStat: Pick<
+      PostDto['postStat'],
+      'likeCount' | 'viewCount' | 'commentCount'
+    >;
+  })[];
   postCount: number;
 }

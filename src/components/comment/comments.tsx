@@ -5,11 +5,9 @@ import CommentPanel from '@/components/comment/commentPanel';
 import CommentPasswordDialog from '@/components/comment/commentPasswordDialog';
 import ProfileIcon from '@/components/user/profileIcon';
 import { ApiError } from '@/errors/errors';
-import * as CommentClientService from '@/features/comment/domain/service/commentClientService';
-import {
-  CommentCursor,
-  CommentsPage,
-} from '@/features/comment/domain/types/page';
+import * as CommentClientRepository from '@/features/comment/data/repository/commentClientRepository';
+import { toProps } from '@/features/comment/ui/mapper/commentMapper';
+import { CommentCursor, CommentsPage } from '@/features/comment/ui/types/page';
 import { PostProps } from '@/features/post/ui/postProps';
 import useMediaQuery, {
   DESKTOP_QUERY,
@@ -79,14 +77,14 @@ export default function Comments({
   } = useInfiniteQuery({
     queryKey: postKeys.comments(postId, highlightCommentId),
     queryFn: async ({ pageParam }) => {
-      const page = await CommentClientService.getRankedComments({
+      const page = await CommentClientRepository.getRankedComments({
         postId,
         timestamp: initialTimestamp,
         cursor: pageParam,
         highlightCommentId,
       });
       return {
-        comments: page.comments.map(comment => comment.toProps()),
+        comments: page.comments.map(toProps),
         nextCursor: page.nextCursor,
       };
     },
@@ -116,13 +114,13 @@ export default function Comments({
       postId: string;
       content: string;
       password?: string;
-    }) => CommentClientService.createComment(params),
+    }) => CommentClientRepository.createComment(params),
     onSuccess: newComment => {
       queryClient.setQueryData(
         postKeys.comments(postId, highlightCommentId),
         (old: InfiniteData<CommentsPage> | undefined) => {
           if (!old) return old;
-          const newProps = newComment.toProps();
+          const newProps = toProps(newComment);
           return {
             ...old,
             pages: old.pages.map((page, i) =>

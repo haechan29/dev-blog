@@ -2,6 +2,7 @@ import { auth } from '@/auth';
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries';
 import * as DraftQueries from '@/features/draft/data/queries/draftQueries';
+import { toDto } from '@/features/post/data/mapper/postMapper';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as FeedUsecase from '@/features/post/data/usecases/feedUsecase';
 import * as PostUsecase from '@/features/post/data/usecases/postUsecase';
@@ -106,7 +107,7 @@ export async function POST(request: NextRequest) {
     const contentText = normalizeText(raw);
     const preview = contentText.slice(0, 1000);
 
-    const post = await PostQueries.createPost({
+    const created = await PostQueries.createPost({
       title,
       contentJson,
       tags,
@@ -116,6 +117,7 @@ export async function POST(request: NextRequest) {
       preview,
       contentText,
     });
+    const post = toDto(created);
 
     await PostStatQueries.createPostStat(post.id);
 

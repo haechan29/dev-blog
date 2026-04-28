@@ -1,19 +1,25 @@
+import { db } from '@/db/index';
+import { creators } from '@/db/schema';
 import { CreatorEntity } from '@/features/creator/data/entities/creatorEntities';
-import { supabase } from '@/lib/supabase';
+import { desc, eq } from 'drizzle-orm';
 import 'server-only';
 
-const SELECT_FIELDS =
-  'id, channel_name, email, memo, status, created_at, last_mailed_at, user_id';
+const CREATOR_SELECT_FIELDS = {
+  id: creators.id,
+  channelName: creators.channelName,
+  email: creators.email,
+  memo: creators.memo,
+  status: creators.status,
+  createdAt: creators.createdAt,
+  lastMailedAt: creators.lastMailedAt,
+  userId: creators.userId,
+} as const;
 
 export async function fetchCreators() {
-  const { data, error } = await supabase
-    .from('creators')
-    .select(SELECT_FIELDS)
-    .order('last_mailed_at', { ascending: false, nullsFirst: true });
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  const data = await db
+    .select(CREATOR_SELECT_FIELDS)
+    .from(creators)
+    .orderBy(desc(creators.lastMailedAt));
 
   const sorted = data.sort((a, b) => {
     if (a.status === 'rejected' && b.status !== 'rejected') return 1;
@@ -21,21 +27,17 @@ export async function fetchCreators() {
     return 0;
   });
 
-  return sorted as CreatorEntity[];
+  return sorted;
 }
 
 export async function fetchCreator(id: string) {
-  const { data, error } = await supabase
-    .from('creators')
-    .select(SELECT_FIELDS)
-    .eq('id', id)
-    .maybeSingle();
+  const creator = await db
+    .select(CREATOR_SELECT_FIELDS)
+    .from(creators)
+    .where(eq(creators.id, id))
+    .limit(1);
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data as CreatorEntity | null;
+  return creator[0] ?? null;
 }
 
 export async function createCreator({
@@ -49,22 +51,21 @@ export async function createCreator({
   memo?: string;
   userId: string;
 }) {
-  const { data, error } = await supabase
-    .from('creators')
-    .insert({
-      channel_name: channelName,
+  const [creator] = await db
+    .insert(creators)
+    .values({
+      channelName,
       email,
       memo: memo ?? null,
-      user_id: userId,
+      userId,
     })
-    .select(SELECT_FIELDS)
-    .single();
+    .returning(CREATOR_SELECT_FIELDS);
 
-  if (error) {
-    throw new Error(error.message);
+  if (!creator) {
+    throw new Error('크리에이터 생성에 실패했습니다');
   }
 
-  return data as CreatorEntity;
+  return creator;
 }
 
 export async function updateCreator({
@@ -81,55 +82,42 @@ export async function updateCreator({
   status?: CreatorEntity['status'];
 }) {
   const updates: Partial<CreatorEntity> = {
-    ...(channelName !== undefined && { channel_name: channelName }),
+    ...(channelName !== undefined && { channelName }),
     ...(email !== undefined && { email }),
     ...(memo !== undefined && { memo }),
     ...(status !== undefined && { status }),
   };
 
-  const { data, error } = await supabase
-    .from('creators')
-    .update(updates)
-    .eq('id', id)
-    .select(SELECT_FIELDS)
-    .single();
+  const [creator] = await db
+    .update(creators)
+    .set(updates)
+    .where(eq(creators.id, id))
+    .returning(CREATOR_SELECT_FIELDS);
 
-  if (error) {
-    throw new Error(error.message);
+  if (!creator) {
+    throw new Error('크리에이터 업데이트에 실패했습니다');
   }
 
-  return data as CreatorEntity;
+  return creator;
 }
 
 export async function updateLastMailedAt(id: string, timestamp: string) {
-  const { error } = await supabase
-    .from('creators')
-    .update({ last_mailed_at: timestamp })
-    .eq('id', id);
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  await db
+    .update(creators)
+    .set({ lastMailedAt: timestamp })
+    .where(eq(creators.id, id));
 }
 
 export async function deleteCreator(id: string) {
-  const { error } = await supabase.from('creators').delete().eq('id', id);
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  await db.delete(creators).where(eq(creators.id, id));
 }
 
 export async function fetchCreatorByUserId(userId: string) {
-  const { data, error } = await supabase
-    .from('creators')
-    .select(SELECT_FIELDS)
-    .eq('user_id', userId)
-    .maybeSingle();
+  const data = await db
+    .select(CREATOR_SELECT_FIELDS)
+    .from(creators)
+    .where(eq(creators.userId, userId))
+    .limit(1);
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data as CreatorEntity | null;
+  return data[0] ?? null;
 }

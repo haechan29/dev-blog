@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { SeriesProps } from '@/features/series/ui/seriesProps';
+import { SeriesProps } from '@/features/series/ui/props/seriesProps';
 import { createRipple } from '@/lib/dom';
 import { Edit2, Trash2 } from 'lucide-react';
 import { MouseEvent, ReactNode, useCallback, useState } from 'react';

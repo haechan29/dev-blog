@@ -1,37 +1,15 @@
 import { CommentResponseDto } from '@/features/comment/data/dto/commentResponseDto';
-import {
-  CommentEntity,
-  CommentEntityFlat,
-} from '@/features/comment/data/entities/commentEntities';
+import { CommentEntity } from '@/features/comment/data/entities/commentEntities';
 
 export function toDto(comment: CommentEntity): CommentResponseDto {
   return {
     id: comment.id,
-    postId: comment.post_id,
-    authorName: comment.users.nickname,
+    postId: comment.postId,
     content: comment.content,
-    createdAt: comment.created_at,
-    updatedAt: comment.updated_at,
-    likeCount: comment.like_count,
-    userId: comment.user_id,
-    deletedAt: comment.users.deleted_at,
-    registeredAt: comment.users.registered_at,
-    profileImageUrl: comment.users.profile_image_url,
-  };
-}
-
-export function flatToDto(comment: CommentEntityFlat): CommentResponseDto {
-  return {
-    id: comment.id,
-    postId: comment.post_id,
-    authorName: comment.nickname,
-    content: comment.content,
-    createdAt: comment.created_at,
-    updatedAt: comment.updated_at,
-    likeCount: comment.like_count,
-    userId: comment.user_id,
-    deletedAt: comment.deleted_at,
-    registeredAt: comment.registered_at,
-    profileImageUrl: comment.profile_image_url,
+    createdAt: comment.createdAt,
+    updatedAt: comment.updatedAt,
+    likeCount: comment.likeCount,
+    userId: comment.userId,
+    user: comment.user,
   };
 }

@@ -1,42 +1,36 @@
-import { InquiryThreadEntity } from '@/features/inquiry/data/entities/inquiryThreadEntities';
+import { db } from '@/db/index';
+import { inquiryMessages, inquiryThreads } from '@/db/schema';
 import { InquiryThreadStatus } from '@/features/inquiry/domain/types/inquiryThreadStatus';
-import { supabase } from '@/lib/supabase';
+import { and, desc, eq, lt, or } from 'drizzle-orm';
 import 'server-only';
 
-const INQUIRY_THREAD_SELECT_FIELDS = `
-  id,
-  user_id,
-  status,
-  first_message_preview,
-  first_message_id,
-  last_message_preview,
-  last_message_id,
-  user_unread_count,
-  admin_unread_count,
-  created_at,
-  updated_at,
-  is_deleted
-`;
-
-function applyQuotedLiteral(value: string) {
-  return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '""')}"`;
-}
+const INQUIRY_THREAD_SELECT_FIELDS = {
+  id: inquiryThreads.id,
+  userId: inquiryThreads.userId,
+  status: inquiryThreads.status,
+  firstMessagePreview: inquiryThreads.firstMessagePreview,
+  firstMessageId: inquiryThreads.firstMessageId,
+  lastMessagePreview: inquiryThreads.lastMessagePreview,
+  lastMessageId: inquiryThreads.lastMessageId,
+  userUnreadCount: inquiryThreads.userUnreadCount,
+  adminUnreadCount: inquiryThreads.adminUnreadCount,
+  createdAt: inquiryThreads.createdAt,
+  updatedAt: inquiryThreads.updatedAt,
+  isDeleted: inquiryThreads.isDeleted,
+} as const;
 
 export async function fetchInquiryThreadForAuth(threadId: string) {
-  const { data, error } = await supabase
-    .from('inquiry_threads')
-    .select('id, user_id, is_deleted')
-    .eq('id', threadId)
-    .maybeSingle();
+  const data = await db
+    .select({
+      id: inquiryThreads.id,
+      userId: inquiryThreads.userId,
+      isDeleted: inquiryThreads.isDeleted,
+    })
+    .from(inquiryThreads)
+    .where(eq(inquiryThreads.id, threadId))
+    .limit(1);
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data as unknown as Pick<
-    InquiryThreadEntity,
-    'id' | 'user_id' | 'is_deleted'
-  > | null;
+  return data[0] ?? null;
 }
 
 export async function fetchMyInquiryThreads({
@@ -50,28 +44,29 @@ export async function fetchMyInquiryThreads({
   cursorUpdatedAt?: string;
   cursorId?: string;
 }) {
-  let query = supabase
-    .from('inquiry_threads')
+  const cursorCondition =
+    cursorUpdatedAt != null && cursorId != null
+      ? or(
+          lt(inquiryThreads.updatedAt, cursorUpdatedAt),
+          and(
+            eq(inquiryThreads.updatedAt, cursorUpdatedAt),
+            lt(inquiryThreads.id, cursorId)
+          )
+        )
+      : undefined;
+
+  return db
     .select(INQUIRY_THREAD_SELECT_FIELDS)
-    .eq('user_id', userId)
-    .eq('is_deleted', false)
-    .order('updated_at', { ascending: false })
-    .order('id', { ascending: false })
+    .from(inquiryThreads)
+    .where(
+      and(
+        eq(inquiryThreads.userId, userId),
+        eq(inquiryThreads.isDeleted, false),
+        cursorCondition
+      )
+    )
+    .orderBy(desc(inquiryThreads.updatedAt), desc(inquiryThreads.id))
     .limit(limit);
-
-  if (cursorUpdatedAt != null && cursorId != null) {
-    const t = applyQuotedLiteral(cursorUpdatedAt);
-    const id = applyQuotedLiteral(cursorId);
-    query = query.or(`updated_at.lt.${t},and(updated_at.eq.${t},id.lt.${id})`);
-  }
-
-  const { data, error } = await query;
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data as unknown as InquiryThreadEntity[];
 }
 
 export async function fetchInquiryThreads({
@@ -85,29 +80,28 @@ export async function fetchInquiryThreads({
   cursorId?: string;
   status?: InquiryThreadStatus;
 }) {
-  let query = supabase
-    .from('inquiry_threads')
+  const cursorCondition =
+    cursorUpdatedAt != null && cursorId != null
+      ? or(
+          lt(inquiryThreads.updatedAt, cursorUpdatedAt),
+          and(
+            eq(inquiryThreads.updatedAt, cursorUpdatedAt),
+            lt(inquiryThreads.id, cursorId)
+          )
+        )
+      : undefined;
+
+  const statusCondition =
+    status != null ? eq(inquiryThreads.status, status) : undefined;
+
+  return db
     .select(INQUIRY_THREAD_SELECT_FIELDS)
-    .eq('is_deleted', false)
-    .order('updated_at', { ascending: false })
-    .order('id', { ascending: false })
+    .from(inquiryThreads)
+    .where(
+      and(eq(inquiryThreads.isDeleted, false), statusCondition, cursorCondition)
+    )
+    .orderBy(desc(inquiryThreads.updatedAt), desc(inquiryThreads.id))
     .limit(limit);
-
-  if (status) query = query.eq('status', status);
-
-  if (cursorUpdatedAt != null && cursorId != null) {
-    const t = applyQuotedLiteral(cursorUpdatedAt);
-    const id = applyQuotedLiteral(cursorId);
-    query = query.or(`updated_at.lt.${t},and(updated_at.eq.${t},id.lt.${id})`);
-  }
-
-  const { data, error } = await query;
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data as unknown as InquiryThreadEntity[];
 }
 
 export async function createInquiryThread({
@@ -121,22 +115,39 @@ export async function createInquiryThread({
   images: string[];
   messagePreview: string;
 }) {
-  const { data, error } = await supabase.rpc('create_inquiry', {
-    p_user_id: userId,
-    p_content: content,
-    p_images: images,
-    p_message_preview: messagePreview,
+  return db.transaction(async tx => {
+    const [thread] = await tx
+      .insert(inquiryThreads)
+      .values({
+        userId,
+        status: 'AWAITING_REPLY',
+        firstMessagePreview: messagePreview,
+        lastMessagePreview: messagePreview,
+        adminUnreadCount: 1,
+      })
+      .returning({ id: inquiryThreads.id });
+
+    const [message] = await tx
+      .insert(inquiryMessages)
+      .values({
+        threadId: thread.id,
+        senderType: 'USER',
+        senderId: userId,
+        content,
+        images,
+      })
+      .returning({ id: inquiryMessages.id });
+
+    await tx
+      .update(inquiryThreads)
+      .set({
+        lastMessageId: message.id,
+        firstMessageId: message.id,
+      })
+      .where(eq(inquiryThreads.id, thread.id));
+
+    return thread.id;
   });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  if (data == null || typeof data !== 'string') {
-    throw new Error('스레드 생성 응답이 올바르지 않습니다');
-  }
-
-  return data;
 }
 
 export async function softDeleteInquiryThread({
@@ -146,17 +157,17 @@ export async function softDeleteInquiryThread({
   threadId: string;
   userId: string;
 }) {
-  const { error } = await supabase
-    .from('inquiry_threads')
-    .update({
-      is_deleted: true,
-      deleted_at: new Date().toISOString(),
+  await db
+    .update(inquiryThreads)
+    .set({
+      isDeleted: true,
+      deletedAt: new Date().toISOString(),
     })
-    .eq('id', threadId)
-    .eq('user_id', userId)
-    .eq('is_deleted', false);
-
-  if (error) {
-    throw new Error(error.message);
-  }
+    .where(
+      and(
+        eq(inquiryThreads.id, threadId),
+        eq(inquiryThreads.userId, userId),
+        eq(inquiryThreads.isDeleted, false)
+      )
+    );
 }
