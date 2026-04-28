@@ -6,6 +6,7 @@ import {
   posts,
   users,
 } from '@/db/schema';
+import { isUniqueViolation } from '@/errors/lib';
 import { and, desc, eq, lt, or, sql } from 'drizzle-orm';
 import 'server-only';
 
@@ -56,15 +57,6 @@ const NOTIFICATION_SELECT_FIELDS = {
     firstMessagePreview: inquiryThreads.firstMessagePreview,
   },
 } as const;
-
-function isUniqueViolation(error: unknown) {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    (error as { code?: string }).code === '23505'
-  );
-}
 
 export async function fetchNotifications({
   userId,

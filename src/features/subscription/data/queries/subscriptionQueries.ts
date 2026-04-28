@@ -1,7 +1,9 @@
+import { db } from '@/db/index';
+import { subscriptions, users } from '@/db/schema';
 import { UnauthorizedError, ValidationError } from '@/errors/errors';
-import { FollowUserEntity } from '@/features/subscription/data/entities/followUserEntities';
-import { supabase } from '@/lib/supabase';
+import { isUniqueViolation } from '@/errors/lib';
 import { getUserId } from '@/lib/user';
+import { and, eq, isNull } from 'drizzle-orm';
 import 'server-only';
 
 export async function getSubscriptionInfo({
@@ -15,59 +17,51 @@ export async function getSubscriptionInfo({
     return { isSubscribed: false };
   }
 
-  const { data, error } = await supabase
-    .from('subscriptions')
-    .select('follower_id')
-    .eq('follower_id', followerUserId)
-    .eq('following_id', followingUserId)
-    .maybeSingle();
+  const entity = await db
+    .select({ followerId: subscriptions.followerId })
+    .from(subscriptions)
+    .where(
+      and(
+        eq(subscriptions.followerId, followerUserId),
+        eq(subscriptions.followingId, followingUserId)
+      )
+    )
+    .limit(1);
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return { isSubscribed: data !== null };
+  return { isSubscribed: entity.length > 0 };
 }
 
 export async function getFollowers(userId: string) {
-  const { data, error } = await supabase
-    .from('subscriptions')
-    .select('follower:users!follower_id(id, nickname, profile_image_url)')
-    .eq('following_id', userId)
-    .is('follower.deleted_at', null);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data.map(row => row.follower) as unknown as FollowUserEntity[];
+  return await db
+    .select({
+      id: users.id,
+      nickname: users.nickname,
+      profileImageUrl: users.profileImageUrl,
+    })
+    .from(subscriptions)
+    .innerJoin(users, eq(subscriptions.followerId, users.id))
+    .where(and(eq(subscriptions.followingId, userId), isNull(users.deletedAt)));
 }
 
 export async function getFollowing(userId: string) {
-  const { data, error } = await supabase
-    .from('subscriptions')
-    .select('following:users!following_id(id, nickname, profile_image_url)')
-    .eq('follower_id', userId)
-    .is('following.deleted_at', null);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data.map(row => row.following) as unknown as FollowUserEntity[];
+  return await db
+    .select({
+      id: users.id,
+      nickname: users.nickname,
+      profileImageUrl: users.profileImageUrl,
+    })
+    .from(subscriptions)
+    .innerJoin(users, eq(subscriptions.followingId, users.id))
+    .where(and(eq(subscriptions.followerId, userId), isNull(users.deletedAt)));
 }
 
 export async function getFollowingIds(userId: string) {
-  const { data, error } = await supabase
-    .from('subscriptions')
-    .select('following_id')
-    .eq('follower_id', userId);
+  const entities = await db
+    .select({ followingId: subscriptions.followingId })
+    .from(subscriptions)
+    .where(eq(subscriptions.followerId, userId));
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data.map(s => s.following_id);
+  return entities.map(entity => entity.followingId);
 }
 
 export async function createSubscription(
@@ -78,18 +72,16 @@ export async function createSubscription(
     throw new ValidationError('자기 자신을 구독할 수 없습니다');
   }
 
-  const { error } = await supabase
-    .from('subscriptions')
-    .insert({ follower_id: followerId, following_id: followingId });
-
-  if (error) {
-    if (error.code === '23505') {
+  try {
+    await db.insert(subscriptions).values({
+      followerId,
+      followingId,
+    });
+  } catch (error) {
+    if (isUniqueViolation(error)) {
       throw new ValidationError('이미 구독한 사용자입니다');
     }
-    if (error.code === '23503') {
-      throw new ValidationError('존재하지 않는 사용자입니다');
-    }
-    throw new Error(error.message);
+    throw error;
   }
 }
 
@@ -103,16 +95,13 @@ export async function deleteSubscription(followingId: string) {
     throw new ValidationError('자기 자신을 구독취소할 수 없습니다');
   }
 
-  const { data: deleted, error } = await supabase
-    .from('subscriptions')
-    .delete()
-    .eq('follower_id', followerId)
-    .eq('following_id', followingId)
-    .select('follower_id');
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return deleted;
+  return await db
+    .delete(subscriptions)
+    .where(
+      and(
+        eq(subscriptions.followerId, followerId),
+        eq(subscriptions.followingId, followingId)
+      )
+    )
+    .returning({ followerId: subscriptions.followerId });
 }

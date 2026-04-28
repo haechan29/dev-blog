@@ -1,6 +1,5 @@
-import { UserEntity } from '@/features/user/data/entities/userEntities';
+import type * as SubscriptionQueries from '@/features/subscription/data/queries/subscriptionQueries';
 
-export type FollowUserEntity = Pick<
-  UserEntity,
-  'id' | 'nickname' | 'profile_image_url'
->;
+export type FollowUserEntity = Awaited<
+  ReturnType<typeof SubscriptionQueries.getFollowers>
+>[number];
