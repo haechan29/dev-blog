@@ -1,11 +1,13 @@
-import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { db } from '@/db/index';
+import * as UserUsecase from '@/features/user/data/usecases/userUsecase';
+import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import NextAuth from 'next-auth';
+import { Adapter, AdapterUser } from 'next-auth/adapters';
 import Google from 'next-auth/providers/google';
 import Kakao from 'next-auth/providers/kakao';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: DrizzleAdapter(db),
+  adapter: createMergeAnonymousAdapter(),
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID || '',
@@ -21,3 +23,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     newUser: '/signup',
   },
 });
+
+export function createMergeAnonymousAdapter(): Adapter {
+  const base = DrizzleAdapter(db);
+  return {
+    ...base,
+    async createUser(user: AdapterUser) {
+      return UserUsecase.mergeAnonymousUser(user, u =>
+        Promise.resolve(base.createUser!(u))
+      );
+    },
+  };
+}

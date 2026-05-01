@@ -17,9 +17,25 @@ const USER_SELECT_FIELDS = {
   subscriberCount: users.subscriberCount,
 } as const;
 
+const USER_AUTH_INFO_SELECT_FIELDS = {
+  id: users.id,
+  email: users.email,
+  emailVerified: users.emailVerified,
+} as const;
+
 export async function fetchUser(userId: string) {
   const entities = await db
     .select(USER_SELECT_FIELDS)
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  return entities[0] ?? null;
+}
+
+export async function fetchUserAuthInfo(userId: string) {
+  const entities = await db
+    .select(USER_AUTH_INFO_SELECT_FIELDS)
     .from(users)
     .where(eq(users.id, userId))
     .limit(1);
@@ -46,18 +62,27 @@ export async function updateUser({
   subscriberCount,
   registeredAt,
   deletedAt,
+  name,
+  email,
+  emailVerified,
 }: {
   userId: string;
   nickname?: string | null;
   subscriberCount?: number;
   registeredAt?: string | null;
   deletedAt?: string | null;
+  name?: string | null;
+  email?: string | null;
+  emailVerified?: string | null;
 }) {
   const updates: Partial<InferInsertModel<typeof users>> = {
     ...(nickname !== undefined && { nickname }),
     ...(subscriberCount !== undefined && { subscriberCount }),
     ...(registeredAt !== undefined && { registeredAt }),
     ...(deletedAt !== undefined && { deletedAt }),
+    ...(name !== undefined && { name }),
+    ...(email !== undefined && { email }),
+    ...(emailVerified !== undefined && { emailVerified }),
   };
 
   try {
