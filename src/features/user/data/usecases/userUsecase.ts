@@ -31,13 +31,7 @@ export async function decrementSubscriberCount(userId: string) {
 }
 
 export async function softDeleteUser(userIdFromSession: string) {
-  const now = new Date().toISOString();
-
-  await UserQueries.updateUser({
-    userId: userIdFromSession,
-    nickname: null,
-    deletedAt: now,
-  });
+  await UserQueries.softDeleteUser(userIdFromSession);
 }
 
 export async function mergeAnonymousUser(

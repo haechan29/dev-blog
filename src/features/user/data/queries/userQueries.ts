@@ -1,5 +1,5 @@
 import { db } from '@/db/index';
-import { users } from '@/db/schema';
+import { accounts, sessions, users } from '@/db/schema';
 import { isUniqueViolation } from '@/errors/lib';
 import { DuplicateNicknameError } from '@/features/user/data/errors/userErrors';
 import { InferInsertModel, eq } from 'drizzle-orm';
@@ -93,4 +93,25 @@ export async function updateUser({
     }
     throw error;
   }
+}
+
+export async function softDeleteUser(userId: string) {
+  const now = new Date().toISOString();
+
+  await db.transaction(async tx => {
+    await tx.delete(sessions).where(eq(sessions.userId, userId));
+    await tx.delete(accounts).where(eq(accounts.userId, userId));
+
+    await tx
+      .update(users)
+      .set({
+        nickname: null,
+        deletedAt: now,
+        name: null,
+        email: null,
+        emailVerified: null,
+        image: null,
+      })
+      .where(eq(users.id, userId));
+  });
 }
