@@ -1,17 +1,13 @@
-import { supabase } from '@/lib/supabase';
+import * as PostQueries from '@/features/post/data/queries/postQueries';
 import { MetadataRoute } from 'next';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const { data: posts } = await supabase
-    .from('posts')
-    .select('id, updated_at')
-    .eq('visibility', 'public');
+  const rows = await PostQueries.fetchPostsForSitemap();
 
-  const postUrls =
-    posts?.map(post => ({
-      url: `https://sharetext.app/read/${post.id}`,
-      lastModified: post.updated_at ? new Date(post.updated_at) : undefined,
-    })) ?? [];
+  const postUrls = rows.map(row => ({
+    url: `https://sharetext.app/read/${row.id}`,
+    lastModified: row.updatedAt ? new Date(row.updatedAt) : undefined,
+  }));
 
   return [
     {

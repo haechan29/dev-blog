@@ -48,6 +48,13 @@ const POST_SELECT_FIELDS = {
   postStat: POST_STATS_FIELDS,
 } as const;
 
+export async function fetchPostsForSitemap() {
+  return db
+    .select({ id: posts.id, updatedAt: posts.updatedAt })
+    .from(posts)
+    .where(eq(posts.visibility, 'public'));
+}
+
 export async function fetchPostsByUserId(
   userId: string,
   currentUserId?: string
