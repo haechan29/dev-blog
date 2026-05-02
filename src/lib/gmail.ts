@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import * as GmailTokenQueries from '@/features/gmail/data/queries/gmailTokenQueries';
 
 interface GmailMessage {
   id: string;
@@ -159,21 +159,17 @@ function extractBody(payload: GmailMessage['payload']): string {
 }
 
 async function getValidAccessToken() {
-  const { data: tokens, error } = await supabase
-    .from('gmail_tokens')
-    .select('*')
-    .eq('id', 'default')
-    .single();
+  const token = await GmailTokenQueries.fetchGmailTokenByDefaultId();
 
-  if (error || !tokens) {
-    throw new Error('Gmail 토큰이 없습니다. 먼저 연동해주세요.');
+  if (!token?.refreshToken) {
+    throw new Error('Gmail 리프레시 토큰이 없습니다.');
   }
 
-  const now = new Date();
-  const expiresAt = new Date(tokens.expires_at);
+  const now = Date.now();
+  const expiresAtMs = token.expiresAt ? new Date(token.expiresAt).getTime() : 0;
 
-  if (expiresAt.getTime() - now.getTime() < 5 * 60 * 1000) {
-    const newTokens = await refreshAccessToken(tokens.refresh_token);
+  if (expiresAtMs - now < 5 * 60 * 1000) {
+    const newTokens = await refreshAccessToken(token.refreshToken);
 
     if (newTokens.error) {
       throw new Error('토큰 갱신 실패: ' + newTokens.error);
@@ -181,19 +177,19 @@ async function getValidAccessToken() {
 
     const newExpiresAt = new Date(Date.now() + newTokens.expires_in * 1000);
 
-    await supabase
-      .from('gmail_tokens')
-      .update({
-        access_token: newTokens.access_token,
-        expires_at: newExpiresAt.toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', 'default');
+    await GmailTokenQueries.updateGmailAccessToken({
+      accessToken: newTokens.access_token,
+      expiresAtIso: newExpiresAt.toISOString(),
+    });
 
     return newTokens.access_token;
   }
 
-  return tokens.access_token;
+  if (!token.accessToken) {
+    throw new Error('Gmail 액세스 토큰이 없습니다.');
+  }
+
+  return token.accessToken;
 }
 
 async function refreshAccessToken(refreshToken: string) {
