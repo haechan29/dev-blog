@@ -12,7 +12,7 @@ export default async function TagLayout({
 }) {
   const session = await auth();
   const userId =
-    session?.user?.user_id ?? (await cookies()).get('userId')?.value;
+    session?.user?.id ?? (await cookies()).get('userId')?.value;
 
   const { tag: encodedTag } = await params;
   const tag = decodeURIComponent(encodedTag);

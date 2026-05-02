@@ -75,7 +75,7 @@ export async function PATCH(request: NextRequest) {
 export async function DELETE() {
   try {
     const session = await auth();
-    const userIdFromSession = session?.user?.user_id;
+    const userIdFromSession = session?.user?.id;
 
     if (!userIdFromSession) {
       throw new UnauthorizedError('인증되지 않은 요청입니다');

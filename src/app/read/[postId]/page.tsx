@@ -19,7 +19,7 @@ export default async function PostPage({
 }) {
   const session = await auth();
   const userId =
-    session?.user?.user_id ?? (await cookies()).get('userId')?.value;
+    session?.user?.id ?? (await cookies()).get('userId')?.value;
 
   const { postId } = await params;
   const { highlightCommentId: highlightRaw } = await searchParams;

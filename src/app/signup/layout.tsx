@@ -13,7 +13,7 @@ export default async function SignupLayout({
     redirect('/login');
   }
 
-  if (session.user.user_id) {
+  if (session.user.id) {
     redirect('/');
   }
 

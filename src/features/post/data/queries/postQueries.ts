@@ -75,7 +75,7 @@ export async function fetchPostsOwnership(postIds: string[]) {
   return await db
     .select({
       id: posts.id,
-      user_id: posts.userId,
+      userId: posts.userId,
     })
     .from(posts)
     .where(inArray(posts.id, postIds));

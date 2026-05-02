@@ -12,7 +12,7 @@ export default async function SearchResultPage({
 }) {
   const session = await auth();
   const userId =
-    session?.user?.user_id ?? (await cookies()).get('userId')?.value;
+    session?.user?.id ?? (await cookies()).get('userId')?.value;
 
   const { q } = await searchParams;
 

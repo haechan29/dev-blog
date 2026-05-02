@@ -14,7 +14,7 @@ export default async function PostsPage({
 
   const session = await auth();
   const currentUserId =
-    session?.user?.user_id ?? (await cookies()).get('userId')?.value;
+    session?.user?.id ?? (await cookies()).get('userId')?.value;
 
   const [posts, creator] = await Promise.all([
     PostServerRepository.getPostsByUserId(userId).then(posts =>

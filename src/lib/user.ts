@@ -4,5 +4,5 @@ import 'server-only';
 
 export async function getUserId() {
   const session = await auth();
-  return session?.user?.user_id ?? (await cookies()).get('userId')?.value;
+  return session?.user?.id ?? (await cookies()).get('userId')?.value;
 }

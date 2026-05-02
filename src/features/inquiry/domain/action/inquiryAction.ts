@@ -17,7 +17,7 @@ export async function createAdminInquiryMessageAction({
   await assertAdmin();
 
   const session = await auth();
-  const adminId = session?.user?.user_id;
+  const adminId = session?.user?.id;
   if (!adminId) {
     throw new UnauthorizedError('인증되지 않은 요청입니다');
   }
