@@ -18,6 +18,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientSecret: process.env.KAKAO_CLIENT_SECRET || '',
     }),
   ],
+  callbacks: {
+    async session({ session, user }) {
+      session.user.nickname = user.nickname;
+      session.user.createdAt = user.createdAt;
+      session.user.updatedAt = user.updatedAt;
+      session.user.deletedAt = user.deletedAt;
+      session.user.registeredAt = user.registeredAt;
+      session.user.profileImageUrl = user.profileImageUrl;
+      session.user.bio = user.bio;
+      session.user.subscriberCount = user.subscriberCount;
+      return session;
+    },
+  },
   pages: {
     signIn: '/login',
     newUser: '/signup',
