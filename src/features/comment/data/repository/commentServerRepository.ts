@@ -12,7 +12,7 @@ export async function getRankedComments({
   postId: string;
   userId?: string;
   timestamp: string;
-  highlightCommentId?: number;
+  highlightCommentId?: string;
 }): Promise<{
   comments: CommentResponseDto[];
   nextCursor: CommentCursor | null;

@@ -1,5 +1,5 @@
 import { ApiError, NotFoundError } from '@/errors/errors';
-import { supabase } from '@/lib/supabase';
+import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -10,25 +10,17 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const { data: creator, error } = await supabase
-      .from('creators')
-      .select('user_id, users(nickname)')
-      .eq('id', id)
-      .maybeSingle();
-
-    if (error) {
-      throw new Error(error.message);
-    }
+    const creator = await CreatorQueries.fetchCreator(id);
 
     if (!creator) {
       throw new NotFoundError('크리에이터를 찾을 수 없습니다');
     }
 
-    if (!creator.user_id) {
+    if (!creator.userId) {
       throw new NotFoundError('연결된 유저를 찾을 수 없습니다');
     }
 
-    const userId = creator.user_id;
+    const userId = creator.userId;
 
     const cookieStore = await cookies();
     cookieStore.set('userId', userId, {

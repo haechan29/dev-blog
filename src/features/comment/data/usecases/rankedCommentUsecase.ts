@@ -21,8 +21,8 @@ export async function getRankedComments({
   userId?: string;
   timestamp?: string;
   cursorScore?: number;
-  cursorId?: number;
-  highlightCommentId?: number;
+  cursorId?: string;
+  highlightCommentId?: string;
 }): Promise<{
   comments: CommentResponseDto[];
   nextCursor: CommentCursor | null;

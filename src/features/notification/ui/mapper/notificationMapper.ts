@@ -14,7 +14,7 @@ function toPostUrl({
   highlightCommentId,
 }: {
   postId: string | null;
-  highlightCommentId?: number | null;
+  highlightCommentId?: string | null;
 }) {
   if (!postId) {
     return null;
@@ -22,7 +22,7 @@ function toPostUrl({
 
   const params = new URLSearchParams();
   if (highlightCommentId != null) {
-    params.set('highlightCommentId', highlightCommentId.toString());
+    params.set('highlightCommentId', highlightCommentId);
   }
   const qs = params.toString();
   return qs ? `/read/${postId}?${qs}` : `/read/${postId}`;

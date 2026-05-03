@@ -5,9 +5,9 @@ config({ path: '.env.local' });
 export default defineConfig({
   schema: './src/db/schema.ts',
   out: './drizzle',
-  schemaFilter: ['public', 'next_auth'],
+  schemaFilter: ['public'],
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL!,
+    url: process.env.DIRECT_DATABASE_URL!,
   },
 });

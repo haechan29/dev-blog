@@ -34,7 +34,7 @@ export default function CommentContentSection({
   isLoggedIn: boolean;
   isEditing: boolean;
   setIsEditing: (isEditing: boolean) => void;
-  highlightCommentId?: number;
+  highlightCommentId?: string;
 }) {
   const queryClient = useQueryClient();
 
@@ -56,7 +56,7 @@ export default function CommentContentSection({
   const updateCommentMutation = useMutation({
     mutationFn: (params: {
       postId: string;
-      commentId: number;
+      commentId: string;
       content: string;
       password?: string;
     }) => CommentClientRepository.updateComment(params),
@@ -104,7 +104,7 @@ export default function CommentContentSection({
   const updateComment = useCallback(
     (params: {
       postId: string;
-      commentId: number;
+      commentId: string;
       content: string;
       password?: string;
     }) => {

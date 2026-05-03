@@ -18,13 +18,10 @@ export default async function PostPage({
   searchParams: Promise<{ highlightCommentId?: string }>;
 }) {
   const session = await auth();
-  const userId =
-    session?.user?.user_id ?? (await cookies()).get('userId')?.value;
+  const userId = session?.user?.id ?? (await cookies()).get('userId')?.value;
 
   const { postId } = await params;
-  const { highlightCommentId: highlightRaw } = await searchParams;
-  const highlightCommentId =
-    highlightRaw !== undefined ? parseInt(highlightRaw) : undefined;
+  const { highlightCommentId } = await searchParams;
   const timestamp = new Date().toISOString();
 
   try {

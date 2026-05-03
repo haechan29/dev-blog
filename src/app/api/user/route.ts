@@ -3,7 +3,6 @@ import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as UserQueries from '@/features/user/data/queries/userQueries';
 import * as UserUsecase from '@/features/user/data/usecases/userUsecase';
 import { getUserId } from '@/lib/user';
-import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import 'server-only';
 
@@ -31,10 +30,9 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const userId = (await cookies()).get('userId')?.value;
-    const userIdFromSession = (await auth())?.user?.id;
+    const userId = (await auth())?.user?.id;
 
-    if (!userId || !userIdFromSession) {
+    if (!userId) {
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 
@@ -52,7 +50,6 @@ export async function PATCH(request: NextRequest) {
 
     await UserQueries.updateUser({
       userId,
-      userIdFromSession,
       nickname,
       registeredAt: now,
       deletedAt: null,
@@ -76,16 +73,13 @@ export async function PATCH(request: NextRequest) {
 export async function DELETE() {
   try {
     const session = await auth();
-    const userIdFromSession = session?.user?.user_id;
+    const userIdFromSession = session?.user?.id;
 
     if (!userIdFromSession) {
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 
-    await Promise.all([
-      UserUsecase.softDeleteUser(userIdFromSession),
-      UserQueries.deleteUserFromAuth(userIdFromSession),
-    ]);
+    await UserUsecase.softDeleteUser(userIdFromSession);
 
     return NextResponse.json({ data: null });
   } catch (error) {

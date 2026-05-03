@@ -135,7 +135,7 @@ export async function upsertUnreadCommentNotification({
   postId: string;
   authorId: string;
   commentUserId: string;
-  representativeCommentId: number;
+  representativeCommentId: string;
 }) {
   if (authorId === commentUserId) {
     return;
@@ -184,7 +184,7 @@ export async function insertMilestoneNotification({
     | 'comment_like_milestone'
     | 'subscriber_milestone';
   postId: string | null;
-  commentId: number | null;
+  commentId: string | null;
   milestoneValue: number;
 }) {
   try {

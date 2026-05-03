@@ -32,8 +32,8 @@ export default function DeleteCommentDialog({
 }: {
   isLoggedIn: boolean;
   postId: string;
-  commentId: number;
-  highlightCommentId?: number;
+  commentId: string;
+  highlightCommentId?: string;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }) {
@@ -49,7 +49,7 @@ export default function DeleteCommentDialog({
       password,
     }: {
       postId: string;
-      commentId: number;
+      commentId: string;
       password?: string;
     }) => CommentClientRepository.deleteComment(postId, commentId, password),
     onSuccess: (_, variables) => {
@@ -88,7 +88,7 @@ export default function DeleteCommentDialog({
   }, [isOpen]);
 
   const deleteComment = useCallback(
-    (params: { postId: string; commentId: number; password?: string }) => {
+    (params: { postId: string; commentId: string; password?: string }) => {
       deleteCommentMutation.mutate(params, {
         onSuccess: () => {
           setIsOpen(false);

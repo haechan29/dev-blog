@@ -21,7 +21,7 @@ export default function CommentSettingsDropdown({
 }: {
   isLoggedIn: boolean;
   comment: CommentItemProps;
-  highlightCommentId?: number;
+  highlightCommentId?: string;
   onEdit: () => void;
   children: React.ReactNode;
 }) {

@@ -177,7 +177,7 @@ export async function PATCH(request: NextRequest) {
       throw new ValidationError('일부 게시글을 찾을 수 없습니다');
     }
 
-    if (existingPosts.some(post => post.user_id !== userId)) {
+    if (existingPosts.some(post => post.userId !== userId)) {
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 

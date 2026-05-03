@@ -11,7 +11,7 @@ export async function getRankedComments({
   postId: string;
   timestamp: string;
   cursor: CommentCursor | null;
-  highlightCommentId?: number;
+  highlightCommentId?: string;
 }): Promise<{
   comments: CommentResponseDto[];
   nextCursor: CommentCursor | null;
@@ -21,7 +21,7 @@ export async function getRankedComments({
     params.set('cursorScore', String(cursor.score));
     params.set('cursorId', cursor.id);
   } else if (highlightCommentId !== undefined) {
-    params.set('highlightCommentId', String(highlightCommentId));
+    params.set('highlightCommentId', highlightCommentId);
   }
 
   const response = await api.get(
@@ -48,7 +48,7 @@ export async function updateComment({
   ...requestBody
 }: {
   postId: string;
-  commentId: number;
+  commentId: string;
   content: string;
   password?: string;
 }): Promise<CommentResponseDto> {
@@ -61,7 +61,7 @@ export async function updateComment({
 
 export async function deleteComment(
   postId: string,
-  commentId: number,
+  commentId: string,
   password?: string
 ): Promise<void> {
   await api.delete(`/api/posts/${postId}/comments/${commentId}`, {
@@ -73,7 +73,7 @@ export async function deleteComment(
 
 export async function incrementLikeCount(
   postId: string,
-  commentId: number
+  commentId: string
 ): Promise<CommentResponseDto> {
   const response = await api.post(
     `/api/posts/${postId}/comments/${commentId}/likeCount/increment`
@@ -83,7 +83,7 @@ export async function incrementLikeCount(
 
 export async function decrementLikeCount(
   postId: string,
-  commentId: number
+  commentId: string
 ): Promise<CommentResponseDto> {
   const response = await api.post(
     `/api/posts/${postId}/comments/${commentId}/likeCount/decrement`

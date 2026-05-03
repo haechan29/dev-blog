@@ -10,7 +10,7 @@ export default async function HomeLayout({
 }) {
   const session = await auth();
   const userId =
-    session?.user?.user_id ?? (await cookies()).get('userId')?.value;
+    session?.user?.id ?? (await cookies()).get('userId')?.value;
 
   return (
     <HomeLayoutClient isLoggedIn={!!session} userId={userId}>

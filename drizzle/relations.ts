@@ -1,4 +1,5 @@
 import {
+  accounts,
   comments,
   creators,
   drafts,
@@ -16,6 +17,7 @@ import {
   postsV2,
   postViews,
   series,
+  sessions,
   subscriptions,
   users,
   usersV2,
@@ -75,6 +77,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   inquiryThreads: many(inquiryThreads),
   postsV2s: many(postsV2),
   mediaV2s: many(mediaV2),
+  sessions: many(sessions),
   subscriptions_followerId: many(subscriptions, {
     relationName: 'subscriptions_followerId_users_id',
   }),
@@ -83,6 +86,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   }),
   postLikes: many(postLikes),
   postSkips: many(postSkips),
+  accounts: many(accounts),
 }));
 
 export const seriesRelations = relations(series, ({ one, many }) => ({
@@ -236,6 +240,13 @@ export const usersV2Relations = relations(usersV2, ({ one }) => ({
   }),
 }));
 
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, {
+    fields: [sessions.userId],
+    references: [users.id],
+  }),
+}));
+
 export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
   user_followerId: one(users, {
     fields: [subscriptions.followerId],
@@ -267,6 +278,13 @@ export const postSkipsRelations = relations(postSkips, ({ one }) => ({
   }),
   user: one(users, {
     fields: [postSkips.userId],
+    references: [users.id],
+  }),
+}));
+
+export const accountsRelations = relations(accounts, ({ one }) => ({
+  user: one(users, {
+    fields: [accounts.userId],
     references: [users.id],
   }),
 }));

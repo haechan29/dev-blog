@@ -26,7 +26,7 @@ const COMMENT_SELECT_FIELDS = {
   user: COMMENT_USER_FIELDS,
 } as const;
 
-export async function fetchComment(commentId: number) {
+export async function fetchComment(commentId: string) {
   const data = await db
     .select(COMMENT_SELECT_FIELDS)
     .from(comments)
@@ -41,7 +41,7 @@ export async function fetchComment(commentId: number) {
   return data[0];
 }
 
-export async function fetchCommentForAuth(commentId: number) {
+export async function fetchCommentForAuth(commentId: string) {
   const data = await db
     .select({
       userId: comments.userId,
@@ -86,7 +86,7 @@ export async function updateComment({
   content,
   likeCount,
 }: {
-  commentId: number;
+  commentId: string;
   content?: string;
   likeCount?: number;
 }) {
@@ -109,6 +109,6 @@ export async function updateComment({
   return await fetchComment(comment.id);
 }
 
-export async function deleteComment(commentId: number) {
+export async function deleteComment(commentId: string) {
   await db.delete(comments).where(eq(comments.id, commentId));
 }

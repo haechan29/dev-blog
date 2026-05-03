@@ -1,5 +1,7 @@
 import { ValidationError } from '@/errors/errors';
 import * as UserQueries from '@/features/user/data/queries/userQueries';
+import { AdapterUser } from 'next-auth/adapters';
+import { cookies } from 'next/headers';
 import 'server-only';
 
 export async function incrementSubscriberCount(
@@ -29,11 +31,39 @@ export async function decrementSubscriberCount(userId: string) {
 }
 
 export async function softDeleteUser(userIdFromSession: string) {
-  const now = new Date().toISOString();
+  await UserQueries.softDeleteUser(userIdFromSession);
+}
+
+export async function mergeAnonymousUser(
+  user: AdapterUser,
+  onCreateUser: (user: AdapterUser) => Promise<AdapterUser>
+) {
+  const cookieStore = await cookies();
+  const userIdFromCookie = cookieStore.get('userId')?.value;
+  if (!userIdFromCookie) {
+    return await onCreateUser(user);
+  }
+
+  const authInfo = await UserQueries.fetchUserAuthInfo(userIdFromCookie);
+  if (!authInfo) {
+    return await onCreateUser(user);
+  } else if (authInfo.email || authInfo.emailVerified) {
+    throw new Error('이미 인증된 사용자입니다');
+  }
 
   await UserQueries.updateUser({
-    userId: userIdFromSession,
-    nickname: null,
-    deletedAt: now,
+    userId: userIdFromCookie,
+    name: user.name,
+    email: user.email,
+    emailVerified: user.emailVerified ?? null,
   });
+
+  cookieStore.delete('userId');
+
+  return {
+    id: userIdFromCookie,
+    name: user.name,
+    email: user.email,
+    emailVerified: user.emailVerified,
+  };
 }

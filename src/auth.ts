@@ -1,13 +1,14 @@
-import { SupabaseAdapter } from '@auth/supabase-adapter';
+import { db } from '@/db/index';
+import { accounts, sessions, users, verificationTokens } from '@/db/schema';
+import * as UserUsecase from '@/features/user/data/usecases/userUsecase';
+import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import NextAuth from 'next-auth';
+import { Adapter, AdapterUser } from 'next-auth/adapters';
 import Google from 'next-auth/providers/google';
 import Kakao from 'next-auth/providers/kakao';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: SupabaseAdapter({
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  }),
+  adapter: createMergeAnonymousAdapter(),
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID || '',
@@ -18,8 +19,38 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientSecret: process.env.KAKAO_CLIENT_SECRET || '',
     }),
   ],
+  callbacks: {
+    async session({ session, user }) {
+      session.user.nickname = user.nickname;
+      session.user.createdAt = user.createdAt;
+      session.user.updatedAt = user.updatedAt;
+      session.user.deletedAt = user.deletedAt;
+      session.user.registeredAt = user.registeredAt;
+      session.user.profileImageUrl = user.profileImageUrl;
+      session.user.bio = user.bio;
+      session.user.subscriberCount = user.subscriberCount;
+      return session;
+    },
+  },
   pages: {
     signIn: '/login',
     newUser: '/signup',
   },
 });
+
+export function createMergeAnonymousAdapter(): Adapter {
+  const base = DrizzleAdapter(db, {
+    usersTable: users,
+    sessionsTable: sessions,
+    accountsTable: accounts,
+    verificationTokensTable: verificationTokens,
+  });
+  return {
+    ...base,
+    async createUser(user: AdapterUser) {
+      return UserUsecase.mergeAnonymousUser(user, u =>
+        Promise.resolve(base.createUser!(u))
+      );
+    },
+  };
+}

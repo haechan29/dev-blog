@@ -16,18 +16,13 @@ export async function POST(
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 
-    const { postId, commentId: commentIdParam } = await params;
-
-    const commentIdNum = Number(commentIdParam);
-    if (!Number.isInteger(commentIdNum)) {
-      throw new ValidationError('유효하지 않은 댓글 ID입니다');
-    }
+    const { postId, commentId } = await params;
 
     const {
       postId: commentPostId,
       userId: commentUserId,
       likeCount,
-    } = await CommentQueries.fetchComment(commentIdNum);
+    } = await CommentQueries.fetchComment(commentId);
 
     if (commentPostId !== postId) {
       throw new ValidationError('댓글이 속한 게시글이 일치하지 않습니다');
@@ -36,7 +31,7 @@ export async function POST(
     const newLikeCount = likeCount + 1;
 
     const updated = await CommentQueries.updateComment({
-      commentId: commentIdNum,
+      commentId,
       likeCount: newLikeCount,
     });
 
@@ -45,7 +40,7 @@ export async function POST(
         postId,
         likeUserId: userId,
         commentUserId,
-        commentId: commentIdNum,
+        commentId,
         milestoneValue: newLikeCount,
       });
     } catch (error) {

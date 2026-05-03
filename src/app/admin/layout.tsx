@@ -8,7 +8,7 @@ export default async function AdminLayout({
   children: ReactNode;
 }) {
   const session = await auth();
-  const isAdmin = session?.user?.user_id === process.env.ADMIN_USER_ID;
+  const isAdmin = session?.user?.id === process.env.ADMIN_USER_ID;
 
   if (!isAdmin) {
     notFound();

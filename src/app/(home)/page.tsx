@@ -7,7 +7,7 @@ import { cookies } from 'next/headers';
 export default async function HomePage() {
   const session = await auth();
   const userId =
-    session?.user?.user_id ?? (await cookies()).get('userId')?.value;
+    session?.user?.id ?? (await cookies()).get('userId')?.value;
 
   const { posts, nextCursor } = await PostServerRepository.getFeedPosts({
     cursor: null,

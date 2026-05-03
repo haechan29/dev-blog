@@ -20,7 +20,7 @@ export default function CommentLikeButton({
   highlightCommentId,
 }: {
   comment: CommentItemProps;
-  highlightCommentId?: number;
+  highlightCommentId?: string;
 }) {
   const queryClient = useQueryClient();
   const [isLiked, setIsLiked] = useLocalStorage(

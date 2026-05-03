@@ -11,6 +11,6 @@ export async function assertAdmin() {
 
 export async function checkAdmin() {
   const session = await auth();
-  const userId = session?.user?.user_id;
+  const userId = session?.user?.id;
   return userId === process.env.ADMIN_USER_ID;
 }

@@ -49,7 +49,7 @@ export default function Comments({
   initialCommentsPage: CommentsPage;
   initialTimestamp: string;
   commentCount: number;
-  highlightCommentId?: number;
+  highlightCommentId?: string;
 }) {
   const queryClient = useQueryClient();
 
@@ -99,7 +99,7 @@ export default function Comments({
   const comments = useMemo(() => {
     const flat = pages.flatMap(page => page.comments);
     if (highlightCommentId == null) return flat;
-    const seen = new Set<number>();
+    const seen = new Set<string>();
     return flat.filter(c => {
       if (seen.has(c.id)) return false;
       seen.add(c.id);
