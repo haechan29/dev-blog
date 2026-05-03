@@ -36,11 +36,11 @@ export const comments = pgTable(
   table => [
     index('idx_comments_post_id').using(
       'btree',
-      table.postId.asc().nullsLast().op('uuid_ops')
+      table.postId.asc().nullsLast()
     ),
     index('idx_comments_user_id').using(
       'btree',
-      table.userId.asc().nullsLast().op('uuid_ops')
+      table.userId.asc().nullsLast()
     ),
     foreignKey({
       columns: [table.postId],
@@ -81,7 +81,7 @@ export const series = pgTable(
   table => [
     index('idx_series_user_id').using(
       'btree',
-      table.userId.asc().nullsLast().op('uuid_ops')
+      table.userId.asc().nullsLast()
     ),
     foreignKey({
       columns: [table.userId],
@@ -150,10 +150,10 @@ export const users = pgTable(
   },
   table => [
     uniqueIndex('users_email_unique')
-      .using('btree', table.email.asc().nullsLast().op('text_ops'))
+      .using('btree', table.email.asc().nullsLast())
       .where(sql`(email IS NOT NULL)`),
     uniqueIndex('users_nickname_unique')
-      .using('btree', table.nickname.asc().nullsLast().op('text_ops'))
+      .using('btree', table.nickname.asc().nullsLast())
       .where(sql`(deleted_at IS NULL)`),
     pgPolicy('Block all access', {
       as: 'permissive',
@@ -225,31 +225,31 @@ export const notifications = pgTable(
     uniqueIndex('idx_notifications_comment_milestone_unique')
       .using(
         'btree',
-        table.commentId.asc().nullsLast().op('int4_ops'),
-        table.type.asc().nullsLast().op('text_ops'),
-        table.milestoneValue.asc().nullsLast().op('uuid_ops')
+        table.commentId.asc().nullsLast(),
+        table.type.asc().nullsLast(),
+        table.milestoneValue.asc().nullsLast()
       )
       .where(sql`(type = 'comment_like_milestone'::text)`),
     uniqueIndex('idx_notifications_comment_upsert')
       .using(
         'btree',
-        table.postId.asc().nullsLast().op('uuid_ops'),
-        table.type.asc().nullsLast().op('uuid_ops')
+        table.postId.asc().nullsLast(),
+        table.type.asc().nullsLast()
       )
       .where(sql`((type = 'comment'::text) AND (is_read = false))`),
     uniqueIndex('idx_notifications_inquiry_reply_upsert')
       .using(
         'btree',
-        table.inquiryThreadId.asc().nullsLast().op('text_ops'),
-        table.type.asc().nullsLast().op('uuid_ops')
+        table.inquiryThreadId.asc().nullsLast(),
+        table.type.asc().nullsLast()
       )
       .where(sql`((type = 'inquiry_reply'::text) AND (is_read = false))`),
     uniqueIndex('idx_notifications_post_milestone_unique')
       .using(
         'btree',
-        table.postId.asc().nullsLast().op('text_ops'),
-        table.type.asc().nullsLast().op('text_ops'),
-        table.milestoneValue.asc().nullsLast().op('uuid_ops')
+        table.postId.asc().nullsLast(),
+        table.type.asc().nullsLast(),
+        table.milestoneValue.asc().nullsLast()
       )
       .where(
         sql`(type = ANY (ARRAY['post_view_milestone'::text, 'post_like_milestone'::text]))`
@@ -257,19 +257,19 @@ export const notifications = pgTable(
     uniqueIndex('idx_notifications_subscriber_milestone_unique')
       .using(
         'btree',
-        table.userId.asc().nullsLast().op('int4_ops'),
-        table.type.asc().nullsLast().op('text_ops'),
-        table.milestoneValue.asc().nullsLast().op('uuid_ops')
+        table.userId.asc().nullsLast(),
+        table.type.asc().nullsLast(),
+        table.milestoneValue.asc().nullsLast()
       )
       .where(sql`(type = 'subscriber_milestone'::text)`),
     index('idx_notifications_user_unread')
-      .using('btree', table.userId.asc().nullsLast().op('uuid_ops'))
+      .using('btree', table.userId.asc().nullsLast())
       .where(sql`(is_read = false)`),
     index('idx_notifications_user_updated').using(
       'btree',
-      table.userId.asc().nullsLast().op('uuid_ops'),
-      table.updatedAt.desc().nullsFirst().op('timestamptz_ops'),
-      table.id.desc().nullsFirst().op('uuid_ops')
+      table.userId.asc().nullsLast(),
+      table.updatedAt.desc().nullsFirst(),
+      table.id.desc().nullsFirst()
     ),
     foreignKey({
       columns: [table.commentId],
@@ -392,16 +392,16 @@ export const posts = pgTable(
   table => [
     index('idx_posts_created_at').using(
       'btree',
-      table.createdAt.desc().nullsFirst().op('timestamptz_ops')
+      table.createdAt.desc().nullsFirst()
     ),
     index('idx_posts_series_id').using(
       'btree',
-      table.seriesId.asc().nullsLast().op('uuid_ops')
+      table.seriesId.asc().nullsLast()
     ),
     index('idx_posts_series_order').using(
       'btree',
-      table.seriesId.asc().nullsLast().op('int4_ops'),
-      table.seriesOrder.asc().nullsLast().op('int4_ops')
+      table.seriesId.asc().nullsLast(),
+      table.seriesOrder.asc().nullsLast()
     ),
     index('idx_posts_tags').using(
       'gin',
@@ -417,11 +417,11 @@ export const posts = pgTable(
     ),
     index('idx_posts_user_id').using(
       'btree',
-      table.userId.asc().nullsLast().op('uuid_ops')
+      table.userId.asc().nullsLast()
     ),
     index('idx_posts_visibility').using(
       'btree',
-      table.visibility.asc().nullsLast().op('text_ops')
+      table.visibility.asc().nullsLast()
     ),
     foreignKey({
       columns: [table.seriesId],
@@ -464,7 +464,7 @@ export const postStats = pgTable(
   table => [
     index('idx_post_stats_popularity').using(
       'btree',
-      table.popularity.desc().nullsFirst().op('numeric_ops')
+      table.popularity.desc().nullsFirst()
     ),
     foreignKey({
       columns: [table.postId],
@@ -497,12 +497,12 @@ export const postViews = pgTable(
   table => [
     index('idx_post_views_post_id').using(
       'btree',
-      table.postId.asc().nullsLast().op('uuid_ops')
+      table.postId.asc().nullsLast()
     ),
     index('idx_post_views_user_id').using(
       'btree',
-      table.userId.asc().nullsLast().op('timestamptz_ops'),
-      table.createdAt.desc().nullsFirst().op('timestamptz_ops')
+      table.userId.asc().nullsLast(),
+      table.createdAt.desc().nullsFirst()
     ),
     foreignKey({
       columns: [table.postId],
@@ -572,7 +572,7 @@ export const drafts = pgTable(
   table => [
     index('idx_post_drafts_user_id').using(
       'btree',
-      table.userId.asc().nullsLast().op('uuid_ops')
+      table.userId.asc().nullsLast()
     ),
     foreignKey({
       columns: [table.postId],
@@ -612,7 +612,7 @@ export const media = pgTable(
   table => [
     index('idx_media_user_id').using(
       'btree',
-      table.userId.asc().nullsLast().op('uuid_ops')
+      table.userId.asc().nullsLast()
     ),
     foreignKey({
       columns: [table.userId],
@@ -649,7 +649,7 @@ export const creators = pgTable(
   },
   table => [
     index('creators_user_id_idx')
-      .using('btree', table.userId.asc().nullsLast().op('uuid_ops'))
+      .using('btree', table.userId.asc().nullsLast())
       .where(sql`(user_id IS NOT NULL)`),
     foreignKey({
       columns: [table.userId],
@@ -683,8 +683,8 @@ export const inquiryMessages = pgTable(
   table => [
     index('idx_inquiry_messages_thread').using(
       'btree',
-      table.threadId.asc().nullsLast().op('timestamptz_ops'),
-      table.createdAt.asc().nullsLast().op('timestamptz_ops')
+      table.threadId.asc().nullsLast(),
+      table.createdAt.asc().nullsLast()
     ),
     foreignKey({
       columns: [table.senderId],
@@ -744,13 +744,13 @@ export const inquiryThreads = pgTable(
     index('idx_inquiry_threads_auto_close')
       .using(
         'btree',
-        table.statusChangedAt.asc().nullsLast().op('timestamptz_ops')
+        table.statusChangedAt.asc().nullsLast()
       )
       .where(sql`((status = 'ANSWERED'::text) AND (is_deleted = false))`),
     index('idx_inquiry_threads_user').using(
       'btree',
-      table.userId.asc().nullsLast().op('timestamptz_ops'),
-      table.updatedAt.desc().nullsFirst().op('timestamptz_ops')
+      table.userId.asc().nullsLast(),
+      table.updatedAt.desc().nullsFirst()
     ),
     foreignKey({
       columns: [table.userId],
@@ -797,11 +797,11 @@ export const postsV2 = pgTable(
   table => [
     index('posts_v2_author_id_idx').using(
       'btree',
-      table.userId.asc().nullsLast().op('uuid_ops')
+      table.userId.asc().nullsLast()
     ),
     index('posts_v2_created_at_idx').using(
       'btree',
-      table.createdAt.desc().nullsFirst().op('timestamptz_ops')
+      table.createdAt.desc().nullsFirst()
     ),
     index('posts_v2_immutable_array_to_string_idx').using(
       'gin',
@@ -809,12 +809,12 @@ export const postsV2 = pgTable(
     ),
     index('posts_v2_series_id_idx').using(
       'btree',
-      table.seriesId.asc().nullsLast().op('uuid_ops')
+      table.seriesId.asc().nullsLast()
     ),
     index('posts_v2_series_id_series_order_idx').using(
       'btree',
-      table.seriesId.asc().nullsLast().op('int4_ops'),
-      table.seriesOrder.asc().nullsLast().op('int4_ops')
+      table.seriesId.asc().nullsLast(),
+      table.seriesOrder.asc().nullsLast()
     ),
     index('posts_v2_tags_idx').using(
       'gin',
@@ -826,7 +826,7 @@ export const postsV2 = pgTable(
     ),
     index('posts_v2_visibility_idx').using(
       'btree',
-      table.visibility.asc().nullsLast().op('text_ops')
+      table.visibility.asc().nullsLast()
     ),
     foreignKey({
       columns: [table.seriesId],
@@ -874,16 +874,16 @@ export const mediaVariants = pgTable(
   table => [
     index('idx_media_variants_media_id').using(
       'btree',
-      table.mediaId.asc().nullsLast().op('uuid_ops')
+      table.mediaId.asc().nullsLast()
     ),
     uniqueIndex('media_variants_audio_unique')
-      .using('btree', table.mediaId.asc().nullsLast().op('uuid_ops'))
+      .using('btree', table.mediaId.asc().nullsLast())
       .where(sql`(type = 'audio'::text)`),
     uniqueIndex('media_variants_image_unique')
       .using(
         'btree',
-        table.mediaId.asc().nullsLast().op('uuid_ops'),
-        table.variant.asc().nullsLast().op('text_ops')
+        table.mediaId.asc().nullsLast(),
+        table.variant.asc().nullsLast()
       )
       .where(sql`(type = 'image'::text)`),
     foreignKey({
@@ -921,7 +921,7 @@ export const mediaV2 = pgTable(
   table => [
     index('media_v2_user_id_idx').using(
       'btree',
-      table.userId.asc().nullsLast().op('uuid_ops')
+      table.userId.asc().nullsLast()
     ),
     foreignKey({
       columns: [table.userId],
@@ -963,7 +963,7 @@ export const usersV2 = pgTable(
   },
   table => [
     uniqueIndex('users_v2_nickname_idx')
-      .using('btree', table.nickname.asc().nullsLast().op('text_ops'))
+      .using('btree', table.nickname.asc().nullsLast())
       .where(sql`(deleted_at IS NULL)`),
     foreignKey({
       columns: [table.profileImageId],
@@ -999,7 +999,7 @@ export const sessions = pgTable(
   table => [
     index('sessions_user_id_idx').using(
       'btree',
-      table.userId.asc().nullsLast().op('uuid_ops')
+      table.userId.asc().nullsLast()
     ),
     foreignKey({
       columns: [table.userId],
@@ -1028,7 +1028,7 @@ export const subscriptions = pgTable(
   table => [
     index('idx_subscriptions_following').using(
       'btree',
-      table.followingId.asc().nullsLast().op('uuid_ops')
+      table.followingId.asc().nullsLast()
     ),
     foreignKey({
       columns: [table.followerId],
@@ -1172,7 +1172,7 @@ export const accounts = pgTable(
   table => [
     index('accounts_user_id_idx').using(
       'btree',
-      table.userId.asc().nullsLast().op('uuid_ops')
+      table.userId.asc().nullsLast()
     ),
     foreignKey({
       columns: [table.userId],

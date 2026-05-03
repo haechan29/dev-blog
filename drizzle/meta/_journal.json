@@ -8,6 +8,13 @@
       "when": 1777784784842,
       "tag": "0000_lucky_moon_knight",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777787336675,
+      "tag": "0001_mushy_kate_bishop",
+      "breakpoints": true
     }
   ]
 }
