@@ -18,7 +18,7 @@ export default function CommentItem({
   isLoggedIn: boolean;
   userId?: string;
   comment: CommentItemProps;
-  highlightCommentId?: number;
+  highlightCommentId?: string;
 }) {
   const [isEditing, setIsEditing] = useState(false);
 

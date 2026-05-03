@@ -47,7 +47,7 @@ export default function PostPageClient({
   initialCommentsPage: CommentsPage;
   initialPostsPage: PostsPage;
   initialTimestamp: string;
-  highlightCommentId?: number;
+  highlightCommentId?: string;
 }) {
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

@@ -7,10 +7,10 @@ export interface NotificationDto {
   isRead: boolean;
   inquiryThreadId: string | null;
   postId: string | null;
-  commentId: number | null;
+  commentId: string | null;
   commentCount: number | null;
   representativeUserId: string | null;
-  representativeCommentId: number | null;
+  representativeCommentId: string | null;
   milestoneValue: number | null;
   createdAt: string;
   updatedAt: string;

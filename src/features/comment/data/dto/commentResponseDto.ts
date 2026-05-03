@@ -1,5 +1,5 @@
 export interface CommentResponseDto {
-  id: number;
+  id: string;
   postId: string;
   content: string;
   createdAt: string;

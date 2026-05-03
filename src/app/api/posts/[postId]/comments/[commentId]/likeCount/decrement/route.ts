@@ -8,15 +8,10 @@ export async function POST(
   { params }: { params: Promise<{ postId: string; commentId: string }> }
 ) {
   try {
-    const { postId, commentId: commentIdParam } = await params;
-
-    const commentIdNum = Number(commentIdParam);
-    if (!Number.isInteger(commentIdNum)) {
-      throw new ValidationError('유효하지 않은 댓글 ID입니다');
-    }
+    const { postId, commentId } = await params;
 
     const { postId: commentPostId, likeCount } =
-      await CommentQueries.fetchComment(commentIdNum);
+      await CommentQueries.fetchComment(commentId);
 
     if (commentPostId !== postId) {
       throw new ValidationError('댓글이 속한 게시글이 일치하지 않습니다');
@@ -25,7 +20,7 @@ export async function POST(
     const newLikeCount = Math.max(0, likeCount - 1);
 
     const updated = await CommentQueries.updateComment({
-      commentId: commentIdNum,
+      commentId,
       likeCount: newLikeCount,
     });
 

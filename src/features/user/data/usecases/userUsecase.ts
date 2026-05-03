@@ -55,7 +55,7 @@ export async function mergeAnonymousUser(
     userId: userIdFromCookie,
     name: user.name,
     email: user.email,
-    emailVerified: user.emailVerified?.toISOString() ?? null,
+    emailVerified: user.emailVerified ?? null,
   });
 
   cookieStore.delete('userId');

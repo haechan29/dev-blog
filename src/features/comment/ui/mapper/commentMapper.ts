@@ -1,7 +1,8 @@
 import { CommentResponseDto } from '@/features/comment/data/dto/commentResponseDto';
+import { CommentItemProps } from '@/features/comment/ui/props/commentItemProps';
 import { toUserNickname } from '@/features/user/ui/userProps';
 
-export function toProps(comment: CommentResponseDto) {
+export function toProps(comment: CommentResponseDto): CommentItemProps {
   return {
     id: comment.id,
     postId: comment.postId,

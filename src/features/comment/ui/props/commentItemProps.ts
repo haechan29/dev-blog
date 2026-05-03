@@ -1,5 +1,5 @@
 export interface CommentItemProps {
-  id: number;
+  id: string;
   postId: string;
   authorName: string;
   profileImageUrl: string | null;

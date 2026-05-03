@@ -33,7 +33,7 @@ export async function fetchRankedComments({
   timestamp?: string;
   limit: number;
   cursorScore?: number;
-  cursorId?: number;
+  cursorId?: string;
 }) {
   const score = sql<number>`
     FLOOR((

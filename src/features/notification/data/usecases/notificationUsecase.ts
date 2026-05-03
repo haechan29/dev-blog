@@ -127,7 +127,7 @@ export async function insertCommentLikeMilestoneNotification({
   postId: string;
   likeUserId: string;
   commentUserId: string;
-  commentId: number;
+  commentId: string;
   milestoneValue: number;
 }) {
   if (commentUserId === likeUserId) {

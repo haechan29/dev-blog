@@ -73,7 +73,7 @@ export async function updateUser({
   deletedAt?: string | null;
   name?: string | null;
   email?: string | null;
-  emailVerified?: string | null;
+  emailVerified?: Date | null;
 }) {
   const updates: Partial<InferInsertModel<typeof users>> = {
     ...(nickname !== undefined && { nickname }),
