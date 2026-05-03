@@ -3,7 +3,6 @@ import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as UserQueries from '@/features/user/data/queries/userQueries';
 import * as UserUsecase from '@/features/user/data/usecases/userUsecase';
 import { getUserId } from '@/lib/user';
-import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import 'server-only';
 
@@ -31,10 +30,9 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const userId = (await cookies()).get('userId')?.value;
-    const userIdFromSession = (await auth())?.user?.id;
+    const userId = (await auth())?.user?.id;
 
-    if (!userId || !userIdFromSession) {
+    if (!userId) {
       throw new UnauthorizedError('인증되지 않은 요청입니다');
     }
 

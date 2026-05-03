@@ -13,7 +13,10 @@ export default async function SignupLayout({
     redirect('/login');
   }
 
-  if (session.user.id) {
+  const hasCompletedSignup =
+    Boolean(session.user.registeredAt) || Boolean(session.user.nickname);
+
+  if (hasCompletedSignup) {
     redirect('/');
   }
 
