@@ -21,7 +21,6 @@ import {
   subscriptions,
   users,
   usersV2,
-  verificationTokens,
 } from '@/db/schema';
 import { relations } from 'drizzle-orm/relations';
 
@@ -60,10 +59,8 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
   postSkips: many(postSkips),
 }));
 
-export const usersRelations = relations(users, ({ one, many }) => ({
-  accounts: many(accounts),
+export const usersRelations = relations(users, ({ many }) => ({
   comments: many(comments),
-  sessions: many(sessions),
   series: many(series),
   notifications_representativeUserId: many(notifications, {
     relationName: 'notifications_representativeUserId_users_id',
@@ -80,6 +77,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   inquiryThreads: many(inquiryThreads),
   postsV2s: many(postsV2),
   mediaV2s: many(mediaV2),
+  sessions: many(sessions),
   subscriptions_followerId: many(subscriptions, {
     relationName: 'subscriptions_followerId_users_id',
   }),
@@ -88,13 +86,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   }),
   postLikes: many(postLikes),
   postSkips: many(postSkips),
-}));
-
-export const accountsRelations = relations(accounts, ({ one }) => ({
-  user: one(users, {
-    fields: [accounts.userId],
-    references: [users.id],
-  }),
+  accounts: many(accounts),
 }));
 
 export const seriesRelations = relations(series, ({ one, many }) => ({
@@ -105,18 +97,6 @@ export const seriesRelations = relations(series, ({ one, many }) => ({
   posts: many(posts),
   postsV2s: many(postsV2),
 }));
-
-export const sessionsRelations = relations(sessions, ({ one }) => ({
-  user: one(users, {
-    fields: [sessions.userId],
-    references: [users.id],
-  }),
-}));
-
-export const verificationTokensRelations = relations(
-  verificationTokens,
-  () => ({})
-);
 
 export const notificationsRelations = relations(notifications, ({ one }) => ({
   comment_commentId: one(comments, {
@@ -260,6 +240,13 @@ export const usersV2Relations = relations(usersV2, ({ one }) => ({
   }),
 }));
 
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, {
+    fields: [sessions.userId],
+    references: [users.id],
+  }),
+}));
+
 export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
   user_followerId: one(users, {
     fields: [subscriptions.followerId],
@@ -291,6 +278,13 @@ export const postSkipsRelations = relations(postSkips, ({ one }) => ({
   }),
   user: one(users, {
     fields: [postSkips.userId],
+    references: [users.id],
+  }),
+}));
+
+export const accountsRelations = relations(accounts, ({ one }) => ({
+  user: one(users, {
+    fields: [accounts.userId],
     references: [users.id],
   }),
 }));

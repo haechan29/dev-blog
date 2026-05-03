@@ -1,6 +1,5 @@
 import { sql } from 'drizzle-orm';
 import {
-  bigint,
   boolean,
   check,
   foreignKey,
@@ -21,15 +20,7 @@ import {
 export const comments = pgTable(
   'comments',
   {
-    // You can use { mode: "bigint" } if numbers are exceeding js number limitations
-    id: bigint({ mode: 'number' }).primaryKey().generatedByDefaultAsIdentity({
-      name: 'comments_id_seq',
-      startWith: 1,
-      increment: 1,
-      minValue: 1,
-      maxValue: 9223372036854775807,
-      cache: 1,
-    }),
+    id: uuid().defaultRandom().primaryKey().notNull(),
     postId: uuid('post_id').notNull(),
     passwordHash: text('password_hash'),
     content: text().notNull(),
@@ -136,18 +127,8 @@ export const users = pgTable(
   'users',
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
-    name: text(),
-    email: text(),
-    emailVerified: timestamp('email_verified', {
-      withTimezone: true,
-      mode: 'string',
-    }),
-    image: text(),
     nickname: text(),
-    createdAt: timestamp('created_at', {
-      withTimezone: true,
-      mode: 'string',
-    })
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
       .defaultNow()
       .notNull(),
     updatedAt: timestamp('updated_at', {
@@ -162,6 +143,10 @@ export const users = pgTable(
     profileImageUrl: text('profile_image_url'),
     bio: text(),
     subscriberCount: integer('subscriber_count').default(0).notNull(),
+    name: text(),
+    email: text(),
+    emailVerified: timestamp('email_verified', { withTimezone: true }),
+    image: text(),
   },
   table => [
     uniqueIndex('users_email_unique')
@@ -184,91 +169,6 @@ export const users = pgTable(
       'users_nickname_length_check',
       sql`(char_length(nickname) >= 1) AND (char_length(nickname) <= 50)`
     ),
-  ]
-);
-
-export const accounts = pgTable(
-  'accounts',
-  {
-    userId: uuid('user_id').notNull(),
-    type: text().notNull(),
-    provider: text().notNull(),
-    providerAccountId: text('provider_account_id').notNull(),
-    refreshToken: text('refresh_token'),
-    accessToken: text('access_token'),
-    expiresAt: integer('expires_at'),
-    tokenType: text('token_type'),
-    scope: text(),
-    idToken: text('id_token'),
-    sessionState: text('session_state'),
-  },
-  table => [
-    index('accounts_user_id_idx').using(
-      'btree',
-      table.userId.asc().nullsLast().op('uuid_ops')
-    ),
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [users.id],
-      name: 'accounts_user_id_fkey',
-    }).onDelete('cascade'),
-    primaryKey({
-      columns: [table.provider, table.providerAccountId],
-      name: 'accounts_pkey',
-    }),
-    pgPolicy('Block all access', {
-      as: 'permissive',
-      for: 'all',
-      to: ['public'],
-      using: sql`false`,
-    }),
-  ]
-);
-
-export const sessions = pgTable(
-  'sessions',
-  {
-    sessionToken: text('session_token').primaryKey().notNull(),
-    userId: uuid('user_id').notNull(),
-    expires: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
-  },
-  table => [
-    index('sessions_user_id_idx').using(
-      'btree',
-      table.userId.asc().nullsLast().op('uuid_ops')
-    ),
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [users.id],
-      name: 'sessions_user_id_fkey',
-    }).onDelete('cascade'),
-    pgPolicy('Block all access', {
-      as: 'permissive',
-      for: 'all',
-      to: ['public'],
-      using: sql`false`,
-    }),
-  ]
-);
-
-export const verificationTokens = pgTable(
-  'verification_tokens',
-  {
-    identifier: text().notNull(),
-    token: text().notNull(),
-    expires: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
-  },
-  table => [
-    primaryKey({
-      columns: [table.identifier, table.token],
-      name: 'verification_tokens_pkey',
-    }),
-    pgPolicy('Block all access', {
-      as: 'permissive',
-      for: 'all',
-      to: ['public'],
-      using: sql`false`,
-    }),
   ]
 );
 
@@ -308,14 +208,10 @@ export const notifications = pgTable(
     type: text().notNull(),
     isRead: boolean('is_read').default(false).notNull(),
     postId: uuid('post_id'),
-    // You can use { mode: "bigint" } if numbers are exceeding js number limitations
-    commentId: bigint('comment_id', { mode: 'number' }),
+    commentId: uuid('comment_id'),
     commentCount: integer('comment_count'),
     representativeUserId: uuid('representative_user_id'),
-    // You can use { mode: "bigint" } if numbers are exceeding js number limitations
-    representativeCommentId: bigint('representative_comment_id', {
-      mode: 'number',
-    }),
+    representativeCommentId: uuid('representative_comment_id'),
     milestoneValue: integer('milestone_value'),
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
       .defaultNow()
@@ -331,7 +227,7 @@ export const notifications = pgTable(
         'btree',
         table.commentId.asc().nullsLast().op('int4_ops'),
         table.type.asc().nullsLast().op('text_ops'),
-        table.milestoneValue.asc().nullsLast().op('int4_ops')
+        table.milestoneValue.asc().nullsLast().op('uuid_ops')
       )
       .where(sql`(type = 'comment_like_milestone'::text)`),
     uniqueIndex('idx_notifications_comment_upsert')
@@ -345,15 +241,15 @@ export const notifications = pgTable(
       .using(
         'btree',
         table.inquiryThreadId.asc().nullsLast().op('text_ops'),
-        table.type.asc().nullsLast().op('text_ops')
+        table.type.asc().nullsLast().op('uuid_ops')
       )
       .where(sql`((type = 'inquiry_reply'::text) AND (is_read = false))`),
     uniqueIndex('idx_notifications_post_milestone_unique')
       .using(
         'btree',
-        table.postId.asc().nullsLast().op('int4_ops'),
+        table.postId.asc().nullsLast().op('text_ops'),
         table.type.asc().nullsLast().op('text_ops'),
-        table.milestoneValue.asc().nullsLast().op('text_ops')
+        table.milestoneValue.asc().nullsLast().op('uuid_ops')
       )
       .where(
         sql`(type = ANY (ARRAY['post_view_milestone'::text, 'post_like_milestone'::text]))`
@@ -361,9 +257,9 @@ export const notifications = pgTable(
     uniqueIndex('idx_notifications_subscriber_milestone_unique')
       .using(
         'btree',
-        table.userId.asc().nullsLast().op('uuid_ops'),
-        table.type.asc().nullsLast().op('uuid_ops'),
-        table.milestoneValue.asc().nullsLast().op('int4_ops')
+        table.userId.asc().nullsLast().op('int4_ops'),
+        table.type.asc().nullsLast().op('text_ops'),
+        table.milestoneValue.asc().nullsLast().op('uuid_ops')
       )
       .where(sql`(type = 'subscriber_milestone'::text)`),
     index('idx_notifications_user_unread')
@@ -577,6 +473,7 @@ export const postStats = pgTable(
     })
       .onUpdate('cascade')
       .onDelete('cascade'),
+    unique('post_stats_post_id_unique').on(table.postId),
     pgPolicy('Block all access', {
       as: 'permissive',
       for: 'all',
@@ -646,7 +543,7 @@ export const gmailTokens = pgTable(
       mode: 'string',
     }).defaultNow(),
   },
-  () => [
+  table => [
     pgPolicy('Block all access', {
       as: 'permissive',
       for: 'all',
@@ -1092,6 +989,32 @@ export const usersV2 = pgTable(
   ]
 );
 
+export const sessions = pgTable(
+  'sessions',
+  {
+    sessionToken: text('session_token').primaryKey().notNull(),
+    userId: uuid('user_id').notNull(),
+    expires: timestamp({ withTimezone: true }).notNull(),
+  },
+  table => [
+    index('sessions_user_id_idx').using(
+      'btree',
+      table.userId.asc().nullsLast().op('uuid_ops')
+    ),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [users.id],
+      name: 'sessions_user_id_fkey',
+    }).onDelete('cascade'),
+    pgPolicy('Block all access', {
+      as: 'permissive',
+      for: 'all',
+      to: ['public'],
+      using: sql`false`,
+    }),
+  ]
+);
+
 export const subscriptions = pgTable(
   'subscriptions',
   {
@@ -1172,6 +1095,27 @@ export const postLikes = pgTable(
   ]
 );
 
+export const verificationTokens = pgTable(
+  'verification_tokens',
+  {
+    identifier: text().notNull(),
+    token: text().notNull(),
+    expires: timestamp({ withTimezone: true }).notNull(),
+  },
+  table => [
+    primaryKey({
+      columns: [table.identifier, table.token],
+      name: 'verification_tokens_pkey',
+    }),
+    pgPolicy('Block all access', {
+      as: 'permissive',
+      for: 'all',
+      to: ['public'],
+      using: sql`false`,
+    }),
+  ]
+);
+
 export const postSkips = pgTable(
   'post_skips',
   {
@@ -1200,6 +1144,44 @@ export const postSkips = pgTable(
     primaryKey({
       columns: [table.userId, table.postId],
       name: 'post_skips_pkey',
+    }),
+    pgPolicy('Block all access', {
+      as: 'permissive',
+      for: 'all',
+      to: ['public'],
+      using: sql`false`,
+    }),
+  ]
+);
+
+export const accounts = pgTable(
+  'accounts',
+  {
+    userId: uuid('user_id').notNull(),
+    type: text().notNull(),
+    provider: text().notNull(),
+    providerAccountId: text('provider_account_id').notNull(),
+    refresh_token: text('refresh_token'),
+    access_token: text('access_token'),
+    expires_at: integer('expires_at'),
+    token_type: text('token_type'),
+    scope: text(),
+    id_token: text('id_token'),
+    session_state: text('session_state'),
+  },
+  table => [
+    index('accounts_user_id_idx').using(
+      'btree',
+      table.userId.asc().nullsLast().op('uuid_ops')
+    ),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [users.id],
+      name: 'accounts_user_id_fkey',
+    }).onDelete('cascade'),
+    primaryKey({
+      columns: [table.provider, table.providerAccountId],
+      name: 'accounts_pkey',
     }),
     pgPolicy('Block all access', {
       as: 'permissive',

@@ -1,4 +1,5 @@
 import { db } from '@/db/index';
+import { accounts, sessions, users, verificationTokens } from '@/db/schema';
 import * as UserUsecase from '@/features/user/data/usecases/userUsecase';
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import NextAuth from 'next-auth';
@@ -38,7 +39,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 });
 
 export function createMergeAnonymousAdapter(): Adapter {
-  const base = DrizzleAdapter(db);
+  const base = DrizzleAdapter(db, {
+    usersTable: users,
+    sessionsTable: sessions,
+    accountsTable: accounts,
+    verificationTokensTable: verificationTokens,
+  });
   return {
     ...base,
     async createUser(user: AdapterUser) {
