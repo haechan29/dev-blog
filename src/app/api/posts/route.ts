@@ -2,7 +2,6 @@ import { auth } from '@/auth';
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries';
 import * as DraftQueries from '@/features/draft/data/queries/draftQueries';
-import { toDto } from '@/features/post/data/mapper/postMapper';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as FeedUsecase from '@/features/post/data/usecases/feedUsecase';
 import * as PostUsecase from '@/features/post/data/usecases/postUsecase';
@@ -107,7 +106,7 @@ export async function POST(request: NextRequest) {
     const contentText = normalizeText(raw);
     const preview = contentText.slice(0, 1000);
 
-    const created = await PostQueries.createPost({
+    const postId = await PostQueries.createPost({
       title,
       contentJson,
       tags,
@@ -117,9 +116,8 @@ export async function POST(request: NextRequest) {
       preview,
       contentText,
     });
-    const post = toDto(created);
 
-    await PostStatQueries.createPostStat(post.id);
+    await PostStatQueries.createPostStat(postId);
 
     if (draftId) {
       try {
@@ -133,7 +131,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ data: post });
+    return NextResponse.json({ data: postId });
   } catch (error) {
     console.error('게시글 생성 요청이 실패했습니다', error);
 

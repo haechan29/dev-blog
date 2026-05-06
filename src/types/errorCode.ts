@@ -8,6 +8,7 @@ export const ErrorCode = {
   RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
   DAILY_QUOTA_EXHAUSTED: 'DAILY_QUOTA_EXHAUSTED',
   EXTERNAL_SERVICE_ERROR: 'EXTERNAL_SERVICE_ERROR',
+  INTERNAL_ERROR: 'INTERNAL_ERROR',
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];

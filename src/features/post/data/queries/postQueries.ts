@@ -1,6 +1,6 @@
 import { db } from '@/db/index';
 import { postStats, posts, series, users } from '@/db/schema';
-import { NotFoundError } from '@/errors/errors';
+import { InternalError, NotFoundError } from '@/errors/errors';
 import { PostEntity } from '@/features/post/data/entities/postEntities';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import { JSONContent } from '@tiptap/core';
@@ -229,10 +229,10 @@ export async function createPost({
     .returning({ id: posts.id });
 
   if (!post) {
-    throw new NotFoundError('게시물을 찾을 수 없습니다');
+    throw new InternalError('게시물 생성에 실패했습니다');
   }
 
-  return await fetchPost(post.id);
+  return post.id;
 }
 
 export async function updatePost({
@@ -277,8 +277,6 @@ export async function updatePost({
   if (!post) {
     throw new NotFoundError('게시물을 찾을 수 없습니다');
   }
-
-  return await fetchPost(post.id);
 }
 
 export async function updatePostsInSeries(

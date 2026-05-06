@@ -2,7 +2,6 @@ import { auth } from '@/auth';
 import { ApiError, UnauthorizedError, ValidationError } from '@/errors/errors';
 import * as CreatorQueries from '@/features/creator/data/queries/creatorQueries';
 import * as DraftQueries from '@/features/draft/data/queries/draftQueries';
-import { toDto } from '@/features/post/data/mapper/postMapper';
 import * as PostQueries from '@/features/post/data/queries/postQueries';
 import * as PostUsecase from '@/features/post/data/usecases/postUsecase';
 import { rendererExtensions } from '@/features/post/domain/lib/extensions';
@@ -87,7 +86,7 @@ export async function PATCH(
     const contentText = raw ? normalizeText(raw) : undefined;
     const preview = contentText ? contentText.slice(0, 1000) : undefined;
 
-    const updated = await PostQueries.updatePost({
+    await PostQueries.updatePost({
       postId,
       title,
       contentJson,
@@ -98,8 +97,6 @@ export async function PATCH(
       preview,
       contentText,
     });
-
-    const post = toDto(updated);
 
     if (draftId) {
       try {
@@ -113,7 +110,7 @@ export async function PATCH(
       }
     }
 
-    return NextResponse.json({ data: post });
+    return NextResponse.json({ data: null });
   } catch (error) {
     console.error('게시글 수정 요청이 실패했습니다', error);
 

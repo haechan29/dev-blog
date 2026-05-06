@@ -16,7 +16,7 @@ import useSaveShortcut from '@/features/draft/hooks/useSaveShortcut';
 import * as PostClientRepository from '@/features/post/data/repository/postClientRepository';
 import { PostVisibility } from '@/features/post/domain/types/postVisibility';
 import useBgmController from '@/features/post/hooks/useBgmController';
-import { createProps, PostProps } from '@/features/post/ui/postProps';
+import { PostProps } from '@/features/post/ui/postProps';
 import useUser from '@/features/user/domain/hooks/useUser';
 import useRouterWithProgress from '@/hooks/useRouterWithProgress';
 import { draftKeys, postKeys } from '@/queries/keys';
@@ -225,7 +225,7 @@ export default function WritePageClient({
         });
         router.push(`/read/${post.id}`);
       } else {
-        const newPost = await PostClientRepository.createPost({
+        const newPostId = await PostClientRepository.createPost({
           title,
           contentJson,
           tags,
@@ -233,11 +233,10 @@ export default function WritePageClient({
           visibility: data.visibility,
           draftId: currentDraftId ?? undefined,
         });
-        const postProps = createProps(newPost);
         queryClient.invalidateQueries({
           queryKey: draftKeys.list(),
         });
-        router.push(`/read/${postProps.id}`);
+        router.push(`/read/${newPostId}`);
       }
     } catch (error) {
       const message =
