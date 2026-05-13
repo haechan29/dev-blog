@@ -18,6 +18,8 @@ export async function fetchSkippedPosts(userId: string) {
 }
 
 export async function incrementPostSkips(userId: string, postIds: string[]) {
+  if (postIds.length === 0) return;
+
   await db
     .insert(postSkips)
     .values(postIds.map(postId => ({ userId, postId, skipCount: 1 })))
